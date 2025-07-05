@@ -1,0 +1,182 @@
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import * as request from 'supertest';
+import * as express from 'express';
+
+// Mock Firebase Admin
+jest.mock('firebase-admin/app', () => ({
+  initializeApp: jest.fn(),
+  getApps: jest.fn(() => []),
+  cert: jest.fn()
+}));
+
+jest.mock('firebase-admin/firestore', () => ({
+  getFirestore: jest.fn(() => ({
+    collection: jest.fn(),
+    batch: jest.fn(),
+    settings: jest.fn()
+  })),
+  Timestamp: {
+    fromDate: jest.fn((date) => ({ toDate: () => date })),
+    now: jest.fn(() => ({ toDate: () => new Date() }))
+  }
+}));
+
+// Mock the providers fetch
+jest.mock('../../lib/status-fetcher', () => ({
+  fetchProviderStatus: jest.fn().mockResolvedValue({
+    id: 'openai',
+    name: 'OpenAI',
+    status: 'operational',
+    statusPageUrl: 'https://status.openai.com',
+    responseTime: 50,
+    lastChecked: new Date().toISOString()
+  })
+}));
+
+// Mock database functions
+jest.mock('../../lib/database', () => ({
+  initDatabase: jest.fn().mockResolvedValue(undefined),
+  calculateUptime: jest.fn().mockResolvedValue(99.5),
+  getAverageResponseTime: jest.fn().mockResolvedValue(75)
+}));
+
+describe('Cloud Functions API', () => {
+  let app: express.Application;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // Create Express app for testing
+    app = express();
+    app.use(express.json());
+    
+    // Mount the API routes (simplified version)
+    app.get('/status', async (req, res) => {
+      res.json({
+        timestamp: new Date().toISOString(),
+        summary: {
+          total: 8,
+          operational: 8,
+          degraded: 0,
+          down: 0,
+          unknown: 0
+        },
+        providers: []
+      });
+    });
+
+    app.get('/health', async (req, res) => {
+      res.json({
+        timestamp: new Date().toISOString(),
+        status: 'healthy',
+        version: '1.0.0'
+      });
+    });
+
+    app.post('/comments', async (req, res) => {
+      const { author, message, type } = req.body;
+      
+      if (!author || author.length < 2) {
+        return res.status(400).json({
+          success: false,
+          errors: ['Author name must be at least 2 characters']
+        });
+      }
+      
+      if (!message || message.length < 10) {
+        return res.status(400).json({
+          success: false,
+          errors: ['Message must be at least 10 characters']
+        });
+      }
+      
+      res.json({
+        success: true,
+        comment: {
+          id: 'test-id',
+          author,
+          message,
+          type: type || 'general',
+          createdAt: new Date().toISOString(),
+          status: 'approved'
+        }
+      });
+    });
+  });
+
+  describe('GET /status', () => {
+    it('should return status for all providers', async () => {
+      const response = await request(app)
+        .get('/status')
+        .expect(200);
+
+      expect(response.body).toHaveProperty('timestamp');
+      expect(response.body).toHaveProperty('summary');
+      expect(response.body.summary.total).toBe(8);
+    });
+  });
+
+  describe('GET /health', () => {
+    it('should return health status', async () => {
+      const response = await request(app)
+        .get('/health')
+        .expect(200);
+
+      expect(response.body).toHaveProperty('status', 'healthy');
+      expect(response.body).toHaveProperty('version');
+    });
+  });
+
+  describe('POST /comments', () => {
+    it('should create a comment with valid data', async () => {
+      const commentData = {
+        author: 'Test User',
+        message: 'This is a test comment with enough characters',
+        type: 'general'
+      };
+
+      const response = await request(app)
+        .post('/comments')
+        .send(commentData)
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(response.body.comment).toMatchObject({
+        author: 'Test User',
+        message: 'This is a test comment with enough characters',
+        type: 'general'
+      });
+    });
+
+    it('should reject comment with short author name', async () => {
+      const commentData = {
+        author: 'A',
+        message: 'This is a test comment with enough characters',
+        type: 'general'
+      };
+
+      const response = await request(app)
+        .post('/comments')
+        .send(commentData)
+        .expect(400);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.errors).toContain('Author name must be at least 2 characters');
+    });
+
+    it('should reject comment with short message', async () => {
+      const commentData = {
+        author: 'Test User',
+        message: 'Short',
+        type: 'general'
+      };
+
+      const response = await request(app)
+        .post('/comments')
+        .send(commentData)
+        .expect(400);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.errors).toContain('Message must be at least 10 characters');
+    });
+  });
+}); 

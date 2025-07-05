@@ -1,0 +1,133 @@
+name: Manual Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - production
+          - preview
+      skip-tests:
+        description: 'Skip tests (use with caution)'
+        required: false
+        type: boolean
+        default: false
+      reason:
+        description: 'Reason for manual deployment'
+        required: true
+        type: string
+
+jobs:
+  validate-deployment:
+    name: Validate Deployment Request
+    runs-on: ubuntu-latest
+    outputs:
+      proceed: ${{ steps.validate.outputs.proceed }}
+      
+    steps:
+      - name: Validate deployment
+        id: validate
+        run: |
+          echo "🚀 Manual deployment requested"
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Skip tests: ${{ inputs.skip-tests }}"
+          echo "Reason: ${{ inputs.reason }}"
+          echo "Requested by: ${{ github.actor }}"
+          echo "proceed=true" >> $GITHUB_OUTPUT
+          
+      - name: Log deployment request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Manual Deployment: ${context.payload.inputs.environment}`,
+              body: `## Manual Deployment Request
+              
+              **Environment:** ${{ inputs.environment }}
+              **Skip Tests:** ${{ inputs.skip-tests }}
+              **Reason:** ${{ inputs.reason }}
+              **Requested by:** @${{ github.actor }}
+              **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+              
+              This issue will be automatically closed when the deployment completes.`,
+              labels: ['deployment', '${{ inputs.environment }}']
+            });
+            
+            core.exportVariable('DEPLOYMENT_ISSUE_NUMBER', issue.data.number);
+            
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    needs: validate-deployment
+    if: needs.validate-deployment.outputs.proceed == 'true'
+    environment: ${{ inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run tests
+        if: inputs.skip-tests == false
+        run: |
+          npm run test:coverage
+          npx playwright install --with-deps
+          npm run test:e2e
+          
+      - name: Build application
+        run: npm run build
+          
+      - name: Deploy to ${{ inputs.environment }}
+        env:
+          DEPLOY_TOKEN: ${{ secrets[format('DEPLOY_TOKEN_{0}', inputs.environment)] }}
+        run: |
+          echo "Deploying to ${{ inputs.environment }}..."
+          # Add actual deployment commands here
+          # For Vercel: npx vercel --prod --token=$DEPLOY_TOKEN
+          # For Netlify: npx netlify deploy --prod --auth=$DEPLOY_TOKEN
+          
+      - name: Verify deployment
+        run: |
+          echo "Verifying deployment..."
+          # Add health check commands here
+          
+      - name: Update deployment issue
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = process.env.DEPLOYMENT_ISSUE_NUMBER;
+            if (!issueNumber) return;
+            
+            const status = '${{ job.status }}' === 'success' ? '✅ Success' : '❌ Failed';
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: parseInt(issueNumber),
+              body: `## Deployment Status: ${status}
+              
+              The deployment to **${{ inputs.environment }}** has completed with status: **${{ job.status }}**`
+            });
+            
+            if ('${{ job.status }}' === 'success') {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: parseInt(issueNumber),
+                state: 'closed'
+              });
+            } 

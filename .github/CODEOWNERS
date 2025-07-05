@@ -1,0 +1,43 @@
+# AI Status Dashboard Code Owners
+# These owners will be the default owners for everything in the repo
+
+# Global owners
+* @khalid
+
+# Frontend code
+/src/ @khalid
+/src/app/components/ @khalid
+/src/app/services/ @khalid
+/src/styles/ @khalid
+
+# Backend code
+/server/ @khalid
+/server/api/ @khalid
+/server/providers/ @khalid
+
+# Configuration files
+/.github/ @khalid
+/package.json @khalid
+/package-lock.json @khalid
+/tsconfig*.json @khalid
+/angular.json @khalid
+/.eslintrc* @khalid
+/.prettierrc* @khalid
+
+# Documentation
+/DOCUMENTATION.md @khalid
+/*.md @khalid
+
+# Tests
+/tests/ @khalid
+/cypress/ @khalid
+*.spec.ts @khalid
+*.test.ts @khalid
+
+# CI/CD
+/.github/workflows/ @khalid
+
+# Security sensitive files
+/.env* @khalid
+/secrets/ @khalid
+/credentials/ @khalid 

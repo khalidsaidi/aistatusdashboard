@@ -1,0 +1,20 @@
+{
+  "projects": {
+    "default": "your-firebase-project-dev",
+    "dev": "your-firebase-project-dev", 
+    "prod": "your-firebase-project"
+  },
+  "targets": {
+    "your-firebase-project": {
+      "hosting": {
+        "production": [
+          "your-domain-com"
+        ],
+        "your-site": [
+          "your-site"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
