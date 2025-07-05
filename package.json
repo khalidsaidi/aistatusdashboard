@@ -37,7 +37,7 @@
     "migrate:firestore": "node scripts/migrate-to-firestore.js"
   },
   "dependencies": {
-    "dotenv": "^17.0.0",
+    "dotenv": "^17.0.1",
     "firebase": "^10.14.1",
     "firebase-admin": "^12.7.0",
     "next": "14.2.3",
