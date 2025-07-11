@@ -6,14 +6,12 @@ const createJestConfig = nextJest({
 
 const customJestConfig = {
   testEnvironment: 'jsdom',
-  // CRITICAL: Load polyfills in multiple ways for CI compatibility
+  // Load polyfills for CI compatibility
   setupFiles: [
-    '<rootDir>/jest.polyfills.js',
-    'whatwg-fetch'
+    '<rootDir>/jest.polyfills.js'
   ],
   setupFilesAfterEnv: [
-    '<rootDir>/jest.setup.js',
-    '<rootDir>/jest.polyfills.js'  // Load again after environment setup
+    '<rootDir>/jest.setup.js'
   ],
   moduleDirectories: ['node_modules', '<rootDir>/'],
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/__tests__/e2e/'],
@@ -24,7 +22,6 @@ const customJestConfig = {
   collectCoverageFrom: [
     'app/**/*.{js,jsx,ts,tsx}',
     'lib/**/*.{js,jsx,ts,tsx}',
-    'functions/src/**/*.{js,jsx,ts,tsx}',
     '!**/*.d.ts',
     '!**/node_modules/**',
     '!**/.next/**',
@@ -35,24 +32,32 @@ const customJestConfig = {
     '<rootDir>/__tests__/integration/**/*.{js,jsx,ts,tsx}',
   ],
   testTimeout: 60000,
-  // CRITICAL: Ensure polyfills are available in all contexts
+  // Transform Firebase ESM modules to CommonJS for Jest
+  transformIgnorePatterns: [
+    'node_modules/(?!(firebase|@firebase|undici)/)'
+  ],
+  // Use babel-jest to transform Firebase modules
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { 
+      presets: [
+        ['@babel/preset-env', { 
+          targets: { node: 'current' },
+          modules: 'commonjs'
+        }],
+        ['@babel/preset-typescript'],
+        ['@babel/preset-react', { runtime: 'automatic' }]
+      ]
+    }],
+  },
+  // Enable ESM support for Firebase modules
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
   globals: {
     'ts-jest': {
       useESM: true
     }
   },
-  // Fix for Next.js 15 and Node.js compatibility
-  extensionsToTreatAsEsm: ['.ts', '.tsx'],
   testEnvironmentOptions: {
-    customExportConditions: [''],
-  },
-  // CRITICAL: Transform Firebase ESM modules for Jest compatibility
-  transformIgnorePatterns: [
-    'node_modules/(?!(firebase|@firebase|undici)/)'
-  ],
-  // Force transform Firebase modules
-  transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }],
+    customExportConditions: ['node', 'node-addons'],
   },
 }
 

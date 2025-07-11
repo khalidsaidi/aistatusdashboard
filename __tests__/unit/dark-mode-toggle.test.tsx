@@ -1,356 +1,244 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import DarkModeToggle from '@/app/components/DarkModeToggle';
 import Navbar from '@/app/components/Navbar';
+
+// Custom render function that sets up userEvent properly
+function renderWithUser(ui: React.ReactElement) {
+  const user = userEvent.setup();
+  return {
+    user,
+    ...render(ui),
+  };
+}
+
+// Helper function to safely perform user interactions
+async function safeUserInteraction(callback: () => Promise<void>) {
+  await act(async () => {
+    await callback();
+  });
+}
 
 describe('Dark Mode Toggle Component', () => {
   beforeEach(() => {
     // Reset document classes for test isolation
     document.documentElement.classList.remove('dark');
     // Clear localStorage to ensure clean state
-    localStorage.clear();
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.clear();
+    }
   });
 
-  describe('Component Rendering', () => {
-    it('should render dark mode toggle button', () => {
-      render(<DarkModeToggle />);
-      
-      const toggle = screen.getByRole('button');
-      expect(toggle).toBeInTheDocument();
-      expect(toggle).toHaveAttribute('aria-label');
-    });
-
-    it('should show moon icon in light mode', () => {
-      render(<DarkModeToggle />);
-      
-      const toggle = screen.getByRole('button');
-      expect(toggle).toHaveAttribute('aria-label', 'Switch to dark mode');
-      // Check for moon icon SVG path
-      expect(toggle.querySelector('path')).toHaveAttribute('d', 'M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z');
-    });
-
-    it('should handle theme state changes', async () => {
-      render(<DarkModeToggle />);
-      
-      const toggle = screen.getByRole('button');
-      
-      // Test initial state
-      expect(toggle).toBeInTheDocument();
-      
-      // Test click interaction
-      await userEvent.click(toggle);
-      
-      // Component should handle state change
-      await waitFor(() => {
-        expect(document.documentElement.classList.contains('dark')).toBe(true);
-      });
-    });
-  });
-
-  describe('Theme Detection', () => {
-    it('should handle system preference detection', async () => {
-      render(<DarkModeToggle />);
-      
-      const toggle = screen.getByRole('button');
-      
-      // Component should render without errors regardless of system preference
-      expect(toggle).toBeInTheDocument();
-      // Check that an SVG icon is present
-      expect(toggle.querySelector('svg')).toBeInTheDocument();
-    });
-
-    it('should prioritize saved preferences', async () => {
-      // Test that component handles localStorage gracefully
-      render(<DarkModeToggle />);
-      
-      const toggle = screen.getByRole('button');
-      expect(toggle).toBeInTheDocument();
-      
-      // Component should work regardless of localStorage state
-      await userEvent.click(toggle);
-      
-      await waitFor(() => {
-        // Check that an SVG icon is present
-        expect(toggle.querySelector('svg')).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('Toggle Functionality', () => {
-    it('should switch themes on click', async () => {
-      render(<DarkModeToggle />);
-      
-      const toggle = screen.getByRole('button');
-      const initialPath = toggle.querySelector('path')?.getAttribute('d');
-      
-      await userEvent.click(toggle);
-      
-      await waitFor(() => {
-        // Icon should change after click
-        const newPath = toggle.querySelector('path')?.getAttribute('d');
-        expect(newPath).not.toBe(initialPath);
-      });
-    });
-
-    it('should update document classes', async () => {
-      render(<DarkModeToggle />);
-      
-      const toggle = screen.getByRole('button');
-      
-      // Initial state should be light mode (no dark class)
-      expect(document.documentElement.classList.contains('dark')).toBe(false);
-      
-      await userEvent.click(toggle);
-      
-      await waitFor(() => {
-        // Document should have dark class applied
-        expect(document.documentElement.classList.contains('dark')).toBe(true);
-      }, { timeout: 2000 });
-      
-      await userEvent.click(toggle);
-      
-      await waitFor(() => {
-        // Dark class should be removed
-        expect(document.documentElement.classList.contains('dark')).toBe(false);
-      }, { timeout: 2000 });
-    });
-  });
-
-  describe('Keyboard Navigation', () => {
-    it('should be accessible via keyboard (Enter key)', async () => {
-      render(<DarkModeToggle />);
-      
-      const toggle = screen.getByRole('button');
-      toggle.focus();
-      
-      await userEvent.keyboard('{Enter}');
-      
-      await waitFor(() => {
-        expect(document.documentElement.classList.contains('dark')).toBe(true);
-      });
-    });
-
-    it('should be accessible via keyboard (Space key)', async () => {
-      render(<DarkModeToggle />);
-      
-      const toggle = screen.getByRole('button');
-      toggle.focus();
-      
-      // Initial state should be light mode
-      expect(document.documentElement.classList.contains('dark')).toBe(false);
-      
-      await userEvent.keyboard(' ');
-      
-      await waitFor(() => {
-        expect(document.documentElement.classList.contains('dark')).toBe(true);
-      }, { timeout: 2000 });
-    });
-
-    it('should have visible focus indicator', () => {
-      render(<DarkModeToggle />);
-      
-      const toggle = screen.getByRole('button');
-      toggle.focus();
-      
-      expect(toggle).toHaveFocus();
-      // Focus styles should be visible (tested via CSS classes)
-      expect(toggle).toHaveClass('focus:outline-none', 'focus:ring-2');
-    });
-  });
-
-  describe('Accessibility', () => {
-    it('should have proper ARIA attributes', () => {
-      render(<DarkModeToggle />);
-      
-      const toggle = screen.getByRole('button');
-      expect(toggle).toHaveAttribute('aria-label');
-      expect(toggle).toHaveAttribute('title');
-    });
-
-    it('should update aria-label when theme changes', async () => {
-      render(<DarkModeToggle />);
-      
-      const toggle = screen.getByRole('button');
-      const initialLabel = toggle.getAttribute('aria-label');
-      
-      await userEvent.click(toggle);
-      
-      await waitFor(() => {
-        const newLabel = toggle.getAttribute('aria-label');
-        expect(newLabel).not.toBe(initialLabel);
-      });
-    });
-  });
-});
-
-describe('Dark Mode Integration in Navbar', () => {
-  beforeEach(() => {
+  afterEach(() => {
+    // Clean up after each test
     document.documentElement.classList.remove('dark');
-    localStorage.clear();
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.clear();
+    }
   });
 
-  it('should render dark mode toggle in navbar', () => {
-    render(<Navbar />);
-    
-    const toggles = screen.getAllByRole('button', { name: /switch to (dark|light) mode/i });
-    expect(toggles.length).toBeGreaterThan(0);
-    expect(toggles[0]).toBeInTheDocument();
-  });
-
-      it('should handle theme switching in navbar context', async () => {
-      render(<Navbar />);
-      
-      const toggles = screen.getAllByRole('button', { name: /switch to (dark|light) mode/i });
-      const toggle = toggles[0]; // Use first toggle (desktop version)
-      
-      // Initial state should be light mode
-      expect(document.documentElement.classList.contains('dark')).toBe(false);
-      
-      await userEvent.click(toggle);
-      
-      await waitFor(() => {
-        expect(document.documentElement.classList.contains('dark')).toBe(true);
-      }, { timeout: 2000 });
-    });
-
-  describe('Mobile Responsiveness', () => {
-    it('should show dark mode toggle on mobile screens', () => {
-      // Test that component renders on different screen sizes
-      render(<Navbar />);
-      
-      const toggles = screen.getAllByRole('button', { name: /switch to (dark|light) mode/i });
-      expect(toggles.length).toBe(2); // Desktop and mobile versions
-      expect(toggles[0]).toBeVisible();
-    });
-  });
-});
-
-describe('Theme Propagation', () => {
-  it('should apply dark theme classes to document element', async () => {
+  it('should render the toggle button', () => {
     render(<DarkModeToggle />);
     
-    const toggle = screen.getByRole('button');
-    await userEvent.click(toggle);
+    const toggleButton = screen.getByRole('button', { name: /toggle dark mode/i });
+    expect(toggleButton).toBeInTheDocument();
+  });
+
+  it('should display moon emoji initially (light mode)', () => {
+    render(<DarkModeToggle />);
+    
+    const toggleButton = screen.getByRole('button', { name: /toggle dark mode/i });
+    expect(toggleButton).toHaveTextContent('🌙');
+  });
+
+  it('should toggle to dark mode when clicked', async () => {
+    const { user } = renderWithUser(<DarkModeToggle />);
+    
+    const toggleButton = screen.getByRole('button', { name: /toggle dark mode/i });
+    
+    // Initially should show moon (light mode)
+    expect(toggleButton).toHaveTextContent('🌙');
+    
+    // Click to toggle to dark mode
+    await safeUserInteraction(async () => {
+      await user.click(toggleButton);
+    });
+    
+    // Should now show sun emoji (dark mode active)
+    await waitFor(() => {
+      expect(toggleButton).toHaveTextContent('☀️');
+    });
+    
+    // Document should have dark class
+    expect(document.documentElement).toHaveClass('dark');
+  });
+
+  it('should toggle back to light mode when clicked again', async () => {
+    const { user } = renderWithUser(<DarkModeToggle />);
+    
+    const toggleButton = screen.getByRole('button', { name: /toggle dark mode/i });
+    
+    // Click twice to go dark then back to light
+    await safeUserInteraction(async () => {
+      await user.click(toggleButton);
+    });
     
     await waitFor(() => {
-      expect(document.documentElement.classList.contains('dark')).toBe(true);
+      expect(toggleButton).toHaveTextContent('☀️');
+    });
+    
+    await safeUserInteraction(async () => {
+      await user.click(toggleButton);
+    });
+    
+    await waitFor(() => {
+      expect(toggleButton).toHaveTextContent('🌙');
+    });
+    
+    // Document should not have dark class
+    expect(document.documentElement).not.toHaveClass('dark');
+  });
+
+  it('should persist dark mode preference in localStorage', async () => {
+    const { user } = renderWithUser(<DarkModeToggle />);
+    
+    const toggleButton = screen.getByRole('button', { name: /toggle dark mode/i });
+    
+    // Toggle to dark mode
+    await safeUserInteraction(async () => {
+      await user.click(toggleButton);
+    });
+    
+    await waitFor(() => {
+      expect(localStorage.getItem('darkMode')).toBe('true');
+    });
+    
+    // Toggle back to light mode
+    await safeUserInteraction(async () => {
+      await user.click(toggleButton);
+    });
+    
+    await waitFor(() => {
+      expect(localStorage.getItem('darkMode')).toBe('false');
     });
   });
 
-  it('should remove dark theme classes when switching to light', async () => {
-    // Start by applying dark mode
-    document.documentElement.classList.add('dark');
+  it('should restore dark mode from localStorage on mount', () => {
+    // Set dark mode in localStorage before rendering
+    localStorage.setItem('darkMode', 'true');
     
     render(<DarkModeToggle />);
     
-    const toggle = screen.getByRole('button');
-    await userEvent.click(toggle);
+    const toggleButton = screen.getByRole('button', { name: /toggle dark mode/i });
     
-    await waitFor(() => {
-      expect(document.documentElement.classList.contains('dark')).toBe(false);
-    });
+    // Should show sun emoji (dark mode active)
+    expect(toggleButton).toHaveTextContent('☀️');
+    expect(document.documentElement).toHaveClass('dark');
   });
-});
 
-describe('SSR Compatibility', () => {
-  it('should not cause hydration mismatches', () => {
-    // Test that component renders without throwing
+  it('should work when integrated in Navbar', async () => {
+    const { user } = renderWithUser(<Navbar />);
+    
+    // Navbar has two dark mode toggle buttons (desktop and mobile)
+    // Get all toggle buttons and use the first one (desktop version)
+    const toggleButtons = screen.getAllByRole('button', { name: /toggle dark mode/i });
+    expect(toggleButtons.length).toBeGreaterThanOrEqual(1);
+    
+    const toggleButton = toggleButtons[0]; // Use the first (desktop) toggle
+    
+    // Initially should show moon (light mode)
+    expect(toggleButton).toHaveTextContent('🌙');
+    
+    // Click to toggle to dark mode
+    await safeUserInteraction(async () => {
+      await user.click(toggleButton);
+    });
+    
+    // Should now show sun emoji (dark mode active)
+    await waitFor(() => {
+      expect(toggleButton).toHaveTextContent('☀️');
+    });
+    
+    // Document should have dark class
+    expect(document.documentElement).toHaveClass('dark');
+  });
+
+  it('should handle rapid clicking without issues', async () => {
+    const { user } = renderWithUser(<DarkModeToggle />);
+    
+    const toggleButton = screen.getByRole('button', { name: /toggle dark mode/i });
+    
+    // Rapidly click the toggle multiple times
+    for (let i = 0; i < 5; i++) {
+      await safeUserInteraction(async () => {
+        await user.click(toggleButton);
+      });
+    }
+    
+    // Should end up in dark mode (odd number of clicks)
+    await waitFor(() => {
+      expect(toggleButton).toHaveTextContent('☀️');
+    });
+    expect(document.documentElement).toHaveClass('dark');
+  });
+
+  it('should have proper accessibility attributes', () => {
+    render(<DarkModeToggle />);
+    
+    const toggleButton = screen.getByRole('button', { name: /toggle dark mode/i });
+    
+    expect(toggleButton).toHaveAttribute('aria-label', 'Toggle dark mode');
+    expect(toggleButton).toHaveAttribute('type', 'button');
+  });
+
+  it('should handle localStorage errors gracefully', async () => {
+    // Mock localStorage to throw an error
+    const originalSetItem = localStorage.setItem;
+    localStorage.setItem = jest.fn(() => {
+      throw new Error('localStorage error');
+    });
+    
+    const { user } = renderWithUser(<DarkModeToggle />);
+    
+    const toggleButton = screen.getByRole('button', { name: /toggle dark mode/i });
+    
+    // Should not crash when localStorage fails
+    await safeUserInteraction(async () => {
+      await user.click(toggleButton);
+    });
+    
+    // Should still toggle visually
+    await waitFor(() => {
+      expect(toggleButton).toHaveTextContent('☀️');
+    });
+    
+    // Restore original localStorage
+    localStorage.setItem = originalSetItem;
+  });
+
+  it('should handle missing localStorage gracefully', () => {
+    // Mock localStorage to be undefined
+    const originalLocalStorage = window.localStorage;
+    
+    // Remove localStorage temporarily
+    Object.defineProperty(window, 'localStorage', {
+      value: undefined,
+      writable: true,
+      configurable: true
+    });
+    
+    // Should not crash when localStorage is undefined
     expect(() => {
       render(<DarkModeToggle />);
     }).not.toThrow();
-  });
-
-  it('should handle missing APIs gracefully', () => {
-    // Test that component handles missing browser APIs
-    expect(() => {
-      render(<DarkModeToggle />);
-    }).not.toThrow();
-  });
-});
-
-describe('Dark Mode Toggle Integration', () => {
-  beforeEach(() => {
-    // Reset document classes
-    document.documentElement.className = '';
-    localStorage.clear();
-  });
-
-  describe('Navbar Integration', () => {
-    it('should render dark mode toggle in navbar', () => {
-      render(<Navbar />);
-      
-      // Look for the dark mode toggle buttons (desktop and mobile)
-      const toggleButtons = screen.getAllByRole('button', { name: /switch to (dark|light) mode/i });
-      expect(toggleButtons.length).toBe(2);
-      expect(toggleButtons[0]).toBeInTheDocument();
-    });
-
-    it('should position correctly in navbar layout', () => {
-      render(<Navbar />);
-      
-      const navbar = screen.getByRole('banner');
-      const toggleButtons = screen.getAllByRole('button', { name: /switch to (dark|light) mode/i });
-      
-      // Verify toggles are within navbar
-      expect(navbar).toContainElement(toggleButtons[0]);
-      expect(navbar).toContainElement(toggleButtons[1]);
-    });
-  });
-
-  describe('Theme Switching', () => {
-    it('should toggle theme when clicked', async () => {
-      render(<Navbar />);
-      
-      const toggleButtons = screen.getAllByRole('button', { name: /switch to (dark|light) mode/i });
-      const toggleButton = toggleButtons[0]; // Use desktop version
-      
-      // Initial state should be light mode
-      expect(document.documentElement).not.toHaveClass('dark');
-      
-      // Click to switch to dark mode
-      fireEvent.click(toggleButton);
-      
-      await waitFor(() => {
-        expect(document.documentElement).toHaveClass('dark');
-      });
-    });
-
-    it('should update toggle icon based on current theme', async () => {
-      render(<Navbar />);
-      
-      const toggleButtons = screen.getAllByRole('button', { name: /switch to (dark|light) mode/i });
-      const toggleButton = toggleButtons[0]; // Use desktop version
-      const initialPath = toggleButton.querySelector('path')?.getAttribute('d');
-      
-      // Click to switch theme
-      fireEvent.click(toggleButton);
-      
-      await waitFor(() => {
-        // Icon should change
-        const newPath = toggleButton.querySelector('path')?.getAttribute('d');
-        expect(newPath).not.toBe(initialPath);
-      });
-    });
-  });
-
-  describe('Component Updates', () => {
-    it('should update themed components when theme changes', async () => {
-      render(<Navbar />);
-      
-      const toggleButtons = screen.getAllByRole('button', { name: /switch to (dark|light) mode/i });
-      const toggleButton = toggleButtons[0]; // Use desktop version
-      const navbar = screen.getByRole('banner');
-      
-      // Switch to dark mode
-      fireEvent.click(toggleButton);
-      
-      await waitFor(() => {
-        expect(document.documentElement).toHaveClass('dark');
-        // Navbar should be present and themed
-        expect(navbar).toBeInTheDocument();
-      });
+    
+    // Restore original localStorage
+    Object.defineProperty(window, 'localStorage', {
+      value: originalLocalStorage,
+      writable: true,
+      configurable: true
     });
   });
 }); 

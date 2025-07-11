@@ -1,131 +1,101 @@
 /**
  * Jest Polyfills for Next.js 15 and Node.js Compatibility
- * Provides Web API mocks for testing environment
  * CRITICAL: This must be loaded BEFORE any Next.js modules
+ * Aggressive polyfills for CI/CD environments
  */
 
-// CRITICAL FIX: Ensure polyfills are loaded immediately
-if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
-  console.log('🔧 Loading Jest polyfills for CI/CD environment...');
-}
-
-// CRITICAL: Polyfill Request/Response BEFORE any other modules load
+// IMMEDIATE POLYFILL EXECUTION - No delays or conditions
 (function() {
   'use strict';
   
-  // Aggressive polyfill setup for CI environments
+  console.log('🔧 Loading aggressive Jest polyfills...');
+
+  // Ensure globalThis exists first
   if (typeof globalThis === 'undefined') {
-    // Fallback for older Node.js versions
-    (function() {
-      if (typeof global !== 'undefined') {
-        global.globalThis = global;
-      } else if (typeof window !== 'undefined') {
-        window.globalThis = window;
-      } else if (typeof self !== 'undefined') {
-        self.globalThis = self;
-      }
-    })();
-  }
-})();
-
-// CRITICAL FIX: Comprehensive Request polyfill for CI environment
-const RequestPolyfill = class Request {
-  constructor(input, init = {}) {
-    this.url = typeof input === 'string' ? input : input.url;
-    this.method = init.method || 'GET';
-    this.headers = new Map(Object.entries(init.headers || {}));
-    this.body = init.body;
-    this.credentials = init.credentials || 'same-origin';
-    this.cache = init.cache || 'default';
-    this.redirect = init.redirect || 'follow';
-    this.referrer = init.referrer || '';
-    this.mode = init.mode || 'cors';
-  }
-
-  clone() {
-    return new RequestPolyfill(this.url, {
-      method: this.method,
-      headers: Object.fromEntries(this.headers),
-      body: this.body,
-      credentials: this.credentials,
-      cache: this.cache,
-      redirect: this.redirect,
-      referrer: this.referrer,
-      mode: this.mode
-    });
-  }
-};
-
-// Apply polyfills to all global contexts
-if (typeof global.Request === 'undefined') {
-  global.Request = RequestPolyfill;
-}
-if (typeof globalThis.Request === 'undefined') {
-  globalThis.Request = RequestPolyfill;
-}
-if (typeof window !== 'undefined' && typeof window.Request === 'undefined') {
-  window.Request = RequestPolyfill;
-}
-
-// CRITICAL FIX: Comprehensive Response polyfill for CI environment
-const ResponsePolyfill = class Response {
-  constructor(body, init = {}) {
-    this.body = body;
-    this.status = init.status || 200;
-    this.statusText = init.statusText || 'OK';
-    this.headers = new Map(Object.entries(init.headers || {}));
-    this.ok = this.status >= 200 && this.status < 300;
-    this.redirected = init.redirected || false;
-    this.type = init.type || 'default';
-    this.url = init.url || '';
-  }
-
-  async json() {
-    try {
-      return JSON.parse(this.body);
-    } catch {
-      throw new Error('Failed to parse response as JSON');
+    if (typeof global !== 'undefined') {
+      global.globalThis = global;
+    } else if (typeof window !== 'undefined') {
+      window.globalThis = window;
+    } else if (typeof self !== 'undefined') {
+      self.globalThis = self;
     }
   }
 
-  async text() {
-    return String(this.body || '');
-  }
+  // CRITICAL: Define Request IMMEDIATELY
+  const RequestPolyfill = class Request {
+    constructor(input, init = {}) {
+      this.url = typeof input === 'string' ? input : input.url;
+      this.method = init.method || 'GET';
+      this.headers = new Map(Object.entries(init.headers || {}));
+      this.body = init.body;
+      this.credentials = init.credentials || 'same-origin';
+      this.cache = init.cache || 'default';
+      this.redirect = init.redirect || 'follow';
+      this.referrer = init.referrer || '';
+      this.mode = init.mode || 'cors';
+    }
 
-  async arrayBuffer() {
-    return new ArrayBuffer(0);
-  }
+    clone() {
+      return new RequestPolyfill(this.url, {
+        method: this.method,
+        headers: Object.fromEntries(this.headers),
+        body: this.body,
+        credentials: this.credentials,
+        cache: this.cache,
+        redirect: this.redirect,
+        referrer: this.referrer,
+        mode: this.mode
+      });
+    }
+  };
 
-  async blob() {
-    return new Blob([this.body || '']);
-  }
+  // CRITICAL: Define Response IMMEDIATELY
+  const ResponsePolyfill = class Response {
+    constructor(body, init = {}) {
+      this.body = body;
+      this.status = init.status || 200;
+      this.statusText = init.statusText || 'OK';
+      this.headers = new Map(Object.entries(init.headers || {}));
+      this.ok = this.status >= 200 && this.status < 300;
+      this.redirected = init.redirected || false;
+      this.type = init.type || 'default';
+      this.url = init.url || '';
+    }
 
-  clone() {
-    return new ResponsePolyfill(this.body, {
-      status: this.status,
-      statusText: this.statusText,
-      headers: Object.fromEntries(this.headers),
-      redirected: this.redirected,
-      type: this.type,
-      url: this.url
-    });
-  }
-};
+    async json() {
+      try {
+        return JSON.parse(this.body);
+      } catch {
+        throw new Error('Failed to parse response as JSON');
+      }
+    }
 
-// Apply polyfills to all global contexts
-if (typeof global.Response === 'undefined') {
-  global.Response = ResponsePolyfill;
-}
-if (typeof globalThis.Response === 'undefined') {
-  globalThis.Response = ResponsePolyfill;
-}
-if (typeof window !== 'undefined' && typeof window.Response === 'undefined') {
-  window.Response = ResponsePolyfill;
-}
+    async text() {
+      return String(this.body || '');
+    }
 
-// Mock Headers if not available
-if (typeof global.Headers === 'undefined') {
-  global.Headers = class Headers extends Map {
+    async arrayBuffer() {
+      return new ArrayBuffer(0);
+    }
+
+    async blob() {
+      return new Blob([this.body || '']);
+    }
+
+    clone() {
+      return new ResponsePolyfill(this.body, {
+        status: this.status,
+        statusText: this.statusText,
+        headers: Object.fromEntries(this.headers),
+        redirected: this.redirected,
+        type: this.type,
+        url: this.url
+      });
+    }
+  };
+
+  // CRITICAL: Headers polyfill
+  const HeadersPolyfill = class Headers extends Map {
     constructor(init) {
       super();
       if (init) {
@@ -158,92 +128,84 @@ if (typeof global.Headers === 'undefined') {
       super.set(name.toLowerCase(), value);
     }
   };
-}
 
-// Mock fetch if not available (though we use node-fetch)
-if (typeof global.fetch === 'undefined') {
-  global.fetch = async (url, options = {}) => {
-    return new Response(JSON.stringify({ mock: true }), {
-      status: 200,
-      headers: { 'content-type': 'application/json' }
-    });
-  };
-}
-
-// Mock URL if not available
-if (typeof global.URL === 'undefined') {
-  global.URL = require('url').URL;
-}
-
-// Mock URLSearchParams if not available
-if (typeof global.URLSearchParams === 'undefined') {
-  global.URLSearchParams = require('url').URLSearchParams;
-}
-
-// Mock AbortController if not available
-if (typeof global.AbortController === 'undefined') {
-  global.AbortController = class AbortController {
-    constructor() {
-      this.signal = {
-        aborted: false,
-        addEventListener: () => {},
-        removeEventListener: () => {}
-      };
-    }
-
-    abort() {
-      this.signal.aborted = true;
-    }
-  };
-}
-
-// Mock performance if not available
-if (typeof global.performance === 'undefined') {
-  global.performance = {
-    now: () => Date.now()
-  };
-}
-
-// Mock crypto for testing
-if (typeof global.crypto === 'undefined') {
-  global.crypto = {
-    randomUUID: () => {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        const r = Math.random() * 16 | 0;
-        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
-    },
-    getRandomValues: (arr) => {
-      for (let i = 0; i < arr.length; i++) {
-        arr[i] = Math.floor(Math.random() * 256);
-      }
-      return arr;
-    }
-  };
-}
-
-// CRITICAL FIX: Force polyfills into all possible global contexts
-const forcePolyfills = () => {
+  // AGGRESSIVE: Force polyfills into ALL contexts IMMEDIATELY
   const contexts = [global, globalThis];
   if (typeof window !== 'undefined') contexts.push(window);
   if (typeof self !== 'undefined') contexts.push(self);
 
   contexts.forEach(ctx => {
-    if (ctx && typeof ctx.Request === 'undefined') {
+    if (ctx) {
+      // Force override even if they exist
       ctx.Request = RequestPolyfill;
-    }
-    if (ctx && typeof ctx.Response === 'undefined') {
       ctx.Response = ResponsePolyfill;
+      ctx.Headers = HeadersPolyfill;
+      
+      // Mock fetch
+      ctx.fetch = ctx.fetch || (async (url, options = {}) => {
+        return new ResponsePolyfill(JSON.stringify({ mock: true }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' }
+        });
+      });
+
+      // Mock URL
+      if (!ctx.URL && typeof require !== 'undefined') {
+        try {
+          ctx.URL = require('url').URL;
+          ctx.URLSearchParams = require('url').URLSearchParams;
+        } catch (e) {
+          // Fallback
+          ctx.URL = class URL {
+            constructor(url) {
+              this.href = url;
+            }
+          };
+        }
+      }
+
+      // Mock AbortController
+      ctx.AbortController = ctx.AbortController || class AbortController {
+        constructor() {
+          this.signal = {
+            aborted: false,
+            addEventListener: () => {},
+            removeEventListener: () => {}
+          };
+        }
+        abort() {
+          this.signal.aborted = true;
+        }
+      };
+
+      // Mock performance
+      ctx.performance = ctx.performance || {
+        now: () => Date.now()
+      };
+
+      // Mock crypto
+      ctx.crypto = ctx.crypto || {
+        randomUUID: () => {
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+          });
+        },
+        getRandomValues: (arr) => {
+          for (let i = 0; i < arr.length; i++) {
+            arr[i] = Math.floor(Math.random() * 256);
+          }
+          return arr;
+        }
+      };
     }
   });
-};
 
-// Apply immediately and on module load
-forcePolyfills();
+  console.log('✅ Aggressive Jest polyfills loaded');
+})();
 
-// Apply again after a short delay for CI environments
-if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
-  setTimeout(forcePolyfills, 0);
-  console.log('✅ Jest polyfills loaded for CI/CD environment');
+// Export for module systems
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {};
 } 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import CommentSection from '@/app/components/CommentSection';
 
 describe('CommentSystem', () => {
@@ -25,24 +25,23 @@ describe('CommentSystem', () => {
     const messageInput = screen.getByPlaceholderText(/share your thoughts/i);
     const submitButton = screen.getByRole('button', { name: /post comment/i });
 
-    fireEvent.change(nameInput, { target: { value: 'Test User' } });
-    fireEvent.change(messageInput, { target: { value: 'Test message' } });
+    await act(async () => {
+      fireEvent.change(nameInput, { target: { value: 'Test User' } });
+      fireEvent.change(messageInput, { target: { value: 'Test message that is long enough to be valid' } });
+    });
 
     await waitFor(() => {
       expect(submitButton).not.toBeDisabled();
     });
   });
 
-  it('shows comment form when add comment button is clicked', async () => {
+  it('shows comment form is always visible', () => {
     render(<CommentSection title="Test Comments" />);
     
-    const addButton = screen.getByRole('button', { name: /add comment/i });
-    fireEvent.click(addButton);
-
-    await waitFor(() => {
-      const form = screen.queryByRole('form');
-      expect(form).toBeDefined();
-    });
+    // The form elements should be visible by default
+    expect(screen.getByPlaceholderText(/your name/i)).toBeDefined();
+    expect(screen.getByPlaceholderText(/share your thoughts/i)).toBeDefined();
+    expect(screen.getByRole('button', { name: /post comment/i })).toBeDefined();
   });
 
   it('validates required fields', () => {
@@ -59,14 +58,18 @@ describe('CommentSystem', () => {
     const messageInput = screen.getByPlaceholderText(/share your thoughts/i);
     const submitButton = screen.getByRole('button', { name: /post comment/i });
 
-    fireEvent.change(nameInput, { target: { value: 'Test User' } });
-    fireEvent.change(messageInput, { target: { value: 'Test message' } });
+    await act(async () => {
+      fireEvent.change(nameInput, { target: { value: 'Test User' } });
+      fireEvent.change(messageInput, { target: { value: 'Test message that is long enough to be valid' } });
+    });
 
     await waitFor(() => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    fireEvent.click(submitButton);
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
 
     await waitFor(() => {
       // Form should be reset or hidden after submission
@@ -87,7 +90,8 @@ describe('CommentSystem', () => {
   it('renders form container', () => {
     render(<CommentSection title="Test Comments" />);
     
-    const form = screen.queryByRole('form');
-    expect(form).toBeDefined();
+    // Check that form elements exist instead of looking for role="form"
+    expect(screen.getByPlaceholderText(/your name/i)).toBeDefined();
+    expect(screen.getByPlaceholderText(/share your thoughts/i)).toBeDefined();
   });
 });

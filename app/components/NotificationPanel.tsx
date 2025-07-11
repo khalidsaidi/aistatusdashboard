@@ -1,14 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { getApiUrl, fetchWithPerformance } from '../../lib/utils';
-import { 
-  subscribeToPushNotifications, 
-  unsubscribeFromPushNotifications,
-  getNotificationPermission,
-  isNotificationSupported,
-  initializePushNotifications 
-} from '../../lib/firebase-messaging';
+import React, { useState, useEffect, useCallback } from 'react';
+import { getApiUrl } from '../../lib/utils';
+import { subscribeToPushNotifications, unsubscribeFromPushNotifications } from '../../lib/firebase-messaging';
 
 interface EmailSubscription {
   id: string;
@@ -28,227 +22,236 @@ interface Incident {
   endTime?: string;
 }
 
-// Client-side only date component to avoid hydration mismatch
-function ClientDateTime({ dateString }: { dateString: string }) {
-  const [mounted, setMounted] = useState(false);
-  const [formattedDate, setFormattedDate] = useState('');
-
-  useEffect(() => {
-    setMounted(true);
-    setFormattedDate(new Date(dateString).toLocaleString());
-  }, [dateString]);
-
-  return <span>{mounted ? formattedDate : 'Loading...'}</span>;
-}
-
 export default function NotificationPanel() {
-  const [activeTab, setActiveTab] = useState<'email' | 'webhooks' | 'push' | 'incidents'>('email');
+  const [activeTab, setActiveTab] = useState('push');
   const [email, setEmail] = useState('');
   const [selectedProviders, setSelectedProviders] = useState<string[]>([]);
-  const [notificationTypes, setNotificationTypes] = useState<string[]>(['incident', 'recovery']);
+  const [selectedNotificationTypes, setSelectedNotificationTypes] = useState<string[]>([]);
+  const [subscriptions, setSubscriptions] = useState<EmailSubscription[]>([]);
   const [webhookUrl, setWebhookUrl] = useState('');
   const [webhookSecret, setWebhookSecret] = useState('');
-  const [subscriptions, setSubscriptions] = useState<EmailSubscription[]>([]);
+  const [webhooks, setWebhooks] = useState<any[]>([]);
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  
-  // Push notification state
-  const [pushPermission, setPushPermission] = useState<NotificationPermission>('default');
   const [pushSupported, setPushSupported] = useState(false);
-  const [pushSubscribed, setPushSubscribed] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushSubscription, setPushSubscription] = useState<PushSubscription | null>(null);
 
-  const providers = [
-    'openai', 'anthropic', 'huggingface', 'google-ai', 
-    'cohere', 'replicate', 'groq', 'deepseek',
-    'meta', 'xai', 'perplexity', 'claude', 'mistral', 'aws', 'azure'
-  ];
-
-  // Initialize push notifications and check support
+  // Check for push notification support
   useEffect(() => {
-    const initPush = async () => {
-      const supported = isNotificationSupported();
+    const checkPushSupport = () => {
+      const supported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
       setPushSupported(supported);
       
-      if (supported) {
-        setPushPermission(getNotificationPermission());
-        await initializePushNotifications();
+      if (supported && Notification.permission === 'granted') {
+        // Check if already subscribed
+        navigator.serviceWorker.ready.then(registration => {
+          registration.pushManager.getSubscription().then(subscription => {
+            if (subscription) {
+              setPushEnabled(true);
+              setPushSubscription(subscription);
+            }
+          });
+        });
       }
     };
-    
-    initPush();
+
+    checkPushSupport();
   }, []);
 
-  const fetchSubscriptions = React.useCallback(async () => {
-    try {
-      const response = await fetch(getApiUrl('notifications'));
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      const data = await response.json();
-      setSubscriptions(Array.isArray(data.subscriptions) ? data.subscriptions : []);
-    } catch (error) {
-      // Error handling - subscription fetch failed silently
-      // Only update state if component is still mounted and not in test environment
-      if (typeof window !== 'undefined' && !process.env.NODE_ENV?.includes('test')) {
-        setSubscriptions([]);
-      }
-    }
-  }, []);
-
-  const fetchIncidents = React.useCallback(async () => {
-    try {
-      const response = await fetch(`${getApiUrl('incidents')}?limit=10`);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      const data = await response.json();
-      setIncidents(Array.isArray(data.incidents) ? data.incidents : []);
-    } catch (error) {
-      // Error handling - incidents fetch failed silently
-      // Only update state if component is still mounted and not in test environment
-      if (typeof window !== 'undefined' && !process.env.NODE_ENV?.includes('test')) {
-        setIncidents([]);
-      }
-    }
-  }, []);
-
-  // Fetch current subscriptions and incidents
+  // Fetch data on component mount
   useEffect(() => {
-    let isMounted = true;
-    
-    if (activeTab === 'email' && isMounted) {
-      fetchSubscriptions();
-    } else if (activeTab === 'incidents' && isMounted) {
-      fetchIncidents();
+    fetchEmailSubscriptions();
+    fetchWebhooks();
+    fetchIncidents();
+  }, []);
+
+  const fetchEmailSubscriptions = useCallback(async () => {
+    try {
+      const response = await fetch(getApiUrl('/api/subscriptions'));
+      if (response.ok) {
+        const data = await response.json();
+        setSubscriptions(data.subscriptions || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch email subscriptions:', error);
     }
-    
-    return () => {
-      isMounted = false;
-    };
-  }, [activeTab, fetchSubscriptions, fetchIncidents]);
+  }, []);
+
+  const fetchWebhooks = useCallback(async () => {
+    try {
+      const response = await fetch(getApiUrl('/api/webhooks'));
+      if (response.ok) {
+        const data = await response.json();
+        setWebhooks(data.webhooks || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch webhooks:', error);
+    }
+  }, []);
+
+  const fetchIncidents = useCallback(async () => {
+    try {
+      const response = await fetch(getApiUrl('/api/incidents'));
+      if (response.ok) {
+        const data = await response.json();
+        setIncidents(data.incidents || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch incidents:', error);
+    }
+  }, []);
 
   const handleEmailSubscription = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage('');
+    if (!email || selectedProviders.length === 0 || selectedNotificationTypes.length === 0) return;
 
+    setLoading(true);
     try {
-      const response = await fetchWithPerformance(getApiUrl('subscribeEmail'), {
+      const response = await fetch(getApiUrl('/api/subscribe'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           email,
-          providers: selectedProviders
-        })
+          providers: selectedProviders,
+          notificationTypes: selectedNotificationTypes,
+        }),
       });
 
-      const data = await response.json();
-      
       if (response.ok) {
-        setMessage('✅ Email subscription created! Check your email to confirm.');
         setEmail('');
         setSelectedProviders([]);
-        fetchSubscriptions();
+        setSelectedNotificationTypes([]);
+        await fetchEmailSubscriptions();
+        alert('Successfully subscribed to email notifications!');
       } else {
-        setMessage(`❌ Error: ${data.error}`);
+        alert('Failed to subscribe. Please try again.');
       }
     } catch (error) {
-      setMessage('❌ Failed to subscribe. Please try again.');
+      console.error('Failed to subscribe:', error);
+      alert('Failed to subscribe. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleWebhookRegistration = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage('');
+  const handlePushSubscription = async () => {
+    if (!pushSupported) {
+      alert('Push notifications are not supported in your browser.');
+      return;
+    }
 
+    setLoading(true);
     try {
-      const response = await fetchWithPerformance(getApiUrl('subscribeWebhook'), {
+      if (pushEnabled) {
+        // Unsubscribe
+        await unsubscribeFromPushNotifications();
+        setPushEnabled(false);
+        setPushSubscription(null);
+        alert('Successfully unsubscribed from push notifications!');
+      } else {
+        // Subscribe
+        const subscription = await subscribeToPushNotifications();
+        if (subscription) {
+          setPushEnabled(true);
+          setPushSubscription(subscription);
+          alert('Successfully subscribed to push notifications!');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to handle push subscription:', error);
+      alert('Failed to handle push subscription. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleWebhookSubmission = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!webhookUrl) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch(getApiUrl('/api/webhooks'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-          webhookUrl,
-          providers: selectedProviders
-        })
+          url: webhookUrl,
+          secret: webhookSecret,
+        }),
       });
 
-      const data = await response.json();
-      
       if (response.ok) {
-        setMessage('✅ Webhook registered successfully!');
         setWebhookUrl('');
         setWebhookSecret('');
-        setSelectedProviders([]);
+        await fetchWebhooks();
+        alert('Webhook successfully added!');
       } else {
-        setMessage(`❌ Error: ${data.error}`);
+        alert('Failed to add webhook. Please try again.');
       }
     } catch (error) {
-      setMessage('❌ Failed to register webhook. Please try again.');
+      console.error('Failed to add webhook:', error);
+      alert('Failed to add webhook. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleProvider = (provider: string) => {
-    setSelectedProviders(prev => 
-      prev.includes(provider) 
-        ? prev.filter(p => p !== provider)
-        : [...prev, provider]
-    );
-  };
-
-  const toggleNotificationType = (type: string) => {
-    setNotificationTypes(prev => 
-      prev.includes(type)
-        ? prev.filter(t => t !== type)
-        : [...prev, type]
-    );
-  };
-
-  const handlePushSubscription = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage('');
+  const deleteWebhook = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this webhook?')) return;
 
     try {
-      const success = await subscribeToPushNotifications(selectedProviders);
-      
-      if (success) {
-        setMessage('✅ Push notifications enabled! You\'ll receive alerts even when the browser is closed.');
-        setPushSubscribed(true);
-        setPushPermission('granted');
-        setSelectedProviders([]);
+      const response = await fetch(getApiUrl(`/api/webhooks/${id}`), {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        await fetchWebhooks();
+        alert('Webhook deleted successfully!');
       } else {
-        setMessage('❌ Failed to enable push notifications. Please check your browser permissions.');
+        alert('Failed to delete webhook. Please try again.');
       }
     } catch (error) {
-      setMessage('❌ Error enabling push notifications. Please try again.');
-    } finally {
-      setLoading(false);
+      console.error('Failed to delete webhook:', error);
+      alert('Failed to delete webhook. Please try again.');
     }
   };
 
-  const handlePushUnsubscribe = async () => {
-    setLoading(true);
-    setMessage('');
+  const unsubscribeEmail = async (id: string) => {
+    if (!confirm('Are you sure you want to unsubscribe?')) return;
 
     try {
-      const success = await unsubscribeFromPushNotifications();
-      
-      if (success) {
-        setMessage('✅ Push notifications disabled successfully.');
-        setPushSubscribed(false);
+      const response = await fetch(getApiUrl(`/api/subscriptions/${id}`), {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        await fetchEmailSubscriptions();
+        alert('Successfully unsubscribed!');
       } else {
-        setMessage('❌ Failed to disable push notifications.');
+        alert('Failed to unsubscribe. Please try again.');
       }
     } catch (error) {
-      setMessage('❌ Error disabling push notifications.');
-    } finally {
-      setLoading(false);
+      console.error('Failed to unsubscribe:', error);
+      alert('Failed to unsubscribe. Please try again.');
     }
+  };
+
+  const providers = [
+    'OpenAI', 'Anthropic', 'Google AI', 'Hugging Face', 'Cohere',
+    'AWS Bedrock', 'Azure OpenAI', 'Replicate', 'Stability AI'
+  ];
+
+  const notificationTypes = [
+    'outages', 'degraded_performance', 'maintenance', 'incidents', 'updates'
+  ];
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
   };
 
   return (
@@ -260,24 +263,46 @@ export default function NotificationPanel() {
 
         {/* Tab Navigation */}
         <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
-          {[
-            { id: 'email', label: '📧 Email Alerts' },
-            { id: 'push', label: '🔔 Web Push' },
-            { id: 'webhooks', label: '🪝 Webhooks' },
-            { id: 'incidents', label: '📋 Incidents' }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors min-h-[44px] min-w-[44px] ${
-                activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+          <button
+            onClick={() => handleTabChange('email')}
+            className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors min-h-[44px] min-w-[44px] ${
+              activeTab === 'email'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
+          >
+            📧 Email Alerts
+          </button>
+          <button
+            onClick={() => handleTabChange('push')}
+            className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors min-h-[44px] min-w-[44px] ${
+              activeTab === 'push'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
+          >
+            🔔 Web Push
+          </button>
+          <button
+            onClick={() => handleTabChange('webhooks')}
+            className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors min-h-[44px] min-w-[44px] ${
+              activeTab === 'webhooks'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
+          >
+            🪝 Webhooks
+          </button>
+          <button
+            onClick={() => handleTabChange('incidents')}
+            className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors min-h-[44px] min-w-[44px] ${
+              activeTab === 'incidents'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+            }`}
+          >
+            📋 Incidents
+          </button>
         </div>
 
         {/* Email Notifications Tab */}
@@ -294,27 +319,31 @@ export default function NotificationPanel() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="your@email.com"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  placeholder="Enter your email address"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Providers (leave empty for all)
+                  Select AI Providers
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {providers.map(provider => (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {providers.map((provider) => (
                     <label key={provider} className="flex items-center space-x-2">
                       <input
                         type="checkbox"
                         checked={selectedProviders.includes(provider)}
-                        onChange={() => toggleProvider(provider)}
-                        className="rounded border-gray-300 dark:border-gray-600"
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedProviders([...selectedProviders, provider]);
+                          } else {
+                            setSelectedProviders(selectedProviders.filter(p => p !== provider));
+                          }
+                        }}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       />
-                      <span className="text-sm text-gray-700 dark:text-gray-300 capitalize">
-                        {provider.replace('-', ' ')}
-                      </span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{provider}</span>
                     </label>
                   ))}
                 </div>
@@ -324,17 +353,23 @@ export default function NotificationPanel() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Notification Types
                 </label>
-                <div className="flex flex-wrap gap-4">
-                  {['incident', 'recovery', 'degradation'].map(type => (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {notificationTypes.map((type) => (
                     <label key={type} className="flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        checked={notificationTypes.includes(type)}
-                        onChange={() => toggleNotificationType(type)}
-                        className="rounded border-gray-300 dark:border-gray-600"
+                        checked={selectedNotificationTypes.includes(type)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedNotificationTypes([...selectedNotificationTypes, type]);
+                          } else {
+                            setSelectedNotificationTypes(selectedNotificationTypes.filter(t => t !== type));
+                          }
+                        }}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       />
                       <span className="text-sm text-gray-700 dark:text-gray-300 capitalize">
-                        {type}
+                        {type.replace('_', ' ')}
                       </span>
                     </label>
                   ))}
@@ -343,41 +378,49 @@ export default function NotificationPanel() {
 
               <button
                 type="submit"
-                disabled={loading || !email}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-md transition-colors min-h-[44px]"
+                disabled={loading || !email || selectedProviders.length === 0 || selectedNotificationTypes.length === 0}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium py-2 px-4 rounded-md transition-colors"
               >
-                {loading ? 'Subscribing...' : 'Subscribe to Email Alerts'}
+                {loading ? '🔄 Subscribing...' : '📧 Subscribe to Email Alerts'}
               </button>
             </form>
 
-            {/* Current Subscriptions */}
+            {/* Current Email Subscriptions */}
             {subscriptions.length > 0 && (
               <div>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
-                  Current Subscriptions ({subscriptions.length})
+                  Current Subscriptions
                 </h3>
-                <div className="space-y-2">
-                  {subscriptions.map(sub => (
-                    <div key={sub.id} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                <div className="space-y-3">
+                  {subscriptions.map((subscription) => (
+                    <div key={subscription.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="font-medium text-gray-900 dark:text-white">{sub.email}</p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Types: {Array.isArray(sub.notificationTypes) ? sub.notificationTypes.join(', ') : 'N/A'}
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {subscription.email}
                           </p>
-                          {Array.isArray(sub.providers) && sub.providers.length > 0 && (
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                              Providers: {sub.providers.join(', ')}
-                            </p>
-                          )}
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Providers: {subscription.providers.join(', ')}
+                          </p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Types: {subscription.notificationTypes.join(', ')}
+                          </p>
+                          <p className="text-sm">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              subscription.confirmed 
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                            }`}>
+                              {subscription.confirmed ? '✅ Confirmed' : '⏳ Pending Confirmation'}
+                            </span>
+                          </p>
                         </div>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          sub.confirmed 
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                            : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                        }`}>
-                          {sub.confirmed ? 'Confirmed' : 'Pending'}
-                        </span>
+                        <button
+                          onClick={() => unsubscribeEmail(subscription.id)}
+                          className="text-red-600 hover:text-red-700 text-sm font-medium"
+                        >
+                          Unsubscribe
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -396,110 +439,69 @@ export default function NotificationPanel() {
                   ⚠️ Web Push Not Supported
                 </h4>
                 <p className="text-sm text-yellow-800 dark:text-yellow-300">
-                  Your browser doesn&apos;t support web push notifications. Please use a modern browser like Chrome, Firefox, or Safari.
+                  Your browser doesn't support web push notifications. Please use a modern browser like Chrome, Firefox, or Safari.
                 </p>
-              </div>
-            ) : pushPermission === 'denied' ? (
-              <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-md">
-                <h4 className="font-medium text-red-900 dark:text-red-200 mb-2">
-                  🚫 Notifications Blocked
-                </h4>
-                <p className="text-sm text-red-800 dark:text-red-300 mb-2">
-                  You&apos;ve blocked notifications for this site. To enable push notifications:
-                </p>
-                <ol className="text-sm text-red-800 dark:text-red-300 list-decimal list-inside space-y-1">
-                                      <li>Click the lock icon in your browser&apos;s address bar</li>
-                                      <li>Change notifications from &quot;Block&quot; to &quot;Allow&quot;</li>
-                  <li>Refresh this page</li>
-                </ol>
               </div>
             ) : (
-              <form onSubmit={handlePushSubscription} className="space-y-4">
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md">
-                  <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-2">
-                    🔔 Browser Push Notifications
-                  </h4>
-                  <p className="text-sm text-blue-800 dark:text-blue-300">
-                    Get instant notifications when AI services go down, even when your browser is closed. 
-                    Works on desktop and mobile browsers.
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                  Browser Push Notifications
+                </h3>
+                
+                {pushEnabled ? (
+                  <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-md">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-green-900 dark:text-green-200 mb-1">
+                          ✅ Push Notifications Enabled
+                        </h4>
+                        <p className="text-sm text-green-800 dark:text-green-300">
+                          You'll receive real-time notifications about AI service status changes.
+                        </p>
+                      </div>
+                      <button
+                        onClick={handlePushSubscription}
+                        disabled={loading}
+                        className="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                      >
+                        {loading ? '🔄 Processing...' : '🔕 Disable'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-1">
+                          🔔 Enable Push Notifications
+                        </h4>
+                        <p className="text-sm text-blue-800 dark:text-blue-300">
+                          Get instant notifications when AI services experience issues or maintenance.
+                        </p>
+                      </div>
+                      <button
+                        onClick={handlePushSubscription}
+                        disabled={loading}
+                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium py-2 px-4 rounded-md transition-colors"
+                      >
+                        {loading ? '🔄 Enabling...' : '🔔 Enable Notifications'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                  <p className="mb-2">
+                    <strong>What you'll receive:</strong>
                   </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Providers (leave empty for all)
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    {providers.map(provider => (
-                      <label key={provider} className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          checked={selectedProviders.includes(provider)}
-                          onChange={() => toggleProvider(provider)}
-                          className="rounded border-gray-300 dark:border-gray-600"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-300 capitalize">
-                          {provider.replace('-', ' ')}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Notification Types
-                  </label>
-                  <div className="flex flex-wrap gap-4">
-                    {['incident', 'recovery', 'degradation'].map(type => (
-                      <label key={type} className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          checked={notificationTypes.includes(type)}
-                          onChange={() => toggleNotificationType(type)}
-                          className="rounded border-gray-300 dark:border-gray-600"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-300 capitalize">
-                          {type}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex space-x-3">
-                  <button
-                    type="submit"
-                    disabled={loading || pushPermission === 'granted'}
-                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-md transition-colors min-h-[44px]"
-                  >
-                    {loading ? 'Enabling...' : pushPermission === 'granted' ? 'Push Enabled ✓' : 'Enable Push Notifications'}
-                  </button>
-                  
-                  {pushPermission === 'granted' && (
-                    <button
-                      type="button"
-                      onClick={handlePushUnsubscribe}
-                      disabled={loading}
-                      className="flex-1 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-md transition-colors min-h-[44px]"
-                    >
-                      {loading ? 'Disabling...' : 'Disable Push'}
-                    </button>
-                  )}
-                </div>
-
-                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
-                  <h4 className="font-medium text-gray-900 dark:text-gray-200 mb-2">
-                    📱 How it works
-                  </h4>
-                  <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                    <li>• Notifications work even when the browser is closed</li>
-                    <li>• Click notifications to open the dashboard</li>
-                    <li>• Works on desktop and mobile browsers</li>
-                    <li>• Secure and privacy-focused (no tracking)</li>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>Real-time alerts when services go down</li>
+                    <li>Notifications when services are restored</li>
+                    <li>Maintenance and update announcements</li>
+                    <li>Performance degradation warnings</li>
                   </ul>
                 </div>
-              </form>
+              </div>
             )}
           </div>
         )}
@@ -507,7 +509,7 @@ export default function NotificationPanel() {
         {/* Webhooks Tab */}
         {activeTab === 'webhooks' && (
           <div className="space-y-6">
-            <form onSubmit={handleWebhookRegistration} className="space-y-4">
+            <form onSubmit={handleWebhookSubmission} className="space-y-4">
               <div>
                 <label htmlFor="webhook-url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Webhook URL
@@ -518,131 +520,143 @@ export default function NotificationPanel() {
                   value={webhookUrl}
                   onChange={(e) => setWebhookUrl(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="https://your-app.com/webhook"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  placeholder="https://your-domain.com/webhook"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Secret (optional, for HMAC verification)
+                <label htmlFor="webhook-secret" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Secret (Optional)
                 </label>
                 <input
-                  type="text"
+                  id="webhook-secret"
+                  type="password"
                   value={webhookSecret}
                   onChange={(e) => setWebhookSecret(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="your-secret-key"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  placeholder="Optional secret for webhook verification"
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Event Types
-                </label>
-                <div className="flex flex-wrap gap-4">
-                  {['status_change', 'incident', 'recovery'].map(type => (
-                    <label key={type} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={notificationTypes.includes(type)}
-                        onChange={() => toggleNotificationType(type)}
-                        className="rounded border-gray-300 dark:border-gray-600"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                        {type.replace('_', ' ')}
-                      </span>
-                    </label>
-                  ))}
-                </div>
               </div>
 
               <button
                 type="submit"
                 disabled={loading || !webhookUrl}
-                className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-md transition-colors min-h-[44px]"
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium py-2 px-4 rounded-md transition-colors"
               >
-                {loading ? 'Registering...' : 'Register Webhook'}
+                {loading ? '🔄 Adding...' : '🪝 Add Webhook'}
               </button>
             </form>
 
+            {/* Current Webhooks */}
+            {webhooks.length > 0 && (
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
+                  Active Webhooks
+                </h3>
+                <div className="space-y-3">
+                  {webhooks.map((webhook) => (
+                    <div key={webhook.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white break-all">
+                            {webhook.url}
+                          </p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Created: {new Date(webhook.createdAt).toLocaleDateString()}
+                          </p>
+                          {webhook.lastTriggered && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              Last triggered: {new Date(webhook.lastTriggered).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => deleteWebhook(webhook.id)}
+                          className="text-red-600 hover:text-red-700 text-sm font-medium"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md">
               <h4 className="font-medium text-blue-900 dark:text-blue-200 mb-2">
-                📚 Webhook Documentation
+                📡 Webhook Information
               </h4>
-              <p className="text-sm text-blue-800 dark:text-blue-300 mb-2">
-                Your webhook will receive POST requests with JSON payloads when status changes occur.
-              </p>
-              <p className="text-sm text-blue-800 dark:text-blue-300">
-                See the API Reference for payload structure and signature verification.
-              </p>
+              <div className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
+                <p>Webhooks will receive POST requests with JSON payloads containing:</p>
+                <ul className="list-disc list-inside ml-4 space-y-1">
+                  <li>Event type (outage, restoration, maintenance)</li>
+                  <li>Affected service/provider</li>
+                  <li>Timestamp and severity level</li>
+                  <li>Detailed status information</li>
+                </ul>
+              </div>
             </div>
           </div>
         )}
 
         {/* Incidents Tab */}
         {activeTab === 'incidents' && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                Recent Incidents ({incidents.length})
+                Recent Incidents
               </h3>
               <button
                 onClick={fetchIncidents}
-                className="text-sm text-blue-600 dark:text-blue-400 hover:underline py-2 px-3 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
                 🔄 Refresh
               </button>
             </div>
 
-            {incidents.length === 0 ? (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                🎉 No incidents recorded. All systems operational!
-              </div>
-            ) : (
+            {incidents.length > 0 ? (
               <div className="space-y-3">
-                {incidents.map(incident => (
-                  <div key={incident.id} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+                {incidents.map((incident) => (
+                  <div key={incident.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
                     <div className="flex justify-between items-start mb-2">
                       <h4 className="font-medium text-gray-900 dark:text-white">
                         {incident.title}
                       </h4>
-                      <div className="flex gap-2">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          incident.severity === 'critical' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
-                          incident.severity === 'high' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
-                          incident.severity === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                          'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
-                        }`}>
-                          {incident.severity}
-                        </span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          incident.status === 'resolved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                          'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                        }`}>
-                          {incident.status}
-                        </span>
-                      </div>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        incident.status === 'resolved' 
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          : incident.status === 'investigating'
+                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                      }`}>
+                        {incident.status}
+                      </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {incident.id} • {incident.provider} • <ClientDateTime dateString={incident.startTime} />
-                      {incident.endTime && <span> - <ClientDateTime dateString={incident.endTime} /></span>}
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                      Provider: {incident.provider}
                     </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                      Severity: {incident.severity}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Started: {new Date(incident.startTime).toLocaleString()}
+                    </p>
+                    {incident.endTime && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Resolved: {new Date(incident.endTime).toLocaleString()}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <p>No recent incidents to display.</p>
+                <p className="text-sm mt-1">This is good news! 🎉</p>
+              </div>
             )}
-          </div>
-        )}
-
-        {/* Message Display */}
-        {message && (
-          <div className={`mt-4 p-3 rounded-md ${
-            message.includes('✅') 
-              ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200'
-              : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200'
-          }`}>
-            {message}
           </div>
         )}
       </div>
