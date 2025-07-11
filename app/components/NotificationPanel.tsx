@@ -37,35 +37,6 @@ export default function NotificationPanel() {
   const [pushEnabled, setPushEnabled] = useState(false);
   const [pushSubscription, setPushSubscription] = useState<PushSubscription | null>(null);
 
-  // Check for push notification support
-  useEffect(() => {
-    const checkPushSupport = () => {
-      const supported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
-      setPushSupported(supported);
-      
-      if (supported && Notification.permission === 'granted') {
-        // Check if already subscribed
-        navigator.serviceWorker.ready.then(registration => {
-          registration.pushManager.getSubscription().then(subscription => {
-            if (subscription) {
-              setPushEnabled(true);
-              setPushSubscription(subscription);
-            }
-          });
-        });
-      }
-    };
-
-    checkPushSupport();
-  }, []);
-
-  // Fetch data on component mount
-  useEffect(() => {
-    fetchEmailSubscriptions();
-    fetchWebhooks();
-    fetchIncidents();
-  }, []);
-
   const fetchEmailSubscriptions = useCallback(async () => {
     try {
       const response = await fetch(getApiUrl('/api/subscriptions'));
@@ -101,6 +72,35 @@ export default function NotificationPanel() {
       console.error('Failed to fetch incidents:', error);
     }
   }, []);
+
+  // Check for push notification support
+  useEffect(() => {
+    const checkPushSupport = () => {
+      const supported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
+      setPushSupported(supported);
+      
+      if (supported && Notification.permission === 'granted') {
+        // Check if already subscribed
+        navigator.serviceWorker.ready.then(registration => {
+          registration.pushManager.getSubscription().then(subscription => {
+            if (subscription) {
+              setPushEnabled(true);
+              setPushSubscription(subscription);
+            }
+          });
+        });
+      }
+    };
+
+    checkPushSupport();
+  }, []);
+
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchEmailSubscriptions();
+    fetchWebhooks();
+    fetchIncidents();
+  }, [fetchEmailSubscriptions, fetchWebhooks, fetchIncidents]);
 
   const handleEmailSubscription = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,17 +147,29 @@ export default function NotificationPanel() {
     try {
       if (pushEnabled) {
         // Unsubscribe
-        await unsubscribeFromPushNotifications();
-        setPushEnabled(false);
-        setPushSubscription(null);
-        alert('Successfully unsubscribed from push notifications!');
+        const success = await unsubscribeFromPushNotifications();
+        if (success) {
+          setPushEnabled(false);
+          setPushSubscription(null);
+          alert('Successfully unsubscribed from push notifications!');
+        } else {
+          alert('Failed to unsubscribe from push notifications.');
+        }
       } else {
-        // Subscribe
-        const subscription = await subscribeToPushNotifications();
-        if (subscription) {
+        // Subscribe with selected providers (default to all if none selected)
+        const providersToUse = selectedProviders.length > 0 ? selectedProviders : [
+          'OpenAI', 'Anthropic', 'Google AI', 'Hugging Face', 'Cohere',
+          'AWS Bedrock', 'Azure OpenAI', 'Replicate', 'Stability AI'
+        ];
+        
+        const success = await subscribeToPushNotifications(providersToUse);
+        if (success) {
           setPushEnabled(true);
-          setPushSubscription(subscription);
+          // Note: Firebase messaging returns a boolean, not a subscription object
+          setPushSubscription(null); // We don't have the actual subscription object
           alert('Successfully subscribed to push notifications!');
+        } else {
+          alert('Failed to subscribe to push notifications.');
         }
       }
     } catch (error) {
@@ -439,7 +451,7 @@ export default function NotificationPanel() {
                   ⚠️ Web Push Not Supported
                 </h4>
                 <p className="text-sm text-yellow-800 dark:text-yellow-300">
-                  Your browser doesn't support web push notifications. Please use a modern browser like Chrome, Firefox, or Safari.
+                  Your browser doesn&apos;t support web push notifications. Please use a modern browser like Chrome, Firefox, or Safari.
                 </p>
               </div>
             ) : (
@@ -456,7 +468,7 @@ export default function NotificationPanel() {
                           ✅ Push Notifications Enabled
                         </h4>
                         <p className="text-sm text-green-800 dark:text-green-300">
-                          You'll receive real-time notifications about AI service status changes.
+                          You&apos;ll receive real-time notifications about AI service status changes.
                         </p>
                       </div>
                       <button
@@ -492,7 +504,7 @@ export default function NotificationPanel() {
 
                 <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
                   <p className="mb-2">
-                    <strong>What you'll receive:</strong>
+                    <strong>What you&apos;ll receive:</strong>
                   </p>
                   <ul className="list-disc list-inside space-y-1 ml-4">
                     <li>Real-time alerts when services go down</li>
