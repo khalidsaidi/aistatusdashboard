@@ -9,13 +9,16 @@
 // Set test environment
 process.env.NODE_ENV = 'test';
 
-// Firebase configuration for tests
-process.env.FIREBASE_PROJECT_ID = 'ai-status-dashboard-dev';
-process.env.FIREBASE_API_KEY = 'AIzaSyB-PApl2fcKWYSjnORl9rn-4NMVGnjVF1Q';
-process.env.FIREBASE_AUTH_DOMAIN = 'ai-status-dashboard-dev.firebaseapp.com';
-process.env.FIREBASE_STORAGE_BUCKET = 'ai-status-dashboard-dev.firebasestorage.app';
-process.env.FIREBASE_MESSAGING_SENDER_ID = '413124782229';
-process.env.FIREBASE_APP_ID = '1:413124782229:web:81c009a0e73157e21e139c';
+// Firebase configuration for tests - SECURE VERSION
+// NOTE: These values are safe to expose as they're dev environment only
+// and Firebase API keys are designed to be public (client-side usage)
+// Real security is enforced by Firebase Security Rules, not API key secrecy
+process.env.FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID || 'ai-status-dashboard-dev';
+process.env.FIREBASE_API_KEY = process.env.FIREBASE_API_KEY || 'test-api-key-placeholder';
+process.env.FIREBASE_AUTH_DOMAIN = process.env.FIREBASE_AUTH_DOMAIN || 'ai-status-dashboard-dev.firebaseapp.com';
+process.env.FIREBASE_STORAGE_BUCKET = process.env.FIREBASE_STORAGE_BUCKET || 'ai-status-dashboard-dev.firebasestorage.app';
+process.env.FIREBASE_MESSAGING_SENDER_ID = process.env.FIREBASE_MESSAGING_SENDER_ID || '413124782229';
+process.env.FIREBASE_APP_ID = process.env.FIREBASE_APP_ID || '1:413124782229:web:test-app-id-placeholder';
 
 // Test configuration
 process.env.JEST_TIMEOUT = '60000';
