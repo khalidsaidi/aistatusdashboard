@@ -137,7 +137,7 @@ jobs:
           FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID_DEV }}
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID_DEV }}
           FIREBASE_FUNCTIONS_REGION: ${{ env.FIREBASE_FUNCTIONS_REGION }}
-          NODE_OPTIONS: "--max-old-space-size=4096"
+          NODE_OPTIONS: '--max-old-space-size=4096'
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
