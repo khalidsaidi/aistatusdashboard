@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { token, title, body: messageBody, data } = body;
-    
+
     if (!token || !title || !messageBody) {
       return NextResponse.json(
         { error: 'Missing required fields: token, title, body' },
@@ -30,14 +30,11 @@ export async function POST(request: NextRequest) {
     }
 
     if (!process.env.FIREBASE_PROJECT_ID) {
-      return NextResponse.json(
-        { error: 'Firebase not configured' },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: 'Firebase not configured' }, { status: 503 });
     }
 
     const messaging = getMessaging();
-    
+
     const message = {
       token,
       notification: {
@@ -47,34 +44,34 @@ export async function POST(request: NextRequest) {
       data: {
         timestamp: Date.now().toString(),
         source: 'ai-status-dashboard',
-        ...data
+        ...data,
       },
       webpush: {
         headers: {
-          'TTL': '86400' // 24 hours
+          TTL: '86400', // 24 hours
         },
         notification: {
           icon: '/icon-192x192.png',
           badge: '/icon-192x192.png',
-          requireInteraction: true
-        }
-      }
+          requireInteraction: true,
+        },
+      },
     };
 
     const response = await messaging.send(message);
-    
-    return NextResponse.json({ 
-      success: true, 
-      messageId: response 
+
+    return NextResponse.json({
+      success: true,
+      messageId: response,
     });
   } catch (error) {
     // Error sending Firebase message
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to send Firebase message',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );
   }
-} 
+}

@@ -22,7 +22,7 @@ let userId: string | null = null;
 export const logError = (error: Error, context: string) => {
   // Log to console for development
   // Error logged to crashlytics - no console pollution
-  
+
   // Store error for potential reporting
   if (typeof window !== 'undefined') {
     const errorLog: ErrorLog = {
@@ -30,16 +30,16 @@ export const logError = (error: Error, context: string) => {
       context,
       timestamp: new Date(),
       userAgent: navigator.userAgent,
-      url: window.location.href
+      url: window.location.href,
     };
-    
+
     errorLogs.push(errorLog);
-    
+
     // Keep only last 50 errors to avoid memory issues
     if (errorLogs.length > 50) {
       errorLogs = errorLogs.slice(-50);
     }
-    
+
     // In a real implementation, you might want to send this to a logging service
     // For now, we'll just store it locally
   }
@@ -71,7 +71,7 @@ const crashlytics = {
       (window as any).gtag('event', 'exception', {
         description: message,
         fatal: false,
-        ...extra
+        ...extra,
       });
     }
     // Crashlytics log handled
@@ -82,7 +82,7 @@ const crashlytics = {
       (window as any).gtag('event', 'exception', {
         description: error.message,
         fatal: false,
-        ...context
+        ...context,
       });
     }
     // Crashlytics error handled
@@ -91,7 +91,7 @@ const crashlytics = {
   setUserId: (userId: string) => {
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('config', process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-HPNE6D3YQW', {
-        user_id: userId
+        user_id: userId,
       });
     }
     // User ID set in Crashlytics
@@ -100,11 +100,11 @@ const crashlytics = {
   setCustomKey: (key: string, value: string | number | boolean) => {
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'custom_parameter', {
-        [key]: value
+        [key]: value,
       });
     }
     // Custom key set in Crashlytics
-  }
+  },
 };
 
-export default crashlytics; 
+export default crashlytics;

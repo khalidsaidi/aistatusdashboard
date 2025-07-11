@@ -1,6 +1,6 @@
 /**
  * UNIFIED ERROR HANDLER
- * 
+ *
  * Provides consistent error handling patterns across all components
  * with proper classification, logging, and recovery strategies.
  */
@@ -22,14 +22,14 @@ export enum ErrorCategory {
   CONFIGURATION = 'configuration',
   TIMEOUT = 'timeout',
   RATE_LIMIT = 'rate_limit',
-  CIRCUIT_BREAKER = 'circuit_breaker'
+  CIRCUIT_BREAKER = 'circuit_breaker',
 }
 
 export enum ErrorSeverity {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 
 export interface ErrorContext {
@@ -64,7 +64,7 @@ class ErrorClassifier {
     /fetch/i,
     /ECONNREFUSED/i,
     /ENOTFOUND/i,
-    /ETIMEDOUT/i
+    /ETIMEDOUT/i,
   ];
 
   private static authErrorPatterns = [
@@ -72,25 +72,21 @@ class ErrorClassifier {
     /authentication/i,
     /invalid.*token/i,
     /expired.*token/i,
-    /permission.*denied/i
+    /permission.*denied/i,
   ];
 
   private static validationErrorPatterns = [
     /validation/i,
     /invalid.*input/i,
     /required.*field/i,
-    /bad.*request/i
+    /bad.*request/i,
   ];
 
-  private static rateLimitPatterns = [
-    /rate.*limit/i,
-    /too.*many.*requests/i,
-    /quota.*exceeded/i
-  ];
+  private static rateLimitPatterns = [/rate.*limit/i, /too.*many.*requests/i, /quota.*exceeded/i];
 
   static classify(error: Error, context: ErrorContext): ClassifiedError {
     const message = error.message.toLowerCase();
-    
+
     // Determine category
     let category = ErrorCategory.SYSTEM;
     let severity = ErrorSeverity.MEDIUM;
@@ -98,28 +94,29 @@ class ErrorClassifier {
     let userFriendlyMessage = 'An unexpected error occurred. Please try again.';
 
     // Network errors
-    if (this.networkErrorPatterns.some(pattern => pattern.test(message))) {
+    if (this.networkErrorPatterns.some((pattern) => pattern.test(message))) {
       category = ErrorCategory.NETWORK;
       severity = ErrorSeverity.MEDIUM;
       retryable = true;
-      userFriendlyMessage = 'Network connection issue. Please check your internet connection and try again.';
+      userFriendlyMessage =
+        'Network connection issue. Please check your internet connection and try again.';
     }
     // Authentication errors
-    else if (this.authErrorPatterns.some(pattern => pattern.test(message))) {
+    else if (this.authErrorPatterns.some((pattern) => pattern.test(message))) {
       category = ErrorCategory.AUTHENTICATION;
       severity = ErrorSeverity.HIGH;
       retryable = false;
       userFriendlyMessage = 'Authentication failed. Please check your credentials.';
     }
     // Validation errors
-    else if (this.validationErrorPatterns.some(pattern => pattern.test(message))) {
+    else if (this.validationErrorPatterns.some((pattern) => pattern.test(message))) {
       category = ErrorCategory.VALIDATION;
       severity = ErrorSeverity.LOW;
       retryable = false;
       userFriendlyMessage = 'Invalid input provided. Please check your data and try again.';
     }
     // Rate limit errors
-    else if (this.rateLimitPatterns.some(pattern => pattern.test(message))) {
+    else if (this.rateLimitPatterns.some((pattern) => pattern.test(message))) {
       category = ErrorCategory.RATE_LIMIT;
       severity = ErrorSeverity.MEDIUM;
       retryable = true;
@@ -155,7 +152,7 @@ class ErrorClassifier {
       context,
       timestamp: Date.now(),
       retryable,
-      userFriendlyMessage
+      userFriendlyMessage,
     };
   }
 }
@@ -193,7 +190,7 @@ class NetworkRecoveryStrategy implements RecoveryStrategy {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
@@ -204,10 +201,10 @@ class CircuitBreakerRecoveryStrategy implements RecoveryStrategy {
 
   async recover(error: ClassifiedError): Promise<any> {
     // Wait for circuit breaker timeout and suggest retry
-    return { 
-      shouldRetry: true, 
+    return {
+      shouldRetry: true,
       delay: 30000, // 30 seconds
-      message: 'Circuit breaker is open. Waiting for recovery...'
+      message: 'Circuit breaker is open. Waiting for recovery...',
     };
   }
 }
@@ -235,10 +232,10 @@ export class UnifiedErrorHandler {
   async handleError(
     error: Error,
     context: ErrorContext
-  ): Promise<{ 
-    classifiedError: ClassifiedError; 
-    recoveryAction?: any; 
-    shouldThrow: boolean 
+  ): Promise<{
+    classifiedError: ClassifiedError;
+    recoveryAction?: any;
+    shouldThrow: boolean;
   }> {
     // Classify the error
     const classifiedError = ErrorClassifier.classify(error, context);
@@ -262,7 +259,7 @@ export class UnifiedErrorHandler {
         } catch (recoveryError) {
           log('warn', 'Recovery strategy failed', {
             strategy: strategy.constructor.name,
-            error: recoveryError instanceof Error ? recoveryError.message : 'Unknown error'
+            error: recoveryError instanceof Error ? recoveryError.message : 'Unknown error',
           });
         }
       }
@@ -271,7 +268,7 @@ export class UnifiedErrorHandler {
     return {
       classifiedError,
       recoveryAction,
-      shouldThrow
+      shouldThrow,
     };
   }
 
@@ -297,18 +294,15 @@ export class UnifiedErrorHandler {
         severity: classifiedError.severity,
         retryable: classifiedError.retryable,
         timestamp: classifiedError.timestamp,
-        requestId: classifiedError.context.requestId
-      }
+        requestId: classifiedError.context.requestId,
+      },
     };
   }
 
   /**
    * Wrap async operations with error handling
    */
-  async wrapOperation<T>(
-    operation: () => Promise<T>,
-    context: ErrorContext
-  ): Promise<T> {
+  async wrapOperation<T>(operation: () => Promise<T>, context: ErrorContext): Promise<T> {
     try {
       return await operation();
     } catch (error) {
@@ -339,8 +333,8 @@ export class UnifiedErrorHandler {
     const errorsBySeverity = {} as Record<ErrorSeverity, number>;
 
     // Initialize counters
-    Object.values(ErrorCategory).forEach(cat => errorsByCategory[cat] = 0);
-    Object.values(ErrorSeverity).forEach(sev => errorsBySeverity[sev] = 0);
+    Object.values(ErrorCategory).forEach((cat) => (errorsByCategory[cat] = 0));
+    Object.values(ErrorSeverity).forEach((sev) => (errorsBySeverity[sev] = 0));
 
     // Count errors
     for (const error of this.errorHistory) {
@@ -352,7 +346,7 @@ export class UnifiedErrorHandler {
       totalErrors: this.errorHistory.length,
       errorsByCategory,
       errorsBySeverity,
-      recentErrors: this.errorHistory.slice(-10) // Last 10 errors
+      recentErrors: this.errorHistory.slice(-10), // Last 10 errors
     };
   }
 
@@ -376,14 +370,14 @@ export class UnifiedErrorHandler {
 
   private logError(error: ClassifiedError): void {
     const logLevel = this.getLogLevel(error.severity);
-    
+
     log(logLevel, `Error in ${error.context.component}.${error.context.operation}`, {
       category: error.category,
       severity: error.severity,
       message: error.message,
       retryable: error.retryable,
       context: error.context,
-      stack: error.originalError.stack
+      stack: error.originalError.stack,
     });
   }
 
@@ -403,7 +397,7 @@ export class UnifiedErrorHandler {
 
   private addToHistory(error: ClassifiedError): void {
     this.errorHistory.push(error);
-    
+
     // Maintain history size limit
     if (this.errorHistory.length > this.maxHistorySize) {
       this.errorHistory.shift();
@@ -440,10 +434,10 @@ const globalErrorHandler = new UnifiedErrorHandler();
 export async function handleError(
   error: Error,
   context: ErrorContext
-): Promise<{ 
-  classifiedError: ClassifiedError; 
-  recoveryAction?: any; 
-  shouldThrow: boolean 
+): Promise<{
+  classifiedError: ClassifiedError;
+  recoveryAction?: any;
+  shouldThrow: boolean;
 }> {
   return globalErrorHandler.handleError(error, context);
 }
@@ -484,4 +478,4 @@ export function clearGlobalErrorHistory(): void {
  */
 export function getGlobalErrorHandler(): UnifiedErrorHandler {
   return globalErrorHandler;
-} 
+}

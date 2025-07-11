@@ -18,9 +18,9 @@ describe('FirebaseWorkerQueue Unit Tests', () => {
       maxQueueSize: 1000,
       rateLimitPerSecond: 10,
       circuitBreakerThreshold: 5,
-      circuitBreakerTimeout: 30000
+      circuitBreakerTimeout: 30000,
     };
-    
+
     queue = new FirebaseWorkerQueue(testConfig);
   });
 
@@ -44,14 +44,14 @@ describe('FirebaseWorkerQueue Unit Tests', () => {
   describe('Metrics', () => {
     it('should return initial metrics', async () => {
       const metrics = await queue.getMetrics();
-      
+
       expect(metrics).toHaveProperty('activeJobs');
       expect(metrics).toHaveProperty('waitingJobs');
       expect(metrics).toHaveProperty('completedJobs');
       expect(metrics).toHaveProperty('failedJobs');
       expect(metrics).toHaveProperty('workers');
       expect(metrics).toHaveProperty('throughput');
-      
+
       expect(metrics.activeJobs).toBe(0);
       expect(metrics.waitingJobs).toBe(0);
       expect(metrics.completedJobs).toBe(0);
@@ -60,7 +60,7 @@ describe('FirebaseWorkerQueue Unit Tests', () => {
 
     it('should return queue status', async () => {
       const status = await queue.getQueueStatus();
-      
+
       expect(status).toHaveProperty('health');
       expect(status).toHaveProperty('details');
       expect(['healthy', 'degraded', 'critical']).toContain(status.health);
@@ -71,17 +71,17 @@ describe('FirebaseWorkerQueue Unit Tests', () => {
     it('should handle pause and resume', async () => {
       await queue.pauseQueue();
       await queue.resumeQueue();
-      
+
       // Should complete without errors
       expect(true).toBe(true);
     });
 
     it('should emit events on pause/resume', async () => {
-      const pausePromise = new Promise(resolve => {
+      const pausePromise = new Promise((resolve) => {
         queue.once('queuePaused', resolve);
       });
 
-      const resumePromise = new Promise(resolve => {
+      const resumePromise = new Promise((resolve) => {
         queue.once('queueResumed', resolve);
       });
 
@@ -96,7 +96,7 @@ describe('FirebaseWorkerQueue Unit Tests', () => {
 
     it('should reject operations when shutting down', async () => {
       await queue.pauseQueue(); // This sets isShuttingDown to true
-      
+
       await expect(queue.queueProvider('test-provider')).rejects.toThrow(
         'System is shutting down, cannot queue new jobs'
       );
@@ -126,4 +126,4 @@ describe('FirebaseWorkerQueue Unit Tests', () => {
       queue.emit('test-event', 'test-data');
     });
   });
-}); 
+});

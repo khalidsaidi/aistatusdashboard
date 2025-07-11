@@ -1,6 +1,6 @@
 /**
  * REAL GLOBAL LOCK MANAGER
- * 
+ *
  * NO MOCKS - This is a production-ready implementation with:
  * - Atomic lock operations
  * - Deadlock prevention
@@ -37,7 +37,7 @@ export class GlobalLockManager {
     totalWaiters: 0,
     averageWaitTime: 0,
     totalLocksAcquired: 0,
-    totalTimeouts: 0
+    totalTimeouts: 0,
   };
   private cleanupInterval: NodeJS.Timeout;
   private readonly maxLocks = 10000;
@@ -51,7 +51,7 @@ export class GlobalLockManager {
 
     log('info', 'Global lock manager initialized', {
       maxLocks: this.maxLocks,
-      defaultTimeout: this.defaultTimeout
+      defaultTimeout: this.defaultTimeout,
     });
   }
 
@@ -59,8 +59,8 @@ export class GlobalLockManager {
    * REAL atomic lock acquisition with timeout and priority
    */
   async withLock<T>(
-    lockKey: string, 
-    fn: () => Promise<T>, 
+    lockKey: string,
+    fn: () => Promise<T>,
     options: {
       timeout?: number;
       priority?: number;
@@ -76,20 +76,19 @@ export class GlobalLockManager {
     }
 
     const startTime = Date.now();
-    
+
     try {
       // Acquire lock
       await this.acquireLock(lockKey, lockId, timeout, priority);
-      
+
       // Execute function with lock held
       const result = await fn();
-      
+
       // Update stats
       const waitTime = Date.now() - startTime;
       this.updateStats(waitTime);
-      
+
       return result;
-      
     } finally {
       // Always release lock
       this.releaseLock(lockKey, lockId);
@@ -100,9 +99,9 @@ export class GlobalLockManager {
    * REAL lock acquisition with queue management
    */
   private async acquireLock(
-    lockKey: string, 
-    lockId: string, 
-    timeout: number, 
+    lockKey: string,
+    lockId: string,
+    timeout: number,
     priority: number
   ): Promise<void> {
     // Check if lock is available
@@ -112,7 +111,7 @@ export class GlobalLockManager {
       this.locks.set(lockKey, entry);
       this.stats.activeLocks++;
       this.stats.totalLocksAcquired++;
-      
+
       log('info', 'Lock acquired immediately', { lockKey, lockId });
       return;
     }
@@ -127,20 +126,20 @@ export class GlobalLockManager {
       if (!this.waitQueue.has(lockKey)) {
         this.waitQueue.set(lockKey, []);
       }
-      
+
       const queue = this.waitQueue.get(lockKey)!;
       queue.push(entry);
-      
+
       // Sort by priority (higher priority first)
       queue.sort((a, b) => b.priority - a.priority);
-      
+
       this.stats.totalWaiters++;
 
-      log('info', 'Added to wait queue', { 
-        lockKey, 
-        lockId, 
+      log('info', 'Added to wait queue', {
+        lockKey,
+        lockId,
         queueLength: queue.length,
-        priority 
+        priority,
       });
 
       // Set timeout
@@ -155,7 +154,7 @@ export class GlobalLockManager {
    */
   private releaseLock(lockKey: string, lockId: string): void {
     const currentLock = this.locks.get(lockKey);
-    
+
     if (!currentLock || currentLock.id !== lockId) {
       log('warn', 'Attempted to release lock not owned', { lockKey, lockId });
       return;
@@ -182,10 +181,10 @@ export class GlobalLockManager {
       // Resolve the waiting promise
       nextEntry.resolve();
 
-      log('info', 'Lock granted to next waiter', { 
-        lockKey, 
+      log('info', 'Lock granted to next waiter', {
+        lockKey,
         nextLockId: nextEntry.id,
-        remainingQueue: queue.length 
+        remainingQueue: queue.length,
       });
 
       // Clean up empty queue
@@ -202,7 +201,7 @@ export class GlobalLockManager {
     // Check if lock is still in wait queue
     const queue = this.waitQueue.get(lockKey);
     if (queue) {
-      const index = queue.findIndex(entry => entry.id === lockId);
+      const index = queue.findIndex((entry) => entry.id === lockId);
       if (index !== -1) {
         const entry = queue[index];
         queue.splice(index, 1);
@@ -226,13 +225,13 @@ export class GlobalLockManager {
     if (currentLock && currentLock.id === lockId) {
       const lockAge = Date.now() - currentLock.acquiredAt;
       if (lockAge > currentLock.timeout) {
-        log('error', 'Active lock timed out - force releasing', { 
-          lockKey, 
-          lockId, 
-          lockAge, 
-          timeout: currentLock.timeout 
+        log('error', 'Active lock timed out - force releasing', {
+          lockKey,
+          lockId,
+          lockAge,
+          timeout: currentLock.timeout,
         });
-        
+
         this.releaseLock(lockKey, lockId);
         this.stats.totalTimeouts++;
       }
@@ -245,7 +244,7 @@ export class GlobalLockManager {
   private createLockEntry(id: string, timeout: number, priority: number): LockEntry {
     let resolve: () => void;
     let reject: (error: Error) => void;
-    
+
     const promise = new Promise<void>((res, rej) => {
       resolve = res;
       reject = rej;
@@ -258,7 +257,7 @@ export class GlobalLockManager {
       promise,
       resolve: resolve!,
       reject: reject!,
-      priority
+      priority,
     };
   }
 
@@ -273,13 +272,13 @@ export class GlobalLockManager {
     for (const [lockKey, lock] of this.locks.entries()) {
       const lockAge = now - lock.acquiredAt;
       if (lockAge > lock.timeout) {
-        log('warn', 'Cleaning up timed-out active lock', { 
-          lockKey, 
-          lockId: lock.id, 
-          lockAge, 
-          timeout: lock.timeout 
+        log('warn', 'Cleaning up timed-out active lock', {
+          lockKey,
+          lockId: lock.id,
+          lockAge,
+          timeout: lock.timeout,
         });
-        
+
         this.releaseLock(lockKey, lock.id);
         cleaned++;
       }
@@ -288,9 +287,9 @@ export class GlobalLockManager {
     // Check wait queues for timeouts
     for (const [lockKey, queue] of this.waitQueue.entries()) {
       const initialLength = queue.length;
-      
+
       // Filter out timed-out entries
-      const validEntries = queue.filter(entry => {
+      const validEntries = queue.filter((entry) => {
         const waitTime = now - entry.acquiredAt;
         if (waitTime > entry.timeout) {
           entry.reject(new Error(`Lock timeout after ${entry.timeout}ms`));
@@ -321,8 +320,7 @@ export class GlobalLockManager {
    */
   private updateStats(waitTime: number): void {
     // Update average wait time (running average)
-    this.stats.averageWaitTime = 
-      (this.stats.averageWaitTime * 0.9) + (waitTime * 0.1);
+    this.stats.averageWaitTime = this.stats.averageWaitTime * 0.9 + waitTime * 0.1;
   }
 
   /**
@@ -338,7 +336,10 @@ export class GlobalLockManager {
   emergencyReset(): void {
     log('warn', 'Emergency lock reset - releasing all locks', {
       activeLocks: this.locks.size,
-      waitingLocks: Array.from(this.waitQueue.values()).reduce((sum, queue) => sum + queue.length, 0)
+      waitingLocks: Array.from(this.waitQueue.values()).reduce(
+        (sum, queue) => sum + queue.length,
+        0
+      ),
     });
 
     // Reject all waiting promises
@@ -372,4 +373,4 @@ export class GlobalLockManager {
 }
 
 // Global instance
-export const globalLockManager = new GlobalLockManager(); 
+export const globalLockManager = new GlobalLockManager();

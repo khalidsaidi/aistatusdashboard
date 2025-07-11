@@ -10,62 +10,73 @@ interface CommentSectionProps {
   className?: string;
 }
 
-export default function CommentSection({ providerId, title = "Comments", className = "" }: CommentSectionProps) {
+export default function CommentSection({
+  providerId,
+  title = 'Comments',
+  className = '',
+}: CommentSectionProps) {
   const [comments, setComments] = useState<UserComment[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
-  
+
   // Form state
   const [author, setAuthor] = useState('');
   const [email, setEmail] = useState('');
   const [commentMessage, setCommentMessage] = useState('');
   const [commentType, setCommentType] = useState<'general' | 'feedback' | 'issue'>('general');
-  
+
   // Pagination
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
 
-  const fetchComments = useCallback(async (loadMore = false) => {
-    setLoading(true);
-    
-    try {
-      const params = new URLSearchParams({
-        limit: limit.toString(),
-        offset: loadMore ? offset.toString() : '0',
-        ...(providerId && { providerId }),
-      });
-      
-      const response = await fetch(`${getApiUrl('comments')}?${params}`);
-      const data = await response.json();
-      
-      if (response.ok) {
-        // Ensure data is an array
-        const commentsData = Array.isArray(data) ? data : (data.comments && Array.isArray(data.comments) ? data.comments : []);
-        
-        if (loadMore) {
-          setComments(prev => [...prev, ...commentsData]);
+  const fetchComments = useCallback(
+    async (loadMore = false) => {
+      setLoading(true);
+
+      try {
+        const params = new URLSearchParams({
+          limit: limit.toString(),
+          offset: loadMore ? offset.toString() : '0',
+          ...(providerId && { providerId }),
+        });
+
+        const response = await fetch(`${getApiUrl('comments')}?${params}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          // Ensure data is an array
+          const commentsData = Array.isArray(data)
+            ? data
+            : data.comments && Array.isArray(data.comments)
+              ? data.comments
+              : [];
+
+          if (loadMore) {
+            setComments((prev) => [...prev, ...commentsData]);
+          } else {
+            setComments(commentsData);
+            setOffset(0);
+          }
+
+          setHasMore(commentsData.length === limit);
+          if (loadMore) {
+            setOffset((prev) => prev + limit);
+          }
         } else {
-          setComments(commentsData);
-          setOffset(0);
+          setMessage(`❌ Error: ${data.error}`);
+          setComments([]); // Ensure comments is always an array
         }
-        
-        setHasMore(commentsData.length === limit);
-        if (loadMore) {
-          setOffset(prev => prev + limit);
-        }
-      } else {
-        setMessage(`❌ Error: ${data.error}`);
+      } catch (error) {
+        setMessage('❌ Failed to load comments');
         setComments([]); // Ensure comments is always an array
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      setMessage('❌ Failed to load comments');
-      setComments([]); // Ensure comments is always an array
-    } finally {
-      setLoading(false);
-    }
-  }, [providerId, offset]);
+    },
+    [providerId, offset]
+  );
 
   useEffect(() => {
     fetchComments();
@@ -83,19 +94,19 @@ export default function CommentSection({ providerId, title = "Comments", classNa
         body: JSON.stringify({
           author,
           content: commentMessage,
-          provider: providerId
-        })
+          provider: providerId,
+        }),
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         setMessage(`✅ Comment posted successfully`);
         setAuthor('');
         setEmail('');
         setCommentMessage('');
         setCommentType('general');
-        
+
         // Refresh comments to show new comment (if approved)
         await fetchComments();
       } else {
@@ -116,25 +127,23 @@ export default function CommentSection({ providerId, title = "Comments", classNa
       const response = await fetch(`${getApiUrl('comments')}/${commentId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action })
+        body: JSON.stringify({ action }),
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         // Update the comment in the list
-        setComments(prev => 
-          prev.map(comment => 
-            comment.id === commentId ? data.comment : comment
-          )
+        setComments((prev) =>
+          prev.map((comment) => (comment.id === commentId ? data.comment : comment))
         );
-        
+
         if (action === 'like') {
           setMessage('👍 Thanks for your feedback!');
         } else if (action === 'report') {
           setMessage('🚨 Comment reported for review');
         }
-        
+
         // Clear message after 3 seconds
         const timer = setTimeout(() => setMessage(''), 3000);
         return () => clearTimeout(timer);
@@ -148,17 +157,17 @@ export default function CommentSection({ providerId, title = "Comments", classNa
 
   const formatDate = (dateString: string | { _seconds: number; _nanoseconds: number }) => {
     let date: Date;
-    
+
     if (typeof dateString === 'string') {
       date = new Date(dateString);
     } else {
       // Handle Firestore timestamp format
       date = new Date(dateString._seconds * 1000);
     }
-    
+
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-    
+
     if (diffInHours < 1) {
       return 'just now';
     } else if (diffInHours < 24) {
@@ -170,10 +179,14 @@ export default function CommentSection({ providerId, title = "Comments", classNa
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'feedback': return '💬';
-      case 'issue': return '🐛';
-      case 'provider': return '🔧';
-      default: return '💭';
+      case 'feedback':
+        return '💬';
+      case 'issue':
+        return '🐛';
+      case 'provider':
+        return '🔧';
+      default:
+        return '💭';
     }
   };
 
@@ -181,25 +194,23 @@ export default function CommentSection({ providerId, title = "Comments", classNa
     <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-center space-x-2">
-          <span className="font-medium text-gray-900 dark:text-white">
-            {comment.author}
-          </span>
+          <span className="font-medium text-gray-900 dark:text-white">{comment.author}</span>
           <span className="text-sm text-gray-500 dark:text-gray-400">
             {getTypeIcon(comment.type || 'general')} {formatDate(comment.createdAt)}
           </span>
         </div>
-        
-        {((comment.status === 'pending') || (comment.approved === false)) && (
+
+        {(comment.status === 'pending' || comment.approved === false) && (
           <span className="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">
             Pending Review
           </span>
         )}
       </div>
-      
+
       <p className="text-gray-700 dark:text-gray-300 mb-3 whitespace-pre-wrap">
         {comment.content || comment.message}
       </p>
-      
+
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
@@ -209,7 +220,7 @@ export default function CommentSection({ providerId, title = "Comments", classNa
             <span>👍</span>
             <span>{comment.likes || 0}</span>
           </button>
-          
+
           <button
             onClick={() => handleCommentAction(comment.id, 'report')}
             className="text-sm text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors py-2 px-3 min-h-[44px] min-w-[44px] rounded flex items-center justify-center"
@@ -218,11 +229,11 @@ export default function CommentSection({ providerId, title = "Comments", classNa
           </button>
         </div>
       </div>
-      
+
       {/* Replies */}
       {comment.replies && comment.replies.length > 0 && (
         <div className="mt-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600 space-y-3">
-          {comment.replies.map(reply => (
+          {comment.replies.map((reply) => (
             <div key={reply.id} className="bg-gray-50 dark:bg-gray-700 rounded p-3">
               <div className="flex items-center space-x-2 mb-1">
                 <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -232,9 +243,7 @@ export default function CommentSection({ providerId, title = "Comments", classNa
                   {formatDate(reply.createdAt)}
                 </span>
               </div>
-              <p className="text-sm text-gray-700 dark:text-gray-300">
-                {reply.message}
-              </p>
+              <p className="text-sm text-gray-700 dark:text-gray-300">{reply.message}</p>
             </div>
           ))}
         </div>
@@ -248,7 +257,7 @@ export default function CommentSection({ providerId, title = "Comments", classNa
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
           {title} ({comments.length})
         </h3>
-        
+
         <button
           onClick={() => fetchComments()}
           disabled={loading}
@@ -259,7 +268,10 @@ export default function CommentSection({ providerId, title = "Comments", classNa
       </div>
 
       {/* Comment Form */}
-      <form onSubmit={handleSubmit} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-4"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -274,7 +286,7 @@ export default function CommentSection({ providerId, title = "Comments", classNa
               placeholder="Your name"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Email (optional)
@@ -288,7 +300,7 @@ export default function CommentSection({ providerId, title = "Comments", classNa
             />
           </div>
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Comment Type
@@ -303,7 +315,7 @@ export default function CommentSection({ providerId, title = "Comments", classNa
             <option value="issue">🐛 Report Issue</option>
           </select>
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Message *
@@ -320,7 +332,7 @@ export default function CommentSection({ providerId, title = "Comments", classNa
             {commentMessage.length}/1000 characters
           </div>
         </div>
-        
+
         <button
           type="submit"
           disabled={submitting || !author.trim() || commentMessage.trim().length < 10}
@@ -332,13 +344,15 @@ export default function CommentSection({ providerId, title = "Comments", classNa
 
       {/* Message Display */}
       {message && (
-        <div className={`p-3 rounded-md ${
-          message.includes('✅') || message.includes('👍')
-            ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200'
-            : message.includes('🚨')
-            ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200'
-            : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200'
-        }`}>
+        <div
+          className={`p-3 rounded-md ${
+            message.includes('✅') || message.includes('👍')
+              ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200'
+              : message.includes('🚨')
+                ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200'
+                : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200'
+          }`}
+        >
           {message}
         </div>
       )}
@@ -355,10 +369,10 @@ export default function CommentSection({ providerId, title = "Comments", classNa
           </div>
         ) : (
           <>
-            {comments.map(comment => (
+            {comments.map((comment) => (
               <CommentItem key={comment.id} comment={comment} />
             ))}
-            
+
             {hasMore && (
               <button
                 onClick={() => fetchComments(true)}
@@ -373,4 +387,4 @@ export default function CommentSection({ providerId, title = "Comments", classNa
       </div>
     </div>
   );
-} 
+}

@@ -1,6 +1,6 @@
 /**
  * COMPREHENSIVE METRICS COLLECTION SYSTEM
- * 
+ *
  * Provides monitoring and alerting capabilities for all critical systems
  */
 
@@ -52,13 +52,18 @@ export class MetricsCollector {
   /**
    * Record a metric value
    */
-  recordMetric(name: string, value: number, tags?: Record<string, string>, type: 'counter' | 'gauge' | 'histogram' | 'timer' = 'gauge'): void {
+  recordMetric(
+    name: string,
+    value: number,
+    tags?: Record<string, string>,
+    type: 'counter' | 'gauge' | 'histogram' | 'timer' = 'gauge'
+  ): void {
     const metric: MetricData = {
       name,
       value,
       timestamp: Date.now(),
       tags,
-      type
+      type,
     };
 
     if (!this.metrics.has(name)) {
@@ -118,13 +123,13 @@ export class MetricsCollector {
    */
   getAllMetrics(): Record<string, MetricData> {
     const result: Record<string, MetricData> = {};
-    
+
     for (const [name, history] of this.metrics.entries()) {
       if (history.length > 0) {
         result[name] = history[history.length - 1];
       }
     }
-    
+
     return result;
   }
 
@@ -146,7 +151,7 @@ export class MetricsCollector {
         threshold: 512,
         duration: 60000, // 1 minute
         severity: 'warning',
-        description: 'High memory usage detected'
+        description: 'High memory usage detected',
       },
       {
         metric: 'memory_usage_mb',
@@ -154,7 +159,7 @@ export class MetricsCollector {
         threshold: 1024,
         duration: 30000, // 30 seconds
         severity: 'critical',
-        description: 'Critical memory usage detected'
+        description: 'Critical memory usage detected',
       },
       {
         metric: 'active_locks',
@@ -162,7 +167,7 @@ export class MetricsCollector {
         threshold: 1000,
         duration: 30000,
         severity: 'critical',
-        description: 'Too many active locks - potential deadlock'
+        description: 'Too many active locks - potential deadlock',
       },
       {
         metric: 'firebase_quota_usage_percent',
@@ -170,7 +175,7 @@ export class MetricsCollector {
         threshold: 80,
         duration: 60000,
         severity: 'warning',
-        description: 'Firebase quota usage high'
+        description: 'Firebase quota usage high',
       },
       {
         metric: 'firebase_quota_usage_percent',
@@ -178,7 +183,7 @@ export class MetricsCollector {
         threshold: 95,
         duration: 30000,
         severity: 'critical',
-        description: 'Firebase quota near limit'
+        description: 'Firebase quota near limit',
       },
       {
         metric: 'error_rate_percent',
@@ -186,7 +191,7 @@ export class MetricsCollector {
         threshold: 10,
         duration: 120000, // 2 minutes
         severity: 'warning',
-        description: 'High error rate detected'
+        description: 'High error rate detected',
       },
       {
         metric: 'error_rate_percent',
@@ -194,7 +199,7 @@ export class MetricsCollector {
         threshold: 25,
         duration: 60000,
         severity: 'critical',
-        description: 'Critical error rate detected'
+        description: 'Critical error rate detected',
       },
       {
         metric: 'average_response_time_ms',
@@ -202,7 +207,7 @@ export class MetricsCollector {
         threshold: 5000,
         duration: 180000, // 3 minutes
         severity: 'warning',
-        description: 'Slow response times detected'
+        description: 'Slow response times detected',
       },
       {
         metric: 'emergency_mode',
@@ -210,8 +215,8 @@ export class MetricsCollector {
         threshold: 1,
         duration: 0,
         severity: 'emergency',
-        description: 'System in emergency mode'
-      }
+        description: 'System in emergency mode',
+      },
     ];
   }
 
@@ -223,15 +228,15 @@ export class MetricsCollector {
 
     for (const rule of this.alertRules) {
       const metric = this.getLatestMetric(rule.metric);
-      
+
       if (!metric) continue;
 
       const alertId = `${rule.metric}_${rule.condition}_${rule.threshold}`;
       const existingAlert = this.alerts.get(alertId);
-      
+
       // Check if condition is met
       const conditionMet = this.evaluateCondition(metric.value, rule.condition, rule.threshold);
-      
+
       if (conditionMet) {
         if (!existingAlert) {
           // Create new alert
@@ -240,9 +245,9 @@ export class MetricsCollector {
             rule,
             triggeredAt: now,
             status: 'active',
-            message: `${rule.description}: ${rule.metric} is ${metric.value} (threshold: ${rule.threshold})`
+            message: `${rule.description}: ${rule.metric} is ${metric.value} (threshold: ${rule.threshold})`,
           };
-          
+
           this.alerts.set(alertId, alert);
           this.triggerAlert(alert);
         }
@@ -283,11 +288,13 @@ export class MetricsCollector {
       info: 'ℹ️',
       warning: '⚠️',
       critical: '🚨',
-      emergency: '💀'
+      emergency: '💀',
     };
 
-    console.log(`${severityEmoji[alert.rule.severity]} ALERT [${alert.rule.severity.toUpperCase()}]: ${alert.message}`);
-    
+    console.log(
+      `${severityEmoji[alert.rule.severity]} ALERT [${alert.rule.severity.toUpperCase()}]: ${alert.message}`
+    );
+
     // Here you would integrate with external alerting systems
     // - Send to Slack/Discord webhook
     // - Send email notification
@@ -300,7 +307,7 @@ export class MetricsCollector {
    */
   private resolveAlert(alert: Alert): void {
     console.log(`✅ RESOLVED: ${alert.message}`);
-    
+
     // Here you would notify external systems that alert is resolved
   }
 
@@ -308,7 +315,7 @@ export class MetricsCollector {
    * Get active alerts
    */
   getActiveAlerts(): Alert[] {
-    return Array.from(this.alerts.values()).filter(alert => alert.status === 'active');
+    return Array.from(this.alerts.values()).filter((alert) => alert.status === 'active');
   }
 
   /**
@@ -347,7 +354,7 @@ export class MetricsCollector {
 
     // Cleanup old metrics
     for (const [name, history] of this.metrics.entries()) {
-      const filteredHistory = history.filter(metric => now - metric.timestamp < maxAge);
+      const filteredHistory = history.filter((metric) => now - metric.timestamp < maxAge);
       this.metrics.set(name, filteredHistory);
     }
 
@@ -372,11 +379,15 @@ export class MetricsCollector {
     totalMetrics: number;
   } {
     const activeAlerts = this.getActiveAlerts();
-    const criticalAlerts = activeAlerts.filter(alert => alert.rule.severity === 'critical').length;
-    const emergencyAlerts = activeAlerts.filter(alert => alert.rule.severity === 'emergency').length;
+    const criticalAlerts = activeAlerts.filter(
+      (alert) => alert.rule.severity === 'critical'
+    ).length;
+    const emergencyAlerts = activeAlerts.filter(
+      (alert) => alert.rule.severity === 'emergency'
+    ).length;
 
     let status: 'healthy' | 'degraded' | 'critical' | 'emergency' = 'healthy';
-    
+
     if (emergencyAlerts > 0) {
       status = 'emergency';
     } else if (criticalAlerts > 0) {
@@ -390,7 +401,7 @@ export class MetricsCollector {
       activeAlerts: activeAlerts.length,
       criticalAlerts,
       emergencyAlerts,
-      totalMetrics: this.metrics.size
+      totalMetrics: this.metrics.size,
     };
   }
 
@@ -421,7 +432,11 @@ export function recordMetric(name: string, value: number, tags?: Record<string, 
   globalMetricsCollector.recordMetric(name, value, tags);
 }
 
-export function incrementCounter(name: string, value?: number, tags?: Record<string, string>): void {
+export function incrementCounter(
+  name: string,
+  value?: number,
+  tags?: Record<string, string>
+): void {
   globalMetricsCollector.incrementCounter(name, value, tags);
 }
 
@@ -439,4 +454,4 @@ export function getHealthSummary() {
 
 export function getActiveAlerts() {
   return globalMetricsCollector.getActiveAlerts();
-} 
+}

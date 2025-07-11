@@ -19,9 +19,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: {
     default: 'AI Status Dashboard',
-    template: '%s | AI Status Dashboard'
+    template: '%s | AI Status Dashboard',
   },
-  description: 'Real-time status monitoring dashboard for AI provider APIs including OpenAI, Anthropic, Google AI, and more. Monitor service availability, response times, and incidents.',
+  description:
+    'Real-time status monitoring dashboard for AI provider APIs including OpenAI, Anthropic, Google AI, and more. Monitor service availability, response times, and incidents.',
   keywords: [
     'AI status',
     'API monitoring',
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     'uptime monitoring',
     'API dashboard',
     'real-time status',
-    'AI provider monitoring'
+    'AI provider monitoring',
   ],
   authors: [{ name: 'AI Status Dashboard Team' }],
   creator: 'AI Status Dashboard',
@@ -54,7 +55,8 @@ export const metadata: Metadata = {
     url: process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com',
     siteName: 'AI Status Dashboard',
     title: 'AI Status Dashboard - Real-time AI Provider Monitoring',
-    description: 'Monitor the status of major AI providers including OpenAI, Anthropic, Google AI, and more in real-time.',
+    description:
+      'Monitor the status of major AI providers including OpenAI, Anthropic, Google AI, and more in real-time.',
     images: [
       {
         url: '/og-image.png',
@@ -85,9 +87,7 @@ export const metadata: Metadata = {
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
       { url: '/favicon-48x48.png', sizes: '48x48', type: 'image/png' },
     ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
     other: [
       {
         rel: 'mask-icon',
@@ -105,36 +105,39 @@ export const metadata: Metadata = {
 // Client-side Firebase initialization component
 function FirebaseInit() {
   if (typeof window === 'undefined') return null;
-  
+
   // Import Firebase modules only on client side
   import('../lib/firebase').then(({ trackPageLoad }) => {
     trackPageLoad('app_layout');
   });
-  
+
   // Import crashlytics for error tracking
   import('../lib/crashlytics').then(({ logError, setBreadcrumb }) => {
     setBreadcrumb('App initialized', 'navigation');
-    
+
     // Set up global error handler
     window.addEventListener('error', (event) => {
       logError(event.error, 'global_error_handler');
     });
-    
+
     window.addEventListener('unhandledrejection', (event) => {
       logError(new Error(event.reason), 'unhandled_promise_rejection');
     });
   });
-  
+
   return null;
 }
 
 // Google Analytics component
 function GoogleAnalytics() {
   if (typeof window === 'undefined') return null;
-  
+
   return (
     <>
-      <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}></script>
+      <script
+        async
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+      ></script>
       <script
         dangerouslySetInnerHTML={{
           __html: `
@@ -151,11 +154,7 @@ function GoogleAnalytics() {
   );
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
@@ -177,7 +176,11 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable}`}
+    >
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#ffffff" />
@@ -193,13 +196,13 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
-        
+
         {/* Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        
+
         <Suspense fallback={null}>
           <GoogleAnalytics />
         </Suspense>
@@ -211,24 +214,30 @@ export default function RootLayout({
             <Suspense fallback={null}>
               <FirebaseInit />
             </Suspense>
-            <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-3 rounded min-h-[44px] min-w-[44px] flex items-center justify-center">
+            <a
+              href="#main"
+              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-3 rounded min-h-[44px] min-w-[44px] flex items-center justify-center"
+            >
               Skip to main content
             </a>
             <Navbar />
             <div id="main" className="flex-1">
               {children}
             </div>
-            
+
             <Footer />
           </Providers>
         </ErrorBoundary>
         <noscript>
           <div className="error-boundary">
             <h2>JavaScript Required</h2>
-            <p>This application requires JavaScript to function properly. Please enable JavaScript in your browser settings.</p>
+            <p>
+              This application requires JavaScript to function properly. Please enable JavaScript in
+              your browser settings.
+            </p>
           </div>
         </noscript>
-        
+
         {/* Service Worker Registration */}
         <Script id="sw-registration" strategy="afterInteractive">
           {`
@@ -245,7 +254,7 @@ export default function RootLayout({
             }
           `}
         </Script>
-        
+
         {/* Firebase Messaging - Temporarily disabled to avoid import issues */}
         {/* 
         <Script id="firebase-messaging" strategy="afterInteractive">
@@ -259,7 +268,7 @@ export default function RootLayout({
           `}
         </Script>
         */}
-        
+
         <Suspense fallback={null}>
           <Analytics />
           <SpeedInsights />

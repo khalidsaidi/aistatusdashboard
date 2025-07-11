@@ -88,8 +88,6 @@
       ]
     }
   ],
-  "permissions": [
-    "notifications"
-  ],
+  "permissions": ["notifications"],
   "prefer_related_applications": false
-} 
+}

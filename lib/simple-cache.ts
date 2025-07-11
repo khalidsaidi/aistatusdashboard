@@ -15,7 +15,7 @@ interface CacheEntry<T> {
 class SimpleCache<T> {
   private data = new Map<string, CacheEntry<T>>();
   private cleanupInterval: NodeJS.Timeout | null = null;
-  
+
   constructor(
     private readonly maxSize: number = 1000,
     private readonly defaultTtl: number = getConfig().performance.cacheTtl
@@ -23,7 +23,7 @@ class SimpleCache<T> {
     // Start cleanup interval
     this.startCleanup();
   }
-  
+
   /**
    * Set cache entry with TTL
    */
@@ -32,7 +32,7 @@ class SimpleCache<T> {
     if (this.data.size >= this.maxSize) {
       this.cleanup();
     }
-    
+
     // If still at capacity, remove oldest entry
     if (this.data.size >= this.maxSize) {
       const firstKey = this.data.keys().next().value;
@@ -40,53 +40,53 @@ class SimpleCache<T> {
         this.data.delete(firstKey);
       }
     }
-    
+
     this.data.set(key, {
       value,
-      expires: Date.now() + ttl
+      expires: Date.now() + ttl,
     });
   }
-  
+
   /**
    * Get cache entry
    */
   get(key: string): T | null {
     const entry = this.data.get(key);
-    
+
     if (!entry) {
       return null;
     }
-    
+
     // Check if expired
     if (entry.expires < Date.now()) {
       this.data.delete(key);
       return null;
     }
-    
+
     return entry.value;
   }
-  
+
   /**
    * Check if key exists and is not expired
    */
   has(key: string): boolean {
     return this.get(key) !== null;
   }
-  
+
   /**
    * Delete specific key
    */
   delete(key: string): boolean {
     return this.data.delete(key);
   }
-  
+
   /**
    * Clear all entries
    */
   clear(): void {
     this.data.clear();
   }
-  
+
   /**
    * Get cache statistics
    */
@@ -96,43 +96,46 @@ class SimpleCache<T> {
   } {
     return {
       size: this.data.size,
-      maxSize: this.maxSize
+      maxSize: this.maxSize,
     };
   }
-  
+
   /**
    * Clean up expired entries
    */
   private cleanup(): void {
     const now = Date.now();
     const keysToDelete: string[] = [];
-    
+
     this.data.forEach((entry, key) => {
       if (entry.expires < now) {
         keysToDelete.push(key);
       }
     });
-    
-    keysToDelete.forEach(key => {
+
+    keysToDelete.forEach((key) => {
       this.data.delete(key);
     });
   }
-  
+
   /**
    * Start automatic cleanup interval
    */
   private startCleanup(): void {
     // Clean up every 5 minutes
-    this.cleanupInterval = setInterval(() => {
-      this.cleanup();
-    }, 5 * 60 * 1000);
-    
+    this.cleanupInterval = setInterval(
+      () => {
+        this.cleanup();
+      },
+      5 * 60 * 1000
+    );
+
     // Don't keep process alive for cleanup
     if (this.cleanupInterval.unref) {
       this.cleanupInterval.unref();
     }
   }
-  
+
   /**
    * Stop automatic cleanup
    */
@@ -209,7 +212,7 @@ export function clearCache(): void {
 export function getCacheStats() {
   return {
     status: statusCache.getStats(),
-    rateLimit: rateLimitCache.getStats()
+    rateLimit: rateLimitCache.getStats(),
   };
 }
 
@@ -223,29 +226,29 @@ export function checkRateLimit(identifier: string): {
 } {
   const now = Date.now();
   const key = identifier;
-  
+
   let entry = rateLimitCache.get(key);
-  
+
   // If no entry or window expired, create new entry
   if (!entry || entry.resetTime < now) {
     entry = {
       count: 0,
-      resetTime: now + config.performance.rateLimitWindow
+      resetTime: now + config.performance.rateLimitWindow,
     };
     rateLimitCache.set(key, entry, config.performance.rateLimitWindow);
   }
-  
+
   // Increment count
   entry.count++;
   rateLimitCache.set(key, entry, config.performance.rateLimitWindow);
-  
+
   const allowed = entry.count <= config.performance.rateLimitRequests;
   const remaining = Math.max(0, config.performance.rateLimitRequests - entry.count);
-  
+
   return {
     allowed,
     remaining,
-    resetTime: entry.resetTime
+    resetTime: entry.resetTime,
   };
 }
 
@@ -254,13 +257,13 @@ export function checkRateLimit(identifier: string): {
  */
 if (typeof process !== 'undefined' && !(global as any).__simpleCacheExitHandlerRegistered) {
   (global as any).__simpleCacheExitHandlerRegistered = true;
-  
+
   const cleanup = () => {
     statusCache.destroy();
     rateLimitCache.destroy();
   };
-  
+
   process.on('exit', cleanup);
   process.on('SIGINT', cleanup);
   process.on('SIGTERM', cleanup);
-} 
+}

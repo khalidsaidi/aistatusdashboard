@@ -26,7 +26,7 @@ describe('Provider Workflow Integration', () => {
           authDomain: process.env.FIREBASE_AUTH_DOMAIN,
           storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
           messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-          appId: process.env.FIREBASE_APP_ID
+          appId: process.env.FIREBASE_APP_ID,
         });
       }
     } catch (error) {
@@ -44,7 +44,7 @@ describe('Provider Workflow Integration', () => {
       maxQueueSize: 1000,
       rateLimitPerSecond: 10,
       circuitBreakerThreshold: 5,
-      circuitBreakerTimeout: 30000
+      circuitBreakerTimeout: 30000,
     });
 
     scalingManager = new HorizontalScalingManager({
@@ -55,7 +55,7 @@ describe('Provider Workflow Integration', () => {
       scaleDownThreshold: 1,
       scaleUpCooldown: 500,
       scaleDownCooldown: 500,
-      healthCheckInterval: 1000
+      healthCheckInterval: 1000,
     });
   });
 
@@ -73,9 +73,9 @@ describe('Provider Workflow Integration', () => {
     if (scalingManager) {
       await scalingManager.destroy();
     }
-    
+
     // Wait for any pending async operations to complete
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
   });
 
   describe('Complete Workflow', () => {
@@ -89,14 +89,14 @@ describe('Provider Workflow Integration', () => {
       const jobIds = await scalingManager.queueProviderBatch(testProviders, 5);
 
       expect(jobIds).toHaveLength(2);
-      expect(jobIds.every(id => typeof id === 'string')).toBe(true);
+      expect(jobIds.every((id) => typeof id === 'string')).toBe(true);
 
       // Wait for processing (with timeout)
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
 
       // Check metrics
       const metrics = await queue.getMetrics();
       expect(metrics.workers).toBeGreaterThan(0);
     }, 10000);
   });
-}); 
+});

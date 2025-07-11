@@ -5,7 +5,7 @@ export function log(level: LogLevel, message: string, data?: Record<string, any>
     timestamp: new Date().toISOString(),
     level,
     message,
-    ...data
+    ...data,
   };
   // Log data processed
-} 
+}

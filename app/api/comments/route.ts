@@ -3,16 +3,18 @@ import { getApiUrl } from '@/lib/utils';
 
 /**
  * COMMENTS API PROXY
- * 
+ *
  * This route proxies requests to Firebase Functions to avoid CORS issues
  * during local development while maintaining the same API interface.
  */
 
 export async function GET(request: NextRequest) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://us-central1-ai-status-dashboard-dev.cloudfunctions.net';
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_BASE_URL ||
+      'https://us-central1-ai-status-dashboard-dev.cloudfunctions.net';
     const firebaseUrl = `${baseUrl}/api/comments`;
-    
+
     const response = await fetch(firebaseUrl, {
       method: 'GET',
       headers: {
@@ -21,8 +23,8 @@ export async function GET(request: NextRequest) {
     });
 
     const data = await response.json();
-    
-    return NextResponse.json(data, { 
+
+    return NextResponse.json(data, {
       status: response.status,
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -41,9 +43,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://us-central1-ai-status-dashboard-dev.cloudfunctions.net';
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_BASE_URL ||
+      'https://us-central1-ai-status-dashboard-dev.cloudfunctions.net';
     const firebaseUrl = `${baseUrl}/api/comments`;
-    
+
     const response = await fetch(firebaseUrl, {
       method: 'POST',
       headers: {
@@ -53,8 +57,8 @@ export async function POST(request: NextRequest) {
     });
 
     const data = await response.json();
-    
-    return NextResponse.json(data, { 
+
+    return NextResponse.json(data, {
       status: response.status,
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -79,4 +83,4 @@ export async function OPTIONS(request: NextRequest) {
       'Access-Control-Allow-Headers': 'Content-Type',
     },
   });
-} 
+}

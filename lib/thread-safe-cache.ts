@@ -1,6 +1,6 @@
 /**
  * THREAD-SAFE CACHE IMPLEMENTATION
- * 
+ *
  * This replaces the unsafe SimpleCache with proper concurrency controls
  * to prevent race conditions and data corruption.
  */
@@ -16,7 +16,7 @@ interface CacheEntry<T> {
 
 /**
  * Thread-safe cache with atomic operations and proper cleanup
- * 
+ *
  * CRITICAL FIXES:
  * - Atomic operations using AtomicLockManager
  * - Safe concurrent access patterns
@@ -26,7 +26,7 @@ interface CacheEntry<T> {
 export class ThreadSafeCache<T> {
   private data = new Map<string, CacheEntry<T>>();
   private cleanupInterval: NodeJS.Timeout | null = null;
-  
+
   constructor(
     private readonly maxSize: number = CONFIG.cache.maxSize,
     private readonly defaultTtl: number = CONFIG.cache.ttl,
@@ -34,64 +34,80 @@ export class ThreadSafeCache<T> {
   ) {
     this.startCleanup();
   }
-  
+
   /**
    * Thread-safe set operation with atomic guarantees
    */
   async set(key: string, value: T, ttl: number = this.defaultTtl): Promise<void> {
-    return globalLockManager.withLock(`cache:${key}`, async () => {
-      // Check size limits before adding
-      if (this.data.size >= this.maxSize && !this.data.has(key)) {
-        await this.evictOldestEntry();
-      }
-      
-      this.data.set(key, {
-        value,
-        expires: Date.now() + ttl,
-        created: Date.now()
-      });
-    }, { timeout: 5000, priority: 1 });
+    return globalLockManager.withLock(
+      `cache:${key}`,
+      async () => {
+        // Check size limits before adding
+        if (this.data.size >= this.maxSize && !this.data.has(key)) {
+          await this.evictOldestEntry();
+        }
+
+        this.data.set(key, {
+          value,
+          expires: Date.now() + ttl,
+          created: Date.now(),
+        });
+      },
+      { timeout: 5000, priority: 1 }
+    );
   }
-  
+
   /**
    * Thread-safe get operation
    */
   async get(key: string): Promise<T | null> {
-    return globalLockManager.withLock(`cache:${key}`, async () => {
-      const entry = this.data.get(key);
-      
-      if (!entry) {
-        return null;
-      }
-      
-      // Check if expired
-      if (entry.expires < Date.now()) {
-        this.data.delete(key);
-        return null;
-      }
-      
-      return entry.value;
-    }, { timeout: 3000, priority: 2 });
+    return globalLockManager.withLock(
+      `cache:${key}`,
+      async () => {
+        const entry = this.data.get(key);
+
+        if (!entry) {
+          return null;
+        }
+
+        // Check if expired
+        if (entry.expires < Date.now()) {
+          this.data.delete(key);
+          return null;
+        }
+
+        return entry.value;
+      },
+      { timeout: 3000, priority: 2 }
+    );
   }
-  
+
   /**
    * Thread-safe delete operation
    */
   async delete(key: string): Promise<boolean> {
-    return globalLockManager.withLock(`cache:${key}`, async () => {
-      return this.data.delete(key);
-    }, { timeout: 3000, priority: 1 });
+    return globalLockManager.withLock(
+      `cache:${key}`,
+      async () => {
+        return this.data.delete(key);
+      },
+      { timeout: 3000, priority: 1 }
+    );
   }
-  
+
   /**
    * Thread-safe clear operation
    */
   async clear(): Promise<void> {
-    return globalLockManager.withLock('cache:global', async () => {
-      this.data.clear();
-    }, { timeout: 10000, priority: 0 });
+    return globalLockManager.withLock(
+      'cache:global',
+      async () => {
+        this.data.clear();
+      },
+      { timeout: 10000, priority: 0 }
+    );
   }
-  
+
   /**
    * Get cache statistics safely
    */
@@ -101,52 +117,56 @@ export class ThreadSafeCache<T> {
     hitRate: number;
     memoryUsage: number;
   }> {
-    return globalLockManager.withLock('cache:global', async () => {
-      const memoryUsage = this.calculateMemoryUsage();
-      
-      return {
-        size: this.data.size,
-        maxSize: this.maxSize,
-        hitRate: 0, // Would need hit tracking for this
-        memoryUsage
-      };
-    }, { timeout: 5000, priority: 3 });
+    return globalLockManager.withLock(
+      'cache:global',
+      async () => {
+        const memoryUsage = this.calculateMemoryUsage();
+
+        return {
+          size: this.data.size,
+          maxSize: this.maxSize,
+          hitRate: 0, // Would need hit tracking for this
+          memoryUsage,
+        };
+      },
+      { timeout: 5000, priority: 3 }
+    );
   }
-  
+
   /**
    * Safely evict oldest entry when at capacity
    */
   private async evictOldestEntry(): Promise<void> {
     let oldestKey: string | null = null;
     let oldestTime = Date.now();
-    
+
     for (const [key, entry] of this.data.entries()) {
       if (entry.created < oldestTime) {
         oldestTime = entry.created;
         oldestKey = key;
       }
     }
-    
+
     if (oldestKey) {
       this.data.delete(oldestKey);
     }
   }
-  
+
   /**
    * Calculate memory usage
    */
   private calculateMemoryUsage(): number {
     let totalSize = 0;
-    
+
     for (const [key, entry] of this.data.entries()) {
       totalSize += key.length * 2; // String characters
       totalSize += JSON.stringify(entry.value).length * 2; // Value size
       totalSize += 24; // Entry object overhead
     }
-    
+
     return totalSize;
   }
-  
+
   /**
    * Start automatic cleanup
    */
@@ -155,49 +175,53 @@ export class ThreadSafeCache<T> {
       await this.cleanup();
     }, this.cleanupIntervalMs);
   }
-  
+
   /**
    * Thread-safe cleanup of expired entries
    */
   private async cleanup(): Promise<void> {
     try {
-      return globalLockManager.withLock('cache:cleanup', async () => {
-        const now = Date.now();
-        const keysToDelete: string[] = [];
-        
-        // Collect expired keys
-        for (const [key, entry] of this.data.entries()) {
-          if (entry.expires < now) {
-            keysToDelete.push(key);
+      return globalLockManager.withLock(
+        'cache:cleanup',
+        async () => {
+          const now = Date.now();
+          const keysToDelete: string[] = [];
+
+          // Collect expired keys
+          for (const [key, entry] of this.data.entries()) {
+            if (entry.expires < now) {
+              keysToDelete.push(key);
+            }
           }
-        }
-        
-        // Delete expired entries
-        for (const key of keysToDelete) {
-          this.data.delete(key);
-        }
-        
-        // Force cleanup if over size limit
-        if (this.data.size > this.maxSize) {
-          const excess = this.data.size - this.maxSize;
-          const entries = Array.from(this.data.entries())
-            .sort(([,a], [,b]) => a.created - b.created) // Sort by creation time
-            .slice(0, excess); // Take oldest entries
-          
-          for (const [key] of entries) {
+
+          // Delete expired entries
+          for (const key of keysToDelete) {
             this.data.delete(key);
           }
-        }
-        
-        if (keysToDelete.length > 0) {
-          console.log(`🧹 Cache cleanup: removed ${keysToDelete.length} expired entries`);
-        }
-      }, { timeout: 30000, priority: 0 });
+
+          // Force cleanup if over size limit
+          if (this.data.size > this.maxSize) {
+            const excess = this.data.size - this.maxSize;
+            const entries = Array.from(this.data.entries())
+              .sort(([, a], [, b]) => a.created - b.created) // Sort by creation time
+              .slice(0, excess); // Take oldest entries
+
+            for (const [key] of entries) {
+              this.data.delete(key);
+            }
+          }
+
+          if (keysToDelete.length > 0) {
+            console.log(`🧹 Cache cleanup: removed ${keysToDelete.length} expired entries`);
+          }
+        },
+        { timeout: 30000, priority: 0 }
+      );
     } catch (error) {
       console.error('Cache cleanup failed:', error);
     }
   }
-  
+
   /**
    * Stop cleanup and release resources
    */
@@ -206,7 +230,7 @@ export class ThreadSafeCache<T> {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;
     }
-    
+
     await this.clear();
   }
 }
@@ -258,12 +282,12 @@ export async function getCacheStats(): Promise<{
 }> {
   const [globalStats, enterpriseStats] = await Promise.all([
     globalCache.getStats(),
-    enterpriseCache.getStats()
+    enterpriseCache.getStats(),
   ]);
-  
+
   return {
     global: globalStats,
-    enterprise: enterpriseStats
+    enterprise: enterpriseStats,
   };
 }
 
@@ -271,8 +295,5 @@ export async function getCacheStats(): Promise<{
  * Cleanup function for graceful shutdown
  */
 export async function shutdownCache(): Promise<void> {
-  await Promise.all([
-    globalCache.destroy(),
-    enterpriseCache.destroy()
-  ]);
-} 
+  await Promise.all([globalCache.destroy(), enterpriseCache.destroy()]);
+}

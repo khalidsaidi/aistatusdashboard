@@ -22,7 +22,10 @@ export interface EmailNotification {
 
 // In-memory storage for demo - in production, use database
 const emailSubscriptions = new Map<string, EmailSubscription>();
-const notificationQueue: Array<{ subscription: EmailSubscription; notification: EmailNotification }> = [];
+const notificationQueue: Array<{
+  subscription: EmailSubscription;
+  notification: EmailNotification;
+}> = [];
 
 /**
  * Add email subscription
@@ -39,18 +42,18 @@ export function addEmailSubscription(
     notificationTypes,
     createdAt: new Date().toISOString(),
     confirmed: false,
-    confirmationToken: generateId()
+    confirmationToken: generateId(),
   };
-  
+
   emailSubscriptions.set(subscription.id, subscription);
-  
+
   log('info', 'Email subscription added', {
     id: subscription.id,
     email: subscription.email,
     providers: subscription.providers,
-    notificationTypes: subscription.notificationTypes
+    notificationTypes: subscription.notificationTypes,
   });
-  
+
   return subscription;
 }
 
@@ -62,12 +65,12 @@ export function confirmEmailSubscription(token: string): boolean {
     if (subscription.confirmationToken === token) {
       subscription.confirmed = true;
       subscription.confirmationToken = undefined;
-      
+
       log('info', 'Email subscription confirmed', {
         id: subscription.id,
-        email: subscription.email
+        email: subscription.email,
       });
-      
+
       return true;
     }
   }
@@ -79,11 +82,11 @@ export function confirmEmailSubscription(token: string): boolean {
  */
 export function removeEmailSubscription(id: string): boolean {
   const result = emailSubscriptions.delete(id);
-  
+
   if (result) {
     log('info', 'Email subscription removed', { id });
   }
-  
+
   return result;
 }
 
@@ -97,46 +100,43 @@ export function getAllSubscriptions(): EmailSubscription[] {
 /**
  * Process status change and queue notifications
  */
-export function processStatusChange(
-  current: StatusResult,
-  previous: StatusResult | null
-): void {
+export function processStatusChange(current: StatusResult, previous: StatusResult | null): void {
   if (!previous || current.status === previous.status) {
     return; // No status change
   }
-  
+
   const notificationType = determineNotificationType(current.status, previous.status);
   if (!notificationType) {
     return; // Not a significant change
   }
-  
+
   const notification: EmailNotification = {
     type: notificationType,
     provider: current.name,
     status: current.status,
     previousStatus: previous.status,
     timestamp: current.lastChecked,
-    responseTime: current.responseTime
+    responseTime: current.responseTime,
   };
-  
+
   // Queue notifications for relevant subscribers
   for (const subscription of Array.from(emailSubscriptions.values())) {
     if (!subscription.confirmed) continue;
-    
+
     // Check if subscriber wants this type of notification
     if (!subscription.notificationTypes.includes(notificationType)) continue;
-    
+
     // Check if subscriber wants notifications for this provider
     if (subscription.providers.length > 0 && !subscription.providers.includes(current.id)) continue;
-    
+
     notificationQueue.push({ subscription, notification });
   }
-  
+
   log('info', 'Status change processed for email notifications', {
     provider: current.id,
     change: `${previous.status} → ${current.status}`,
     type: notificationType,
-    queuedNotifications: notificationQueue.length
+    queuedNotifications: notificationQueue.length,
   });
 }
 
@@ -145,9 +145,9 @@ export function processStatusChange(
  */
 export async function sendQueuedNotifications(): Promise<void> {
   if (notificationQueue.length === 0) return;
-  
+
   const notifications = notificationQueue.splice(0);
-  
+
   for (const item of notifications) {
     try {
       // Real email implementation - send to actual email service
@@ -155,9 +155,9 @@ export async function sendQueuedNotifications(): Promise<void> {
         to: item.subscription.email,
         subject: generateEmailSubject(item.notification),
         html: generateEmailHtml(item.notification),
-        text: generateEmailText(item.notification)
+        text: generateEmailText(item.notification),
       };
-      
+
       // Try to send via email service API
       try {
         const response = await fetch('/api/send-email', {
@@ -165,15 +165,15 @@ export async function sendQueuedNotifications(): Promise<void> {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(emailData)
+          body: JSON.stringify(emailData),
         });
-        
+
         if (response.ok) {
           log('info', 'Email notification sent successfully', {
             to: item.subscription.email,
             provider: item.notification.provider,
             type: item.notification.type,
-            change: `${item.notification.previousStatus} → ${item.notification.status}`
+            change: `${item.notification.previousStatus} → ${item.notification.status}`,
           });
         } else {
           throw new Error(`Email service responded with status ${response.status}`);
@@ -186,13 +186,13 @@ export async function sendQueuedNotifications(): Promise<void> {
           type: item.notification.type,
           change: `${item.notification.previousStatus} → ${item.notification.status}`,
           subject: emailData.subject,
-          error: fetchError instanceof Error ? fetchError.message : 'Unknown error'
+          error: fetchError instanceof Error ? fetchError.message : 'Unknown error',
         });
       }
     } catch (error) {
       log('error', 'Failed to process email notification', {
         email: item.subscription.email,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -203,7 +203,7 @@ export async function sendQueuedNotifications(): Promise<void> {
  */
 function generateEmailSubject(notification: EmailNotification): string {
   const { provider, type, status } = notification;
-  
+
   switch (type) {
     case 'incident':
       return `🚨 ${provider} Service Issue Detected`;
@@ -221,10 +221,10 @@ function generateEmailSubject(notification: EmailNotification): string {
  */
 function generateEmailHtml(notification: EmailNotification): string {
   const { provider, type, status, previousStatus, timestamp, responseTime } = notification;
-  
+
   const statusIcon = type === 'incident' ? '🚨' : type === 'recovery' ? '✅' : '⚠️';
   const statusColor = type === 'incident' ? '#dc3545' : type === 'recovery' ? '#28a745' : '#ffc107';
-  
+
   return `
     <!DOCTYPE html>
     <html>
@@ -261,9 +261,10 @@ function generateEmailHtml(notification: EmailNotification): string {
  */
 function generateEmailText(notification: EmailNotification): string {
   const { provider, type, status, previousStatus, timestamp, responseTime } = notification;
-  
-  const statusIcon = type === 'incident' ? '[ISSUE]' : type === 'recovery' ? '[RECOVERED]' : '[DEGRADED]';
-  
+
+  const statusIcon =
+    type === 'incident' ? '[ISSUE]' : type === 'recovery' ? '[RECOVERED]' : '[DEGRADED]';
+
   return `
 ${statusIcon} ${provider} Status Update
 
@@ -291,17 +292,17 @@ function determineNotificationType(
   if (currentStatus === 'operational' && previousStatus !== 'operational') {
     return 'recovery';
   }
-  
+
   // Incident: operational to down
   if (currentStatus === 'down' && previousStatus === 'operational') {
     return 'incident';
   }
-  
+
   // Degradation: operational to degraded
   if (currentStatus === 'degraded' && previousStatus === 'operational') {
     return 'degradation';
   }
-  
+
   return null; // No significant change
 }
 
@@ -315,12 +316,15 @@ function generateId(): string {
 /**
  * Auto-send notifications every 5 minutes
  */
-setInterval(async () => {
-  try {
-    await sendQueuedNotifications();
-  } catch (error) {
-    log('error', 'Failed to process notification queue', {
-      error: error instanceof Error ? error.message : 'Unknown error'
-    });
-  }
-}, 5 * 60 * 1000); // 5 minutes 
+setInterval(
+  async () => {
+    try {
+      await sendQueuedNotifications();
+    } catch (error) {
+      log('error', 'Failed to process notification queue', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  },
+  5 * 60 * 1000
+); // 5 minutes

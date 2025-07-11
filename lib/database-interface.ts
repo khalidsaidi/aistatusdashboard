@@ -6,15 +6,15 @@ export interface DatabaseInterface {
   saveStatusResults(results: StatusResult[]): Promise<void>;
   getLastStatus(providerId: string): Promise<StatusResult | null>;
   getProviderHistory(providerId: string, hours?: number): Promise<StatusHistoryRecord[]>;
-  
+
   // Analytics
   calculateUptime(providerId: string, hours?: number): Promise<number>;
   getAverageResponseTime(providerId: string, hours?: number): Promise<number>;
-  
+
   // Maintenance
   cleanupOldRecords(): Promise<void>;
   closeDatabase(): Promise<void>;
-  
+
   // Health check
   isHealthy(): Promise<boolean>;
 }
@@ -31,7 +31,7 @@ export async function createDatabase(config: DatabaseConfig): Promise<DatabaseIn
     case 'firestore':
       const firestoreDb = await import('./firestore-database');
       return firestoreDb;
-    
+
     default:
       throw new Error(`Unsupported database type: ${config.type}. Only 'firestore' is supported.`);
   }
@@ -47,12 +47,12 @@ export async function getDatabase(): Promise<DatabaseInterface> {
       connectionString: process.env.DATABASE_URL,
       options: {
         retentionDays: parseInt(process.env.DATA_RETENTION_DAYS || '30'),
-        batchSize: parseInt(process.env.DATABASE_BATCH_SIZE || '100')
-      }
+        batchSize: parseInt(process.env.DATABASE_BATCH_SIZE || '100'),
+      },
     };
-    
+
     databaseInstance = await createDatabase(config);
   }
-  
+
   return databaseInstance;
-} 
+}

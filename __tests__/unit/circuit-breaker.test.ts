@@ -16,7 +16,7 @@ describe('Circuit Breaker Tests', () => {
         ok: true,
         status: 200,
         json: async () => ({ status: 'operational' }),
-        headers: new Headers()
+        headers: new Headers(),
       } as Response);
 
       // Test successful request
@@ -38,7 +38,7 @@ describe('Circuit Breaker Tests', () => {
         ok: true,
         status: 200,
         json: async () => ({ status: 'operational' }),
-        headers: new Headers()
+        headers: new Headers(),
       } as Response);
 
       // Test multiple requests
@@ -60,7 +60,7 @@ describe('Circuit Breaker Tests', () => {
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
-        headers: new Headers()
+        headers: new Headers(),
       } as Response);
 
       const response = await fetch('https://example.com');
@@ -68,4 +68,4 @@ describe('Circuit Breaker Tests', () => {
       expect(response.status).toBe(500);
     });
   });
-}); 
+});

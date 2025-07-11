@@ -1,7 +1,7 @@
 name: Bug Report
 description: File a bug report to help us improve
-title: "[Bug]: "
-labels: ["bug"]
+title: '[Bug]: '
+labels: ['bug']
 body:
   - type: markdown
     attributes:
@@ -56,4 +56,4 @@ body:
       description: By submitting this issue, you agree to follow our Code of Conduct
       options:
         - label: I agree to follow this project's Code of Conduct
-          required: true 
+          required: true

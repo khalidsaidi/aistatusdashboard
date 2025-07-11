@@ -1,9 +1,9 @@
 /**
  * UNIFIED STATUS FETCHER: Consolidation of 6 implementations into 2 optimized versions
- * 
+ *
  * CRITICAL FIXES APPLIED:
  * - Memory leak fixes from enterprise-status-fetcher.ts
- * - Race condition fixes from horizontal-scaling-manager.ts  
+ * - Race condition fixes from horizontal-scaling-manager.ts
  * - Security vulnerabilities fixes from scaledStatusMonitor.ts
  * - Notification bottleneck fixes from pushNotifications.ts
  * - Firebase optimization with real pricing data
@@ -44,7 +44,7 @@ class ThreadSafeRateLimiter {
       allowed: true,
       remaining: limit - 1,
       resetTime: Date.now() + windowMs,
-      retryAfter: undefined
+      retryAfter: undefined,
     };
   }
 }
@@ -63,15 +63,15 @@ class FirebaseQuotaOptimizer {
       storage: { stored: 0, downloads: 0, operations: 0, total: 0 },
       grandTotal: 0,
       savingsFromFreeQuota: 0,
-      recommendations: []
+      recommendations: [],
     };
   }
 }
 
 // Optimized fetcher strategies
 export enum FetcherStrategy {
-  ENTERPRISE = 'enterprise',  // High-volume, enterprise-grade with all optimizations
-  STANDARD = 'standard'       // Standard implementation for smaller loads
+  ENTERPRISE = 'enterprise', // High-volume, enterprise-grade with all optimizations
+  STANDARD = 'standard', // Standard implementation for smaller loads
 }
 
 interface FetcherConfig {
@@ -105,21 +105,21 @@ export class UnifiedStatusFetcher {
     failedRequests: 0,
     avgResponseTime: 0,
     cacheHitRate: 0,
-    costSavings: 0
+    costSavings: 0,
   };
-  
+
   constructor(private config: FetcherConfig) {
     this.rateLimiter = new ThreadSafeRateLimiter();
     this.lockManager = new GlobalLockManager();
     this.quotaOptimizer = new FirebaseQuotaOptimizer();
-    
+
     // Start cache cleanup
     this.startCacheCleanup();
-    
+
     log('info', `Unified Status Fetcher initialized with ${config.strategy} strategy`, {
       maxConcurrency: config.maxConcurrency,
       rateLimitPerSecond: config.rateLimitPerSecond,
-      enableCaching: config.enableCaching
+      enableCaching: config.enableCaching,
     });
   }
 
@@ -129,36 +129,38 @@ export class UnifiedStatusFetcher {
   async fetchStatusEnterprise(providers: ProviderConfig[]): Promise<StatusResult[]> {
     const startTime = Date.now();
     this.metrics.totalRequests += providers.length;
-    
+
     try {
       // Intelligent batching based on provider characteristics
       const batches = this.createIntelligentBatches(providers);
       const results: StatusResult[] = [];
-      
+
       // Process batches with optimal concurrency
       for (const batch of batches) {
         const batchResults = await this.processBatchEnterprise(batch);
         results.push(...batchResults);
-        
+
         // Adaptive rate limiting between batches
         await this.adaptiveDelay(batch.length);
       }
-      
+
       // Update metrics and costs
       this.updateMetrics(results, Date.now() - startTime);
       await this.updateFirebaseCosts(results);
-      
-      this.metrics.successfulRequests += results.filter(r => r.status !== 'error').length;
-      this.metrics.failedRequests += results.filter(r => r.status === 'error').length;
-      
+
+      this.metrics.successfulRequests += results.filter((r) => r.status !== 'error').length;
+      this.metrics.failedRequests += results.filter((r) => r.status === 'error').length;
+
       return results;
-      
-         } catch (error) {
-       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-       log('error', 'Enterprise status fetch failed', { error: errorMessage, providersCount: providers.length });
-       this.metrics.failedRequests += providers.length;
-       throw error;
-     }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      log('error', 'Enterprise status fetch failed', {
+        error: errorMessage,
+        providersCount: providers.length,
+      });
+      this.metrics.failedRequests += providers.length;
+      throw error;
+    }
   }
 
   /**
@@ -167,11 +169,11 @@ export class UnifiedStatusFetcher {
   async fetchStatusStandard(providers: ProviderConfig[]): Promise<StatusResult[]> {
     const startTime = Date.now();
     this.metrics.totalRequests += providers.length;
-    
+
     try {
       // Simple concurrent processing with basic optimizations
       const semaphore = new Semaphore(this.config.maxConcurrency);
-      const promises = providers.map(provider => 
+      const promises = providers.map((provider) =>
         semaphore.acquire().then(async () => {
           try {
             const result = await this.fetchSingleProviderStandard(provider);
@@ -181,7 +183,7 @@ export class UnifiedStatusFetcher {
           }
         })
       );
-      
+
       const results = await Promise.allSettled(promises);
       const statusResults = results.map((result, index) => {
         if (result.status === 'fulfilled') {
@@ -193,24 +195,26 @@ export class UnifiedStatusFetcher {
             status: 'error' as const,
             lastChecked: new Date(),
             responseTime: 0,
-            error: result.reason?.message || 'Unknown error'
+            error: result.reason?.message || 'Unknown error',
           };
         }
       });
-      
+
       this.updateMetrics(statusResults, Date.now() - startTime);
-      
-      this.metrics.successfulRequests += statusResults.filter(r => r.status !== 'error').length;
-      this.metrics.failedRequests += statusResults.filter(r => r.status === 'error').length;
-      
+
+      this.metrics.successfulRequests += statusResults.filter((r) => r.status !== 'error').length;
+      this.metrics.failedRequests += statusResults.filter((r) => r.status === 'error').length;
+
       return statusResults;
-      
-         } catch (error) {
-       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-       log('error', 'Standard status fetch failed', { error: errorMessage, providersCount: providers.length });
-       this.metrics.failedRequests += providers.length;
-       throw error;
-     }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      log('error', 'Standard status fetch failed', {
+        error: errorMessage,
+        providersCount: providers.length,
+      });
+      this.metrics.failedRequests += providers.length;
+      throw error;
+    }
   }
 
   /**
@@ -229,7 +233,7 @@ export class UnifiedStatusFetcher {
    */
   private async processBatchEnterprise(providers: ProviderConfig[]): Promise<StatusResult[]> {
     const results: StatusResult[] = [];
-    
+
     // Process with enterprise-grade optimizations
     const promises = providers.map(async (provider) => {
       // Check cache first (if enabled)
@@ -240,35 +244,35 @@ export class UnifiedStatusFetcher {
           return cached;
         }
       }
-      
+
       // Rate limiting with enterprise settings
       const rateLimitResult = await this.rateLimiter.checkRateLimit(
         provider.id,
         this.config.rateLimitPerSecond,
         1000 // 1 second window
       );
-      
+
       if (!rateLimitResult.allowed) {
-        log('warn', 'Rate limit exceeded for provider', { 
-          providerId: provider.id, 
-          retryAfter: rateLimitResult.retryAfter 
+        log('warn', 'Rate limit exceeded for provider', {
+          providerId: provider.id,
+          retryAfter: rateLimitResult.retryAfter,
         });
-        
+
         // Wait and retry
-        await new Promise(resolve => setTimeout(resolve, rateLimitResult.retryAfter || 1000));
+        await new Promise((resolve) => setTimeout(resolve, rateLimitResult.retryAfter || 1000));
       }
-      
+
       // Fetch with enterprise-grade error handling
       return this.fetchSingleProviderEnterprise(provider);
     });
-    
+
     const settledResults = await Promise.allSettled(promises);
-    
+
     for (let i = 0; i < settledResults.length; i++) {
       const result = settledResults[i];
       if (result.status === 'fulfilled') {
         results.push(result.value);
-        
+
         // Cache successful results
         if (this.config.enableCaching && result.value.status !== 'error') {
           this.setCachedResult(providers[i].id, result.value);
@@ -280,11 +284,11 @@ export class UnifiedStatusFetcher {
           status: 'error',
           lastChecked: new Date(),
           responseTime: 0,
-          error: result.reason?.message || 'Enterprise fetch failed'
+          error: result.reason?.message || 'Enterprise fetch failed',
         });
       }
     }
-    
+
     return results;
   }
 
@@ -293,67 +297,85 @@ export class UnifiedStatusFetcher {
    */
   private async fetchSingleProviderEnterprise(provider: ProviderConfig): Promise<StatusResult> {
     const startTime = Date.now();
-    
+
     try {
       // SECURITY FIX: Comprehensive URL validation to prevent SSRF attacks
       if (!provider.statusUrl || typeof provider.statusUrl !== 'string') {
         throw new Error('Invalid provider URL');
       }
-      
+
       let parsedUrl: URL;
       try {
         parsedUrl = new URL(provider.statusUrl);
       } catch {
         throw new Error('Malformed provider URL');
       }
-      
+
       // SECURITY FIX: Prevent SSRF attacks with strict protocol and host validation
       const allowedProtocols = ['https:', 'http:'];
       if (!allowedProtocols.includes(parsedUrl.protocol)) {
         throw new Error(`Invalid protocol: ${parsedUrl.protocol}. Only HTTPS and HTTP allowed.`);
       }
-      
+
       // SECURITY FIX: Block private IP ranges and localhost
       const blockedHosts = [
-        '127.0.0.1', 'localhost', '0.0.0.0',
-        '10.', '172.16.', '172.17.', '172.18.', '172.19.', '172.20.',
-        '172.21.', '172.22.', '172.23.', '172.24.', '172.25.', '172.26.',
-        '172.27.', '172.28.', '172.29.', '172.30.', '172.31.', '192.168.'
+        '127.0.0.1',
+        'localhost',
+        '0.0.0.0',
+        '10.',
+        '172.16.',
+        '172.17.',
+        '172.18.',
+        '172.19.',
+        '172.20.',
+        '172.21.',
+        '172.22.',
+        '172.23.',
+        '172.24.',
+        '172.25.',
+        '172.26.',
+        '172.27.',
+        '172.28.',
+        '172.29.',
+        '172.30.',
+        '172.31.',
+        '192.168.',
       ];
-      
-      if (blockedHosts.some(blocked => parsedUrl.hostname.startsWith(blocked))) {
+
+      if (blockedHosts.some((blocked) => parsedUrl.hostname.startsWith(blocked))) {
         throw new Error(`Blocked hostname: ${parsedUrl.hostname}`);
       }
-      
+
       // SECURITY FIX: Timeout protection against resource exhaustion
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.config.timeoutMs);
-      
+
       try {
         const response = await fetch(provider.statusUrl, {
           signal: controller.signal,
           headers: {
             'User-Agent': 'AI-Status-Dashboard/1.0',
-            'Accept': 'application/json',
+            Accept: 'application/json',
             'Cache-Control': 'no-cache',
           },
           // SECURITY FIX: Prevent redirect attacks and limit redirects
           redirect: 'manual',
         });
-        
+
         clearTimeout(timeoutId);
-        
+
         // SECURITY FIX: Validate response size to prevent memory exhaustion
         const contentLength = response.headers.get('content-length');
-        if (contentLength && parseInt(contentLength) > 1024 * 1024) { // 1MB limit
+        if (contentLength && parseInt(contentLength) > 1024 * 1024) {
+          // 1MB limit
           throw new Error('Response too large');
         }
-        
+
         const responseTime = Date.now() - startTime;
-        
+
         // Parse response based on provider configuration
         let status: 'operational' | 'degraded' | 'outage' | 'error' = 'operational';
-        
+
         if (response.ok) {
           try {
             const data = await response.json();
@@ -365,7 +387,7 @@ export class UnifiedStatusFetcher {
         } else {
           status = response.status >= 500 ? 'outage' : 'degraded';
         }
-        
+
         return {
           providerId: provider.id,
           providerName: provider.name,
@@ -376,31 +398,29 @@ export class UnifiedStatusFetcher {
           details: {
             url: provider.statusUrl,
             method: 'GET',
-            strategy: 'enterprise'
-          }
+            strategy: 'enterprise',
+          },
         };
-        
       } finally {
         clearTimeout(timeoutId);
       }
-      
-         } catch (error) {
-       const responseTime = Date.now() - startTime;
-       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-       
-       return {
-         providerId: provider.id,
-         providerName: provider.name,
-         status: 'error',
-         lastChecked: new Date(),
-         responseTime,
-         error: errorMessage,
-         details: {
-           url: provider.statusUrl,
-           strategy: 'enterprise'
-         }
-       };
-     }
+    } catch (error) {
+      const responseTime = Date.now() - startTime;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+      return {
+        providerId: provider.id,
+        providerName: provider.name,
+        status: 'error',
+        lastChecked: new Date(),
+        responseTime,
+        error: errorMessage,
+        details: {
+          url: provider.statusUrl,
+          strategy: 'enterprise',
+        },
+      };
+    }
   }
 
   /**
@@ -408,31 +428,31 @@ export class UnifiedStatusFetcher {
    */
   private async fetchSingleProviderStandard(provider: ProviderConfig): Promise<StatusResult> {
     const startTime = Date.now();
-    
+
     try {
       // Basic URL validation
       if (!provider.statusUrl) {
         throw new Error('No status URL provided');
       }
-      
+
       // Simple timeout protection
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.config.timeoutMs);
-      
+
       try {
         const response = await fetch(provider.statusUrl, {
           signal: controller.signal,
           headers: {
             'User-Agent': 'AI-Status-Dashboard/1.0',
-            'Accept': 'application/json'
-          }
+            Accept: 'application/json',
+          },
         });
-        
+
         clearTimeout(timeoutId);
-        
+
         const responseTime = Date.now() - startTime;
         let status: 'operational' | 'degraded' | 'outage' | 'error' = 'operational';
-        
+
         if (response.ok) {
           try {
             const data = await response.json();
@@ -443,7 +463,7 @@ export class UnifiedStatusFetcher {
         } else {
           status = response.status >= 500 ? 'outage' : 'degraded';
         }
-        
+
         return {
           providerId: provider.id,
           providerName: provider.name,
@@ -454,17 +474,15 @@ export class UnifiedStatusFetcher {
           details: {
             url: provider.statusUrl,
             method: 'GET',
-            strategy: 'standard'
-          }
+            strategy: 'standard',
+          },
         };
-        
       } finally {
         clearTimeout(timeoutId);
       }
-      
     } catch (error) {
       const responseTime = Date.now() - startTime;
-      
+
       return {
         providerId: provider.id,
         providerName: provider.name,
@@ -474,8 +492,8 @@ export class UnifiedStatusFetcher {
         error: error instanceof Error ? error.message : 'Unknown error',
         details: {
           url: provider.statusUrl,
-          strategy: 'standard'
-        }
+          strategy: 'standard',
+        },
       };
     }
   }
@@ -486,32 +504,35 @@ export class UnifiedStatusFetcher {
   private createIntelligentBatches(providers: ProviderConfig[]): ProviderConfig[][] {
     const batches: ProviderConfig[][] = [];
     const batchSize = Math.min(this.config.maxConcurrency, 50); // Max 50 per batch
-    
+
     // Group providers by priority and expected response time
     const priorityGroups = {
-      high: providers.filter(p => p.priority === 'high'),
-      medium: providers.filter(p => p.priority === 'medium'),
-      low: providers.filter(p => p.priority === 'low' || !p.priority)
+      high: providers.filter((p) => p.priority === 'high'),
+      medium: providers.filter((p) => p.priority === 'medium'),
+      low: providers.filter((p) => p.priority === 'low' || !p.priority),
     };
-    
+
     // Process high priority first, in smaller batches
     for (let i = 0; i < priorityGroups.high.length; i += Math.floor(batchSize / 2)) {
       batches.push(priorityGroups.high.slice(i, i + Math.floor(batchSize / 2)));
     }
-    
+
     // Process medium and low priority in larger batches
     const remainingProviders = [...priorityGroups.medium, ...priorityGroups.low];
     for (let i = 0; i < remainingProviders.length; i += batchSize) {
       batches.push(remainingProviders.slice(i, i + batchSize));
     }
-    
+
     return batches;
   }
 
   /**
    * Parse provider-specific status format
    */
-  private parseProviderStatus(data: any, provider: ProviderConfig): 'operational' | 'degraded' | 'outage' | 'error' {
+  private parseProviderStatus(
+    data: any,
+    provider: ProviderConfig
+  ): 'operational' | 'degraded' | 'outage' | 'error' {
     // Handle common status page formats
     if (data.status) {
       const status = data.status.toLowerCase();
@@ -519,14 +540,14 @@ export class UnifiedStatusFetcher {
       if (status.includes('degraded') || status.includes('partial')) return 'degraded';
       if (status.includes('down') || status.includes('outage')) return 'outage';
     }
-    
+
     if (data.page && data.page.status) {
       const status = data.page.status.toLowerCase();
       if (status.includes('operational')) return 'operational';
       if (status.includes('degraded')) return 'degraded';
       if (status.includes('critical')) return 'outage';
     }
-    
+
     // Default to operational if we can't determine status
     return 'operational';
   }
@@ -539,11 +560,11 @@ export class UnifiedStatusFetcher {
     if (cached && Date.now() - cached.timestamp < cached.ttl) {
       return cached.result;
     }
-    
+
     if (cached) {
       this.cache.delete(providerId);
     }
-    
+
     return null;
   }
 
@@ -551,7 +572,7 @@ export class UnifiedStatusFetcher {
     this.cache.set(providerId, {
       result,
       timestamp: Date.now(),
-      ttl: this.config.cacheTtlMs
+      ttl: this.config.cacheTtlMs,
     });
   }
 
@@ -572,7 +593,7 @@ export class UnifiedStatusFetcher {
   private async adaptiveDelay(batchSize: number): Promise<void> {
     // Longer delay for larger batches
     const delay = Math.min(1000, batchSize * 50);
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
   }
 
   /**
@@ -594,27 +615,28 @@ export class UnifiedStatusFetcher {
           writes: results.length, // One write per status result
           deletes: 0,
           storageGB: results.length * 0.001, // Approximate 1KB per result
-          networkEgressGB: 0
+          networkEgressGB: 0,
         },
         functions: {
           invocations: 1, // One function invocation for this batch
           gbSeconds: results.length * 0.1, // Approximate compute time
           ghzSeconds: results.length * 0.2,
-          networkEgressGB: results.length * 0.0001 // Approximate network usage
+          networkEgressGB: results.length * 0.0001, // Approximate network usage
         },
         storage: {
           storedGB: 0,
           downloadsGB: 0,
           uploadOps: 0,
-          downloadOps: 0
-        }
+          downloadOps: 0,
+        },
       };
-      
+
       const costs = this.quotaOptimizer.calculateMonthlyCosts(usage);
       this.metrics.costSavings += costs.savingsFromFreeQuota;
-      
     } catch (error) {
-      log('warn', 'Failed to update Firebase costs', { error: error instanceof Error ? error.message : 'Unknown error' });
+      log('warn', 'Failed to update Firebase costs', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
     }
   }
 
@@ -635,7 +657,7 @@ export class UnifiedStatusFetcher {
       failedRequests: 0,
       avgResponseTime: 0,
       cacheHitRate: 0,
-      costSavings: 0
+      costSavings: 0,
     };
   }
 }
@@ -675,7 +697,9 @@ class Semaphore {
 /**
  * Factory function to create optimized fetcher instances
  */
-export function createStatusFetcher(strategy: FetcherStrategy = FetcherStrategy.STANDARD): UnifiedStatusFetcher {
+export function createStatusFetcher(
+  strategy: FetcherStrategy = FetcherStrategy.STANDARD
+): UnifiedStatusFetcher {
   const enterpriseConfig: FetcherConfig = {
     strategy: FetcherStrategy.ENTERPRISE,
     maxConcurrency: 100,
@@ -684,7 +708,7 @@ export function createStatusFetcher(strategy: FetcherStrategy = FetcherStrategy.
     timeoutMs: 10000,
     enableCaching: true,
     cacheTtlMs: 300000, // 5 minutes
-    enableMetrics: true
+    enableMetrics: true,
   };
 
   const standardConfig: FetcherConfig = {
@@ -695,10 +719,10 @@ export function createStatusFetcher(strategy: FetcherStrategy = FetcherStrategy.
     timeoutMs: 5000,
     enableCaching: true,
     cacheTtlMs: 180000, // 3 minutes
-    enableMetrics: true
+    enableMetrics: true,
   };
 
   const config = strategy === FetcherStrategy.ENTERPRISE ? enterpriseConfig : standardConfig;
-  
+
   return new UnifiedStatusFetcher(config);
-} 
+}

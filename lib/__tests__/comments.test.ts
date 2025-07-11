@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from '@jest/globals';
-import { 
-  createComment, 
-  getComments, 
+import {
+  createComment,
+  getComments,
   getComment,
   updateCommentStatus,
   likeComment,
@@ -9,7 +9,7 @@ import {
   addReply,
   deleteComment,
   getCommentStats,
-  _testOnlyComments
+  _testOnlyComments,
 } from '../comments';
 import { CommentCreate, CommentFilter } from '../types';
 
@@ -25,7 +25,7 @@ describe('Comments System', () => {
         author: 'Test User',
         email: 'test@example.com',
         message: 'This is a test comment with enough characters',
-        type: 'general'
+        type: 'general',
       };
 
       const result = createComment(commentData);
@@ -44,7 +44,7 @@ describe('Comments System', () => {
       const commentData: CommentCreate = {
         author: 'A', // Too short
         message: 'This is a valid message with enough characters',
-        type: 'general'
+        type: 'general',
       };
 
       const result = createComment(commentData);
@@ -57,7 +57,7 @@ describe('Comments System', () => {
       const commentData: CommentCreate = {
         author: 'Test User',
         message: 'Short', // Too short
-        type: 'general'
+        type: 'general',
       };
 
       const result = createComment(commentData);
@@ -71,7 +71,7 @@ describe('Comments System', () => {
         author: 'Test User',
         email: 'invalid-email',
         message: 'This is a valid message with enough characters',
-        type: 'general'
+        type: 'general',
       };
 
       const result = createComment(commentData);
@@ -84,7 +84,7 @@ describe('Comments System', () => {
       const commentData: CommentCreate = {
         author: 'Test User',
         message: 'This message contains spam content which should be flagged',
-        type: 'general'
+        type: 'general',
       };
 
       const result = createComment(commentData);
@@ -96,11 +96,11 @@ describe('Comments System', () => {
     it('should support different comment types', () => {
       const types: Array<'general' | 'feedback' | 'issue'> = ['general', 'feedback', 'issue'];
 
-      types.forEach(type => {
+      types.forEach((type) => {
         const commentData: CommentCreate = {
           author: 'Test User',
           message: `This is a ${type} comment with enough characters`,
-          type
+          type,
         };
 
         const result = createComment(commentData);
@@ -115,7 +115,7 @@ describe('Comments System', () => {
         author: 'Test User',
         message: 'This is a comment about OpenAI specifically',
         type: 'provider',
-        providerId: 'openai'
+        providerId: 'openai',
       };
 
       const result = createComment(commentData);
@@ -131,20 +131,20 @@ describe('Comments System', () => {
       createComment({
         author: 'User 1',
         message: 'General comment about the dashboard',
-        type: 'general'
+        type: 'general',
       });
 
       createComment({
         author: 'User 2',
         message: 'Feedback about the interface',
-        type: 'feedback'
+        type: 'feedback',
       });
 
       createComment({
         author: 'User 3',
         message: 'Issue with OpenAI status',
         type: 'issue',
-        providerId: 'openai'
+        providerId: 'openai',
       });
     });
 
@@ -181,21 +181,27 @@ describe('Comments System', () => {
 
     it('should sort by creation date (newest first)', () => {
       const comments = getComments();
-      
+
       // Comments should be sorted newest first
       for (let i = 1; i < comments.length; i++) {
         const prevCreatedAt = comments[i - 1].createdAt;
         const currentCreatedAt = comments[i].createdAt;
-        
+
         // Handle both string dates and Firebase Timestamp objects
-        const prevTime = typeof prevCreatedAt === 'string' 
-          ? new Date(prevCreatedAt).getTime()
-          : (prevCreatedAt as any)._seconds ? (prevCreatedAt as any)._seconds * 1000 : Date.now();
-        
-        const currentTime = typeof currentCreatedAt === 'string' 
-          ? new Date(currentCreatedAt).getTime()
-          : (currentCreatedAt as any)._seconds ? (currentCreatedAt as any)._seconds * 1000 : Date.now();
-        
+        const prevTime =
+          typeof prevCreatedAt === 'string'
+            ? new Date(prevCreatedAt).getTime()
+            : (prevCreatedAt as any)._seconds
+              ? (prevCreatedAt as any)._seconds * 1000
+              : Date.now();
+
+        const currentTime =
+          typeof currentCreatedAt === 'string'
+            ? new Date(currentCreatedAt).getTime()
+            : (currentCreatedAt as any)._seconds
+              ? (currentCreatedAt as any)._seconds * 1000
+              : Date.now();
+
         expect(prevTime).toBeGreaterThanOrEqual(currentTime);
       }
     });
@@ -208,7 +214,7 @@ describe('Comments System', () => {
       const result = createComment({
         author: 'Test User',
         message: 'This is a test comment for actions',
-        type: 'general'
+        type: 'general',
       });
       commentId = result.comment!.id;
     });
@@ -260,7 +266,7 @@ describe('Comments System', () => {
       const result = createComment({
         author: 'Parent User',
         message: 'This is a parent comment',
-        type: 'general'
+        type: 'general',
       });
       parentCommentId = result.comment!.id;
     });
@@ -269,7 +275,7 @@ describe('Comments System', () => {
       const replyData: CommentCreate = {
         author: 'Reply User',
         message: 'This is a reply to the parent comment',
-        type: 'general'
+        type: 'general',
       };
 
       const result = addReply(parentCommentId, replyData);
@@ -287,7 +293,7 @@ describe('Comments System', () => {
       const replyData: CommentCreate = {
         author: 'Reply User',
         message: 'This is a reply to a non-existent comment',
-        type: 'general'
+        type: 'general',
       };
 
       const result = addReply('invalid-id', replyData);
@@ -300,7 +306,7 @@ describe('Comments System', () => {
       const replyData: CommentCreate = {
         author: 'A', // Too short
         message: 'Short', // Too short
-        type: 'general'
+        type: 'general',
       };
 
       const result = addReply(parentCommentId, replyData);
@@ -317,20 +323,20 @@ describe('Comments System', () => {
       createComment({
         author: 'User 1',
         message: 'Approved general comment',
-        type: 'general'
+        type: 'general',
       });
 
       const result2 = createComment({
         author: 'User 2',
         message: 'This contains spam so should be pending',
-        type: 'feedback'
+        type: 'feedback',
       });
-      
+
       createComment({
         author: 'User 3',
         message: 'Issue with OpenAI specifically',
         type: 'issue',
-        providerId: 'openai'
+        providerId: 'openai',
       });
 
       // Hide one comment
@@ -354,4 +360,4 @@ describe('Comments System', () => {
       expect(stats.byProvider.openai).toBe(1);
     });
   });
-}); 
+});

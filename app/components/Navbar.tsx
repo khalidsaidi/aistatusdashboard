@@ -35,22 +35,22 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-6">
           <DarkModeToggle />
           <nav className="flex gap-6">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="hover:opacity-80 transition-opacity py-2 px-3 min-h-[44px] min-w-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
               aria-label="Dashboard"
             >
               Dashboard
             </Link>
-            <Link 
-              href="/?tab=api" 
+            <Link
+              href="/?tab=api"
               className="hover:opacity-80 transition-opacity py-2 px-3 min-h-[44px] min-w-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
               aria-label="API Documentation"
             >
               API
             </Link>
-            <a 
-              href="/rss.xml" 
+            <a
+              href="/rss.xml"
               className="hover:opacity-80 transition-opacity py-2 px-3 min-h-[44px] min-w-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
               aria-label="RSS Feed"
             >
@@ -71,12 +71,22 @@ export default function Navbar() {
             {mobileMenuOpen ? (
               // Close icon
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             ) : (
               // Hamburger icon
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             )}
           </button>
@@ -87,31 +97,31 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <>
           {/* Overlay */}
-          <div 
+          <div
             className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
           />
-          
+
           {/* Mobile Menu */}
           <div className="absolute top-full left-0 right-0 bg-slate-700 dark:bg-gray-800 border-t border-slate-600 dark:border-gray-600 z-50 md:hidden">
             <nav className="px-4 py-6 space-y-4">
-              <Link 
-                href="/" 
+              <Link
+                href="/"
                 className="block py-3 px-4 rounded-md hover:bg-slate-600 dark:hover:bg-gray-700 transition-colors text-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-400"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 📊 Dashboard
               </Link>
-              <Link 
-                href="/?tab=api" 
+              <Link
+                href="/?tab=api"
                 className="block py-3 px-4 rounded-md hover:bg-slate-600 dark:hover:bg-gray-700 transition-colors text-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-400"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 🚀 API
               </Link>
-              <a 
-                href="/rss.xml" 
+              <a
+                href="/rss.xml"
                 className="block py-3 px-4 rounded-md hover:bg-slate-600 dark:hover:bg-gray-700 transition-colors text-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-400"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -123,4 +133,4 @@ export default function Navbar() {
       )}
     </header>
   );
-} 
+}

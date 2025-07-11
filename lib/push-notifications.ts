@@ -52,8 +52,8 @@ export class PushNotificationService {
           body: payload.body,
           icon: payload.icon || '/icon-192x192.png',
           badge: payload.badge || '/icon-192x192.png',
-          data: payload.data || {}
-        }
+          data: payload.data || {},
+        },
       };
 
       const result = await webpush.sendNotification(
@@ -77,4 +77,4 @@ export class PushNotificationService {
       return false;
     }
   }
-} 
+}

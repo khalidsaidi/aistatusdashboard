@@ -3,20 +3,15 @@
 const fs = require('fs');
 const path = require('path');
 
-
-
-
 // Read service account keys
 const devKeyPath = path.join(process.cwd(), 'dev-servicekey.json');
 const prodKeyPath = path.join(process.cwd(), 'prod-servicekey.json');
 
 if (!fs.existsSync(devKeyPath)) {
-  
   process.exit(1);
 }
 
 if (!fs.existsSync(prodKeyPath)) {
-  
   process.exit(1);
 }
 
@@ -84,46 +79,34 @@ NEXT_PUBLIC_SITE_URL="https://ai-status-dashboard.web.app"
   fs.writeFileSync('.env.local', devEnvContent);
   fs.writeFileSync('.env.production', prodEnvContent);
 
-  
-  
-  
   // Update .gitignore to ensure service keys and env files are ignored
   const gitignorePath = '.gitignore';
   let gitignoreContent = '';
-  
+
   if (fs.existsSync(gitignorePath)) {
     gitignoreContent = fs.readFileSync(gitignorePath, 'utf8');
   }
-  
+
   const ignorePatterns = [
     '# Firebase service account keys',
     'dev-servicekey.json',
     'prod-servicekey.json',
     '# Environment files',
     '.env.local',
-    '.env.production'
+    '.env.production',
   ];
-  
+
   let needsUpdate = false;
-  ignorePatterns.forEach(pattern => {
+  ignorePatterns.forEach((pattern) => {
     if (!gitignoreContent.includes(pattern)) {
       gitignoreContent += '\n' + pattern;
       needsUpdate = true;
     }
   });
-  
+
   if (needsUpdate) {
     fs.writeFileSync(gitignorePath, gitignoreContent);
-    
   }
-
-  
-  
-  
-  
-  
-
 } catch (error) {
-  
   process.exit(1);
-} 
+}

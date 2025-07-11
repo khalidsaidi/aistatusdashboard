@@ -1,20 +1,20 @@
 /**
  * WSL2 Firebase Network Adapter
- * 
+ *
  * Production-grade solution for Firebase connectivity in WSL2 environments.
  * Addresses the fundamental network stack limitations that cause offline mode warnings.
  */
 
 import { initializeApp, getApps, FirebaseApp, deleteApp } from 'firebase/app';
-import { 
-  getFirestore, 
-  initializeFirestore, 
-  Firestore, 
+import {
+  getFirestore,
+  initializeFirestore,
+  Firestore,
   connectFirestoreEmulator,
   enableNetwork,
   disableNetwork,
   clearIndexedDbPersistence,
-  terminate
+  terminate,
 } from 'firebase/firestore';
 import { getFunctions, Functions } from 'firebase/functions';
 
@@ -55,8 +55,8 @@ class WSL2FirebaseAdapter {
     return (
       process.platform === 'linux' &&
       (process.env.WSL_DISTRO_NAME !== undefined ||
-       process.env.WSLENV !== undefined ||
-       process.env.WSL_INTEROP !== undefined)
+        process.env.WSLENV !== undefined ||
+        process.env.WSL_INTEROP !== undefined)
     );
   }
 
@@ -106,21 +106,21 @@ class WSL2FirebaseAdapter {
         experimentalForceLongPolling: true,
         useFetchStreams: false,
         localCache: {
-          kind: 'memory' as const
+          kind: 'memory' as const,
         },
         // Force REST API mode - no WebSocket/WebChannel connections
         host: 'firestore.googleapis.com',
-        ssl: true
+        ssl: true,
       };
 
       console.log('🔧 WSL2 Mode: Using REST API to eliminate WebChannel errors');
       const db = initializeFirestore(app, settings);
-      
+
       // Disable and re-enable network to force REST mode
       await disableNetwork(db);
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       await enableNetwork(db);
-      
+
       return db;
     } else {
       // Production mode with standard settings
@@ -128,8 +128,8 @@ class WSL2FirebaseAdapter {
         ignoreUndefinedProperties: true,
         experimentalForceLongPolling: false,
         localCache: {
-          kind: 'persistent' as const
-        }
+          kind: 'persistent' as const,
+        },
       };
 
       return initializeFirestore(app, settings);
@@ -139,18 +139,18 @@ class WSL2FirebaseAdapter {
   private async optimizeNetworkConnection(db: Firestore): Promise<void> {
     try {
       console.log('🌐 Forcing REST API mode for WSL2...');
-      
+
       // Multiple disable/enable cycles to force REST mode
       for (let i = 0; i < 3; i++) {
         await disableNetwork(db);
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 200));
         await enableNetwork(db);
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
-      
+
       // Final stabilization wait
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       console.log('✅ REST API mode established');
     } catch (error) {
       console.warn('⚠️ Network optimization failed:', error);
@@ -183,7 +183,7 @@ class WSL2FirebaseAdapter {
 
     const { doc, getDoc } = await import('firebase/firestore');
     const testDoc = doc(this.firebaseInstance.db, 'health', 'check');
-    
+
     // Quick health check - don't log errors, just throw
     await getDoc(testDoc);
   }
@@ -196,19 +196,18 @@ class WSL2FirebaseAdapter {
     try {
       const { doc, getDoc } = await import('firebase/firestore');
       const testDoc = doc(this.firebaseInstance.db, 'test', 'connectivity');
-      
+
       await getDoc(testDoc);
       console.log('✅ Firebase connectivity verified');
       return true;
     } catch (error) {
       if (error instanceof Error) {
         // Permission errors are actually good - means we can connect
-        if (error.message.includes('permission') || 
-            error.message.includes('PERMISSION_DENIED')) {
+        if (error.message.includes('permission') || error.message.includes('PERMISSION_DENIED')) {
           console.log('✅ Firebase connectivity verified (permission check passed)');
           return true;
         }
-        
+
         console.warn('⚠️ Connectivity test failed:', error.message);
         return false;
       }
@@ -238,7 +237,7 @@ class WSL2FirebaseAdapter {
 
         // Delete Firebase app
         await deleteApp(this.firebaseInstance.app);
-        
+
         this.firebaseInstance = null;
         console.log('🧹 WSL2 Firebase adapter cleaned up');
       } catch (error) {
@@ -266,7 +265,9 @@ class WSL2FirebaseAdapter {
 export const wsl2Firebase = WSL2FirebaseAdapter.getInstance();
 
 // Convenience functions
-export async function initializeWSL2Firebase(config: WSL2FirebaseConfig): Promise<WSL2FirebaseInstance> {
+export async function initializeWSL2Firebase(
+  config: WSL2FirebaseConfig
+): Promise<WSL2FirebaseInstance> {
   return wsl2Firebase.initializeFirebase(config);
 }
 
@@ -280,4 +281,4 @@ export async function cleanupWSL2Firebase(): Promise<void> {
 
 export async function testWSL2Connectivity(): Promise<boolean> {
   return wsl2Firebase.testConnectivity();
-} 
+}

@@ -4,7 +4,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 // Initialize Firebase Admin SDK
 if (!getApps().length) {
   const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
-  
+
   if (!process.env.FIREBASE_PROJECT_ID || !privateKey || !process.env.FIREBASE_CLIENT_EMAIL) {
     throw new Error('Missing Firebase Admin SDK configuration');
   }
@@ -36,4 +36,4 @@ export function timestampToISOString(timestamp: any): string {
 // Helper function to create server timestamp
 export function serverTimestamp() {
   return new Date();
-} 
+}

@@ -4,7 +4,7 @@ import { getApiUrl } from '@/lib/utils';
 export async function GET(request: NextRequest) {
   try {
     const firebaseUrl = getApiUrl('status');
-    
+
     const response = await fetch(firebaseUrl, {
       method: 'GET',
       headers: {
@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
     });
 
     const data = await response.json();
-    
-    return NextResponse.json(data, { 
+
+    return NextResponse.json(data, {
       status: response.status,
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const firebaseUrl = getApiUrl('status');
-    
+
     const response = await fetch(firebaseUrl, {
       method: 'POST',
       headers: {
@@ -45,8 +45,8 @@ export async function POST(request: NextRequest) {
     });
 
     const data = await response.json();
-    
-    return NextResponse.json(data, { 
+
+    return NextResponse.json(data, {
       status: response.status,
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -61,4 +61,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

@@ -2,9 +2,9 @@ name: 🚀 AI Status Dashboard CI/CD
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
   workflow_dispatch:
 
 env:
@@ -143,7 +143,7 @@ jobs:
           sleep 30
         env:
           NODE_ENV: development
-          
+
       - name: Run critical endpoint health check
         run: node scripts/ci-health-check.js
         env:
@@ -375,20 +375,20 @@ jobs:
           release_name: Release v${{ github.run_number }}
           body: |
             🚀 **AI Status Dashboard Release v${{ github.run_number }}**
-            
+
             **Changes in this release:**
             - Fixed CI/CD to work with Firebase backend architecture
             - Removed emulator dependencies
             - Real Firebase dev/prod environment testing
             - Unified status fetcher implementation
             - Enhanced security configuration
-            
+
             **Architecture:**
             - Frontend: Next.js deployed to Firebase Hosting
             - Backend: Firebase Cloud Functions
             - Database: Firestore
             - Authentication: Firebase Auth
-            
+
             **Environments:**
             - Dev: ${{ env.FIREBASE_PROJECT_ID_DEV }}
             - Prod: ${{ env.FIREBASE_PROJECT_ID_PROD }}
@@ -418,12 +418,12 @@ jobs:
           channel: '#deployments'
           text: |
             🎉 **AI Status Dashboard v${{ github.run_number }} deployed successfully!**
-            
+
             ✅ Firebase backend architecture working
             ✅ Real environment testing configured
             ✅ No emulator dependencies
             ✅ Dev/Prod environments separated
-            
+
             🔗 **Live:** https://${{ env.FIREBASE_PROJECT_ID_PROD }}.web.app
             🔗 **API:** https://us-central1-${{ env.FIREBASE_PROJECT_ID_PROD }}.cloudfunctions.net/api
         env:
@@ -445,4 +445,4 @@ jobs:
 
       - name: Update status badge
         run: |
-          echo "Updating README status badges..." 
+          echo "Updating README status badges..."

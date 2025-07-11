@@ -9,71 +9,73 @@ const messaging = getMessaging();
 // Interface removed - using Firestore document structure directly
 
 // Subscribe to push notifications
-export const subscribePush = onRequest(
-  { cors: true, region: 'us-central1' },
-  async (req, res) => {
-    if (req.method !== 'POST') {
-      res.status(405).json({ error: 'Method not allowed' });
+export const subscribePush = onRequest({ cors: true, region: 'us-central1' }, async (req, res) => {
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
+  try {
+    const { token, providers, endpoint, userAgent } = req.body;
+
+    if (!token || !Array.isArray(providers)) {
+      res.status(400).json({ error: 'Token and providers array required' });
       return;
     }
 
+    // Validate FCM token format (basic validation)
+    if (typeof token !== 'string' || token.length < 10) {
+      res.status(400).json({ error: 'Invalid push notification token format' });
+      return;
+    }
+
+    // Store subscription in Firestore
+    const subscriptionRef = db.collection('push_subscriptions').doc(token);
+    await subscriptionRef.set({
+      token,
+      providers,
+      endpoint: endpoint || token,
+      userAgent: userAgent || 'Unknown',
+      subscribedAt: new Date(),
+      active: true,
+      lastUsed: new Date(),
+    });
+
+    logger.info('Real push subscription created', {
+      token: token.substring(0, 20) + '...',
+      providers,
+    });
+
+    // Send welcome push notification
     try {
-      const { token, providers, endpoint, userAgent } = req.body;
-
-      if (!token || !Array.isArray(providers)) {
-        res.status(400).json({ error: 'Token and providers array required' });
-        return;
-      }
-
-      // Validate FCM token format (basic validation)
-      if (typeof token !== 'string' || token.length < 10) {
-        res.status(400).json({ error: 'Invalid push notification token format' });
-        return;
-      }
-
-      // Store subscription in Firestore
-      const subscriptionRef = db.collection('push_subscriptions').doc(token);
-      await subscriptionRef.set({
+      await messaging.send({
         token,
-        providers,
-        endpoint: endpoint || token,
-        userAgent: userAgent || 'Unknown',
-        subscribedAt: new Date(),
-        active: true,
-        lastUsed: new Date()
+        notification: {
+          title: '🎉 Push Notifications Enabled!',
+          body: `You'll now receive real-time alerts for ${providers.length === 0 ? 'all AI services' : providers.join(', ')}.`,
+        },
+        data: {
+          type: 'welcome',
+          providers: JSON.stringify(providers),
+        },
       });
 
-      logger.info('Real push subscription created', { token: token.substring(0, 20) + '...', providers });
-      
-      // Send welcome push notification
-      try {
-        await messaging.send({
-          token,
-          notification: {
-            title: '🎉 Push Notifications Enabled!',
-            body: `You'll now receive real-time alerts for ${providers.length === 0 ? 'all AI services' : providers.join(', ')}.`
-          },
-          data: {
-            type: 'welcome',
-            providers: JSON.stringify(providers)
-          }
-        });
-        
-        logger.info('Welcome push notification sent successfully', { token: token.substring(0, 20) + '...' });
-      } catch (pushError) {
-        logger.warn('Failed to send welcome push notification', { 
-          error: pushError instanceof Error ? pushError.message : 'Unknown error',
-          token: token.substring(0, 20) + '...'
-        });
-      }
-
-      res.json({ success: true, message: 'Real push subscription created successfully' });
-    } catch (error) {
-      logger.error('Error creating real push subscription', error);
-      res.status(500).json({ error: 'Internal server error' });
+      logger.info('Welcome push notification sent successfully', {
+        token: token.substring(0, 20) + '...',
+      });
+    } catch (pushError) {
+      logger.warn('Failed to send welcome push notification', {
+        error: pushError instanceof Error ? pushError.message : 'Unknown error',
+        token: token.substring(0, 20) + '...',
+      });
     }
+
+    res.json({ success: true, message: 'Real push subscription created successfully' });
+  } catch (error) {
+    logger.error('Error creating real push subscription', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
-);
+});
 
 // Unsubscribe from push notifications
 export const unsubscribePush = onRequest(
@@ -97,7 +99,10 @@ export const unsubscribePush = onRequest(
       await subscriptionRef.delete();
 
       logger.info('Real push subscription removed', { token: token.substring(0, 20) + '...' });
-      res.json({ success: true, message: 'Unsubscribed successfully from real push notifications' });
+      res.json({
+        success: true,
+        message: 'Unsubscribed successfully from real push notifications',
+      });
     } catch (error) {
       logger.error('Error removing real push subscription', error);
       res.status(500).json({ error: 'Internal server error' });
@@ -124,10 +129,16 @@ export const sendTestPushNotification = onRequest(
 
       // Check if real push notifications are enabled
       if (process.env.ENABLE_REAL_NOTIFICATIONS !== 'true') {
-        logger.warn('Real push notifications are disabled. Set ENABLE_REAL_NOTIFICATIONS=true to send actual notifications.', {
-          token: token.substring(0, 20) + '...'
+        logger.warn(
+          'Real push notifications are disabled. Set ENABLE_REAL_NOTIFICATIONS=true to send actual notifications.',
+          {
+            token: token.substring(0, 20) + '...',
+          }
+        );
+        res.json({
+          success: false,
+          message: 'Real push notifications are disabled in configuration',
         });
-        res.json({ success: false, message: 'Real push notifications are disabled in configuration' });
         return;
       }
 
@@ -136,27 +147,29 @@ export const sendTestPushNotification = onRequest(
         token,
         notification: {
           title: title || '🧪 Test Push Notification',
-          body: body || 'This is a REAL test push notification from your AI Status Dashboard. Push notifications are working!'
+          body:
+            body ||
+            'This is a REAL test push notification from your AI Status Dashboard. Push notifications are working!',
         },
         data: {
           type: 'test',
           timestamp: new Date().toISOString(),
-          source: 'ai-status-dashboard'
+          source: 'ai-status-dashboard',
         },
         android: {
           notification: {
             icon: 'notification_icon',
             color: '#007bff',
-            sound: 'default'
-          }
+            sound: 'default',
+          },
         },
         apns: {
           payload: {
             aps: {
               sound: 'default',
-              badge: 1
-            }
-          }
+              badge: 1,
+            },
+          },
         },
         webpush: {
           notification: {
@@ -164,32 +177,30 @@ export const sendTestPushNotification = onRequest(
             badge: '/badge-72x72.png',
             tag: 'test-notification',
             requireInteraction: true,
-            actions: [
-              { action: 'view', title: '👀 View Dashboard' }
-            ]
-          }
-        }
+            actions: [{ action: 'view', title: '👀 View Dashboard' }],
+          },
+        },
       };
 
       const result = await messaging.send(message);
-      
-      logger.info('REAL test push notification sent successfully', { 
+
+      logger.info('REAL test push notification sent successfully', {
         messageId: result,
         token: token.substring(0, 20) + '...',
-        title: message.notification?.title
+        title: message.notification?.title,
       });
 
-      res.json({ 
-        success: true, 
+      res.json({
+        success: true,
         message: 'Real test push notification sent successfully!',
-        messageId: result
+        messageId: result,
       });
     } catch (error) {
       logger.error('Error sending real test push notification', {
         error: error instanceof Error ? error.message : 'Unknown error',
-        token: req.body.token ? req.body.token.substring(0, 20) + '...' : 'unknown'
+        token: req.body.token ? req.body.token.substring(0, 20) + '...' : 'unknown',
       });
-      
+
       if (error instanceof Error && error.message.includes('registration-token-not-registered')) {
         res.status(400).json({ error: 'Push notification token is no longer valid' });
       } else if (error instanceof Error && error.message.includes('invalid-registration-token')) {
@@ -212,17 +223,20 @@ export async function sendStatusChangePushNotifications(
 ): Promise<void> {
   try {
     if (process.env.ENABLE_REAL_NOTIFICATIONS !== 'true') {
-      logger.warn('Real push notifications are disabled. Set ENABLE_REAL_NOTIFICATIONS=true to send actual notifications.');
+      logger.warn(
+        'Real push notifications are disabled. Set ENABLE_REAL_NOTIFICATIONS=true to send actual notifications.'
+      );
       return;
     }
 
     // CRITICAL FIX: Use queue system for scalable notification processing
-    const subscriptionsSnapshot = await db.collection('push_subscriptions')
+    const subscriptionsSnapshot = await db
+      .collection('push_subscriptions')
       .where('active', '==', true)
       .limit(10000) // Limit query size for performance
       .get();
 
-    const relevantSubscriptions = subscriptionsSnapshot.docs.filter(doc => {
+    const relevantSubscriptions = subscriptionsSnapshot.docs.filter((doc) => {
       const data = doc.data();
       return data.providers.length === 0 || data.providers.includes(providerId);
     });
@@ -232,12 +246,17 @@ export async function sendStatusChangePushNotifications(
       return;
     }
 
-    const tokens = relevantSubscriptions.map(doc => doc.data().token);
-    
+    const tokens = relevantSubscriptions.map((doc) => doc.data().token);
+
     // CRITICAL FIX: Determine priority based on status severity
-    const priority = newStatus === 'down' ? 10 : 
-                    newStatus === 'degraded' ? 5 : 
-                    newStatus === 'operational' ? 3 : 1;
+    const priority =
+      newStatus === 'down'
+        ? 10
+        : newStatus === 'degraded'
+          ? 5
+          : newStatus === 'operational'
+            ? 3
+            : 1;
 
     // CRITICAL FIX: Enqueue notification job instead of immediate processing
     const success = await notificationQueue.enqueue({
@@ -248,7 +267,7 @@ export async function sendStatusChangePushNotifications(
       previousStatus,
       tokens,
       priority,
-      retryCount: 0
+      retryCount: 0,
     });
 
     if (success) {
@@ -257,24 +276,23 @@ export async function sendStatusChangePushNotifications(
         totalSubscribers: tokens.length,
         priority,
         statusChange: `${previousStatus} → ${newStatus}`,
-        queueStats: notificationQueue.getQueueStats()
+        queueStats: notificationQueue.getQueueStats(),
       });
     } else {
       logger.error('Failed to enqueue push notification job - queue full', {
         providerId,
         totalSubscribers: tokens.length,
-        queueStats: notificationQueue.getQueueStats()
+        queueStats: notificationQueue.getQueueStats(),
       });
     }
-
   } catch (error) {
     logger.error('Error queueing status change push notifications', {
       error: error instanceof Error ? error.message : 'Unknown error',
       providerId,
-      statusChange: `${previousStatus} → ${newStatus}`
+      statusChange: `${previousStatus} → ${newStatus}`,
     });
   }
-} 
+}
 
 /**
  * CRITICAL FIX: Queue-based notification system with backpressure
@@ -311,7 +329,7 @@ class NotificationQueue {
       logger.warn('Notification queue full, dropping job', {
         queueSize: this.queue.length,
         maxSize: this.maxQueueSize,
-        providerId: job.providerId
+        providerId: job.providerId,
       });
       return false;
     }
@@ -319,11 +337,11 @@ class NotificationQueue {
     const notificationJob: NotificationJob = {
       ...job,
       id: `${job.type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
 
     // CRITICAL FIX: Priority queue - higher priority jobs first
-    const insertIndex = this.queue.findIndex(item => item.priority < notificationJob.priority);
+    const insertIndex = this.queue.findIndex((item) => item.priority < notificationJob.priority);
     if (insertIndex === -1) {
       this.queue.push(notificationJob);
     } else {
@@ -334,7 +352,7 @@ class NotificationQueue {
       jobId: notificationJob.id,
       type: notificationJob.type,
       queueSize: this.queue.length,
-      priority: notificationJob.priority
+      priority: notificationJob.priority,
     });
 
     return true;
@@ -350,28 +368,28 @@ class NotificationQueue {
 
   private async processQueue(): Promise<void> {
     if (this.processing) return;
-    
+
     this.processing = true;
 
     try {
       // CRITICAL FIX: Process multiple batches concurrently with limit
       const jobs = this.queue.splice(0, this.batchSize * this.maxConcurrentBatches);
-      
+
       if (jobs.length === 0) {
         this.processing = false;
         return;
       }
 
       // Group jobs by type for batch processing
-      const pushJobs = jobs.filter(job => job.type === 'push');
-      const emailJobs = jobs.filter(job => job.type === 'email');
+      const pushJobs = jobs.filter((job) => job.type === 'push');
+      const emailJobs = jobs.filter((job) => job.type === 'email');
 
       const processingPromises: Promise<void>[] = [];
 
       // Process push notifications in batches
       if (pushJobs.length > 0) {
         const pushBatches = this.createBatches(pushJobs, this.batchSize);
-        processingPromises.push(...pushBatches.map(batch => this.processPushBatch(batch)));
+        processingPromises.push(...pushBatches.map((batch) => this.processPushBatch(batch)));
       }
 
       // Process email notifications
@@ -382,21 +400,20 @@ class NotificationQueue {
       // CRITICAL FIX: Wait for all batches with timeout protection
       await Promise.race([
         Promise.allSettled(processingPromises),
-        new Promise((_, reject) => 
+        new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Batch processing timeout')), 30000)
-        )
+        ),
       ]);
 
       logger.info('Notification batch processing completed', {
         pushJobs: pushJobs.length,
         emailJobs: emailJobs.length,
-        remainingQueue: this.queue.length
+        remainingQueue: this.queue.length,
       });
-
     } catch (error) {
       logger.error('Error processing notification queue', {
         error: error instanceof Error ? error.message : 'Unknown error',
-        queueSize: this.queue.length
+        queueSize: this.queue.length,
       });
     } finally {
       this.processing = false;
@@ -415,17 +432,18 @@ class NotificationQueue {
     if (jobs.length === 0) return;
 
     // Flatten all tokens from jobs
-    const allTokens = jobs.flatMap(job => job.tokens);
+    const allTokens = jobs.flatMap((job) => job.tokens);
     if (allTokens.length === 0) return;
 
     // Use the first job's data for the message (they should be similar in a batch)
     const job = jobs[0];
-    const statusIcon = job.newStatus === 'operational' ? '✅' : job.newStatus === 'degraded' ? '⚠️' : '🚨';
-    
+    const statusIcon =
+      job.newStatus === 'operational' ? '✅' : job.newStatus === 'degraded' ? '⚠️' : '🚨';
+
     const message = {
       notification: {
         title: `${statusIcon} ${job.providerName} Status Update`,
-        body: `Status changed from ${job.previousStatus} to ${job.newStatus}`
+        body: `Status changed from ${job.previousStatus} to ${job.newStatus}`,
       },
       data: {
         type: 'status_change',
@@ -433,7 +451,7 @@ class NotificationQueue {
         providerName: job.providerName,
         newStatus: job.newStatus,
         previousStatus: job.previousStatus,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       },
       webpush: {
         notification: {
@@ -441,24 +459,22 @@ class NotificationQueue {
           badge: '/badge-72x72.png',
           tag: `status-${job.providerId}`,
           requireInteraction: job.newStatus !== 'operational',
-          actions: [
-            { action: 'view', title: '👀 View Dashboard' }
-          ]
-        }
-      }
+          actions: [{ action: 'view', title: '👀 View Dashboard' }],
+        },
+      },
     };
 
     try {
       const result = await messaging.sendEachForMulticast({
         tokens: allTokens,
-        ...message
+        ...message,
       });
 
       logger.info('Push notification batch sent', {
         providerId: job.providerId,
         batchSize: allTokens.length,
         successCount: result.successCount,
-        failureCount: result.failureCount
+        failureCount: result.failureCount,
       });
 
       // CRITICAL FIX: Handle invalid tokens efficiently
@@ -467,8 +483,10 @@ class NotificationQueue {
         result.responses.forEach((response, index) => {
           if (!response.success && response.error) {
             const errorCode = response.error.code;
-            if (errorCode === 'messaging/invalid-registration-token' || 
-                errorCode === 'messaging/registration-token-not-registered') {
+            if (
+              errorCode === 'messaging/invalid-registration-token' ||
+              errorCode === 'messaging/registration-token-not-registered'
+            ) {
               invalidTokens.push(allTokens[index]);
             }
           }
@@ -479,12 +497,11 @@ class NotificationQueue {
           await this.batchDeleteInvalidTokens(invalidTokens);
         }
       }
-
     } catch (error) {
       logger.error('Error sending push notification batch', {
         error: error instanceof Error ? error.message : 'Unknown error',
         batchSize: allTokens.length,
-        providerId: job.providerId
+        providerId: job.providerId,
       });
 
       // CRITICAL FIX: Re-queue failed jobs with exponential backoff
@@ -497,7 +514,7 @@ class NotificationQueue {
     const batches = this.createBatches(tokens, batchSize);
 
     const deletePromises = batches.map(async (batch) => {
-      const deleteOps = batch.map(token => 
+      const deleteOps = batch.map((token) =>
         db.collection('push_subscriptions').doc(token).delete()
       );
       await Promise.allSettled(deleteOps);
@@ -514,23 +531,23 @@ class NotificationQueue {
 
   private async requeueFailedJobs(jobs: NotificationJob[]): Promise<void> {
     const maxRetries = 3;
-    
+
     for (const job of jobs) {
       if (job.retryCount < maxRetries) {
         // CRITICAL FIX: Exponential backoff for retries
         const delay = Math.pow(2, job.retryCount) * 1000; // 1s, 2s, 4s
-        
+
         setTimeout(() => {
           this.enqueue({
             ...job,
             retryCount: job.retryCount + 1,
-            priority: Math.max(1, job.priority - 1) // Lower priority for retries
+            priority: Math.max(1, job.priority - 1), // Lower priority for retries
           });
         }, delay);
       } else {
         logger.error('Job exceeded max retries, dropping', {
           jobId: job.id,
-          retryCount: job.retryCount
+          retryCount: job.retryCount,
         });
       }
     }
@@ -539,7 +556,7 @@ class NotificationQueue {
   getQueueStats(): { size: number; processing: boolean } {
     return {
       size: this.queue.length,
-      processing: this.processing
+      processing: this.processing,
     };
   }
 
@@ -551,4 +568,4 @@ class NotificationQueue {
 }
 
 // Global notification queue instance
-const notificationQueue = new NotificationQueue(); 
+const notificationQueue = new NotificationQueue();

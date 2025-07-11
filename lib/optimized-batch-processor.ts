@@ -1,6 +1,6 @@
 /**
  * OPTIMIZED BATCH PROCESSOR
- * 
+ *
  * Replaces O(N²) operations with efficient algorithms optimized for
  * processing hundreds of AI providers simultaneously.
  */
@@ -93,7 +93,7 @@ class PriorityQueue<T> {
     while (index > 0) {
       const parentIndex = Math.floor((index - 1) / 2);
       if (this.heap[parentIndex].priority >= this.heap[index].priority) break;
-      
+
       [this.heap[parentIndex], this.heap[index]] = [this.heap[index], this.heap[parentIndex]];
       index = parentIndex;
     }
@@ -105,11 +105,17 @@ class PriorityQueue<T> {
       const leftChild = 2 * index + 1;
       const rightChild = 2 * index + 2;
 
-      if (leftChild < this.heap.length && this.heap[leftChild].priority > this.heap[maxIndex].priority) {
+      if (
+        leftChild < this.heap.length &&
+        this.heap[leftChild].priority > this.heap[maxIndex].priority
+      ) {
         maxIndex = leftChild;
       }
 
-      if (rightChild < this.heap.length && this.heap[rightChild].priority > this.heap[maxIndex].priority) {
+      if (
+        rightChild < this.heap.length &&
+        this.heap[rightChild].priority > this.heap[maxIndex].priority
+      ) {
         maxIndex = rightChild;
       }
 
@@ -195,22 +201,21 @@ export class OptimizedBatchProcessor<T, R> {
     config: Partial<BatchProcessorConfig> = {}
   ) {
     this.config = {
-      maxConcurrency: 50,        // Optimized for hundreds of providers
-      batchSize: 25,            // Optimal batch size
-      defaultTimeout: 10000,    // 10 seconds
-      maxRetries: 2,           // Quick retries
-      retryDelay: 1000,        // 1 second retry delay
-      priorityLevels: 5,       // 5 priority levels
+      maxConcurrency: 50, // Optimized for hundreds of providers
+      batchSize: 25, // Optimal batch size
+      defaultTimeout: 10000, // 10 seconds
+      maxRetries: 2, // Quick retries
+      retryDelay: 1000, // 1 second retry delay
+      priorityLevels: 5, // 5 priority levels
       enableMetrics: true,
-      ...config
+      ...config,
     };
 
     this.queue = new PriorityQueue<BatchItem<T>>();
     this.metrics = this.initializeMetrics();
-    
-    this.workerPool = new WorkerPool(
-      this.config.maxConcurrency,
-      (item) => this.processItemWithRetry(item)
+
+    this.workerPool = new WorkerPool(this.config.maxConcurrency, (item) =>
+      this.processItemWithRetry(item)
     );
   }
 
@@ -242,14 +247,14 @@ export class OptimizedBatchProcessor<T, R> {
 
     this.processing = true;
     this.processingStartTime = Date.now();
-    
+
     try {
       const allResults: BatchResult<R>[] = [];
-      
+
       while (!this.queue.isEmpty()) {
         // Extract batch from queue
         const batch = this.extractBatch();
-        
+
         if (batch.length === 0) break;
 
         log('info', `Processing batch of ${batch.length} items`);
@@ -269,7 +274,6 @@ export class OptimizedBatchProcessor<T, R> {
 
       log('info', `Completed processing ${allResults.length} items`);
       return allResults;
-
     } finally {
       this.processing = false;
       this.updateThroughputMetrics();
@@ -382,34 +386,30 @@ export class OptimizedBatchProcessor<T, R> {
     const context: ErrorContext = {
       component: 'BatchProcessor',
       operation: 'processItem',
-      metadata: { itemId: item.id, retryCount }
+      metadata: { itemId: item.id, retryCount },
     };
 
     while (retryCount <= maxRetries) {
       try {
-        const result = await withErrorHandling(
-          () => this.processWithTimeout(item),
-          context
-        );
+        const result = await withErrorHandling(() => this.processWithTimeout(item), context);
 
         return {
           id: item.id,
           success: true,
           result,
           processingTime: Date.now() - startTime,
-          retryCount
+          retryCount,
         };
-
       } catch (error) {
         retryCount++;
-        
+
         if (retryCount > maxRetries) {
           return {
             id: item.id,
             success: false,
             error: error instanceof Error ? error.message : 'Unknown error',
             processingTime: Date.now() - startTime,
-            retryCount: retryCount - 1
+            retryCount: retryCount - 1,
           };
         }
 
@@ -426,7 +426,7 @@ export class OptimizedBatchProcessor<T, R> {
       success: false,
       error: 'Max retries exceeded',
       processingTime: Date.now() - startTime,
-      retryCount: maxRetries
+      retryCount: maxRetries,
     };
   }
 
@@ -435,12 +435,12 @@ export class OptimizedBatchProcessor<T, R> {
    */
   private async processWithTimeout(item: BatchItem<T>): Promise<R> {
     const timeout = item.timeout ?? this.config.defaultTimeout;
-    
+
     return Promise.race([
       this.processor(item.data),
-      new Promise<never>((_, reject) => 
+      new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error('Processing timeout')), timeout)
-      )
+      ),
     ]);
   }
 
@@ -449,7 +449,7 @@ export class OptimizedBatchProcessor<T, R> {
    */
   private groupByPriority(items: BatchItem<T>[]): Record<number, BatchItem<T>[]> {
     const groups: Record<number, BatchItem<T>[]> = {};
-    
+
     for (const item of items) {
       const priority = item.priority;
       if (!groups[priority]) {
@@ -478,7 +478,7 @@ export class OptimizedBatchProcessor<T, R> {
   private updateProcessingMetrics(results: BatchResult<R>[]): void {
     if (!this.config.enableMetrics) return;
 
-    const successful = results.filter(r => r.success).length;
+    const successful = results.filter((r) => r.success).length;
     const failed = results.length - successful;
     const totalTime = results.reduce((sum, r) => sum + r.processingTime, 0);
     const avgTime = results.length > 0 ? totalTime / results.length : 0;
@@ -487,15 +487,16 @@ export class OptimizedBatchProcessor<T, R> {
     this.metrics.totalProcessed += results.length;
     this.metrics.successfullyProcessed += successful;
     this.metrics.failedProcessed += failed;
-    
+
     // Update running average
     const totalProcessed = this.metrics.totalProcessed;
-    this.metrics.averageProcessingTime = 
-      (this.metrics.averageProcessingTime * (totalProcessed - results.length) + totalTime) / totalProcessed;
+    this.metrics.averageProcessingTime =
+      (this.metrics.averageProcessingTime * (totalProcessed - results.length) + totalTime) /
+      totalProcessed;
 
     // Update retry rate
     this.metrics.retryRate = retries / results.length;
-    
+
     this.processedItems += results.length;
   }
 
@@ -504,7 +505,7 @@ export class OptimizedBatchProcessor<T, R> {
    */
   private updateQueueMetrics(): void {
     if (!this.config.enableMetrics) return;
-    
+
     this.metrics.queueSize = this.queue.size();
     this.metrics.currentConcurrency = this.workerPool.getCurrentWorkerCount();
   }
@@ -531,7 +532,7 @@ export class OptimizedBatchProcessor<T, R> {
       throughputPerSecond: 0,
       currentConcurrency: 0,
       queueSize: 0,
-      retryRate: 0
+      retryRate: 0,
     };
   }
 
@@ -539,7 +540,7 @@ export class OptimizedBatchProcessor<T, R> {
    * Delay execution
    */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
@@ -562,7 +563,7 @@ export function createStatusFetchProcessor<T, R>(
     retryDelay: 1000,
     priorityLevels: 3,
     enableMetrics: true,
-    ...config
+    ...config,
   };
 
   return new OptimizedBatchProcessor(processor, optimizedConfig);
@@ -580,6 +581,6 @@ export function createBatchItems<T>(
     id: idExtractor(item, index),
     data: item,
     priority: priorityExtractor ? priorityExtractor(item, index) : 1,
-    retryCount: 0
+    retryCount: 0,
   }));
-} 
+}

@@ -7,14 +7,14 @@ test.describe('Mobile Responsiveness', () => {
       ...iPhone,
     });
     const page = await context.newPage();
-    
+
     await page.goto('/');
     await page.waitForSelector('[data-testid="provider-card"]');
-    
+
     // Check viewport
     const viewport = page.viewportSize();
     expect(viewport?.width).toBeLessThan(400);
-    
+
     // Cards should stack vertically
     const cards = await page.$$('[data-testid="provider-card"]');
     const positions = await Promise.all(
@@ -23,12 +23,12 @@ test.describe('Mobile Responsiveness', () => {
         return box;
       })
     );
-    
+
     // Verify cards are stacked (same x position)
-    const xPositions = positions.map(p => p?.x || 0);
+    const xPositions = positions.map((p) => p?.x || 0);
     const uniqueX = Array.from(new Set(xPositions));
     expect(uniqueX.length).toBe(1);
-    
+
     await context.close();
   });
 
@@ -37,30 +37,32 @@ test.describe('Mobile Responsiveness', () => {
       ...devices['iPhone 12'],
     });
     const page = await context.newPage();
-    
+
     await page.goto('/');
-    
+
     // Check all clickable elements
     const clickables = await page.$$('a, button');
-    
+
     for (const element of clickables) {
       const box = await element.boundingBox();
       if (box) {
-        const tagName = await element.evaluate(el => el.tagName);
-        const textContent = await element.evaluate(el => el.textContent?.trim() || '');
-        const className = await element.evaluate(el => el.className);
-        
+        const tagName = await element.evaluate((el) => el.tagName);
+        const textContent = await element.evaluate((el) => el.textContent?.trim() || '');
+        const className = await element.evaluate((el) => el.className);
+
         // Touch targets should be at least 44x44px (iOS guideline)
         try {
           expect(box.width).toBeGreaterThanOrEqual(44);
           expect(box.height).toBeGreaterThanOrEqual(44);
         } catch (error) {
-          console.log(`Failed element: ${tagName} with text "${textContent}" and class "${className}" - Size: ${box.width}x${box.height}`);
+          console.log(
+            `Failed element: ${tagName} with text "${textContent}" and class "${className}" - Size: ${box.width}x${box.height}`
+          );
           throw error;
         }
       }
     }
-    
+
     await context.close();
   });
 
@@ -69,17 +71,17 @@ test.describe('Mobile Responsiveness', () => {
       ...devices['iPhone 12 landscape'],
     });
     const page = await context.newPage();
-    
+
     await page.goto('/');
     await page.waitForSelector('[data-testid="provider-card"]');
-    
+
     // Content should still be readable
     const bodyWidth = await page.evaluate(() => document.body.scrollWidth);
     const viewportWidth = page.viewportSize()?.width || 0;
-    
+
     // No horizontal scroll
     expect(bodyWidth).toBeLessThanOrEqual(viewportWidth);
-    
+
     await context.close();
   });
 
@@ -88,14 +90,14 @@ test.describe('Mobile Responsiveness', () => {
       ...devices['iPhone 12'],
     });
     const page = await context.newPage();
-    
+
     await page.goto('/');
-    
+
     // Check font sizes
     const textElements = await page.$$('p, span, h1, h2, h3');
-    
+
     for (const element of textElements) {
-      const fontSize = await element.evaluate(el => {
+      const fontSize = await element.evaluate((el) => {
         const style = window.getComputedStyle(el);
         const fontSizeValue = style.fontSize;
         // Convert font size to pixels for comparison
@@ -107,15 +109,17 @@ test.describe('Mobile Responsiveness', () => {
           return remValue * rootFontSize;
         } else if (fontSizeValue.includes('em')) {
           const emValue = parseFloat(fontSizeValue.replace('em', ''));
-          const parentFontSize = parseFloat(getComputedStyle(el.parentElement || document.body).fontSize);
+          const parentFontSize = parseFloat(
+            getComputedStyle(el.parentElement || document.body).fontSize
+          );
           return emValue * parentFontSize;
         }
         return parseFloat(fontSizeValue) || 14; // fallback to 14px
       });
-      
+
       expect(fontSize).toBeGreaterThanOrEqual(12); // Minimum readable size
     }
-    
+
     await context.close();
   });
 
@@ -124,21 +128,21 @@ test.describe('Mobile Responsiveness', () => {
       ...devices['iPhone 12'],
     });
     const page = await context.newPage();
-    
+
     await page.goto('/');
-    
+
     // Check if there's a mobile menu or simplified navigation
     const mobileMenu = await page.$('[data-testid="mobile-menu"]');
     const desktopNav = await page.$('[data-testid="desktop-nav"]');
-    
+
     if (mobileMenu) {
       await expect(page.locator('[data-testid="mobile-menu"]')).toBeVisible();
     }
-    
+
     if (desktopNav) {
       await expect(page.locator('[data-testid="desktop-nav"]')).toBeHidden();
     }
-    
+
     await context.close();
   });
 
@@ -147,27 +151,27 @@ test.describe('Mobile Responsiveness', () => {
       ...devices['iPhone 12'],
     });
     const page = await context.newPage();
-    
+
     await page.goto('/');
-    
+
     const images = await page.$$('img');
-    
+
     for (const img of images) {
       const src = await img.getAttribute('src');
       const srcset = await img.getAttribute('srcset');
-      
+
       // Should have responsive images
       expect(src || srcset).toBeTruthy();
-      
+
       // Check image dimensions don't exceed viewport
       const box = await img.boundingBox();
       const viewport = page.viewportSize();
-      
+
       if (box && viewport) {
         expect(box.width).toBeLessThanOrEqual(viewport.width);
       }
     }
-    
+
     await context.close();
   });
-}); 
+});

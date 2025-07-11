@@ -13,12 +13,12 @@ export default function OfflineIndicator({ className = '' }: OfflineIndicatorPro
 
   useEffect(() => {
     setMounted(true);
-    
+
     const updateOnlineStatus = () => {
       if (typeof navigator !== 'undefined') {
         const online = navigator.onLine;
         setIsOnline(online);
-        
+
         if (!online && isOnline) {
           setLastOnline(new Date());
         }
@@ -50,8 +50,18 @@ export default function OfflineIndicator({ className = '' }: OfflineIndicatorPro
       <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 shadow-lg">
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0">
-            <svg className="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            <svg
+              className="w-6 h-6 text-yellow-600 dark:text-yellow-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
             </svg>
           </div>
           <div className="flex-1">
@@ -61,9 +71,7 @@ export default function OfflineIndicator({ className = '' }: OfflineIndicatorPro
             <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
               Showing cached data. Some features may be limited.
               {lastOnline && (
-                <span className="block mt-1">
-                  Last online: {lastOnline.toLocaleTimeString()}
-                </span>
+                <span className="block mt-1">Last online: {lastOnline.toLocaleTimeString()}</span>
               )}
             </p>
           </div>
@@ -93,7 +101,7 @@ export class StatusCache {
       if (typeof localStorage !== 'undefined') {
         const cacheData = {
           timestamp: Date.now(),
-          data
+          data,
         };
         localStorage.setItem(this.CACHE_KEY, JSON.stringify(cacheData));
       }
@@ -105,7 +113,7 @@ export class StatusCache {
   static load(): any | null {
     try {
       if (typeof localStorage === 'undefined') return null;
-      
+
       const cached = localStorage.getItem(this.CACHE_KEY);
       if (!cached) return null;
 
@@ -139,7 +147,7 @@ export class StatusCache {
   static isStale(): boolean {
     try {
       if (typeof localStorage === 'undefined') return true;
-      
+
       const cached = localStorage.getItem(this.CACHE_KEY);
       if (!cached) return true;
 
@@ -150,4 +158,4 @@ export class StatusCache {
       return true;
     }
   }
-} 
+}

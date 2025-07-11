@@ -22,5 +22,5 @@ export const CONFIG = {
   memory: {
     maxHeapSize: 512 * 1024 * 1024, // 512MB
     warningThreshold: 0.8, // 80%
-  }
-} as const; 
+  },
+} as const;

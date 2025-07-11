@@ -9,12 +9,12 @@ describe('Push Notification Functions - Real Implementation', () => {
     it('should load push notification functions without errors', async () => {
       try {
         const pushNotifications = await import('../../functions/src/pushNotifications');
-        
+
         // Check that main functions are exported
         expect(typeof pushNotifications.subscribePush).toBe('function');
         expect(typeof pushNotifications.unsubscribePush).toBe('function');
         expect(typeof pushNotifications.sendTestPushNotification).toBe('function');
-        
+
         console.log('Push notification functions loaded successfully');
       } catch (error) {
         console.log('Functions not available in test environment (expected)');
@@ -56,25 +56,19 @@ describe('Push Notification Functions - Real Implementation', () => {
       const validTokens = [
         'valid-looking-token-123',
         'fcm-token-with-numbers-456',
-        'token_with_underscores'
+        'token_with_underscores',
       ];
 
-      const invalidTokens = [
-        '',
-        null,
-        undefined,
-        123,
-        {}
-      ];
+      const invalidTokens = ['', null, undefined, 123, {}];
 
-      validTokens.forEach(token => {
+      validTokens.forEach((token) => {
         expect(typeof token).toBe('string');
         expect(token.length).toBeGreaterThan(0);
         // FCM tokens should be alphanumeric with allowed special characters
         expect(token).toMatch(/^[a-zA-Z0-9_-]+$/);
       });
 
-      invalidTokens.forEach(token => {
+      invalidTokens.forEach((token) => {
         if (token === '') {
           expect(token.length).toBe(0);
         } else {
@@ -85,18 +79,12 @@ describe('Push Notification Functions - Real Implementation', () => {
 
     it('should validate providers array structure', () => {
       const validProviders = ['openai', 'anthropic', 'google-ai'];
-      const invalidProviders = [
-        'not-an-array',
-        123,
-        null,
-        undefined,
-        {}
-      ];
+      const invalidProviders = ['not-an-array', 123, null, undefined, {}];
 
       expect(Array.isArray(validProviders)).toBe(true);
       expect(validProviders.length).toBeGreaterThan(0);
 
-      invalidProviders.forEach(providers => {
+      invalidProviders.forEach((providers) => {
         expect(Array.isArray(providers)).toBe(false);
       });
     });
@@ -121,9 +109,21 @@ describe('Push Notification Functions - Real Implementation', () => {
 
     it('should validate provider names', () => {
       const validProviders = [
-        'openai', 'anthropic', 'huggingface', 'google-ai', 'cohere',
-        'replicate', 'groq', 'deepseek', 'meta', 'xai',
-        'perplexity', 'claude', 'mistral', 'aws', 'azure'
+        'openai',
+        'anthropic',
+        'huggingface',
+        'google-ai',
+        'cohere',
+        'replicate',
+        'groq',
+        'deepseek',
+        'meta',
+        'xai',
+        'perplexity',
+        'claude',
+        'mistral',
+        'aws',
+        'azure',
       ];
 
       const invalidProviders = [
@@ -133,15 +133,15 @@ describe('Push Notification Functions - Real Implementation', () => {
         'Provider!', // special characters
         '',
         null,
-        undefined
+        undefined,
       ];
 
-      validProviders.forEach(provider => {
+      validProviders.forEach((provider) => {
         expect(typeof provider).toBe('string');
         expect(provider).toMatch(/^[a-z0-9-]+$/);
       });
 
-      invalidProviders.forEach(provider => {
+      invalidProviders.forEach((provider) => {
         if (typeof provider === 'string') {
           expect(provider).not.toMatch(/^[a-z0-9-]+$/);
         } else {
@@ -158,10 +158,10 @@ describe('Push Notification Functions - Real Implementation', () => {
         'javascript:alert("xss")',
         '../../etc/passwd',
         'DROP TABLE users;',
-        '${process.env.SECRET}'
+        '${process.env.SECRET}',
       ];
 
-      maliciousInputs.forEach(input => {
+      maliciousInputs.forEach((input) => {
         // Input should be treated as plain string, not executed
         expect(typeof input).toBe('string');
         expect(input).not.toContain('undefined');
@@ -186,10 +186,10 @@ describe('Push Notification Functions - Real Implementation', () => {
         'token-with-special-chars-!@#$%^&*()',
         'token_with_underscores',
         'token-with-dashes',
-        'tokenWithCamelCase'
+        'tokenWithCamelCase',
       ];
 
-      specialCharTokens.forEach(token => {
+      specialCharTokens.forEach((token) => {
         expect(typeof token).toBe('string');
         expect(token.length).toBeGreaterThan(0);
       });
@@ -202,10 +202,10 @@ describe('Push Notification Functions - Real Implementation', () => {
         { token: '', providers: [] },
         { token: null, providers: undefined },
         { token: 'valid', providers: [] },
-        { token: '', providers: ['openai'] }
+        { token: '', providers: ['openai'] },
       ];
 
-      edgeCases.forEach(testCase => {
+      edgeCases.forEach((testCase) => {
         // Should be able to validate these cases
         if (testCase.token && testCase.providers && testCase.providers.length > 0) {
           expect(testCase.token).toBeTruthy();
@@ -213,10 +213,10 @@ describe('Push Notification Functions - Real Implementation', () => {
         } else {
           // Invalid cases should be detectable
           expect(
-            !testCase.token || 
-            !testCase.providers || 
-            !Array.isArray(testCase.providers) ||
-            testCase.providers.length === 0
+            !testCase.token ||
+              !testCase.providers ||
+              !Array.isArray(testCase.providers) ||
+              testCase.providers.length === 0
           ).toBe(true);
         }
       });
@@ -248,8 +248,8 @@ describe('Push Notification Functions - Real Implementation', () => {
         data: {
           providerId: 'openai',
           status: 'down',
-          url: 'https://status.openai.com'
-        }
+          url: 'https://status.openai.com',
+        },
       };
 
       // Validate notification structure
@@ -266,7 +266,7 @@ describe('Push Notification Functions - Real Implementation', () => {
         providers: ['openai'],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        active: true
+        active: true,
       };
 
       // Validate document structure
@@ -282,7 +282,7 @@ describe('Push Notification Functions - Real Implementation', () => {
     it('should handle memory efficiency requirements', () => {
       // Test memory efficiency simulation
       const largeDataSet = [];
-      
+
       for (let i = 0; i < 100; i++) {
         largeDataSet.push({
           token: `memory-test-token-${i}`,
@@ -292,7 +292,7 @@ describe('Push Notification Functions - Real Implementation', () => {
 
       // Should be able to process large datasets
       expect(largeDataSet.length).toBe(100);
-      
+
       // Memory usage should be reasonable
       const jsonSize = JSON.stringify(largeDataSet).length;
       expect(jsonSize).toBeGreaterThan(0);
@@ -305,16 +305,16 @@ describe('Push Notification Functions - Real Implementation', () => {
       const batches = Math.ceil(totalItems / batchSize);
 
       expect(batches).toBe(3); // Should create 3 batches
-      
+
       // Validate batch structure
       for (let i = 0; i < batches; i++) {
         const startIndex = i * batchSize;
         const endIndex = Math.min(startIndex + batchSize, totalItems);
         const batchItems = endIndex - startIndex;
-        
+
         expect(batchItems).toBeGreaterThan(0);
         expect(batchItems).toBeLessThanOrEqual(batchSize);
       }
     });
   });
-}); 
+});

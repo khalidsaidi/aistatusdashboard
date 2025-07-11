@@ -21,8 +21,8 @@ async function isServerAvailable(): Promise<boolean> {
     });
 
     const fetchPromise = fetch(`${API_BASE}/api/health`);
-    
-    const response = await Promise.race([fetchPromise, timeoutPromise]) as Response;
+
+    const response = (await Promise.race([fetchPromise, timeoutPromise])) as Response;
     return response.status < 500; // Any response (even 404) means server is running
   } catch (error) {
     return false;
@@ -53,20 +53,20 @@ describe('Health API Integration', () => {
 
       try {
         const response = await fetch(`${API_BASE}/api/health`);
-        
+
         console.log('Response status:', response.status);
         console.log('Response ok:', response.ok);
-        
+
         if (!response.ok) {
           const errorText = await response.text();
           console.log('Error response body:', errorText);
         }
-        
+
         expect(response.ok).toBe(true);
         expect(response.status).toBe(200);
-        
+
         const healthData = await response.json();
-        
+
         // Validate response structure
         expect(healthData).toHaveProperty('status');
         expect(healthData.status).toMatch(/^(healthy|degraded|unhealthy)$/);
@@ -80,13 +80,13 @@ describe('Health API Integration', () => {
 
         // Validate health checks
         expect(healthData.checks.length).toBeGreaterThan(0);
-        
+
         for (const check of healthData.checks) {
           expect(check).toMatchObject({
             name: expect.any(String),
             status: expect.stringMatching(/^(pass|fail|warn)$/),
             duration: expect.any(Number),
-            message: expect.any(String)
+            message: expect.any(String),
           });
         }
 
@@ -94,14 +94,14 @@ describe('Health API Integration', () => {
         expect(healthData.system).toMatchObject({
           uptime: expect.any(Number),
           memory: expect.any(Object),
-          load: expect.any(Object)
+          load: expect.any(Object),
         });
 
         // Validate critical systems
         expect(healthData.criticalSystems).toMatchObject({
           database: expect.stringMatching(/^(operational|degraded|down)$/),
           api: expect.stringMatching(/^(operational|degraded|down)$/),
-          monitoring: expect.stringMatching(/^(operational|degraded|down)$/)
+          monitoring: expect.stringMatching(/^(operational|degraded|down)$/),
         });
 
         console.log('✅ Health endpoint validation passed');
@@ -119,24 +119,26 @@ describe('Health API Integration', () => {
 
       try {
         const response = await fetch(`${API_BASE}/api/health`);
-        
+
         if (!response.ok) {
           console.log(`⚠️ Health API responded with status ${response.status}`);
           return; // Skip validation if endpoint not available
         }
-        
+
         const healthData = await response.json();
-        
+
         // Should include resilience components
         expect(healthData.components).toMatchObject({
           circuitBreaker: expect.any(Object),
           rateLimit: expect.any(Object),
-          cache: expect.any(Object)
+          cache: expect.any(Object),
         });
 
         console.log('✅ Resilience components validation passed');
       } catch (error) {
-        console.log('⚠️ Resilience components test skipped - Firebase endpoint may not be fully configured');
+        console.log(
+          '⚠️ Resilience components test skipped - Firebase endpoint may not be fully configured'
+        );
       }
     });
 
@@ -150,9 +152,9 @@ describe('Health API Integration', () => {
         const startTime = Date.now();
         const response = await fetch(`${API_BASE}/api/health`);
         const duration = Date.now() - startTime;
-        
+
         expect(duration).toBeLessThan(5000); // Should respond within 5 seconds
-        
+
         if (response.ok) {
           const healthData = await response.json();
           expect(healthData.duration).toBeLessThan(1000); // Internal processing should be under 1 second
@@ -171,14 +173,16 @@ describe('Health API Integration', () => {
       }
 
       try {
-        const requests = Array(5).fill(null).map(() => fetch(`${API_BASE}/api/health`));
+        const requests = Array(5)
+          .fill(null)
+          .map(() => fetch(`${API_BASE}/api/health`));
         const responses = await Promise.all(requests);
-        
+
         // All requests should complete
         expect(responses).toHaveLength(5);
-        
+
         // Check that at least some succeeded (Firebase may rate limit)
-        const successfulResponses = responses.filter(r => r.ok);
+        const successfulResponses = responses.filter((r) => r.ok);
         expect(successfulResponses.length).toBeGreaterThan(0);
 
         console.log(`✅ Concurrent requests handled (${successfulResponses.length}/5 successful)`);
@@ -197,7 +201,7 @@ describe('Health API Integration', () => {
 
       try {
         const response = await fetch(`${API_BASE}/api/health?invalid=param`);
-        
+
         // Should still respond even with invalid params
         expect(response.status).toBeLessThan(500);
 
@@ -215,12 +219,16 @@ describe('Health API Integration', () => {
 
       try {
         const response = await fetch(`${API_BASE}/api/health`);
-        
+
         if (response.ok) {
           const healthData = await response.json();
-          
+
           if (healthData.status === 'degraded') {
-            expect(healthData.checks.some((check: any) => check.status === 'fail' || check.status === 'warn')).toBe(true);
+            expect(
+              healthData.checks.some(
+                (check: any) => check.status === 'fail' || check.status === 'warn'
+              )
+            ).toBe(true);
           }
         }
 
@@ -240,20 +248,20 @@ describe('Health API Integration', () => {
 
       try {
         const measurements: number[] = [];
-        
+
         for (let i = 0; i < 3; i++) {
           const startTime = Date.now();
           await fetch(`${API_BASE}/api/health`);
           measurements.push(Date.now() - startTime);
-          
+
           // Small delay between requests
-          await new Promise(resolve => setTimeout(resolve, 100));
+          await new Promise((resolve) => setTimeout(resolve, 100));
         }
-        
+
         // Response times shouldn't vary too much
         const avg = measurements.reduce((a, b) => a + b) / measurements.length;
-        const variance = measurements.every(m => Math.abs(m - avg) < avg * 0.5);
-        
+        const variance = measurements.every((m) => Math.abs(m - avg) < avg * 0.5);
+
         expect(variance).toBe(true);
 
         console.log(`✅ Performance consistency validated (avg: ${avg.toFixed(0)}ms)`);
@@ -262,4 +270,4 @@ describe('Health API Integration', () => {
       }
     });
   });
-}); 
+});

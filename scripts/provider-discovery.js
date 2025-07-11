@@ -10,18 +10,18 @@ const NOTIFICATION_EMAIL = 'admin@aistatusdashboard.com';
 
 async function fetchProviderStatus() {
   // Fetching provider status...
-  
+
   try {
     const fetch = (await import('node-fetch')).default;
     const response = await fetch(`${API_BASE}/status`);
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
-    
+
     const data = await response.json();
     // Provider status fetched successfully
-    
+
     return data;
   } catch (error) {
     // Error fetching provider status
@@ -30,12 +30,10 @@ async function fetchProviderStatus() {
 }
 
 async function sendEmailNotification(type, data) {
-  
-  
   try {
     const fetch = (await import('node-fetch')).default;
     let response;
-    
+
     if (type === 'status_summary') {
       // Send status summary email
       const subject = `🤖 AI Provider Status Summary - ${data.summary.operational}/${data.summary.total} Operational`;
@@ -70,12 +68,16 @@ async function sendEmailNotification(type, data) {
             </div>
             
             <h3>🔍 Provider Details</h3>
-            ${data.providers.map(provider => `
+            ${data.providers
+              .map(
+                (provider) => `
               <div class="provider ${provider.status}">
                 <strong>${provider.name}</strong> - ${provider.status.toUpperCase()}
                 <br><small>Response Time: ${provider.responseTime}ms | Last Checked: ${new Date(provider.lastChecked).toLocaleString()}</small>
               </div>
-            `).join('')}
+            `
+              )
+              .join('')}
             
             <div class="footer">
               <p>This is a real email notification from your AI Status Dashboard provider discovery system.</p>
@@ -85,7 +87,7 @@ async function sendEmailNotification(type, data) {
         </body>
         </html>
       `;
-      
+
       response = await fetch(`${API_BASE}/send-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -93,8 +95,8 @@ async function sendEmailNotification(type, data) {
           to: NOTIFICATION_EMAIL,
           subject,
           html,
-          text: `AI Provider Status Summary: ${data.summary.operational}/${data.summary.total} providers operational. Check the dashboard for details.`
-        })
+          text: `AI Provider Status Summary: ${data.summary.operational}/${data.summary.total} providers operational. Check the dashboard for details.`,
+        }),
       });
     } else if (type === 'test_alert') {
       // Send test status alert
@@ -103,68 +105,48 @@ async function sendEmailNotification(type, data) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: NOTIFICATION_EMAIL,
-          type: 'status'
-        })
+          type: 'status',
+        }),
       });
     }
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
-    
+
     const result = await response.json();
-    
+
     if (result.success) {
-      
-      
-      
     } else {
-      
     }
-    
+
     return result;
   } catch (error) {
-    
     throw error;
   }
 }
 
 async function runProviderDiscovery() {
   try {
-    
-    
-    
     // 1. Fetch current provider status
     const statusData = await fetchProviderStatus();
-    
+
     // 2. Send status summary email
-    
+
     await sendEmailNotification('status_summary', statusData);
-    
-    
+
     // 3. Send test alert email
-    
+
     await sendEmailNotification('test_alert');
-    
-    
+
     // 4. Summary
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
   } catch (error) {
-    
     process.exit(1);
   }
 }
 
 // Run the discovery
-runProviderDiscovery().catch( 
+runProviderDiscovery().catch((error) => {
+  console.error('Provider discovery failed:', error);
+  process.exit(1);
+});

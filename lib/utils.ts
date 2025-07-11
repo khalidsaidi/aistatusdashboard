@@ -3,18 +3,20 @@ import { trackApiCall } from './firebase';
 export function getApiUrl(endpoint: string): string {
   // For client-side requests, detect if we're running locally
   if (typeof window !== 'undefined') {
-    const isLocalhost = window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1';
-    
+    const isLocalhost =
+      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
     if (isLocalhost) {
       // Use local API routes that will proxy to Firebase Functions
       return `/api/${endpoint}`;
     }
   }
-  
+
   // For server-side or production, use Firebase Functions directly
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || `https://us-central1-${process.env.FIREBASE_PROJECT_ID || 'demo-project'}.cloudfunctions.net`;
-  
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    `https://us-central1-${process.env.FIREBASE_PROJECT_ID || 'demo-project'}.cloudfunctions.net`;
+
   // Handle different endpoint types
   if (['status', 'health', 'comments', 'notifications', 'incidents'].includes(endpoint)) {
     // These endpoints are part of the main api function
@@ -28,7 +30,7 @@ export function getApiUrl(endpoint: string): string {
 // Enhanced fetch with performance tracking
 export async function fetchWithPerformance(url: string, options?: RequestInit): Promise<Response> {
   const apiName = url.split('/').pop() || 'unknown';
-  
+
   return trackApiCall(apiName, async () => {
     const response = await fetch(url, options);
     if (!response.ok) {
@@ -58,4 +60,4 @@ export async function checkSystemHealth() {
     }
     return response.json();
   });
-} 
+}

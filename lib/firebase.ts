@@ -9,7 +9,7 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
@@ -47,7 +47,7 @@ export const trackPageLoad = (pageName: string) => {
   if (performance && typeof window !== 'undefined') {
     const trace = performance.trace(`page_load_${pageName}`);
     trace.start();
-    
+
     // Stop trace when page is fully loaded
     if (document.readyState === 'complete') {
       trace.stop();
@@ -63,7 +63,7 @@ export const trackApiCall = async (apiName: string, apiCall: () => Promise<any>)
   if (performance && typeof window !== 'undefined') {
     const trace = performance.trace(`api_${apiName}`);
     trace.start();
-    
+
     try {
       const result = await apiCall();
       trace.putAttribute('success', 'true');
@@ -78,4 +78,4 @@ export const trackApiCall = async (apiName: string, apiCall: () => Promise<any>)
   } else {
     return await apiCall();
   }
-}; 
+};

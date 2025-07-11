@@ -1,6 +1,6 @@
 /**
  * HTTP Client Utility
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST handle timeouts properly
  * - MUST return consistent error types
@@ -31,7 +31,7 @@ export interface HttpResult {
 
 /**
  * Fetch with timeout and error handling
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST return HttpResult (never throw)
  * - MUST measure actual response time
@@ -39,7 +39,7 @@ export interface HttpResult {
  * - timeoutMs MUST be > 0
  */
 export async function fetchWithTimeout(
-  url: string, 
+  url: string,
   timeoutMs: number = 10000
 ): Promise<HttpResult> {
   if (timeoutMs <= 0) {
@@ -48,8 +48,8 @@ export async function fetchWithTimeout(
       error: {
         message: 'Timeout must be greater than 0',
         code: 'NETWORK',
-        responseTime: 0
-      }
+        responseTime: 0,
+      },
     };
   }
 
@@ -67,9 +67,9 @@ export async function fetchWithTimeout(
       signal: controller.signal,
       headers: {
         'User-Agent': 'AI-Status-Dashboard/1.0',
-        'Accept': 'application/json,text/html,application/rss+xml,*/*',
-        'Cache-Control': 'no-cache'
-      }
+        Accept: 'application/json,text/html,application/rss+xml,*/*',
+        'Cache-Control': 'no-cache',
+      },
     });
 
     clearTimeout(timeoutId);
@@ -82,8 +82,8 @@ export async function fetchWithTimeout(
         error: {
           message: 'Invalid response object received',
           code: 'NETWORK',
-          responseTime
-        }
+          responseTime,
+        },
       };
     }
 
@@ -91,7 +91,7 @@ export async function fetchWithTimeout(
     let data: any;
     try {
       const contentType = response.headers.get('content-type') || '';
-      
+
       if (contentType.includes('application/json')) {
         data = await response.json();
       } else {
@@ -104,8 +104,8 @@ export async function fetchWithTimeout(
           message: `Failed to parse response: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`,
           code: 'PARSE_ERROR',
           status: response.status,
-          responseTime
-        }
+          responseTime,
+        },
       };
     }
 
@@ -116,10 +116,9 @@ export async function fetchWithTimeout(
         status: response.status,
         statusText: response.statusText,
         data,
-        responseTime
-      }
+        responseTime,
+      },
     };
-
   } catch (error) {
     if (timeoutId) clearTimeout(timeoutId);
     const responseTime = Date.now() - startTime;
@@ -132,8 +131,8 @@ export async function fetchWithTimeout(
           error: {
             message: `Request timeout after ${timeoutMs}ms`,
             code: 'TIMEOUT',
-            responseTime
-          }
+            responseTime,
+          },
         };
       }
 
@@ -142,8 +141,8 @@ export async function fetchWithTimeout(
         error: {
           message: error.message,
           code: 'NETWORK',
-          responseTime
-        }
+          responseTime,
+        },
       };
     }
 
@@ -152,26 +151,26 @@ export async function fetchWithTimeout(
       error: {
         message: 'Unknown network error',
         code: 'NETWORK',
-        responseTime
-      }
+        responseTime,
+      },
     };
   }
 }
 
 /**
  * Check if URL is reachable (HEAD request)
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST use HEAD method to minimize data transfer
  * - MUST return boolean result
  * - MUST handle all error cases gracefully
  */
 export async function isUrlReachable(
-  url: string, 
+  url: string,
   timeoutMs: number = 5000
 ): Promise<{ reachable: boolean; responseTime: number; status?: number }> {
   const startTime = Date.now();
-  
+
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -180,8 +179,8 @@ export async function isUrlReachable(
       method: 'HEAD',
       signal: controller.signal,
       headers: {
-        'User-Agent': 'AI-Status-Dashboard/1.0'
-      }
+        'User-Agent': 'AI-Status-Dashboard/1.0',
+      },
     });
 
     clearTimeout(timeoutId);
@@ -190,14 +189,13 @@ export async function isUrlReachable(
     return {
       reachable: response.ok,
       responseTime,
-      status: response.status
+      status: response.status,
     };
-
   } catch (error) {
     const responseTime = Date.now() - startTime;
     return {
       reachable: false,
-      responseTime
+      responseTime,
     };
   }
-} 
+}

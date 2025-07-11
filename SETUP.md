@@ -133,29 +133,32 @@ aistatusdashboard/
 
 ## Features by Setup Type
 
-| Feature | Demo Mode | With Firebase |
-|---------|-----------|---------------|
-| Status monitoring | ✅ | ✅ |
-| Real-time updates | ✅ | ✅ |
-| Historical data | ❌ | ✅ |
-| Email notifications | ❌ | ✅ |
-| Webhooks | ❌ | ✅ |
-| Incident tracking | ❌ | ✅ |
-| Data persistence | ❌ | ✅ |
+| Feature             | Demo Mode | With Firebase |
+| ------------------- | --------- | ------------- |
+| Status monitoring   | ✅        | ✅            |
+| Real-time updates   | ✅        | ✅            |
+| Historical data     | ❌        | ✅            |
+| Email notifications | ❌        | ✅            |
+| Webhooks            | ❌        | ✅            |
+| Incident tracking   | ❌        | ✅            |
+| Data persistence    | ❌        | ✅            |
 
 ## Troubleshooting
 
 ### Common Issues
 
 **"Firebase not initialized" error:**
+
 - Check your `.env.local` file has all required Firebase variables
 - Ensure Firebase project has required services enabled
 
 **API endpoints returning 404:**
+
 - Make sure Firebase Functions are deployed
 - Check your Firebase project configuration
 
 **Build errors:**
+
 - Run `npm run type-check` to identify TypeScript issues
 - Ensure all dependencies are installed: `npm install`
 
@@ -180,4 +183,4 @@ Once you have the project running:
 - **Add new features**: Follow the TDD approach outlined in the docs
 - **Deploy your own instance**: See deployment guides in README.md
 
-Happy coding! 🎉 
+Happy coding! 🎉

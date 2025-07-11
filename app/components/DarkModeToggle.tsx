@@ -8,7 +8,7 @@ export default function DarkModeToggle() {
 
   useEffect(() => {
     setMounted(true);
-    
+
     // Handle cases where localStorage might not be available
     let darkMode = false;
     try {
@@ -19,9 +19,9 @@ export default function DarkModeToggle() {
       // localStorage not available or throws error
       console.warn('localStorage not available:', error);
     }
-    
+
     setIsDark(darkMode);
-    
+
     if (darkMode) {
       document.documentElement.classList.add('dark');
     } else {
@@ -32,7 +32,7 @@ export default function DarkModeToggle() {
   const toggleDarkMode = () => {
     const newDarkMode = !isDark;
     setIsDark(newDarkMode);
-    
+
     // Handle cases where localStorage might not be available
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
@@ -42,7 +42,7 @@ export default function DarkModeToggle() {
       // localStorage not available or throws error
       console.warn('localStorage not available:', error);
     }
-    
+
     if (newDarkMode) {
       document.documentElement.classList.add('dark');
     } else {
@@ -52,7 +52,7 @@ export default function DarkModeToggle() {
 
   if (!mounted) {
     return (
-      <button 
+      <button
         type="button"
         className="p-2 rounded-md bg-gray-200 dark:bg-gray-700"
         aria-label="Toggle dark mode"
@@ -69,9 +69,7 @@ export default function DarkModeToggle() {
       className="p-2 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
       aria-label="Toggle dark mode"
     >
-      <span className="w-5 h-5 block">
-        {isDark ? '☀️' : '🌙'}
-      </span>
+      <span className="w-5 h-5 block">{isDark ? '☀️' : '🌙'}</span>
     </button>
   );
-} 
+}

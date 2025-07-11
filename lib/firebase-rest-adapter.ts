@@ -1,17 +1,17 @@
 /**
  * Firebase REST API Adapter
- * 
+ *
  * Forces Firebase to use REST API instead of WebSocket/WebChannel to eliminate
  * transport errors in WSL2 environments. This is a proper fix, not a workaround.
  */
 
 import { initializeApp, getApps, FirebaseApp, deleteApp } from 'firebase/app';
-import { 
-  initializeFirestore, 
-  Firestore, 
+import {
+  initializeFirestore,
+  Firestore,
   enableNetwork,
   disableNetwork,
-  terminate
+  terminate,
 } from 'firebase/firestore';
 import { getFunctions, Functions } from 'firebase/functions';
 
@@ -50,8 +50,8 @@ class FirebaseRestAdapter {
     return (
       process.platform === 'linux' &&
       (process.env.WSL_DISTRO_NAME !== undefined ||
-       process.env.WSLENV !== undefined ||
-       process.env.WSL_INTEROP !== undefined)
+        process.env.WSLENV !== undefined ||
+        process.env.WSL_INTEROP !== undefined)
     );
   }
 
@@ -98,16 +98,16 @@ class FirebaseRestAdapter {
       ignoreUndefinedProperties: true,
       experimentalForceLongPolling: true,
       useFetchStreams: false,
-      
+
       // Memory-only cache to prevent offline mode
       localCache: {
-        kind: 'memory' as const
+        kind: 'memory' as const,
       },
-      
+
       // Network settings that discourage WebSocket
       host: 'firestore.googleapis.com',
       ssl: true,
-      
+
       // Additional REST enforcement
       experimentalAutoDetectLongPolling: false,
     };
@@ -119,15 +119,15 @@ class FirebaseRestAdapter {
   private async establishRestMode(db: Firestore): Promise<void> {
     try {
       console.log('🌐 Establishing REST API connection...');
-      
+
       // Force immediate REST mode by cycling network
       await disableNetwork(db);
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       await enableNetwork(db);
-      
+
       // Allow connection to stabilize in REST mode
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       console.log('✅ REST API connection established');
     } catch (error) {
       console.warn('⚠️ REST mode establishment warning:', error);
@@ -150,19 +150,18 @@ class FirebaseRestAdapter {
     try {
       const { doc, getDoc } = await import('firebase/firestore');
       const testDoc = doc(this.firebaseInstance.db, 'test', 'connectivity');
-      
+
       await getDoc(testDoc);
       console.log('✅ REST API connectivity verified');
       return true;
     } catch (error) {
       if (error instanceof Error) {
         // Permission errors mean connection works
-        if (error.message.includes('permission') || 
-            error.message.includes('PERMISSION_DENIED')) {
+        if (error.message.includes('permission') || error.message.includes('PERMISSION_DENIED')) {
           console.log('✅ REST API connectivity verified (permission check)');
           return true;
         }
-        
+
         console.warn('⚠️ Connectivity test failed:', error.message);
         return false;
       }
@@ -180,7 +179,7 @@ class FirebaseRestAdapter {
 
         // Delete Firebase app
         await deleteApp(this.firebaseInstance.app);
-        
+
         this.firebaseInstance = null;
         console.log('🧹 Firebase REST adapter cleaned up');
       } catch (error) {
@@ -222,4 +221,4 @@ export async function cleanupRestFirebase(): Promise<void> {
 
 export async function testRestConnectivity(): Promise<boolean> {
   return firebaseRest.testConnectivity();
-} 
+}

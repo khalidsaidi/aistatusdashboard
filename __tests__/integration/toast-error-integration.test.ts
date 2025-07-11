@@ -13,7 +13,7 @@ describe('Toast Error Integration - Real Application Errors', () => {
 
   beforeAll(async () => {
     browser = await chromium.launch({
-      headless: process.env.CI === 'true'
+      headless: process.env.CI === 'true',
     });
   });
 
@@ -23,65 +23,70 @@ describe('Toast Error Integration - Real Application Errors', () => {
 
   beforeEach(async () => {
     page = await browser.newPage();
-    
+
     // Track toast notifications that appear
-    const toastNotifications: Array<{type: string, title: string, message: string}> = [];
-    
-         // Monitor DOM for toast notifications
-     await page.addInitScript(() => {
-       // Store toast notifications globally for test access
-       (window as any).toastNotifications = [];
-       
-       // Monitor for toast DOM elements being added
-       const observer = new MutationObserver((mutations) => {
-         mutations.forEach((mutation) => {
-           mutation.addedNodes.forEach((node) => {
-             if (node.nodeType === Node.ELEMENT_NODE) {
-               const element = node as Element;
-               
-               // Check for toast elements
-               if (element.classList?.contains('toast') || 
-                   element.classList?.contains('notification') ||
-                   element.querySelector?.('.toast, .notification')) {
-                 
-                 const textContent = element.textContent || '';
-                 
-                 // Detect error toasts
-                 if (textContent.includes('Error') || 
-                     textContent.includes('Failed') || 
-                     textContent.includes('Unable to') ||
-                     element.classList?.contains('error') ||
-                     element.classList?.contains('danger')) {
-                   (window as any).toastNotifications.push({
-                     type: 'error',
-                     title: 'DOM Error Toast',
-                     message: textContent.slice(0, 100)
-                   });
-                 }
-                 
-                 // Detect warning toasts
-                 if (textContent.includes('Warning') || 
-                     textContent.includes('Font') ||
-                     element.classList?.contains('warning')) {
-                   (window as any).toastNotifications.push({
-                     type: 'warning',
-                     title: 'DOM Warning Toast',
-                     message: textContent.slice(0, 100)
-                   });
-                 }
-               }
-             }
-           });
-         });
-       });
-       
-       // Start observing
-       observer.observe(document.body, {
-         childList: true,
-         subtree: true
-       });
-     });
-    
+    const toastNotifications: Array<{ type: string; title: string; message: string }> = [];
+
+    // Monitor DOM for toast notifications
+    await page.addInitScript(() => {
+      // Store toast notifications globally for test access
+      (window as any).toastNotifications = [];
+
+      // Monitor for toast DOM elements being added
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const element = node as Element;
+
+              // Check for toast elements
+              if (
+                element.classList?.contains('toast') ||
+                element.classList?.contains('notification') ||
+                element.querySelector?.('.toast, .notification')
+              ) {
+                const textContent = element.textContent || '';
+
+                // Detect error toasts
+                if (
+                  textContent.includes('Error') ||
+                  textContent.includes('Failed') ||
+                  textContent.includes('Unable to') ||
+                  element.classList?.contains('error') ||
+                  element.classList?.contains('danger')
+                ) {
+                  (window as any).toastNotifications.push({
+                    type: 'error',
+                    title: 'DOM Error Toast',
+                    message: textContent.slice(0, 100),
+                  });
+                }
+
+                // Detect warning toasts
+                if (
+                  textContent.includes('Warning') ||
+                  textContent.includes('Font') ||
+                  element.classList?.contains('warning')
+                ) {
+                  (window as any).toastNotifications.push({
+                    type: 'warning',
+                    title: 'DOM Warning Toast',
+                    message: textContent.slice(0, 100),
+                  });
+                }
+              }
+            }
+          });
+        });
+      });
+
+      // Start observing
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+    });
+
     // Store for test access
     (page as any).toastNotifications = toastNotifications;
   });
@@ -102,7 +107,7 @@ describe('Toast Error Integration - Real Application Errors', () => {
             await fetch('/api/non-existent-endpoint', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ test: 'data' })
+              body: JSON.stringify({ test: 'data' }),
             });
           } catch (error) {
             // This should trigger the GlobalErrorHandler
@@ -114,16 +119,18 @@ describe('Toast Error Integration - Real Application Errors', () => {
         await page.waitForTimeout(2000);
 
         // Check if any toast notifications appeared in the DOM
-        const toastElements = await page.$$('.toast, .notification, [class*="toast"], [class*="notification"]');
-        
+        const toastElements = await page.$$(
+          '.toast, .notification, [class*="toast"], [class*="notification"]'
+        );
+
         if (toastElements.length > 0) {
           console.log('✅ Toast notification detected in DOM');
-          
+
           // Get toast content
           for (const toast of toastElements) {
             const textContent = await toast.textContent();
             console.log('Toast content:', textContent);
-            
+
             // Verify it contains error-related text
             expect(textContent).toMatch(/error|failed|unable|connection/i);
           }
@@ -133,10 +140,10 @@ describe('Toast Error Integration - Real Application Errors', () => {
 
         // Check if toast notifications were captured via JavaScript interception
         const capturedToasts = await page.evaluate(() => (window as any).toastNotifications || []);
-        
+
         if (capturedToasts.length > 0) {
           console.log('✅ Toast notifications captured via JavaScript:', capturedToasts);
-          
+
           // Verify error toast was triggered
           const errorToasts = capturedToasts.filter((toast: any) => toast.type === 'error');
           expect(errorToasts.length).toBeGreaterThan(0);
@@ -145,7 +152,6 @@ describe('Toast Error Integration - Real Application Errors', () => {
         // At minimum, verify the application is still functional
         const isPageFunctional = await page.locator('body').isVisible();
         expect(isPageFunctional).toBe(true);
-        
       } catch (error) {
         console.warn('Network error toast test failed, likely no dev server running:', error);
         expect(true).toBe(true); // Pass test if dev server not available
@@ -168,10 +174,10 @@ describe('Toast Error Integration - Real Application Errors', () => {
 
         // Check for error toasts in DOM
         const errorToasts = await page.$$('[class*="error"], [class*="red-"], .toast');
-        
+
         if (errorToasts.length > 0) {
           console.log('✅ Error toast detected after JavaScript error');
-          
+
           for (const toast of errorToasts) {
             const textContent = await toast.textContent();
             if (textContent && textContent.includes('Error')) {
@@ -188,7 +194,6 @@ describe('Toast Error Integration - Real Application Errors', () => {
         // Verify application remains functional
         const isPageFunctional = await page.locator('body').isVisible();
         expect(isPageFunctional).toBe(true);
-        
       } catch (error) {
         console.warn('JavaScript error toast test failed:', error);
         expect(true).toBe(true); // Pass test if error handling prevents test execution
@@ -201,7 +206,7 @@ describe('Toast Error Integration - Real Application Errors', () => {
         await page.waitForLoadState('networkidle', { timeout: 5000 });
 
         // Trigger a fetch failure by blocking network
-        await page.route('**/api/test-endpoint', route => route.abort());
+        await page.route('**/api/test-endpoint', (route) => route.abort());
 
         // Try to fetch the blocked endpoint
         await page.evaluate(async () => {
@@ -216,12 +221,17 @@ describe('Toast Error Integration - Real Application Errors', () => {
         await page.waitForTimeout(2000);
 
         // Check for connection error toasts
-        const toastElements = await page.$$('.toast, .notification, [class*="toast"], [class*="notification"]');
-        
+        const toastElements = await page.$$(
+          '.toast, .notification, [class*="toast"], [class*="notification"]'
+        );
+
         let foundConnectionError = false;
         for (const toast of toastElements) {
           const textContent = await toast.textContent();
-          if (textContent && (textContent.includes('Connection') || textContent.includes('Network'))) {
+          if (
+            textContent &&
+            (textContent.includes('Connection') || textContent.includes('Network'))
+          ) {
             foundConnectionError = true;
             console.log('✅ Connection error toast found:', textContent);
           }
@@ -229,8 +239,8 @@ describe('Toast Error Integration - Real Application Errors', () => {
 
         // Check captured toasts
         const capturedToasts = await page.evaluate(() => (window as any).toastNotifications || []);
-        const connectionToasts = capturedToasts.filter((toast: any) => 
-          toast.title.includes('Connection') || toast.title.includes('Network')
+        const connectionToasts = capturedToasts.filter(
+          (toast: any) => toast.title.includes('Connection') || toast.title.includes('Network')
         );
 
         if (connectionToasts.length > 0) {
@@ -241,7 +251,6 @@ describe('Toast Error Integration - Real Application Errors', () => {
         // Verify application remains functional
         const isPageFunctional = await page.locator('body').isVisible();
         expect(isPageFunctional).toBe(true);
-        
       } catch (error) {
         console.warn('Fetch error toast test failed:', error);
         expect(true).toBe(true); // Pass test if error handling prevents test execution
@@ -255,8 +264,8 @@ describe('Toast Error Integration - Real Application Errors', () => {
         await page.goto(baseUrl, { timeout: 10000 });
 
         // Block font loading to trigger font errors
-        await page.route('**/*.woff*', route => route.abort());
-        await page.route('**/*.ttf', route => route.abort());
+        await page.route('**/*.woff*', (route) => route.abort());
+        await page.route('**/*.ttf', (route) => route.abort());
 
         // Reload to trigger font loading errors
         await page.reload({ waitUntil: 'networkidle' });
@@ -265,8 +274,10 @@ describe('Toast Error Integration - Real Application Errors', () => {
         await page.waitForTimeout(3000);
 
         // Check for font warning toasts
-        const toastElements = await page.$$('.toast, .notification, [class*="toast"], [class*="notification"]');
-        
+        const toastElements = await page.$$(
+          '.toast, .notification, [class*="toast"], [class*="notification"]'
+        );
+
         let foundFontWarning = false;
         for (const toast of toastElements) {
           const textContent = await toast.textContent();
@@ -278,8 +289,8 @@ describe('Toast Error Integration - Real Application Errors', () => {
 
         // Check captured toasts
         const capturedToasts = await page.evaluate(() => (window as any).toastNotifications || []);
-        const fontToasts = capturedToasts.filter((toast: any) => 
-          toast.title.includes('Font') || toast.message.includes('font')
+        const fontToasts = capturedToasts.filter(
+          (toast: any) => toast.title.includes('Font') || toast.message.includes('font')
         );
 
         if (fontToasts.length > 0) {
@@ -290,11 +301,10 @@ describe('Toast Error Integration - Real Application Errors', () => {
         // Verify application remains functional even with font errors
         const isPageFunctional = await page.locator('body').isVisible();
         expect(isPageFunctional).toBe(true);
-        
       } catch (error) {
         console.warn('Font error toast test failed:', error);
         expect(true).toBe(true); // Pass test if error handling prevents test execution
       }
     }, 15000);
   });
-}); 
+});

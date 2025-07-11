@@ -36,16 +36,16 @@ export class EmailService {
           pass: process.env.SMTP_PASS,
         },
         tls: {
-          rejectUnauthorized: process.env.NODE_ENV === 'production'
-        }
+          rejectUnauthorized: process.env.NODE_ENV === 'production',
+        },
       });
 
       // Verify connection
       this.transporter?.verify((error: Error | null) => {
         if (error) {
-                // SMTP connection error
-    } else {
-      // SMTP server ready
+          // SMTP connection error
+        } else {
+          // SMTP server ready
         }
       });
     } catch (error) {
@@ -70,7 +70,7 @@ export class EmailService {
       const result = await this.transporter.sendMail(mailOptions);
       return {
         messageId: result.messageId,
-        response: result.response
+        response: result.response,
       };
     } catch (error) {
       // Failed to send email
@@ -91,4 +91,4 @@ export class EmailService {
       return false;
     }
   }
-} 
+}

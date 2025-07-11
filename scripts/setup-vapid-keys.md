@@ -1,6 +1,7 @@
 # Firebase VAPID Keys Setup Guide
 
 ## Overview
+
 VAPID keys are required for web push notifications. You need separate keys for dev and production environments.
 
 ## Steps to Get VAPID Keys
@@ -28,11 +29,13 @@ VAPID keys are required for web push notifications. You need separate keys for d
 ## Environment Variables to Update
 
 ### Development (.env.local)
+
 ```bash
 NEXT_PUBLIC_FCM_VAPID_KEY=<DEV_VAPID_KEY_HERE>
 ```
 
 ### Production (.env.production)
+
 ```bash
 NEXT_PUBLIC_FCM_VAPID_KEY=<PROD_VAPID_KEY_HERE>
 ```
@@ -46,7 +49,7 @@ If you have Firebase CLI with admin permissions:
 firebase use ai-status-dashboard-dev
 # Then go to Firebase Console to get the key
 
-# For production environment  
+# For production environment
 firebase use ai-status-dashboard
 # Then go to Firebase Console to get the key
 ```
@@ -62,4 +65,4 @@ firebase use ai-status-dashboard
 
 - VAPID keys are public keys and safe to include in client-side code
 - They are environment-specific and should be different for dev/prod
-- Store them in environment variables, not hardcoded in source code 
+- Store them in environment variables, not hardcoded in source code

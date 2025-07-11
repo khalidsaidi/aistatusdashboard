@@ -22,13 +22,13 @@ test.describe('Web Push Notifications E2E - Real Environment', () => {
   test('should display push notification interface when supported', async () => {
     // Navigate to notifications panel
     await page.click('[data-testid="notifications-button"]');
-    
+
     // Switch to web push tab
     await page.click('text=🔔 Web Push');
 
     // Verify push notification interface is visible
     await expect(page.locator('text=Browser Push Notifications')).toBeVisible();
-    
+
     // Check if browser supports push notifications
     const isSupported = await page.evaluate(() => {
       return 'serviceWorker' in navigator && 'Notification' in window;
@@ -36,7 +36,7 @@ test.describe('Web Push Notifications E2E - Real Environment', () => {
 
     if (isSupported) {
       await expect(page.locator('text=Enable Push Notifications')).toBeVisible();
-      
+
       // Verify provider selection is available
       const providers = ['openai', 'anthropic', 'huggingface', 'google-ai'];
       for (const provider of providers) {
@@ -63,7 +63,7 @@ test.describe('Web Push Notifications E2E - Real Environment', () => {
 
     if (permission === 'denied') {
       await expect(page.locator('text=🚫 Notifications Blocked')).toBeVisible();
-      await expect(page.locator('text=You\'ve blocked notifications for this site')).toBeVisible();
+      await expect(page.locator("text=You've blocked notifications for this site")).toBeVisible();
     } else if (permission === 'granted') {
       await expect(page.locator('text=Push Enabled ✓')).toBeVisible();
       await expect(page.locator('text=Disable Push')).toBeVisible();
@@ -79,7 +79,7 @@ test.describe('Web Push Notifications E2E - Real Environment', () => {
 
     // Check if we can enable push notifications
     const canEnable = await page.locator('text=Enable Push Notifications').isVisible();
-    
+
     if (canEnable) {
       // Select a provider
       await page.check('[data-testid="provider-openai"]');
@@ -93,7 +93,7 @@ test.describe('Web Push Notifications E2E - Real Environment', () => {
       try {
         // Wait for the real API response
         const response = await responsePromise;
-        
+
         // Check if the request was made to the correct endpoint
         expect(response.url()).toContain('/api/subscribePush');
         expect(response.request().method()).toBe('POST');
@@ -107,7 +107,7 @@ test.describe('Web Push Notifications E2E - Real Environment', () => {
         if (response.ok()) {
           const responseData = await response.json();
           expect(responseData).toHaveProperty('success');
-          
+
           if (responseData.success) {
             await expect(page.locator('text=Push notifications enabled!')).toBeVisible();
           }
@@ -116,7 +116,10 @@ test.describe('Web Push Notifications E2E - Real Environment', () => {
           console.log(`API returned ${response.status()}: ${await response.text()}`);
         }
       } catch (error: unknown) {
-        console.log('Push notification subscription failed:', error instanceof Error ? error.message : String(error));
+        console.log(
+          'Push notification subscription failed:',
+          error instanceof Error ? error.message : String(error)
+        );
         // In E2E, we might expect failures due to missing Firebase config
       }
     }
@@ -135,14 +138,17 @@ test.describe('Web Push Notifications E2E - Real Environment', () => {
 
       // Navigate back to main page
       await page.goto('/');
-      
+
       // Check if service worker registration works
       const registrationResult = await page.evaluate(async () => {
         try {
           const registration = await navigator.serviceWorker.register('/sw.js');
           return { success: true, scope: registration.scope };
         } catch (error) {
-          return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          };
         }
       });
 
@@ -174,14 +180,14 @@ test.describe('Web Push Notifications E2E - Real Environment', () => {
 
     // Test all notification tabs are accessible
     const tabs = ['📧 Email Alerts', '🔔 Web Push', '🪝 Webhooks', '📋 Incidents'];
-    
+
     for (const tab of tabs) {
       await page.click(`text=${tab}`);
-      
+
       // Verify tab is active (implementation may vary)
       const tabElement = page.locator(`text=${tab}`);
       await expect(tabElement).toBeVisible();
-      
+
       // Give a moment for content to load
       await page.waitForTimeout(500);
     }
@@ -193,17 +199,17 @@ test.describe('Web Push Notifications E2E - Real Environment', () => {
 
   test('should handle keyboard navigation', async () => {
     await page.click('[data-testid="notifications-button"]');
-    
+
     // Use keyboard to navigate to push tab
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
-    
+
     // Check if we can navigate to the web push tab
     const pushTab = page.locator('text=🔔 Web Push');
     if (await pushTab.isVisible()) {
       await pushTab.focus();
       await page.keyboard.press('Enter');
-      
+
       await expect(page.locator('text=Browser Push Notifications')).toBeVisible();
     }
   });
@@ -221,7 +227,7 @@ test.describe('Web Push Notifications E2E - Real Environment', () => {
 
       // Reload page
       await page.reload();
-      
+
       // Navigate back to push notifications
       await page.click('[data-testid="notifications-button"]');
       await page.click('text=🔔 Web Push');
@@ -235,9 +241,7 @@ test.describe('Web Push Notifications E2E - Real Environment', () => {
     // Test Firebase messaging initialization
     const firebaseInitialized = await page.evaluate(() => {
       // Check if Firebase messaging is available
-      return typeof window !== 'undefined' && 
-             'firebase' in window || 
-             'importScripts' in window;
+      return (typeof window !== 'undefined' && 'firebase' in window) || 'importScripts' in window;
     });
 
     if (firebaseInitialized) {
@@ -266,7 +270,9 @@ test.describe('Web Push Notifications E2E - Real Environment', () => {
     expect(statusElements).toBeGreaterThan(0);
 
     // Check if status monitoring is working
-    const openaiStatus = page.locator('[data-testid="provider-openai"] [data-testid="status-indicator"]');
+    const openaiStatus = page.locator(
+      '[data-testid="provider-openai"] [data-testid="status-indicator"]'
+    );
     if (await openaiStatus.isVisible()) {
       const statusText = await openaiStatus.textContent();
       expect(['operational', 'degraded', 'down', 'unknown']).toContain(statusText?.toLowerCase());
@@ -277,17 +283,17 @@ test.describe('Web Push Notifications E2E - Real Environment', () => {
     // Test that our notification API endpoints are accessible
     const endpoints = [
       '/api/subscribePush',
-      '/api/unsubscribePush', 
-      '/api/sendTestPushNotification'
+      '/api/unsubscribePush',
+      '/api/sendTestPushNotification',
     ];
 
     for (const endpoint of endpoints) {
       const response = await page.request.post(endpoint, {
-        data: { test: true }
+        data: { test: true },
       });
-      
+
       // Endpoints should exist (even if they return errors due to invalid data)
       expect(response.status()).not.toBe(404);
     }
   });
-}); 
+});

@@ -1,4 +1,14 @@
-import { getFirestore, collection, doc, setDoc, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
 import { FirebaseProviderRegistry, ProviderRegistryEntry } from './firebase-provider-registry';
 
 const db = getFirestore();
@@ -26,7 +36,7 @@ export interface DiscoveryCandidate {
 export class FirebaseProviderDiscovery {
   private static instance: FirebaseProviderDiscovery;
   private registry: FirebaseProviderRegistry;
-  
+
   static getInstance(): FirebaseProviderDiscovery {
     if (!this.instance) {
       this.instance = new FirebaseProviderDiscovery();
@@ -38,9 +48,11 @@ export class FirebaseProviderDiscovery {
     this.registry = FirebaseProviderRegistry.getInstance();
   }
 
-  async addDiscoveryCandidate(candidate: Omit<DiscoveryCandidate, 'discoveredAt' | 'validationStatus'>): Promise<void> {
+  async addDiscoveryCandidate(
+    candidate: Omit<DiscoveryCandidate, 'discoveredAt' | 'validationStatus'>
+  ): Promise<void> {
     const candidateDoc = doc(db, 'discoveryQueue', candidate.id);
-    
+
     await setDoc(candidateDoc, {
       ...candidate,
       discoveredAt: new Date(),
@@ -58,7 +70,7 @@ export class FirebaseProviderDiscovery {
     );
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => doc.data() as DiscoveryCandidate);
+    return snapshot.docs.map((doc) => doc.data() as DiscoveryCandidate);
   }
 
   async validateCandidate(candidateId: string): Promise<{
@@ -67,12 +79,16 @@ export class FirebaseProviderDiscovery {
     results: any;
   }> {
     const candidateDoc = doc(db, 'discoveryQueue', candidateId);
-    
+
     // Mark as validating
-    await setDoc(candidateDoc, {
-      validationStatus: 'validating',
-      lastValidated: new Date(),
-    }, { merge: true });
+    await setDoc(
+      candidateDoc,
+      {
+        validationStatus: 'validating',
+        lastValidated: new Date(),
+      },
+      { merge: true }
+    );
 
     try {
       const candidate = await this.getCandidateById(candidateId);
@@ -83,12 +99,16 @@ export class FirebaseProviderDiscovery {
       const isValid = confidence >= 0.7; // 70% confidence threshold
 
       // Update validation results
-      await setDoc(candidateDoc, {
-        validationStatus: isValid ? 'validated' : 'rejected',
-        confidence: confidence,
-        validationResults: results,
-        lastValidated: new Date(),
-      }, { merge: true });
+      await setDoc(
+        candidateDoc,
+        {
+          validationStatus: isValid ? 'validated' : 'rejected',
+          confidence: confidence,
+          validationResults: results,
+          lastValidated: new Date(),
+        },
+        { merge: true }
+      );
 
       // If valid, promote to provider registry
       if (isValid) {
@@ -96,28 +116,33 @@ export class FirebaseProviderDiscovery {
       }
 
       return { isValid, confidence, results };
-
     } catch (error) {
-      await setDoc(candidateDoc, {
-        validationStatus: 'rejected',
-        validationResults: {
-          error: (error as Error).message,
+      await setDoc(
+        candidateDoc,
+        {
+          validationStatus: 'rejected',
+          validationResults: {
+            error: (error as Error).message,
+          },
+          lastValidated: new Date(),
         },
-        lastValidated: new Date(),
-      }, { merge: true });
+        { merge: true }
+      );
 
-      return { 
-        isValid: false, 
-        confidence: 0, 
-        results: { error: (error as Error).message } 
+      return {
+        isValid: false,
+        confidence: 0,
+        results: { error: (error as Error).message },
       };
     }
   }
 
   private async getCandidateById(candidateId: string): Promise<DiscoveryCandidate | null> {
     const candidateDoc = doc(db, 'discoveryQueue', candidateId);
-    const snapshot = await getDocs(query(collection(db, 'discoveryQueue'), where('__name__', '==', candidateId)));
-    return snapshot.empty ? null : snapshot.docs[0].data() as DiscoveryCandidate;
+    const snapshot = await getDocs(
+      query(collection(db, 'discoveryQueue'), where('__name__', '==', candidateId))
+    );
+    return snapshot.empty ? null : (snapshot.docs[0].data() as DiscoveryCandidate);
   }
 
   private async performValidation(candidate: DiscoveryCandidate): Promise<any> {
@@ -134,7 +159,7 @@ export class FirebaseProviderDiscovery {
       const startTime = Date.now();
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
-      
+
       const response = await fetch(candidate.statusUrl, {
         method: 'GET',
         signal: controller.signal,
@@ -142,7 +167,7 @@ export class FirebaseProviderDiscovery {
           'User-Agent': 'AI-Status-Dashboard-Discovery/1.0',
         },
       });
-      
+
       clearTimeout(timeoutId);
 
       results.responseTime = Date.now() - startTime;
@@ -160,12 +185,12 @@ export class FirebaseProviderDiscovery {
     try {
       const pageController = new AbortController();
       const pageTimeoutId = setTimeout(() => pageController.abort(), 5000);
-      
+
       const pageResponse = await fetch(candidate.statusPageUrl, {
         method: 'HEAD',
         signal: pageController.signal,
       });
-      
+
       clearTimeout(pageTimeoutId);
       results.statusPageWorks = pageResponse.ok;
     } catch (error) {
@@ -185,7 +210,7 @@ export class FirebaseProviderDiscovery {
 
   private calculateConfidence(results: any): number {
     let score = 0;
-    
+
     if (results.statusUrlWorks) score += 0.4;
     if (results.statusPageWorks) score += 0.2;
     if (results.hasValidFormat) score += 0.3;
@@ -195,7 +220,10 @@ export class FirebaseProviderDiscovery {
     return Math.min(score, 1.0);
   }
 
-  private async promoteToRegistry(candidate: DiscoveryCandidate, confidence: number): Promise<void> {
+  private async promoteToRegistry(
+    candidate: DiscoveryCandidate,
+    confidence: number
+  ): Promise<void> {
     const providerEntry: Omit<ProviderRegistryEntry, 'discoveredAt' | 'lastValidated'> = {
       id: candidate.id,
       name: candidate.name,
@@ -212,7 +240,9 @@ export class FirebaseProviderDiscovery {
     await this.registry.registerProvider(providerEntry);
   }
 
-  private determineTier(confidence: number): 'enterprise' | 'startup' | 'research' | 'experimental' {
+  private determineTier(
+    confidence: number
+  ): 'enterprise' | 'startup' | 'research' | 'experimental' {
     if (confidence >= 0.9) return 'enterprise';
     if (confidence >= 0.8) return 'startup';
     if (confidence >= 0.7) return 'research';
@@ -226,14 +256,27 @@ export class FirebaseProviderDiscovery {
     rejected: number;
     totalCandidates: number;
   }> {
-    const [pendingSnapshot, validatingSnapshot, validatedSnapshot, rejectedSnapshot] = await Promise.all([
-      getDocs(query(collection(db, 'discoveryQueue'), where('validationStatus', '==', 'pending'))),
-      getDocs(query(collection(db, 'discoveryQueue'), where('validationStatus', '==', 'validating'))),
-      getDocs(query(collection(db, 'discoveryQueue'), where('validationStatus', '==', 'validated'))),
-      getDocs(query(collection(db, 'discoveryQueue'), where('validationStatus', '==', 'rejected'))),
-    ]);
+    const [pendingSnapshot, validatingSnapshot, validatedSnapshot, rejectedSnapshot] =
+      await Promise.all([
+        getDocs(
+          query(collection(db, 'discoveryQueue'), where('validationStatus', '==', 'pending'))
+        ),
+        getDocs(
+          query(collection(db, 'discoveryQueue'), where('validationStatus', '==', 'validating'))
+        ),
+        getDocs(
+          query(collection(db, 'discoveryQueue'), where('validationStatus', '==', 'validated'))
+        ),
+        getDocs(
+          query(collection(db, 'discoveryQueue'), where('validationStatus', '==', 'rejected'))
+        ),
+      ]);
 
-    const totalCandidates = pendingSnapshot.size + validatingSnapshot.size + validatedSnapshot.size + rejectedSnapshot.size;
+    const totalCandidates =
+      pendingSnapshot.size +
+      validatingSnapshot.size +
+      validatedSnapshot.size +
+      rejectedSnapshot.size;
 
     return {
       pending: pendingSnapshot.size,
@@ -272,4 +315,4 @@ export class FirebaseProviderDiscovery {
       await this.addDiscoveryCandidate(provider);
     }
   }
-} 
+}

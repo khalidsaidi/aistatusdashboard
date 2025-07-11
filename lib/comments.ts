@@ -19,23 +19,23 @@ function generateId(): string {
  */
 function validateComment(comment: CommentCreate): string[] {
   const errors: string[] = [];
-  
+
   if (!comment.author || comment.author.trim().length < 2) {
     errors.push('Author name must be at least 2 characters');
   }
-  
+
   if (!comment.message || comment.message.trim().length < 10) {
     errors.push('Message must be at least 10 characters');
   }
-  
+
   if (comment.message && comment.message.length > 1000) {
     errors.push('Message must be less than 1000 characters');
   }
-  
+
   if (comment.email && !isValidEmail(comment.email)) {
     errors.push('Invalid email address');
   }
-  
+
   return errors;
 }
 
@@ -44,29 +44,37 @@ function validateComment(comment: CommentCreate): string[] {
  */
 function containsInappropriateContent(text: string): boolean {
   const inappropriateWords = [
-    'spam', 'viagra', 'casino', 'porn', 'xxx',
+    'spam',
+    'viagra',
+    'casino',
+    'porn',
+    'xxx',
     // Add more as needed
   ];
-  
+
   const lowercaseText = text.toLowerCase();
-  return inappropriateWords.some(word => lowercaseText.includes(word));
+  return inappropriateWords.some((word) => lowercaseText.includes(word));
 }
 
 /**
  * Create a new comment
  */
-export function createComment(commentData: CommentCreate): { success: boolean; comment?: UserComment; errors?: string[] } {
+export function createComment(commentData: CommentCreate): {
+  success: boolean;
+  comment?: UserComment;
+  errors?: string[];
+} {
   const errors = validateComment(commentData);
-  
+
   if (errors.length > 0) {
     return { success: false, errors };
   }
-  
+
   // Check for inappropriate content
-  const hasInappropriateContent = 
+  const hasInappropriateContent =
     containsInappropriateContent(commentData.message) ||
     containsInappropriateContent(commentData.author);
-  
+
   const comment: UserComment = {
     id: generateId(),
     author: commentData.author.trim(),
@@ -78,19 +86,19 @@ export function createComment(commentData: CommentCreate): { success: boolean; c
     status: hasInappropriateContent ? 'pending' : 'approved',
     replies: [],
     likes: 0,
-    reported: false
+    reported: false,
   };
-  
+
   comments.set(comment.id, comment);
-  
+
   log('info', 'Comment created', {
     id: comment.id,
     author: comment.author,
     type: comment.type,
     status: comment.status,
-    providerId: comment.providerId
+    providerId: comment.providerId,
   });
-  
+
   return { success: true, comment };
 }
 
@@ -99,26 +107,26 @@ export function createComment(commentData: CommentCreate): { success: boolean; c
  */
 export function getComments(filter: CommentFilter = {}): UserComment[] {
   const allComments = Array.from(comments.values());
-  
-  let filteredComments = allComments.filter(comment => {
+
+  let filteredComments = allComments.filter((comment) => {
     // Filter by provider
     if (filter.providerId && comment.providerId !== filter.providerId) {
       return false;
     }
-    
+
     // Filter by type
     if (filter.type && comment.type !== filter.type) {
       return false;
     }
-    
+
     // Filter by status
     if (filter.status && comment.status !== filter.status) {
       return false;
     }
-    
+
     return true;
   });
-  
+
   // Sort by creation date (newest first)
   filteredComments.sort((a, b) => {
     const getTime = (dateValue: string | { _seconds: number; _nanoseconds: number }) => {
@@ -130,16 +138,16 @@ export function getComments(filter: CommentFilter = {}): UserComment[] {
     };
     return getTime(b.createdAt) - getTime(a.createdAt);
   });
-  
+
   // Apply pagination
   if (filter.offset) {
     filteredComments = filteredComments.slice(filter.offset);
   }
-  
+
   if (filter.limit) {
     filteredComments = filteredComments.slice(0, filter.limit);
   }
-  
+
   return filteredComments;
 }
 
@@ -153,19 +161,22 @@ export function getComment(id: string): UserComment | null {
 /**
  * Update comment status (for moderation)
  */
-export function updateCommentStatus(id: string, status: 'pending' | 'approved' | 'hidden'): boolean {
+export function updateCommentStatus(
+  id: string,
+  status: 'pending' | 'approved' | 'hidden'
+): boolean {
   const comment = comments.get(id);
   if (!comment) return false;
-  
+
   comment.status = status;
   comment.updatedAt = new Date().toISOString();
-  
+
   log('info', 'Comment status updated', {
     id,
     status,
-    author: comment.author
+    author: comment.author,
   });
-  
+
   return true;
 }
 
@@ -175,9 +186,9 @@ export function updateCommentStatus(id: string, status: 'pending' | 'approved' |
 export function likeComment(id: string): boolean {
   const comment = comments.get(id);
   if (!comment) return false;
-  
+
   comment.likes = (comment.likes || 0) + 1;
-  
+
   return true;
 }
 
@@ -187,33 +198,36 @@ export function likeComment(id: string): boolean {
 export function reportComment(id: string): boolean {
   const comment = comments.get(id);
   if (!comment) return false;
-  
+
   comment.reported = true;
   comment.status = 'pending'; // Auto-moderate reported comments
-  
+
   log('warn', 'Comment reported', {
     id,
     author: comment.author,
-    message: (comment.message || comment.content || '').substring(0, 50) + '...'
+    message: (comment.message || comment.content || '').substring(0, 50) + '...',
   });
-  
+
   return true;
 }
 
 /**
  * Add reply to comment
  */
-export function addReply(parentId: string, replyData: CommentCreate): { success: boolean; reply?: UserComment; errors?: string[] } {
+export function addReply(
+  parentId: string,
+  replyData: CommentCreate
+): { success: boolean; reply?: UserComment; errors?: string[] } {
   const parentComment = comments.get(parentId);
   if (!parentComment) {
     return { success: false, errors: ['Parent comment not found'] };
   }
-  
+
   const errors = validateComment(replyData);
   if (errors.length > 0) {
     return { success: false, errors };
   }
-  
+
   const reply: UserComment = {
     id: generateId(),
     author: replyData.author.trim(),
@@ -223,21 +237,21 @@ export function addReply(parentId: string, replyData: CommentCreate): { success:
     createdAt: new Date().toISOString(),
     status: 'approved',
     likes: 0,
-    reported: false
+    reported: false,
   };
-  
+
   if (!parentComment.replies) {
     parentComment.replies = [];
   }
-  
+
   parentComment.replies.push(reply);
-  
+
   log('info', 'Reply added', {
     parentId,
     replyId: reply.id,
-    author: reply.author
+    author: reply.author,
   });
-  
+
   return { success: true, reply };
 }
 
@@ -260,29 +274,29 @@ export function getCommentStats(): {
   byProvider: Record<string, number>;
 } {
   const allComments = Array.from(comments.values());
-  
+
   const stats = {
     total: allComments.length,
-    approved: allComments.filter(c => c.status === 'approved').length,
-    pending: allComments.filter(c => c.status === 'pending').length,
-    hidden: allComments.filter(c => c.status === 'hidden').length,
+    approved: allComments.filter((c) => c.status === 'approved').length,
+    pending: allComments.filter((c) => c.status === 'pending').length,
+    hidden: allComments.filter((c) => c.status === 'hidden').length,
     byType: {} as Record<string, number>,
-    byProvider: {} as Record<string, number>
+    byProvider: {} as Record<string, number>,
   };
-  
+
   // Count by type
-  allComments.forEach(comment => {
+  allComments.forEach((comment) => {
     const type = comment.type || 'general';
     stats.byType[type] = (stats.byType[type] || 0) + 1;
   });
-  
+
   // Count by provider
-  allComments.forEach(comment => {
+  allComments.forEach((comment) => {
     if (comment.providerId) {
       stats.byProvider[comment.providerId] = (stats.byProvider[comment.providerId] || 0) + 1;
     }
   });
-  
+
   return stats;
 }
 
@@ -292,4 +306,4 @@ export function getCommentStats(): {
 function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
-} 
+}

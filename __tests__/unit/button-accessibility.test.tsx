@@ -12,7 +12,8 @@ let CommentSection: any;
 try {
   DashboardTabs = require('@/app/components/DashboardTabs').default;
 } catch (error) {
-  DashboardTabs = () => React.createElement('div', { 'data-testid': 'dashboard-tabs' }, 'Dashboard Tabs');
+  DashboardTabs = () =>
+    React.createElement('div', { 'data-testid': 'dashboard-tabs' }, 'Dashboard Tabs');
 }
 
 try {
@@ -24,7 +25,8 @@ try {
 try {
   CommentSection = require('@/app/components/CommentSection').default;
 } catch (error) {
-  CommentSection = () => React.createElement('div', { 'data-testid': 'comment-section' }, 'Comment Section');
+  CommentSection = () =>
+    React.createElement('div', { 'data-testid': 'comment-section' }, 'Comment Section');
 }
 
 describe('Button Accessibility and Styling', () => {
@@ -35,8 +37,8 @@ describe('Button Accessibility and Styling', () => {
       status: 'operational' as const,
       responseTime: 150,
       lastChecked: new Date().toISOString(),
-      statusPageUrl: 'https://status.openai.com'
-    }
+      statusPageUrl: 'https://status.openai.com',
+    },
   ];
 
   beforeEach(() => {
@@ -51,14 +53,14 @@ describe('Button Accessibility and Styling', () => {
       await act(async () => {
         render(React.createElement(DashboardTabs, { statuses: testStatuses }));
       });
-      
+
       // Tab buttons should meet minimum size requirements
       const tabButtons = screen.getAllByRole('button');
-      tabButtons.forEach(button => {
+      tabButtons.forEach((button) => {
         const styles = window.getComputedStyle(button);
         const minHeight = parseInt(styles.minHeight) || parseInt(styles.height) || 44;
         const minWidth = parseInt(styles.minWidth) || parseInt(styles.width) || 44;
-        
+
         expect(minHeight).toBeGreaterThanOrEqual(44);
         expect(minWidth).toBeGreaterThanOrEqual(44);
       });
@@ -68,13 +70,13 @@ describe('Button Accessibility and Styling', () => {
       await act(async () => {
         render(React.createElement(APIDemo));
       });
-      
+
       const buttons = screen.getAllByRole('button');
-      buttons.forEach(button => {
+      buttons.forEach((button) => {
         const styles = window.getComputedStyle(button);
         const minHeight = parseInt(styles.minHeight) || parseInt(styles.height) || 44;
         const minWidth = parseInt(styles.minWidth) || parseInt(styles.width) || 44;
-        
+
         expect(minHeight).toBeGreaterThanOrEqual(44);
         expect(minWidth).toBeGreaterThanOrEqual(44);
       });
@@ -84,13 +86,13 @@ describe('Button Accessibility and Styling', () => {
       await act(async () => {
         render(React.createElement(CommentSection, { title: 'Test Comments' }));
       });
-      
+
       const buttons = screen.getAllByRole('button');
-      buttons.forEach(button => {
+      buttons.forEach((button) => {
         const styles = window.getComputedStyle(button);
         const minHeight = parseInt(styles.minHeight) || parseInt(styles.height) || 44;
         const minWidth = parseInt(styles.minWidth) || parseInt(styles.width) || 44;
-        
+
         expect(minHeight).toBeGreaterThanOrEqual(44);
         expect(minWidth).toBeGreaterThanOrEqual(44);
       });
@@ -102,14 +104,14 @@ describe('Button Accessibility and Styling', () => {
       await act(async () => {
         render(React.createElement(DashboardTabs, { statuses: testStatuses }));
       });
-      
+
       // Search for buttons that might be icon-only
       const buttons = screen.getAllByRole('button');
-      buttons.forEach(button => {
+      buttons.forEach((button) => {
         const hasText = button.textContent && button.textContent.trim().length > 0;
         const hasAriaLabel = button.getAttribute('aria-label');
         const hasAriaLabelledBy = button.getAttribute('aria-labelledby');
-        
+
         // Icon-only buttons should have aria-label or aria-labelledby
         if (!hasText) {
           expect(hasAriaLabel || hasAriaLabelledBy).toBeTruthy();
@@ -121,19 +123,19 @@ describe('Button Accessibility and Styling', () => {
       await act(async () => {
         render(React.createElement(DashboardTabs, { statuses: testStatuses }));
       });
-      
+
       const buttons = screen.getAllByRole('button');
-      buttons.forEach(button => {
+      buttons.forEach((button) => {
         // Focus the button
         act(() => {
           button.focus();
         });
-        
+
         const styles = window.getComputedStyle(button);
         // Should have visible focus indicator (outline or ring)
         const hasOutline = styles.outline !== 'none' && styles.outline !== '0px';
         const hasRing = styles.boxShadow.includes('ring') || styles.boxShadow.includes('focus');
-        
+
         expect(hasOutline || hasRing).toBeTruthy();
       });
     });
@@ -144,17 +146,17 @@ describe('Button Accessibility and Styling', () => {
       await act(async () => {
         render(React.createElement(CommentSection, { title: 'Test Comments' }));
       });
-      
+
       const buttons = screen.getAllByRole('button');
-      
+
       // At least one button should exist
       expect(buttons.length).toBeGreaterThan(0);
-      
+
       // Check for disabled styling if button is disabled
-      const disabledButtons = buttons.filter(button => button.hasAttribute('disabled'));
-      
+      const disabledButtons = buttons.filter((button) => button.hasAttribute('disabled'));
+
       if (disabledButtons.length > 0) {
-        disabledButtons.forEach(button => {
+        disabledButtons.forEach((button) => {
           const styles = window.getComputedStyle(button);
           // Disabled buttons should have either not-allowed or default cursor
           expect(['not-allowed', 'default'].includes(styles.cursor)).toBeTruthy();
@@ -163,7 +165,7 @@ describe('Button Accessibility and Styling', () => {
         });
       } else {
         // If no disabled buttons, test that enabled buttons have proper cursor
-        buttons.forEach(button => {
+        buttons.forEach((button) => {
           const styles = window.getComputedStyle(button);
           expect(styles.cursor).toBeDefined();
         });
@@ -175,22 +177,22 @@ describe('Button Accessibility and Styling', () => {
       await act(async () => {
         render(React.createElement(DashboardTabs, { statuses: testStatuses }));
       });
-      
+
       const dashboardButtons = screen.getAllByRole('button');
       expect(dashboardButtons.length).toBeGreaterThan(0);
-      
+
       // Clean up and test APIDemo buttons
       document.body.innerHTML = '';
-      
+
       await act(async () => {
         render(React.createElement(APIDemo));
       });
-      
+
       const apiButtons = screen.getAllByRole('button');
       expect(apiButtons.length).toBeGreaterThan(0);
-      
+
       // Validate that buttons have proper styling
-      apiButtons.forEach(button => {
+      apiButtons.forEach((button) => {
         const styles = window.getComputedStyle(button);
         expect(styles.borderRadius).toBeDefined();
         expect(styles.padding).toBeDefined();
@@ -203,18 +205,18 @@ describe('Button Accessibility and Styling', () => {
       await act(async () => {
         render(React.createElement(APIDemo));
       });
-      
+
       // Find buttons
       const buttons = screen.getAllByRole('button');
-      
-             buttons.forEach(button => {
-         // Button should be clickable when not loading
-         expect(button.hasAttribute('disabled')).toBe(false);
-         
-         // Should have proper loading state handling
-         expect(button.textContent).not.toContain('undefined');
-         expect(button.textContent).not.toBeNull();
-       });
+
+      buttons.forEach((button) => {
+        // Button should be clickable when not loading
+        expect(button.hasAttribute('disabled')).toBe(false);
+
+        // Should have proper loading state handling
+        expect(button.textContent).not.toContain('undefined');
+        expect(button.textContent).not.toBeNull();
+      });
     });
   });
-}); 
+});

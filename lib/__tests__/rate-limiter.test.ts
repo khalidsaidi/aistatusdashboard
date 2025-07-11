@@ -1,14 +1,19 @@
 /**
  * @jest-environment node
  */
-import { rateLimiter, getClientIdentifier, createRateLimitHeaders, RATE_LIMITS } from '../rate-limiter';
+import {
+  rateLimiter,
+  getClientIdentifier,
+  createRateLimitHeaders,
+  RATE_LIMITS,
+} from '../rate-limiter';
 
 // Polyfill Request for Node.js test environment
 if (typeof Request === 'undefined') {
   global.Request = class Request {
     url: string;
     headers: Headers;
-    
+
     constructor(input: string, init?: RequestInit) {
       this.url = input;
       this.headers = new Headers(init?.headers);
@@ -123,17 +128,17 @@ describe('Rate Limiter Module', () => {
     it('should have correct default rate limits', () => {
       expect(RATE_LIMITS.status).toEqual({
         windowMs: 60000,
-        maxRequests: 60
+        maxRequests: 60,
       });
-      
+
       expect(RATE_LIMITS.health).toEqual({
         windowMs: 60000,
-        maxRequests: 30
+        maxRequests: 30,
       });
-      
+
       expect(RATE_LIMITS.provider).toEqual({
         windowMs: 60000,
-        maxRequests: 120
+        maxRequests: 120,
       });
     });
 
@@ -141,8 +146,8 @@ describe('Rate Limiter Module', () => {
       expect(RATE_LIMITS).toHaveProperty('status');
       expect(RATE_LIMITS).toHaveProperty('health');
       expect(RATE_LIMITS).toHaveProperty('provider');
-      
-      Object.values(RATE_LIMITS).forEach(config => {
+
+      Object.values(RATE_LIMITS).forEach((config) => {
         expect(config).toHaveProperty('windowMs');
         expect(config).toHaveProperty('maxRequests');
         expect(typeof config.windowMs).toBe('number');
@@ -150,4 +155,4 @@ describe('Rate Limiter Module', () => {
       });
     });
   });
-}); 
+});

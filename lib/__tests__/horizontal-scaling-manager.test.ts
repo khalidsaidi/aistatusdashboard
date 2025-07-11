@@ -19,7 +19,7 @@ describe('HorizontalScalingManager', () => {
         authDomain: process.env.FIREBASE_AUTH_DOMAIN,
         storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
         messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-        appId: process.env.FIREBASE_APP_ID
+        appId: process.env.FIREBASE_APP_ID,
       });
     }
   });
@@ -33,9 +33,9 @@ describe('HorizontalScalingManager', () => {
       scaleDownThreshold: 2,
       scaleUpCooldown: 100, // Very short for testing
       scaleDownCooldown: 100, // Very short for testing
-      healthCheckInterval: 500 // Short for testing
+      healthCheckInterval: 500, // Short for testing
     };
-    
+
     scalingManager = new HorizontalScalingManager(testConfig);
   });
 
@@ -49,10 +49,10 @@ describe('HorizontalScalingManager', () => {
     it('should initialize with minimum workers', async () => {
       try {
         await scalingManager.initialize();
-        
+
         // Wait for initialization to complete
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         const metrics = await scalingManager.getScalingMetrics();
         expect(metrics.totalWorkers).toBeGreaterThanOrEqual(testConfig.minWorkers);
       } catch (error) {
@@ -66,18 +66,18 @@ describe('HorizontalScalingManager', () => {
     beforeEach(async () => {
       await scalingManager.initialize();
       // Wait for initialization to complete
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
     });
 
     it('should scale up successfully', async () => {
       const initialMetrics = await scalingManager.getScalingMetrics();
       const success = await scalingManager.scaleUp('test-scale-up');
-      
+
       expect(success).toBe(true);
-      
+
       // Wait for scaling to complete
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
       const newMetrics = await scalingManager.getScalingMetrics();
       expect(newMetrics.totalWorkers).toBeGreaterThan(initialMetrics.totalWorkers);
     }, 10000);
@@ -86,18 +86,18 @@ describe('HorizontalScalingManager', () => {
       try {
         // First scale up to have workers to scale down
         await scalingManager.scaleUp('prepare-for-scale-down');
-        
+
         // Wait for cooldown to pass
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
         const initialMetrics = await scalingManager.getScalingMetrics();
         const success = await scalingManager.scaleDown('test-scale-down');
-        
+
         expect(success).toBe(true);
-        
+
         // Wait for scaling to complete
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
         const newMetrics = await scalingManager.getScalingMetrics();
         expect(newMetrics.totalWorkers).toBeLessThan(initialMetrics.totalWorkers);
       } catch (error) {
@@ -111,12 +111,12 @@ describe('HorizontalScalingManager', () => {
       for (let i = 0; i < testConfig.maxWorkers + 2; i++) {
         await scalingManager.scaleUp(`test-max-${i}`);
         // Small delay to avoid cooldown issues
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise((resolve) => setTimeout(resolve, 50));
       }
-      
+
       // Wait for all scaling operations to complete
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       const metrics = await scalingManager.getScalingMetrics();
       expect(metrics.totalWorkers).toBeLessThanOrEqual(testConfig.maxWorkers);
     }, 15000);
@@ -127,12 +127,12 @@ describe('HorizontalScalingManager', () => {
         for (let i = 0; i < testConfig.minWorkers + 2; i++) {
           await scalingManager.scaleDown(`test-min-${i}`);
           // Small delay to avoid cooldown issues
-          await new Promise(resolve => setTimeout(resolve, 120));
+          await new Promise((resolve) => setTimeout(resolve, 120));
         }
-        
+
         // Wait for all scaling operations to complete
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         const metrics = await scalingManager.getScalingMetrics();
         expect(metrics.totalWorkers).toBeGreaterThanOrEqual(testConfig.minWorkers);
       } catch (error) {
@@ -145,14 +145,14 @@ describe('HorizontalScalingManager', () => {
       // Scale up once
       const firstResult = await scalingManager.scaleUp('first-scale-up');
       expect(firstResult).toBe(true);
-      
+
       // Try to scale up immediately (should fail due to cooldown)
       const secondResult = await scalingManager.scaleUp('second-scale-up');
       expect(secondResult).toBe(false);
-      
+
       // Wait for cooldown to pass
-      await new Promise(resolve => setTimeout(resolve, 150));
-      
+      await new Promise((resolve) => setTimeout(resolve, 150));
+
       // Should succeed after cooldown
       const thirdResult = await scalingManager.scaleUp('third-scale-up');
       expect(thirdResult).toBe(true);
@@ -162,12 +162,12 @@ describe('HorizontalScalingManager', () => {
   describe('Health Monitoring', () => {
     beforeEach(async () => {
       await scalingManager.initialize();
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
     });
 
     it('should provide system status', async () => {
       const status = await scalingManager.getSystemStatus();
-      
+
       expect(status).toHaveProperty('status');
       expect(status).toHaveProperty('details');
       expect(['healthy', 'degraded', 'critical']).toContain(status.status);
@@ -176,7 +176,7 @@ describe('HorizontalScalingManager', () => {
     it('should provide scaling metrics', async () => {
       try {
         const metrics = await scalingManager.getScalingMetrics();
-        
+
         expect(metrics).toHaveProperty('totalWorkers');
         expect(metrics).toHaveProperty('healthyWorkers');
         expect(metrics).toHaveProperty('totalConcurrency');
@@ -185,7 +185,7 @@ describe('HorizontalScalingManager', () => {
         expect(metrics).toHaveProperty('avgResponseTime');
         expect(metrics).toHaveProperty('errorRate');
         expect(metrics).toHaveProperty('lastScalingAction');
-        
+
         expect(metrics.totalWorkers).toBeGreaterThanOrEqual(testConfig.minWorkers);
       } catch (error) {
         console.warn('Scaling metrics test skipped due to connectivity:', error);
@@ -197,16 +197,14 @@ describe('HorizontalScalingManager', () => {
   describe('Queue Integration', () => {
     beforeEach(async () => {
       await scalingManager.initialize();
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 200));
     });
 
     it('should queue single provider', async () => {
       try {
         const jobId = await Promise.race([
           scalingManager.queueSingleProvider('test-provider-1'),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Queue timeout')), 5000)
-          )
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Queue timeout')), 5000)),
         ]);
         expect(jobId).toBeDefined();
         expect(typeof jobId).toBe('string');
@@ -221,11 +219,11 @@ describe('HorizontalScalingManager', () => {
         const providerIds = ['test-provider-1', 'test-provider-2', 'test-provider-3'];
         const jobIds = await Promise.race([
           scalingManager.queueProviderBatch(providerIds),
-          new Promise((_, reject) => 
+          new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Batch queue timeout')), 6000)
-          )
+          ),
         ]);
-        
+
         expect(jobIds).toBeDefined();
         expect(Array.isArray(jobIds)).toBe(true);
         expect((jobIds as string[]).length).toBe(providerIds.length);
@@ -235,4 +233,4 @@ describe('HorizontalScalingManager', () => {
       }
     }, 8000);
   });
-}); 
+});

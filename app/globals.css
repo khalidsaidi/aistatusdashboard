@@ -62,7 +62,9 @@
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-feature-settings: "rlig" 1, "calt" 1;
+  font-feature-settings:
+    'rlig' 1,
+    'calt' 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -109,9 +111,10 @@ body {
 
 /* Loading states */
 .loading-skeleton {
-  background: linear-gradient(90deg, 
-    hsl(var(--muted)) 25%, 
-    hsl(var(--muted-foreground) / 0.1) 50%, 
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
     hsl(var(--muted)) 75%
   );
   background-size: 200% 100%;
@@ -135,16 +138,16 @@ body {
     box-shadow: none !important;
     text-shadow: none !important;
   }
-  
+
   a,
   a:visited {
     text-decoration: underline;
   }
-  
+
   a[href]:after {
-    content: " (" attr(href) ")";
+    content: ' (' attr(href) ')';
   }
-  
+
   .no-print {
     display: none !important;
   }
@@ -156,7 +159,7 @@ body {
     --border: 0 0% 0%;
     --ring: 0 0% 0%;
   }
-  
+
   .dark {
     --border: 0 0% 100%;
     --ring: 0 0% 100%;
@@ -215,16 +218,16 @@ body {
   .status-operational {
     @apply text-operational;
   }
-  
+
   .status-degraded {
     @apply text-degraded;
   }
-  
+
   .status-down {
     @apply text-down;
   }
-  
+
   .status-unknown {
     @apply text-unknown;
   }
-} 
+}

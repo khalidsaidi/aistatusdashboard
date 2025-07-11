@@ -35,7 +35,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
   const [loading, setLoading] = useState({
     email: false,
     webhook: false,
-    test: false
+    test: false,
   });
 
   const validateEmail = (email: string): boolean => {
@@ -53,15 +53,13 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
   };
 
   const toggleProvider = (providerId: string) => {
-    setSelectedProviders(prev => 
-      prev.includes(providerId) 
-        ? prev.filter(id => id !== providerId)
-        : [...prev, providerId]
+    setSelectedProviders((prev) =>
+      prev.includes(providerId) ? prev.filter((id) => id !== providerId) : [...prev, providerId]
     );
   };
 
   const selectAllProviders = () => {
-    setSelectedProviders(PROVIDERS.map(p => p.id));
+    setSelectedProviders(PROVIDERS.map((p) => p.id));
   };
 
   const clearAllProviders = () => {
@@ -79,7 +77,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
       return;
     }
 
-    setLoading(prev => ({ ...prev, email: true }));
+    setLoading((prev) => ({ ...prev, email: true }));
     setEmailMessage('');
 
     try {
@@ -87,7 +85,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
         fetch('/api/subscribeEmail', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, providers: selectedProviders })
+          body: JSON.stringify({ email, providers: selectedProviders }),
         })
       );
 
@@ -103,7 +101,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
     } catch (error) {
       setEmailMessage('Network error. Please try again.');
     } finally {
-      setLoading(prev => ({ ...prev, email: false }));
+      setLoading((prev) => ({ ...prev, email: false }));
     }
   };
 
@@ -113,7 +111,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
       return;
     }
 
-    setLoading(prev => ({ ...prev, email: true }));
+    setLoading((prev) => ({ ...prev, email: true }));
     setEmailMessage('');
 
     try {
@@ -121,7 +119,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
         fetch('/api/unsubscribeEmail', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
+          body: JSON.stringify({ email }),
         })
       );
 
@@ -136,7 +134,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
     } catch (error) {
       setEmailMessage('Network error. Please try again.');
     } finally {
-      setLoading(prev => ({ ...prev, email: false }));
+      setLoading((prev) => ({ ...prev, email: false }));
     }
   };
 
@@ -151,7 +149,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
       return;
     }
 
-    setLoading(prev => ({ ...prev, webhook: true }));
+    setLoading((prev) => ({ ...prev, webhook: true }));
     setWebhookMessage('');
 
     try {
@@ -159,7 +157,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
         fetch('/api/subscribeWebhook', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ webhookUrl, providers: selectedProviders })
+          body: JSON.stringify({ webhookUrl, providers: selectedProviders }),
         })
       );
 
@@ -175,7 +173,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
     } catch (error) {
       setWebhookMessage('Network error. Please try again.');
     } finally {
-      setLoading(prev => ({ ...prev, webhook: false }));
+      setLoading((prev) => ({ ...prev, webhook: false }));
     }
   };
 
@@ -185,7 +183,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
       return;
     }
 
-    setLoading(prev => ({ ...prev, test: true }));
+    setLoading((prev) => ({ ...prev, test: true }));
     setTestMessage('');
 
     try {
@@ -193,7 +191,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
         fetch('/api/sendTestNotification', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: testEmail, type: 'status' })
+          body: JSON.stringify({ email: testEmail, type: 'status' }),
         })
       );
 
@@ -207,7 +205,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
     } catch (error) {
       setTestMessage('Network error. Please try again.');
     } finally {
-      setLoading(prev => ({ ...prev, test: false }));
+      setLoading((prev) => ({ ...prev, test: false }));
     }
   };
 
@@ -218,7 +216,8 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
           🔔 AI Status Dashboard Notifications
         </h2>
         <p className="text-gray-600 dark:text-gray-300">
-          Stay informed about AI service status changes across 15+ providers. Get instant alerts via email or webhooks.
+          Stay informed about AI service status changes across 15+ providers. Get instant alerts via
+          email or webhooks.
         </p>
       </div>
 
@@ -243,7 +242,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
             </button>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {PROVIDERS.map((provider) => (
             <button
@@ -273,10 +272,13 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
       </div>
 
       {/* Email Notifications */}
-      <form 
+      <form
         aria-label="Email notifications"
         className="space-y-4"
-        onSubmit={(e) => { e.preventDefault(); handleEmailSubscribe(); }}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleEmailSubscribe();
+        }}
       >
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
@@ -284,7 +286,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
           </h3>
           <div className="space-y-3">
             <div>
-              <label 
+              <label
                 htmlFor="email-input"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
@@ -303,7 +305,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
                 We&apos;ll send you notifications when service status changes
               </p>
             </div>
-            
+
             <div className="flex space-x-3">
               <button
                 type="submit"
@@ -312,7 +314,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
               >
                 {loading.email ? 'Subscribing...' : 'Subscribe'}
               </button>
-              
+
               <button
                 type="button"
                 onClick={handleEmailUnsubscribe}
@@ -322,13 +324,17 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
                 {loading.email ? 'Processing...' : 'Unsubscribe'}
               </button>
             </div>
-            
+
             {emailMessage && (
-              <div className={`p-3 rounded-md text-sm ${
-                emailMessage.toLowerCase().includes('error') || emailMessage.toLowerCase().includes('failed') || emailMessage.toLowerCase().includes('already')
-                  ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
-                  : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-              }`}>
+              <div
+                className={`p-3 rounded-md text-sm ${
+                  emailMessage.toLowerCase().includes('error') ||
+                  emailMessage.toLowerCase().includes('failed') ||
+                  emailMessage.toLowerCase().includes('already')
+                    ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
+                    : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+                }`}
+              >
                 {emailMessage}
               </div>
             )}
@@ -337,10 +343,13 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
       </form>
 
       {/* Webhook Notifications */}
-      <form 
+      <form
         aria-label="Webhook notifications"
         className="space-y-4"
-        onSubmit={(e) => { e.preventDefault(); handleWebhookSubscribe(); }}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleWebhookSubscribe();
+        }}
       >
         <div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
@@ -348,7 +357,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
           </h3>
           <div className="space-y-3">
             <div>
-              <label 
+              <label
                 htmlFor="webhook-input"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
@@ -367,7 +376,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
                 We&apos;ll POST status change notifications to this URL
               </p>
             </div>
-            
+
             <button
               type="submit"
               disabled={loading.webhook}
@@ -375,13 +384,16 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
             >
               {loading.webhook ? 'Adding...' : 'Add Webhook'}
             </button>
-            
+
             {webhookMessage && (
-              <div className={`p-3 rounded-md text-sm ${
-                webhookMessage.toLowerCase().includes('error') || webhookMessage.toLowerCase().includes('failed')
-                  ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
-                  : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-              }`}>
+              <div
+                className={`p-3 rounded-md text-sm ${
+                  webhookMessage.toLowerCase().includes('error') ||
+                  webhookMessage.toLowerCase().includes('failed')
+                    ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
+                    : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+                }`}
+              >
                 {webhookMessage}
               </div>
             )}
@@ -398,10 +410,10 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
           <p className="text-sm text-gray-600 dark:text-gray-300">
             Send a test notification to verify your setup
           </p>
-          
+
           <div className="space-y-3">
             <div>
-              <label 
+              <label
                 htmlFor="test-email-input"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
@@ -416,7 +428,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
-            
+
             <button
               onClick={handleTestNotification}
               disabled={loading.test}
@@ -424,13 +436,16 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
             >
               {loading.test ? 'Sending...' : 'Send Test Notification'}
             </button>
-            
+
             {testMessage && (
-              <div className={`p-3 rounded-md text-sm ${
-                testMessage.toLowerCase().includes('error') || testMessage.toLowerCase().includes('failed')
-                  ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
-                  : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-              }`}>
+              <div
+                className={`p-3 rounded-md text-sm ${
+                  testMessage.toLowerCase().includes('error') ||
+                  testMessage.toLowerCase().includes('failed')
+                    ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
+                    : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+                }`}
+              >
                 {testMessage}
               </div>
             )}
@@ -439,4 +454,4 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
       </div>
     </div>
   );
-} 
+}

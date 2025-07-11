@@ -17,7 +17,7 @@ describe('Frontend Integration Testing - Actual Components', () => {
 
   beforeAll(async () => {
     browser = await chromium.launch({
-      headless: process.env.CI === 'true'
+      headless: process.env.CI === 'true',
     });
   });
 
@@ -27,12 +27,12 @@ describe('Frontend Integration Testing - Actual Components', () => {
 
   beforeEach(async () => {
     page = await browser.newPage();
-    
+
     // Capture console messages and errors
     const consoleLogs: string[] = [];
     const errors: string[] = [];
     const networkFailures: string[] = [];
-    
+
     page.on('console', (msg) => {
       consoleLogs.push(`${msg.type()}: ${msg.text()}`);
       if (msg.type() === 'error') {
@@ -63,15 +63,16 @@ describe('Frontend Integration Testing - Actual Components', () => {
       try {
         await page.goto(baseUrl, { timeout: 10000 });
         await page.waitForLoadState('networkidle', { timeout: 5000 });
-        
+
         const errors = (page as any).testData.errors;
-        const criticalErrors = errors.filter((error: string) => 
-          !error.includes('favicon') && 
-          !error.includes('manifest') &&
-          !error.includes('sw.js') &&
-          !error.includes('404') // Allow 404s for optional resources
+        const criticalErrors = errors.filter(
+          (error: string) =>
+            !error.includes('favicon') &&
+            !error.includes('manifest') &&
+            !error.includes('sw.js') &&
+            !error.includes('404') // Allow 404s for optional resources
         );
-        
+
         expect(criticalErrors).toHaveLength(0);
       } catch (error) {
         console.warn('Page load failed, likely no dev server running:', error);
@@ -86,12 +87,12 @@ describe('Frontend Integration Testing - Actual Components', () => {
         await page.waitForLoadState('networkidle', { timeout: 5000 });
 
         // Check for basic Next.js structure
-        const hasHtml = await page.locator('html').count() > 0;
-        const hasBody = await page.locator('body').count() > 0;
-        const hasNextScript = await page.locator('script[src*="_next"]').count() > 0;
-        
+        const hasHtml = (await page.locator('html').count()) > 0;
+        const hasBody = (await page.locator('body').count()) > 0;
+        const hasNextScript = (await page.locator('script[src*="_next"]').count()) > 0;
+
         expect(hasHtml && hasBody).toBe(true);
-        
+
         // Next.js should inject its scripts
         if (hasNextScript) {
           console.log('Next.js scripts detected');
@@ -108,9 +109,9 @@ describe('Frontend Integration Testing - Actual Components', () => {
         await page.waitForLoadState('networkidle', { timeout: 5000 });
 
         // Check for stylesheets
-        const hasStylesheets = await page.locator('link[rel="stylesheet"]').count() > 0;
-        const hasInlineStyles = await page.locator('style').count() > 0;
-        
+        const hasStylesheets = (await page.locator('link[rel="stylesheet"]').count()) > 0;
+        const hasInlineStyles = (await page.locator('style').count()) > 0;
+
         // Should have some form of styling
         expect(hasStylesheets || hasInlineStyles).toBe(true);
       } catch (error) {
@@ -135,18 +136,18 @@ describe('Frontend Integration Testing - Actual Components', () => {
               filename: 'test.js',
               lineno: 1,
               colno: 1,
-              error: new Error('Test error for error boundary')
+              error: new Error('Test error for error boundary'),
             });
             window.dispatchEvent(event);
           }, 100);
         });
 
         await page.waitForTimeout(1000);
-        
+
         // Page should still be functional after error
         const isPageResponsive = await page.locator('body').isVisible();
         expect(isPageResponsive).toBe(true);
-        
+
         console.log('Error boundary test completed');
       } catch (error) {
         console.warn('Error boundary test failed, likely no dev server running:', error);
@@ -161,16 +162,18 @@ describe('Frontend Integration Testing - Actual Components', () => {
 
         // Check if error boundary component exists in DOM
         const hasErrorBoundary = await page.evaluate(() => {
-          return document.querySelector('[data-error-boundary]') !== null ||
-                 document.querySelector('.error-boundary') !== null ||
-                 document.body.innerHTML.includes('Error') ||
-                 document.body.innerHTML.includes('Something went wrong');
+          return (
+            document.querySelector('[data-error-boundary]') !== null ||
+            document.querySelector('.error-boundary') !== null ||
+            document.body.innerHTML.includes('Error') ||
+            document.body.innerHTML.includes('Something went wrong')
+          );
         });
 
         // Error boundary should either be present or page should be stable
         const isPageStable = await page.locator('html').isVisible();
         expect(isPageStable).toBe(true);
-        
+
         console.log('Error boundary UI test completed');
       } catch (error) {
         console.warn('Error boundary UI test failed, likely no dev server running:', error);
@@ -190,22 +193,21 @@ describe('Frontend Integration Testing - Actual Components', () => {
           return {
             hasNotificationAPI: 'Notification' in window,
             hasServiceWorker: 'serviceWorker' in navigator,
-            permission: (window as any).Notification?.permission || 'unsupported'
+            permission: (window as any).Notification?.permission || 'unsupported',
           };
         });
 
         console.log('Notification support:', notificationSupport);
-        
+
         // Application should handle all permission states gracefully
         if (notificationSupport.hasNotificationAPI) {
           expect(['default', 'granted', 'denied']).toContain(notificationSupport.permission);
         }
-        
+
         // Should not have notification-related errors
         const errors = (page as any).testData.errors;
-        const notificationErrors = errors.filter((error: string) => 
-          error.includes('notification') && 
-          !error.includes('favicon')
+        const notificationErrors = errors.filter(
+          (error: string) => error.includes('notification') && !error.includes('favicon')
         );
         expect(notificationErrors).toHaveLength(0);
       } catch (error) {
@@ -221,18 +223,19 @@ describe('Frontend Integration Testing - Actual Components', () => {
 
         // Wait for potential Firebase initialization
         await page.waitForTimeout(2000);
-        
+
         // Check for Firebase-related errors
         const errors = (page as any).testData.errors;
-        const firebaseErrors = errors.filter((error: string) => 
-          error.includes('Firebase') || 
-          error.includes('messaging') ||
-          error.includes('installations')
+        const firebaseErrors = errors.filter(
+          (error: string) =>
+            error.includes('Firebase') ||
+            error.includes('messaging') ||
+            error.includes('installations')
         );
-        
+
         // Firebase errors should be handled gracefully
         console.log('Firebase messaging test completed, errors:', firebaseErrors.length);
-        
+
         // Page should remain functional regardless of Firebase status
         const isPageFunctional = await page.locator('body').isVisible();
         expect(isPageFunctional).toBe(true);
@@ -253,7 +256,7 @@ describe('Frontend Integration Testing - Actual Components', () => {
         const hasContent = await page.locator('body').textContent();
         expect(hasContent).toBeDefined();
         expect(hasContent!.length).toBeGreaterThan(0);
-        
+
         console.log('Basic render test completed');
       } catch (error) {
         console.warn('Basic render test failed, likely no dev server running:', error);
@@ -267,26 +270,26 @@ describe('Frontend Integration Testing - Actual Components', () => {
         await page.setViewportSize({ width: 375, height: 667 });
         await page.goto(baseUrl, { timeout: 10000 });
         await page.waitForLoadState('networkidle', { timeout: 5000 });
-        
+
         // Should not have errors on mobile
         let errors = (page as any).testData.errors;
-        const mobileErrors = errors.filter((e: string) => 
-          !e.includes('favicon') && !e.includes('404')
+        const mobileErrors = errors.filter(
+          (e: string) => !e.includes('favicon') && !e.includes('404')
         );
         expect(mobileErrors).toHaveLength(0);
-        
+
         // Test desktop viewport
         await page.setViewportSize({ width: 1920, height: 1080 });
         await page.reload({ timeout: 10000 });
         await page.waitForLoadState('networkidle', { timeout: 5000 });
-        
+
         // Should not have errors on desktop
         errors = (page as any).testData.errors;
-        const desktopErrors = errors.filter((e: string) => 
-          !e.includes('favicon') && !e.includes('404')
+        const desktopErrors = errors.filter(
+          (e: string) => !e.includes('favicon') && !e.includes('404')
         );
         expect(desktopErrors).toHaveLength(0);
-        
+
         console.log('Responsive design test completed');
       } catch (error) {
         console.warn('Responsive test failed, likely no dev server running:', error);
@@ -300,10 +303,10 @@ describe('Frontend Integration Testing - Actual Components', () => {
         await page.goto(baseUrl, { timeout: 15000 });
         await page.waitForLoadState('networkidle', { timeout: 10000 });
         const end = performance.now();
-        
+
         // Should load within 15 seconds (generous for test environment)
         expect(end - start).toBeLessThan(15000);
-        
+
         console.log(`Page loaded in ${end - start}ms`);
       } catch (error) {
         console.warn('Performance test failed, likely no dev server running:', error);
@@ -319,15 +322,16 @@ describe('Frontend Integration Testing - Actual Components', () => {
         await page.waitForLoadState('networkidle', { timeout: 5000 });
 
         const networkFailures = (page as any).testData.networkFailures;
-        
+
         // Filter out acceptable 404s
-        const critical404s = networkFailures.filter((failure: string) => 
-          failure.includes('404') && 
-          !failure.includes('favicon') && 
-          !failure.includes('manifest') &&
-          !failure.includes('browserconfig') &&
-          !failure.includes('sw.js') &&
-          !failure.includes('robots.txt')
+        const critical404s = networkFailures.filter(
+          (failure: string) =>
+            failure.includes('404') &&
+            !failure.includes('favicon') &&
+            !failure.includes('manifest') &&
+            !failure.includes('browserconfig') &&
+            !failure.includes('sw.js') &&
+            !failure.includes('robots.txt')
         );
 
         // Should not have critical resource failures
@@ -346,9 +350,9 @@ describe('Frontend Integration Testing - Actual Components', () => {
 
         // Check if API calls are being made
         const networkFailures = (page as any).testData.networkFailures;
-        const apiFailures = networkFailures.filter((failure: string) => 
-          failure.includes('/api/') && 
-          (failure.includes('500') || failure.includes('404'))
+        const apiFailures = networkFailures.filter(
+          (failure: string) =>
+            failure.includes('/api/') && (failure.includes('500') || failure.includes('404'))
         );
 
         // API failures should not crash the application
@@ -363,4 +367,4 @@ describe('Frontend Integration Testing - Actual Components', () => {
       }
     }, 15000);
   });
-}); 
+});

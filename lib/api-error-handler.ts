@@ -1,6 +1,6 @@
 /**
  * COMPREHENSIVE API ERROR HANDLER
- * 
+ *
  * Provides centralized error handling for API routes with proper fallbacks,
  * retry mechanisms, and graceful degradation.
  */
@@ -50,7 +50,7 @@ export function withErrorHandler(
   return async (request: NextRequest): Promise<NextResponse> => {
     const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const startTime = Date.now();
-    
+
     try {
       // Set timeout if specified
       if (options.timeout) {
@@ -59,14 +59,13 @@ export function withErrorHandler(
             reject(new ApiError('Request timeout'));
           }, options.timeout);
         });
-        
+
         const handlerPromise = handler(request);
-        
+
         return await Promise.race([handlerPromise, timeoutPromise]);
       }
-      
+
       return await handler(request);
-      
     } catch (error) {
       return handleApiError(error, request, requestId, startTime, options);
     }
@@ -84,14 +83,14 @@ export function handleApiError(
   options: ApiHandlerOptions = {}
 ): NextResponse {
   const responseTime = Date.now() - startTime;
-  
+
   // Determine error details
   const apiError = normalizeError(error);
   const statusCode = apiError.statusCode || 500;
-  
+
   // Log error
   logApiError(apiError, request, requestId, responseTime);
-  
+
   // Create error response
   const errorResponse: ErrorResponse = {
     error: getErrorType(statusCode),
@@ -100,25 +99,28 @@ export function handleApiError(
     timestamp: new Date().toISOString(),
     requestId,
     retryable: isRetryableError(apiError),
-    retryAfter: getRetryAfter(apiError, statusCode)
+    retryAfter: getRetryAfter(apiError, statusCode),
   };
-  
+
   // Add fallback response if available
   if (options.fallbackResponse && statusCode >= 500) {
-    return NextResponse.json({
-      ...errorResponse,
-      fallback: options.fallbackResponse,
-      message: 'Service temporarily unavailable, using cached data'
-    }, {
-      status: 200, // Return success with fallback
-      headers: {
-        'X-Error-Fallback': 'true',
-        'X-Request-Id': requestId,
-        'X-Response-Time': `${responseTime}ms`
+    return NextResponse.json(
+      {
+        ...errorResponse,
+        fallback: options.fallbackResponse,
+        message: 'Service temporarily unavailable, using cached data',
+      },
+      {
+        status: 200, // Return success with fallback
+        headers: {
+          'X-Error-Fallback': 'true',
+          'X-Request-Id': requestId,
+          'X-Response-Time': `${responseTime}ms`,
+        },
       }
-    });
+    );
   }
-  
+
   return NextResponse.json(errorResponse, {
     status: statusCode,
     headers: {
@@ -126,9 +128,9 @@ export function handleApiError(
       'X-Response-Time': `${responseTime}ms`,
       'X-Error-Type': getErrorType(statusCode),
       ...(errorResponse.retryAfter && {
-        'Retry-After': errorResponse.retryAfter.toString()
-      })
-    }
+        'Retry-After': errorResponse.retryAfter.toString(),
+      }),
+    },
   });
 }
 
@@ -139,11 +141,11 @@ function normalizeError(error: any): ApiError {
   if (error instanceof ApiError) {
     return error;
   }
-  
+
   if (error instanceof Error) {
     const apiError = new ApiError(error.message) as ApiError;
     apiError.stack = error.stack;
-    
+
     // Detect common error types
     if (error.message.includes('timeout')) {
       apiError.statusCode = 408;
@@ -170,10 +172,10 @@ function normalizeError(error: any): ApiError {
       apiError.code = 'INTERNAL_ERROR';
       apiError.retryable = true;
     }
-    
+
     return apiError;
   }
-  
+
   // Handle string errors
   if (typeof error === 'string') {
     const apiError = new ApiError(error) as ApiError;
@@ -182,7 +184,7 @@ function normalizeError(error: any): ApiError {
     apiError.retryable = true;
     return apiError;
   }
-  
+
   // Handle unknown error types
   const apiError = new ApiError('Unknown error occurred') as ApiError;
   apiError.statusCode = 500;
@@ -200,12 +202,12 @@ function getErrorMessage(error: ApiError, statusCode: number): string {
   if (process.env.NODE_ENV === 'production' && statusCode >= 500) {
     return 'Internal server error. Please try again later.';
   }
-  
+
   // Return specific error message for client errors
   if (statusCode >= 400 && statusCode < 500) {
     return error.message || 'Bad request';
   }
-  
+
   return error.message || 'An unexpected error occurred';
 }
 
@@ -230,19 +232,19 @@ function isRetryableError(error: ApiError): boolean {
   if (error.retryable !== undefined) {
     return error.retryable;
   }
-  
+
   const statusCode = error.statusCode || 500;
-  
+
   // Retryable status codes
   if ([408, 429, 500, 502, 503, 504].includes(statusCode)) {
     return true;
   }
-  
+
   // Non-retryable client errors
   if (statusCode >= 400 && statusCode < 500) {
     return false;
   }
-  
+
   return true; // Default to retryable for server errors
 }
 
@@ -253,7 +255,7 @@ function getRetryAfter(error: ApiError, statusCode: number): number | undefined 
   if (!isRetryableError(error)) {
     return undefined;
   }
-  
+
   switch (statusCode) {
     case 429: // Rate limited
       return 60; // 1 minute
@@ -286,11 +288,11 @@ function logApiError(
     responseTime,
     timestamp: new Date().toISOString(),
     userAgent: request.headers.get('user-agent'),
-    ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
+    ip: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
   };
-  
+
   const statusCode = error.statusCode || 500;
-  
+
   if (statusCode >= 500) {
     console.error('🚨 API ERROR (5xx):', logData);
     if (error.stack) {
@@ -327,50 +329,45 @@ export function createApiError(
  * Common error creators
  */
 export const ApiErrors = {
-  badRequest: (message: string = 'Bad request') => 
+  badRequest: (message: string = 'Bad request') =>
     createApiError(message, 400, 'BAD_REQUEST', false),
-  
-  unauthorized: (message: string = 'Unauthorized') => 
+
+  unauthorized: (message: string = 'Unauthorized') =>
     createApiError(message, 401, 'UNAUTHORIZED', false),
-  
-  forbidden: (message: string = 'Forbidden') => 
-    createApiError(message, 403, 'FORBIDDEN', false),
-  
-  notFound: (message: string = 'Not found') => 
-    createApiError(message, 404, 'NOT_FOUND', false),
-  
-  methodNotAllowed: (message: string = 'Method not allowed') => 
+
+  forbidden: (message: string = 'Forbidden') => createApiError(message, 403, 'FORBIDDEN', false),
+
+  notFound: (message: string = 'Not found') => createApiError(message, 404, 'NOT_FOUND', false),
+
+  methodNotAllowed: (message: string = 'Method not allowed') =>
     createApiError(message, 405, 'METHOD_NOT_ALLOWED', false),
-  
-  timeout: (message: string = 'Request timeout') => 
-    createApiError(message, 408, 'TIMEOUT', true),
-  
-  rateLimited: (message: string = 'Rate limit exceeded') => 
+
+  timeout: (message: string = 'Request timeout') => createApiError(message, 408, 'TIMEOUT', true),
+
+  rateLimited: (message: string = 'Rate limit exceeded') =>
     createApiError(message, 429, 'RATE_LIMITED', true),
-  
-  internalError: (message: string = 'Internal server error') => 
+
+  internalError: (message: string = 'Internal server error') =>
     createApiError(message, 500, 'INTERNAL_ERROR', true),
-  
-  badGateway: (message: string = 'Bad gateway') => 
+
+  badGateway: (message: string = 'Bad gateway') =>
     createApiError(message, 502, 'BAD_GATEWAY', true),
-  
-  serviceUnavailable: (message: string = 'Service unavailable') => 
+
+  serviceUnavailable: (message: string = 'Service unavailable') =>
     createApiError(message, 503, 'SERVICE_UNAVAILABLE', true),
-  
-  gatewayTimeout: (message: string = 'Gateway timeout') => 
-    createApiError(message, 504, 'GATEWAY_TIMEOUT', true)
+
+  gatewayTimeout: (message: string = 'Gateway timeout') =>
+    createApiError(message, 504, 'GATEWAY_TIMEOUT', true),
 };
 
 /**
  * Async error handler wrapper for API routes
  */
-export function asyncHandler(
-  fn: (request: NextRequest) => Promise<NextResponse>
-) {
+export function asyncHandler(fn: (request: NextRequest) => Promise<NextResponse>) {
   return (request: NextRequest): Promise<NextResponse> => {
     return Promise.resolve(fn(request)).catch((error) => {
       const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       return handleApiError(error, request, requestId, Date.now());
     });
   };
-} 
+}

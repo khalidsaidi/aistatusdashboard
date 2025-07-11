@@ -11,10 +11,10 @@ export function middleware(request: NextRequest) {
         'Content-Type': 'text/html',
         'Cache-Control': 'public, max-age=60',
         'X-Response-Time': '1ms',
-        'X-Optimized': 'head-request'
-      }
+        'X-Optimized': 'head-request',
+      },
     });
-    
+
     return response;
   }
 
@@ -32,4 +32,4 @@ export const config = {
      */
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
-}; 
+};

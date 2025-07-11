@@ -22,7 +22,7 @@ let messaging: Messaging | null = null;
 if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
   try {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-    
+
     // Initialize messaging only on client side with proper browser detection
     if ('navigator' in window && 'serviceWorker' in navigator) {
       messaging = getMessaging(app);
@@ -62,24 +62,32 @@ export async function requestNotificationPermission(): Promise<string | null> {
     return null;
   }
 
-  if (!vapidKey || vapidKey === 'your-dev-vapid-public-key' || vapidKey === 'your-prod-vapid-public-key') {
+  if (
+    !vapidKey ||
+    vapidKey === 'your-dev-vapid-public-key' ||
+    vapidKey === 'your-prod-vapid-public-key'
+  ) {
     const env = process.env.NODE_ENV || 'development';
-    console.error(`VAPID key not configured for ${env} environment. Please set NEXT_PUBLIC_FCM_VAPID_KEY in your .env.${env === 'production' ? 'production' : 'local'} file.`);
-    throw new Error(`VAPID key not configured for ${env} environment. Please check your environment variables.`);
+    console.error(
+      `VAPID key not configured for ${env} environment. Please set NEXT_PUBLIC_FCM_VAPID_KEY in your .env.${env === 'production' ? 'production' : 'local'} file.`
+    );
+    throw new Error(
+      `VAPID key not configured for ${env} environment. Please check your environment variables.`
+    );
   }
 
   try {
     // Request permission
     const permission = await Notification.requestPermission();
-    
+
     if (permission === 'granted') {
       console.log('Notification permission granted');
-      
+
       // Get FCM token
       const token = await getToken(messaging, {
-        vapidKey: vapidKey
+        vapidKey: vapidKey,
       });
-      
+
       if (token) {
         console.log('FCM token received:', token);
         return token;
@@ -120,7 +128,7 @@ export function getNotificationPermission(): NotificationPermission {
 export async function subscribeToPushNotifications(providers: string[]): Promise<boolean> {
   try {
     const token = await requestNotificationPermission();
-    
+
     if (!token) {
       return false;
     }
@@ -158,7 +166,7 @@ export async function subscribeToPushNotifications(providers: string[]): Promise
 export async function unsubscribeFromPushNotifications(): Promise<boolean> {
   try {
     const token = await requestNotificationPermission();
-    
+
     if (!token) {
       return false;
     }
@@ -209,7 +217,7 @@ export async function registerServiceWorker(): Promise<boolean> {
     });
 
     console.log('Service worker registered:', registration);
-    
+
     // Send Firebase config to service worker (environment-aware)
     const config = {
       apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -219,13 +227,13 @@ export async function registerServiceWorker(): Promise<boolean> {
       messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
       appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     };
-    
+
     // Send config to service worker
     registration.active?.postMessage({
       type: 'FIREBASE_CONFIG',
-      config: config
+      config: config,
     });
-    
+
     return true;
   } catch (error) {
     console.error('Service worker registration failed:', error);
@@ -261,7 +269,7 @@ export async function initializePushNotifications(): Promise<boolean> {
   try {
     // Register service worker
     const swRegistered = await registerServiceWorker();
-    
+
     if (!swRegistered) {
       return false;
     }
@@ -277,4 +285,4 @@ export async function initializePushNotifications(): Promise<boolean> {
     console.error('Error initializing push notifications:', error);
     return false;
   }
-} 
+}

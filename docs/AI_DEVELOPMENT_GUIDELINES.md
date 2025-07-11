@@ -7,6 +7,7 @@ This document defines the systematic approach for AI-assisted development to ens
 ## 📁 1. Explicit File Structure
 
 ### Project Structure (Next.js App Router)
+
 ```
 aistatusdashboard/
 ├── app/                    # Next.js App Router
@@ -35,12 +36,12 @@ aistatusdashboard/
 ```typescript
 // GOOD: Explicit, validated interface
 export interface ProviderStatus {
-  id: string;           // MUST be non-empty string
-  name: string;         // MUST be non-empty string  
+  id: string; // MUST be non-empty string
+  name: string; // MUST be non-empty string
   status: 'operational' | 'degraded' | 'down' | 'unknown'; // MUST be one of these
   responseTime: number; // MUST be >= 0
-  lastChecked: string;  // MUST be ISO 8601 string
-  error?: string;       // Optional error message
+  lastChecked: string; // MUST be ISO 8601 string
+  error?: string; // Optional error message
 }
 
 // BAD: Implicit typing
@@ -58,18 +59,18 @@ const status = await fetchStatus(); // What type is this?
 describe('fetchProviderStatus', () => {
   test('should return operational status for OpenAI', async () => {
     const mockResponse = {
-      status: { indicator: 'none', description: 'All Systems Operational' }
+      status: { indicator: 'none', description: 'All Systems Operational' },
     };
-    
+
     const result = await fetchProviderStatus(OPENAI_PROVIDER);
-    
+
     expect(result).toEqual({
       id: 'openai',
       name: 'OpenAI',
       status: 'operational',
       responseTime: expect.any(Number),
       lastChecked: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
-      error: undefined
+      error: undefined,
     });
   });
 });
@@ -91,13 +92,17 @@ test('should work', () => {
 export function parseStatusPageResponse(data: StatusPageResponse): ProviderStatus {
   // MUST return one of: 'operational' | 'degraded' | 'down' | 'unknown'
   const indicator = data.status?.indicator || 'unknown';
-  
+
   switch (indicator) {
-    case 'none': return 'operational';
-    case 'minor': return 'degraded';
+    case 'none':
+      return 'operational';
+    case 'minor':
+      return 'degraded';
     case 'major':
-    case 'critical': return 'down';
-    default: return 'unknown';
+    case 'critical':
+      return 'down';
+    default:
+      return 'unknown';
   }
 }
 
@@ -127,11 +132,11 @@ export function validateProvider(provider: unknown): Provider {
       'Provider must be an object with { id: string, name: string, statusUrl: string, statusPageUrl: string }'
     );
   }
-  
+
   if (!provider.id || typeof provider.id !== 'string') {
     throw new Error('Provider.id must be a non-empty string');
   }
-  
+
   // ... more validation
   return provider as Provider;
 }
@@ -147,7 +152,7 @@ if (!provider) throw new Error('Invalid provider');
 ### Implementation Order (MUST follow this sequence):
 
 1. **Types** (`lib/types.ts`) - Define all interfaces
-2. **Config** (`config/`) - JSON configuration files  
+2. **Config** (`config/`) - JSON configuration files
 3. **Utilities** (`lib/utils/`) - Single-purpose functions
 4. **Providers** (`lib/providers/`) - Provider-specific logic
 5. **API** (`app/api/`) - API endpoints
@@ -170,7 +175,7 @@ export const ProviderStatusSchema = z.object({
   status: z.enum(['operational', 'degraded', 'down', 'unknown']),
   responseTime: z.number().min(0, 'Response time must be non-negative'),
   lastChecked: z.string().datetime('Must be valid ISO 8601 date'),
-  error: z.string().optional()
+  error: z.string().optional(),
 });
 
 export type ProviderStatus = z.infer<typeof ProviderStatusSchema>;
@@ -203,7 +208,7 @@ export function StatusCard({ provider, onRefresh }: StatusCardProps) {
       throw new Error(`StatusCard received invalid provider: ${error.message}`);
     }
   }
-  
+
   // Component implementation...
 }
 ```
@@ -217,13 +222,13 @@ export function StatusCard({ provider, onRefresh }: StatusCardProps) {
 ```typescript
 /**
  * Fetches status for a single provider
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST return a ProviderStatus object
  * - MUST handle network timeouts (max 10 seconds)
  * - MUST never throw exceptions (return error in status)
  * - MUST set responseTime to actual measured time
- * 
+ *
  * @example
  * const result = await fetchProviderStatus({
  *   id: 'openai',
@@ -243,42 +248,49 @@ export async function fetchProviderStatus(provider: Provider): Promise<ProviderS
 ## ✅ 10. Success Criteria for Each Checkpoint
 
 ### Types Checkpoint
+
 - [ ] All interfaces defined in `lib/types.ts`
 - [ ] Zod schemas created for validation
 - [ ] No `any` types used
 - [ ] All types exported properly
 
-### Config Checkpoint  
+### Config Checkpoint
+
 - [ ] JSON configuration files created
 - [ ] Schema validation for config files
 - [ ] Environment variable mapping
 - [ ] Default values defined
 
 ### Utilities Checkpoint
+
 - [ ] Single-purpose functions only
 - [ ] Full test coverage
 - [ ] Error handling with descriptive messages
 - [ ] TypeScript strict mode compliance
 
 ### Providers Checkpoint
+
 - [ ] Provider-specific logic isolated
 - [ ] Consistent error handling
 - [ ] Timeout protection
 - [ ] Fallback mechanisms
 
 ### API Checkpoint
+
 - [ ] Rate limiting implemented
 - [ ] Input validation with Zod
 - [ ] Consistent response format
 - [ ] Error responses standardized
 
 ### Components Checkpoint
+
 - [ ] Props validation in development
 - [ ] Responsive design (mobile-friendly)
 - [ ] Accessibility compliance
 - [ ] Error boundaries
 
 ### Tests Checkpoint
+
 - [ ] Unit tests with exact mock data
 - [ ] Integration tests for API endpoints
 - [ ] E2E tests for critical paths
@@ -307,4 +319,4 @@ export async function fetchProviderStatus(provider: Provider): Promise<ProviderS
 
 ---
 
-**Ready to implement? Follow the checkpoints in order and verify each step!** 🚀 
+**Ready to implement? Follow the checkpoints in order and verify each step!** 🚀

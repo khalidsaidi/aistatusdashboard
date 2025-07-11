@@ -49,7 +49,7 @@ describe('Toast Error Detection System', () => {
     const toastErrors = global.testUtils.getToastErrors();
     const toastWarnings = global.testUtils.getToastWarnings();
     const applicationErrors = global.testUtils.getApplicationErrors();
-    
+
     expect(toastErrors).toHaveLength(0);
     expect(toastWarnings).toHaveLength(0);
     expect(applicationErrors).toHaveLength(0);
@@ -65,16 +65,16 @@ describe('Toast Error Detection System', () => {
   it('should simulate toast error detection', () => {
     // Simulate a toast error being detected
     global.toastErrors.push('Network Error: Unable to connect to server');
-    
+
     const toastErrors = global.testUtils.getToastErrors();
     expect(toastErrors).toHaveLength(1);
     expect(toastErrors[0]).toContain('Network Error');
-    
+
     // This should now throw since we have an error
     expect(() => {
       global.testUtils.expectNoToastErrors();
     }).toThrow('Expected no toast errors');
-    
+
     // Clean up for afterEach hook
     global.testUtils.resetToastTracking();
   });
@@ -82,7 +82,7 @@ describe('Toast Error Detection System', () => {
   it('should simulate toast warning detection', () => {
     // Simulate a toast warning being detected
     global.toastWarnings.push('Font Loading Error: Some fonts failed to load');
-    
+
     const toastWarnings = global.testUtils.getToastWarnings();
     expect(toastWarnings).toHaveLength(1);
     expect(toastWarnings[0]).toContain('Font Loading Error');
@@ -91,17 +91,17 @@ describe('Toast Error Detection System', () => {
   it('should validate expected toast error detection', () => {
     // Simulate a specific error
     global.toastErrors.push('API Error: Service temporarily unavailable');
-    
+
     // This should not throw since we expect this error
     expect(() => {
       global.testUtils.expectToastError('Service temporarily unavailable');
     }).not.toThrow();
-    
+
     // This should throw since we don't have this error
     expect(() => {
       global.testUtils.expectToastError('Database connection failed');
     }).toThrow('Expected toast error containing');
-    
+
     // Clean up for afterEach hook
     global.testUtils.resetToastTracking();
   });
@@ -111,18 +111,18 @@ describe('Toast Error Detection System', () => {
     global.toastErrors.push('Test error');
     global.toastWarnings.push('Test warning');
     global.applicationErrors.push('Test app error');
-    
+
     // Verify they exist
     expect(global.toastErrors).toHaveLength(1);
     expect(global.toastWarnings).toHaveLength(1);
     expect(global.applicationErrors).toHaveLength(1);
-    
+
     // Reset tracking
     global.testUtils.resetToastTracking();
-    
+
     // Verify they're cleared
     expect(global.toastErrors).toHaveLength(0);
     expect(global.toastWarnings).toHaveLength(0);
     expect(global.applicationErrors).toHaveLength(0);
   });
-}); 
+});

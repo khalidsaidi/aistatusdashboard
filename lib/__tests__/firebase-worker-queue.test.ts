@@ -20,7 +20,7 @@ describe('FirebaseWorkerQueue', () => {
         authDomain: process.env.FIREBASE_AUTH_DOMAIN,
         storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
         messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-        appId: process.env.FIREBASE_APP_ID
+        appId: process.env.FIREBASE_APP_ID,
       });
     }
   });
@@ -36,9 +36,9 @@ describe('FirebaseWorkerQueue', () => {
       maxQueueSize: 100, // Smaller queue for tests
       rateLimitPerSecond: 10, // Lower rate limit
       circuitBreakerThreshold: 3,
-      circuitBreakerTimeout: 5000 // Shorter timeout
+      circuitBreakerTimeout: 5000, // Shorter timeout
     };
-    
+
     queue = new FirebaseWorkerQueue(testConfig);
   });
 
@@ -47,7 +47,7 @@ describe('FirebaseWorkerQueue', () => {
       try {
         await Promise.race([
           queue.shutdown(false),
-          new Promise(resolve => setTimeout(resolve, 2000)) // Max 2 seconds for shutdown
+          new Promise((resolve) => setTimeout(resolve, 2000)), // Max 2 seconds for shutdown
         ]);
       } catch (error) {
         console.warn('Queue shutdown timeout, continuing...');
@@ -66,9 +66,9 @@ describe('FirebaseWorkerQueue', () => {
       try {
         await Promise.race([
           queue.initialize(),
-          new Promise((_, reject) => 
+          new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Initialization timeout')), 5000)
-          )
+          ),
         ]);
         expect(true).toBe(true);
       } catch (error) {
@@ -84,9 +84,7 @@ describe('FirebaseWorkerQueue', () => {
       try {
         await Promise.race([
           queue.initialize(),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Init timeout')), 3000)
-          )
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Init timeout')), 3000)),
         ]);
       } catch (error) {
         console.warn('Queue initialization failed, tests will be skipped');
@@ -97,20 +95,19 @@ describe('FirebaseWorkerQueue', () => {
       try {
         const jobId = await Promise.race([
           queue.queueProvider('test-provider-1', 5, { source: 'test' }),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Queue timeout')), 3000)
-          )
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Queue timeout')), 3000)),
         ]);
-        
+
         expect(jobId).toBeDefined();
         expect(typeof jobId).toBe('string');
       } catch (error) {
-        if (error instanceof Error && (
-          error.message.includes('timeout') ||
-          error.message.includes('Backend didn\'t respond') ||
-          error.message.includes('DEADLINE_EXCEEDED') ||
-          error.message.includes('UNAVAILABLE')
-        )) {
+        if (
+          error instanceof Error &&
+          (error.message.includes('timeout') ||
+            error.message.includes("Backend didn't respond") ||
+            error.message.includes('DEADLINE_EXCEEDED') ||
+            error.message.includes('UNAVAILABLE'))
+        ) {
           console.warn('Skipping test due to Firebase connectivity:', error.message);
           expect(true).toBe(true);
         } else {
@@ -125,20 +122,19 @@ describe('FirebaseWorkerQueue', () => {
         const providerIds = ['provider-1', 'provider-2', 'provider-3'];
         const jobIds = await Promise.race([
           queue.queueBatch(providerIds, 'test-batch', 3),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Batch timeout')), 4000)
-          )
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Batch timeout')), 4000)),
         ]);
-        
+
         expect(jobIds).toHaveLength(3);
         expect((jobIds as string[]).every((id: string) => typeof id === 'string')).toBe(true);
       } catch (error) {
-        if (error instanceof Error && (
-          error.message.includes('timeout') ||
-          error.message.includes('Backend didn\'t respond') ||
-          error.message.includes('DEADLINE_EXCEEDED') ||
-          error.message.includes('UNAVAILABLE')
-        )) {
+        if (
+          error instanceof Error &&
+          (error.message.includes('timeout') ||
+            error.message.includes("Backend didn't respond") ||
+            error.message.includes('DEADLINE_EXCEEDED') ||
+            error.message.includes('UNAVAILABLE'))
+        ) {
           console.warn('Skipping batch test due to Firebase connectivity:', error.message);
           expect(true).toBe(true);
         } else {
@@ -151,7 +147,7 @@ describe('FirebaseWorkerQueue', () => {
     it('should reject queuing when shutting down', async () => {
       try {
         await queue.pauseQueue();
-        
+
         await expect(queue.queueProvider('test-provider')).rejects.toThrow(
           'System is shutting down, cannot queue new jobs'
         );
@@ -168,9 +164,7 @@ describe('FirebaseWorkerQueue', () => {
       try {
         await Promise.race([
           queue.initialize(),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Init timeout')), 3000)
-          )
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Init timeout')), 3000)),
         ]);
       } catch (error) {
         console.warn('Queue initialization failed, worker tests will be skipped');
@@ -181,11 +175,11 @@ describe('FirebaseWorkerQueue', () => {
       try {
         await Promise.race([
           queue.addWorker('test-worker-1', 3),
-          new Promise((_, reject) => 
+          new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Add worker timeout')), 2000)
-          )
+          ),
         ]);
-        
+
         const metrics = await queue.getMetrics();
         expect(metrics.workers).toBeGreaterThan(0);
       } catch (error) {
@@ -198,18 +192,18 @@ describe('FirebaseWorkerQueue', () => {
       try {
         await Promise.race([
           queue.addWorker('test-worker-2', 2),
-          new Promise((_, reject) => 
+          new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Add worker timeout')), 2000)
-          )
+          ),
         ]);
-        
+
         await Promise.race([
           queue.removeWorker('test-worker-2'),
-          new Promise((_, reject) => 
+          new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Remove worker timeout')), 2000)
-          )
+          ),
         ]);
-        
+
         // Should not throw error
         expect(true).toBe(true);
       } catch (error) {
@@ -222,17 +216,17 @@ describe('FirebaseWorkerQueue', () => {
       try {
         await Promise.race([
           queue.addWorker('duplicate-worker', 1),
-          new Promise((_, reject) => 
+          new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Add worker timeout')), 2000)
-          )
+          ),
         ]);
-        
+
         await expect(
           Promise.race([
             queue.addWorker('duplicate-worker', 1),
-            new Promise((_, reject) => 
+            new Promise((_, reject) =>
               setTimeout(() => reject(new Error('Duplicate test timeout')), 2000)
-            )
+            ),
           ])
         ).rejects.toThrow();
       } catch (error) {
@@ -247,9 +241,7 @@ describe('FirebaseWorkerQueue', () => {
       try {
         await Promise.race([
           queue.initialize(),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Init timeout')), 3000)
-          )
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Init timeout')), 3000)),
         ]);
       } catch (error) {
         console.warn('Queue initialization failed, metrics tests will be skipped');
@@ -260,11 +252,9 @@ describe('FirebaseWorkerQueue', () => {
       try {
         const metrics = await Promise.race([
           queue.getMetrics(),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Metrics timeout')), 2000)
-          )
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Metrics timeout')), 2000)),
         ]);
-        
+
         expect(metrics).toHaveProperty('activeJobs');
         expect(metrics).toHaveProperty('waitingJobs');
         expect(metrics).toHaveProperty('completedJobs');
@@ -281,11 +271,9 @@ describe('FirebaseWorkerQueue', () => {
       try {
         const status = await Promise.race([
           queue.getQueueStatus(),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Status timeout')), 2000)
-          )
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Status timeout')), 2000)),
         ]);
-        
+
         expect(status).toHaveProperty('health');
         expect(status).toHaveProperty('details');
         expect(['healthy', 'degraded', 'critical']).toContain((status as any).health);
@@ -299,18 +287,14 @@ describe('FirebaseWorkerQueue', () => {
       try {
         await Promise.race([
           queue.pauseQueue(),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Pause timeout')), 2000)
-          )
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Pause timeout')), 2000)),
         ]);
-        
+
         await Promise.race([
           queue.resumeQueue(),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Resume timeout')), 2000)
-          )
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Resume timeout')), 2000)),
         ]);
-        
+
         // Should complete without errors
         expect(true).toBe(true);
       } catch (error) {
@@ -319,4 +303,4 @@ describe('FirebaseWorkerQueue', () => {
       }
     }, 5000);
   });
-}); 
+});

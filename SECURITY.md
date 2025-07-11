@@ -3,6 +3,7 @@
 ## Secret Management
 
 ### ❌ Never Commit These Files
+
 - `*.env` (except `.env.example`)
 - `service-account*.json`
 - `*firebase-adminsdk*.json`
@@ -11,6 +12,7 @@
 - Files in `secrets/` or `credentials/` directories
 
 ### ✅ Safe to Commit
+
 - `.env.example` files with placeholder values
 - Configuration templates with `your-value-here` placeholders
 - Public Firebase configuration (project IDs, etc.)
@@ -18,12 +20,14 @@
 ### 🛡️ Environment File Setup
 
 1. **Copy example files:**
+
    ```bash
    cp .env.example .env.local
    cp environments/production.env.example environments/production.env
    ```
 
 2. **Replace placeholder values:**
+
    ```bash
    # Replace 'your-api-key-here' with actual values
    FIREBASE_API_KEY=your-actual-api-key
@@ -51,6 +55,7 @@
 ### 🔍 GitHub Security Scanning
 
 Our repository uses:
+
 - **GitHub Secret Scanning** - Automatically detects exposed secrets
 - **TruffleHog** - Scans for secrets in CI/CD
 - **CodeQL** - Static analysis for security vulnerabilities
@@ -58,6 +63,7 @@ Our repository uses:
 ### 📧 Security Alerts
 
 When GitHub detects secrets:
+
 1. **Email alerts** are sent immediately
 2. **CI/CD pipeline fails** and blocks deployment
 3. **Security tab** shows detailed findings
@@ -66,6 +72,7 @@ When GitHub detects secrets:
 ### 🛠️ Local Development
 
 Use environment variables or local files:
+
 ```bash
 # Local development
 export FIREBASE_API_KEY="your-dev-key"
@@ -78,6 +85,7 @@ echo "FIREBASE_API_KEY=your-dev-key" >> .env.local
 ### 🏭 Production Deployment
 
 All production secrets are managed via:
+
 - **GitHub Secrets** for CI/CD
 - **Firebase Environment Config** for Cloud Functions
 - **Vercel/Hosting Environment Variables** for frontend
@@ -88,4 +96,4 @@ Never hardcode production credentials in source code.
 
 Email security issues to: `security@aistatusdashboard.com`
 
-Do not create public GitHub issues for security vulnerabilities. 
+Do not create public GitHub issues for security vulnerabilities.

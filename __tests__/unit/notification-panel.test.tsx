@@ -21,11 +21,11 @@ describe('Notification Panel - Real Dev Environment', () => {
       expect(true).toBe(true); // Test passes in test environment
       return;
     }
-    
+
     // Test notification-related environment variables in non-test environments
     expect(process.env.NEXT_PUBLIC_FIREBASE_API_KEY).toBeDefined();
     expect(process.env.NEXT_PUBLIC_VAPID_KEY).toBeDefined();
-    
+
     // Ensure these are real values, not placeholders
     expect(process.env.NEXT_PUBLIC_FIREBASE_API_KEY).not.toContain('your_');
     expect(process.env.NEXT_PUBLIC_VAPID_KEY).not.toBe('your_vapid_key_here');
@@ -34,11 +34,11 @@ describe('Notification Panel - Real Dev Environment', () => {
   it('should validate notification service worker setup', () => {
     const fs = require('fs');
     const path = require('path');
-    
+
     // Check if service worker file exists
     const swPath = path.join(process.cwd(), 'public', 'firebase-messaging-sw.js');
     expect(fs.existsSync(swPath)).toBe(true);
-    
+
     const swContent = fs.readFileSync(swPath, 'utf8');
     expect(swContent).toContain('firebase');
     expect(swContent).toContain('messaging');
@@ -48,11 +48,11 @@ describe('Notification Panel - Real Dev Environment', () => {
   it('should validate notification icon assets', () => {
     const fs = require('fs');
     const path = require('path');
-    
+
     // Check if notification icons exist
     const iconPath = path.join(process.cwd(), 'public', 'favicon.svg');
     expect(fs.existsSync(iconPath)).toBe(true);
-    
+
     const iconContent = fs.readFileSync(iconPath, 'utf8');
     expect(iconContent).toContain('<svg');
     expect(iconContent).toContain('</svg>');
@@ -64,12 +64,9 @@ describe('Notification Panel - Real Dev Environment', () => {
       expect(true).toBe(true);
       return;
     }
-    
+
     // Test that notification API endpoints exist
-    const endpoints = [
-      '/api/notifications',
-      '/api/incidents'
-    ];
+    const endpoints = ['/api/notifications', '/api/incidents'];
 
     for (const endpoint of endpoints) {
       try {
@@ -86,11 +83,11 @@ describe('Notification Panel - Real Dev Environment', () => {
   it('should validate notification component dependencies', () => {
     const fs = require('fs');
     const path = require('path');
-    
+
     // Check if Firebase messaging lib exists
     const fbPath = path.join(process.cwd(), 'lib', 'firebase-messaging.ts');
     expect(fs.existsSync(fbPath)).toBe(true);
-    
+
     const fbContent = fs.readFileSync(fbPath, 'utf8');
     expect(fbContent).toContain('firebase');
     expect(fbContent).toContain('messaging');
@@ -99,11 +96,11 @@ describe('Notification Panel - Real Dev Environment', () => {
   it('should validate notification component file structure', () => {
     const fs = require('fs');
     const path = require('path');
-    
+
     // Check if notification panel component exists
     const componentPath = path.join(process.cwd(), 'app', 'components', 'NotificationPanel.tsx');
     expect(fs.existsSync(componentPath)).toBe(true);
-    
+
     const componentContent = fs.readFileSync(componentPath, 'utf8');
     expect(componentContent).toContain('NotificationPanel');
     expect(componentContent).toContain('React');
@@ -115,20 +112,20 @@ describe('Notification Panel - Real Dev Environment', () => {
       expect(true).toBe(true);
       return;
     }
-    
+
     // Test all required environment variables in non-test environments
     const requiredEnvVars = [
       'NEXT_PUBLIC_FIREBASE_API_KEY',
       'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
       'NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID',
       'NEXT_PUBLIC_FIREBASE_APP_ID',
-      'NEXT_PUBLIC_VAPID_KEY'
+      'NEXT_PUBLIC_VAPID_KEY',
     ];
 
-    requiredEnvVars.forEach(envVar => {
+    requiredEnvVars.forEach((envVar) => {
       expect(process.env[envVar]).toBeDefined();
       expect(process.env[envVar]).not.toContain('your_');
       expect(process.env[envVar]).not.toContain('placeholder');
     });
   });
-}); 
+});

@@ -1,19 +1,19 @@
 /**
  * UNIFIED FIREBASE ADAPTER
- * 
+ *
  * Consolidates all Firebase initialization strategies into a single,
  * production-grade system that handles all environments and use cases.
  */
 
 import { initializeApp, getApps, FirebaseApp, deleteApp } from 'firebase/app';
-import { 
-  getFirestore, 
-  initializeFirestore, 
-  Firestore, 
+import {
+  getFirestore,
+  initializeFirestore,
+  Firestore,
   connectFirestoreEmulator,
   enableNetwork,
   disableNetwork,
-  terminate
+  terminate,
 } from 'firebase/firestore';
 import { getFunctions, Functions, connectFunctionsEmulator } from 'firebase/functions';
 import { getAuth, Auth } from 'firebase/auth';
@@ -49,7 +49,7 @@ export interface UnifiedFirebaseInstance {
 
 /**
  * Unified Firebase Adapter
- * 
+ *
  * CRITICAL FEATURES:
  * - Single source of truth for Firebase initialization
  * - Environment-aware configuration
@@ -111,7 +111,7 @@ export class UnifiedFirebaseAdapter {
         useRestOnlyMode: process.env.FIREBASE_REST_ONLY === 'true' || isWSL2, // Force REST in WSL2
         connectionTimeout: 10000,
         maxRetries: 3,
-        ...adapterConfig
+        ...adapterConfig,
       };
 
       // Suppress WebChannel warnings in WSL2 environments
@@ -121,9 +121,11 @@ export class UnifiedFirebaseAdapter {
         const originalConsoleWarn = console.warn;
         console.warn = (...args: any[]) => {
           const message = args.join(' ');
-          if (message.includes('WebChannelConnection') || 
-              message.includes('transport errored') ||
-              message.includes('WebChannel')) {
+          if (
+            message.includes('WebChannelConnection') ||
+            message.includes('transport errored') ||
+            message.includes('WebChannel')
+          ) {
             return; // Suppress WebChannel warnings
           }
           originalConsoleWarn.apply(console, args);
@@ -135,7 +137,8 @@ export class UnifiedFirebaseAdapter {
         optimizeForWSL2: finalAdapterConfig.optimizeForWSL2,
         useRestOnlyMode: finalAdapterConfig.useRestOnlyMode,
         projectId: config.projectId,
-        webChannelSuppressed: finalAdapterConfig.optimizeForWSL2 || finalAdapterConfig.useRestOnlyMode
+        webChannelSuppressed:
+          finalAdapterConfig.optimizeForWSL2 || finalAdapterConfig.useRestOnlyMode,
       });
 
       // Validate configuration
@@ -154,14 +157,14 @@ export class UnifiedFirebaseAdapter {
       let functions: Functions | null = null;
       try {
         functions = getFunctions(app);
-        
+
         if (finalAdapterConfig.enableEmulators && finalAdapterConfig.environment !== 'production') {
           connectFunctionsEmulator(functions, 'localhost', 5001);
           log('info', 'Connected to Functions emulator');
         }
       } catch (error) {
         log('warn', 'Functions initialization failed, continuing without Functions', {
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
 
@@ -175,7 +178,7 @@ export class UnifiedFirebaseAdapter {
         functions,
         auth,
         config,
-        adapterConfig: finalAdapterConfig
+        adapterConfig: finalAdapterConfig,
       };
 
       // Test connectivity
@@ -187,15 +190,14 @@ export class UnifiedFirebaseAdapter {
       log('info', 'Unified Firebase Adapter initialized successfully', {
         hasFirestore: !!db,
         hasFunctions: !!functions,
-        hasAuth: !!auth
+        hasAuth: !!auth,
       });
 
       return this.firebaseInstance;
-
     } catch (error) {
       this.initializationPromise = null;
       log('error', 'Failed to initialize Unified Firebase Adapter', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -213,36 +215,40 @@ export class UnifiedFirebaseAdapter {
     };
 
     // Environment-specific optimizations
-    if (adapterConfig.environment === 'test' || adapterConfig.optimizeForWSL2 || adapterConfig.useRestOnlyMode) {
+    if (
+      adapterConfig.environment === 'test' ||
+      adapterConfig.optimizeForWSL2 ||
+      adapterConfig.useRestOnlyMode
+    ) {
       // Test/WSL2/REST-only optimizations - Force REST transport to avoid WebChannel issues
       settings.experimentalForceLongPolling = true;
       settings.experimentalAutoDetectLongPolling = false; // Don't auto-detect, force long polling
       settings.useFetchStreams = false;
       settings.localCache = { kind: 'memory' };
-      
+
       // Additional WSL2-specific settings to completely disable WebChannel
       if (adapterConfig.optimizeForWSL2) {
         settings.experimentalWebChannelTransport = false; // Disable WebChannel entirely
         settings.host = undefined; // Use default host
         settings.port = undefined; // Use default port
       }
-      
+
       log('info', 'Applied REST-only Firestore optimizations (no WebChannel)', {
         forceLongPolling: true,
         autoDetect: false,
         useFetchStreams: false,
-        webChannelDisabled: adapterConfig.optimizeForWSL2
+        webChannelDisabled: adapterConfig.optimizeForWSL2,
       });
     } else if (adapterConfig.environment === 'production') {
       // Production optimizations
       settings.localCache = { kind: 'persistent' };
       settings.experimentalForceLongPolling = false;
-      
+
       log('info', 'Applied production Firestore optimizations');
     } else {
       // Development optimizations
       settings.localCache = { kind: 'memory' };
-      
+
       log('info', 'Applied development Firestore optimizations');
     }
 
@@ -255,7 +261,7 @@ export class UnifiedFirebaseAdapter {
         log('info', 'Connected to Firestore emulator');
       } catch (error) {
         log('warn', 'Failed to connect to Firestore emulator', {
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }
@@ -274,19 +280,19 @@ export class UnifiedFirebaseAdapter {
   private async optimizeWSL2Network(db: Firestore): Promise<void> {
     try {
       log('info', 'Optimizing network for WSL2 environment');
-      
+
       // Force network reset cycles to establish stable connection
       for (let i = 0; i < 3; i++) {
         await disableNetwork(db);
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 200));
         await enableNetwork(db);
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
       }
-      
+
       log('info', 'WSL2 network optimization completed');
     } catch (error) {
       log('warn', 'WSL2 network optimization failed', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -308,7 +314,7 @@ export class UnifiedFirebaseAdapter {
       }
     } catch (error) {
       log('warn', 'Firebase connectivity test failed', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -353,8 +359,15 @@ export class UnifiedFirebaseAdapter {
    * Validate Firebase configuration
    */
   private validateConfig(config: FirebaseConfig, adapterConfig: FirebaseAdapterConfig): void {
-    const required = ['projectId', 'apiKey', 'authDomain', 'storageBucket', 'messagingSenderId', 'appId'];
-    
+    const required = [
+      'projectId',
+      'apiKey',
+      'authDomain',
+      'storageBucket',
+      'messagingSenderId',
+      'appId',
+    ];
+
     for (const field of required) {
       if (!config[field as keyof FirebaseConfig]) {
         throw new Error(`Missing required Firebase config field: ${field}`);
@@ -382,15 +395,13 @@ export class UnifiedFirebaseAdapter {
       const fs = require('fs');
       if (fs.existsSync('/proc/version')) {
         const version = fs.readFileSync('/proc/version', 'utf8');
-        return version.toLowerCase().includes('microsoft') || 
-               version.toLowerCase().includes('wsl');
+        return version.toLowerCase().includes('microsoft') || version.toLowerCase().includes('wsl');
       }
     } catch {
       // Ignore errors
     }
-    
-    return process.env.WSL_DISTRO_NAME !== undefined ||
-           process.env.WSLENV !== undefined;
+
+    return process.env.WSL_DISTRO_NAME !== undefined || process.env.WSLENV !== undefined;
   }
 
   /**
@@ -412,7 +423,7 @@ export class UnifiedFirebaseAdapter {
       log('info', 'Firebase cleanup completed');
     } catch (error) {
       log('warn', 'Firebase cleanup failed', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -425,17 +436,17 @@ export class UnifiedFirebaseAdapter {
       if (this.firebaseInstance) {
         // Terminate Firestore
         await terminate(this.firebaseInstance.db);
-        
+
         // Delete app
         await deleteApp(this.firebaseInstance.app);
       }
 
       await this.cleanup();
-      
+
       log('info', 'Unified Firebase Adapter shutdown completed');
     } catch (error) {
       log('error', 'Firebase shutdown failed', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -463,4 +474,4 @@ export function isFirebaseReady(): boolean {
 
 export async function shutdownUnifiedFirebase(): Promise<void> {
   return globalFirebaseAdapter.shutdown();
-} 
+}

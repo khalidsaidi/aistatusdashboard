@@ -9,7 +9,7 @@ import { render } from '@testing-library/react';
 // Component that would cause hydration error (before our fix)
 function HydrationErrorComponent() {
   const [mounted, setMounted] = React.useState(false);
-  
+
   React.useEffect(() => {
     setMounted(true);
   }, []);
@@ -20,17 +20,13 @@ function HydrationErrorComponent() {
   }
 
   // This would be different on server vs client
-  return (
-    <div>
-      Current time: {new Date().toLocaleTimeString()}
-    </div>
-  );
+  return <div>Current time: {new Date().toLocaleTimeString()}</div>;
 }
 
 // Component that accesses window without proper checks (causes hydration error)
 function BadHydrationComponent() {
   const [url, setUrl] = React.useState('');
-  
+
   React.useEffect(() => {
     // This would cause hydration error if accessed during SSR
     setUrl(window.location.href);
@@ -56,14 +52,14 @@ describe('Hydration Error Detection', () => {
     // The issue is that Jest/jsdom doesn't actually do server-side rendering
     // It only does client-side rendering, so hydration mismatches don't occur
     // in the test environment the same way they do in production Next.js
-    
+
     console.log('Test environment details:');
     console.log('- typeof window:', typeof window);
     console.log('- typeof document:', typeof document);
     console.log('- Environment:', process.env.NODE_ENV);
-    
+
     // In Jest, window is always available, so hydration mismatches are harder to detect
     expect(typeof window).toBe('object');
     expect(typeof document).toBe('object');
   });
-}); 
+});

@@ -8,4 +8,4 @@
     "TEMPLATES_COLLECTION": "email_templates",
     "TTL_SECONDS": "86400"
   }
-} 
+}

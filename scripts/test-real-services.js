@@ -11,17 +11,19 @@ const path = require('path');
 
 // Configuration
 const CONFIG = {
-  apiUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://us-central1-ai-status-dashboard-dev.cloudfunctions.net/api',
+  apiUrl:
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    'https://us-central1-ai-status-dashboard-dev.cloudfunctions.net/api',
   testEmail: process.env.TEST_EMAIL || 'hello@aistatusdashboard.com',
   timeout: 15000,
-  retries: 3
+  retries: 3,
 };
 
 // Test results tracking
 const results = {
   passed: 0,
   failed: 0,
-  tests: []
+  tests: [],
 };
 
 // Dynamic import for fetch
@@ -38,13 +40,13 @@ async function initializeFetch() {
         fetch = nodeFetch.default;
       } catch (error) {
         // Fallback to a simple mock for testing
-        fetch = async function(url, options = {}) {
+        fetch = async function (url, options = {}) {
           return {
             ok: false,
             status: 500,
             statusText: 'Fetch not available',
             json: async () => ({ error: 'Fetch not available in this environment' }),
-            text: async () => 'Fetch not available in this environment'
+            text: async () => 'Fetch not available in this environment',
           };
         };
       }
@@ -57,7 +59,6 @@ async function initializeFetch() {
 function log(message, type = 'info') {
   const timestamp = new Date().toISOString();
   const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
-  
 }
 
 function recordTest(name, passed, message = '') {
@@ -75,11 +76,11 @@ async function makeRequest(url, options = {}) {
   await initializeFetch();
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), CONFIG.timeout);
-  
+
   try {
     const response = await fetch(url, {
       ...options,
-      signal: controller.signal
+      signal: controller.signal,
     });
     clearTimeout(timeoutId);
     return response;
@@ -92,7 +93,7 @@ async function makeRequest(url, options = {}) {
 // Test functions
 async function testEmailService() {
   log('Testing Email Service...', 'info');
-  
+
   try {
     const response = await makeRequest(`${CONFIG.apiUrl}/api/send-email/`, {
       method: 'POST',
@@ -101,17 +102,21 @@ async function testEmailService() {
         to: CONFIG.testEmail,
         subject: 'AI Status Dashboard Test Email',
         text: 'This is a test email from the AI Status Dashboard real services testing.',
-        html: '<h1>Test Email</h1><p>This is a test email from the AI Status Dashboard real services testing.</p>'
-      })
+        html: '<h1>Test Email</h1><p>This is a test email from the AI Status Dashboard real services testing.</p>',
+      }),
     });
 
     const data = await response.json();
-    
+
     if (response.ok && data.success) {
       recordTest('Email Service', true, 'Test email sent successfully');
       return true;
     } else {
-      recordTest('Email Service', false, `API returned: ${data.error || data.details || 'Unknown error'}`);
+      recordTest(
+        'Email Service',
+        false,
+        `API returned: ${data.error || data.details || 'Unknown error'}`
+      );
       return false;
     }
   } catch (error) {
@@ -122,7 +127,7 @@ async function testEmailService() {
 
 async function testPushNotificationService() {
   log('Testing Push Notification Service...', 'info');
-  
+
   // Note: This requires a real FCM token, so we test the endpoint availability
   try {
     const response = await makeRequest(`${CONFIG.apiUrl}/api/notifications/`, {
@@ -133,17 +138,21 @@ async function testPushNotificationService() {
           endpoint: 'https://fcm.googleapis.com/fcm/send/test',
           keys: {
             p256dh: 'test-key',
-            auth: 'test-auth'
-          }
+            auth: 'test-auth',
+          },
         },
         title: 'Test Notification',
-        body: 'This is a test push notification'
-      })
+        body: 'This is a test push notification',
+      }),
     });
 
     // We expect this to fail gracefully with invalid subscription
     if (response.status === 400 || response.status === 500) {
-      recordTest('Push Notification Service', true, 'Endpoint accessible, invalid subscription handled correctly');
+      recordTest(
+        'Push Notification Service',
+        true,
+        'Endpoint accessible, invalid subscription handled correctly'
+      );
       return true;
     } else if (response.ok) {
       recordTest('Push Notification Service', true, 'Service working with valid subscription');
@@ -160,13 +169,13 @@ async function testPushNotificationService() {
 
 async function testProviderStatusAPI() {
   log('Testing Provider Status API...', 'info');
-  
+
   try {
     const response = await makeRequest(`${CONFIG.apiUrl}/api/status`);
-    
+
     if (response.ok) {
       const data = await response.json();
-      
+
       if (Array.isArray(data) && data.length > 0) {
         recordTest('Provider Status API', true, `Retrieved ${data.length} provider statuses`);
         return true;
@@ -186,7 +195,7 @@ async function testProviderStatusAPI() {
 
 async function testFirebaseIntegration() {
   log('Testing Firebase Integration...', 'info');
-  
+
   try {
     // Test Firebase messaging endpoint
     const response = await makeRequest(`${CONFIG.apiUrl}/api/firebase/`, {
@@ -196,13 +205,17 @@ async function testFirebaseIntegration() {
         token: 'test-firebase-token',
         title: 'Test Firebase Message',
         body: 'This is a test Firebase Cloud Messaging notification',
-        data: { test: 'true' }
-      })
+        data: { test: 'true' },
+      }),
     });
 
     if (response.status === 400 || response.status === 500 || response.status === 503) {
       // Expected errors due to invalid token or missing config
-      recordTest('Firebase Integration', true, 'Firebase endpoint accessible, handled invalid input correctly');
+      recordTest(
+        'Firebase Integration',
+        true,
+        'Firebase endpoint accessible, handled invalid input correctly'
+      );
       return true;
     } else if (response.ok) {
       recordTest('Firebase Integration', true, 'Firebase messaging working');
@@ -219,7 +232,7 @@ async function testFirebaseIntegration() {
 
 async function testWebhookIntegration() {
   log('Testing Webhook Integration...', 'info');
-  
+
   try {
     // Test webhook endpoint if it exists
     const response = await makeRequest(`${CONFIG.apiUrl}/api/webhook`, {
@@ -227,8 +240,8 @@ async function testWebhookIntegration() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         test: 'webhook-test',
-        message: 'Real service testing webhook'
-      })
+        message: 'Real service testing webhook',
+      }),
     });
 
     if (response.ok) {
@@ -249,14 +262,14 @@ async function testWebhookIntegration() {
 
 async function testProviderDiscovery() {
   log('Testing Provider Discovery...', 'info');
-  
+
   try {
     // Run provider discovery script
     const { spawn } = require('child_process');
-    
+
     return new Promise((resolve) => {
       const discovery = spawn('node', ['scripts/discover-ai-providers.js'], {
-        env: { ...process.env, ENABLE_REAL_EMAIL_SENDING: 'false' }
+        env: { ...process.env, ENABLE_REAL_EMAIL_SENDING: 'false' },
       });
 
       let output = '';
@@ -287,11 +300,11 @@ async function testProviderDiscovery() {
 
 async function testRealProviderAPIs() {
   log('Testing Real Provider APIs...', 'info');
-  
+
   const providers = [
     { name: 'OpenAI', url: 'https://status.openai.com/api/v2/status.json' },
     { name: 'Anthropic', url: 'https://status.anthropic.com/api/v2/summary.json' },
-    { name: 'HuggingFace', url: 'https://status.huggingface.co/api/v2/summary.json' }
+    { name: 'HuggingFace', url: 'https://status.huggingface.co/api/v2/summary.json' },
   ];
 
   let successCount = 0;
@@ -299,7 +312,7 @@ async function testRealProviderAPIs() {
   for (const provider of providers) {
     try {
       const response = await makeRequest(provider.url);
-      
+
       if (response.ok) {
         successCount++;
         log(`${provider.name} API: ✅ Accessible`, 'success');
@@ -312,7 +325,11 @@ async function testRealProviderAPIs() {
   }
 
   const allWorking = successCount === providers.length;
-  recordTest('Real Provider APIs', allWorking, `${successCount}/${providers.length} providers accessible`);
+  recordTest(
+    'Real Provider APIs',
+    allWorking,
+    `${successCount}/${providers.length} providers accessible`
+  );
   return allWorking;
 }
 
@@ -321,10 +338,6 @@ async function runAllTests() {
   log('🚀 Starting Real Services Testing...', 'info');
   log(`Base URL: ${CONFIG.apiUrl}`, 'info');
   log(`Test Email: ${CONFIG.testEmail}`, 'info');
-  
-  
-  
-  
 
   const tests = [
     { name: 'Email Service', fn: testEmailService },
@@ -333,44 +346,43 @@ async function runAllTests() {
     { name: 'Firebase Integration', fn: testFirebaseIntegration },
     { name: 'Webhook Integration', fn: testWebhookIntegration },
     { name: 'Provider Discovery', fn: testProviderDiscovery },
-    { name: 'Real Provider APIs', fn: testRealProviderAPIs }
+    { name: 'Real Provider APIs', fn: testRealProviderAPIs },
   ];
 
   for (const test of tests) {
     await test.fn();
-     // Add spacing between tests
+    // Add spacing between tests
   }
 
   // Generate test report
-  
-  
-  
-  
-  
-  
-  
 
   // Save detailed results
   const reportPath = path.join(__dirname, '../test-results-real-services.json');
-  fs.writeFileSync(reportPath, JSON.stringify({
-    summary: {
-      passed: results.passed,
-      failed: results.failed,
-      total: results.passed + results.failed,
-      successRate: (results.passed / (results.passed + results.failed)) * 100,
-      timestamp: new Date().toISOString(),
-      environment: 'staging',
-      baseUrl: CONFIG.apiUrl
-    },
-    tests: results.tests
-  }, null, 2));
+  fs.writeFileSync(
+    reportPath,
+    JSON.stringify(
+      {
+        summary: {
+          passed: results.passed,
+          failed: results.failed,
+          total: results.passed + results.failed,
+          successRate: (results.passed / (results.passed + results.failed)) * 100,
+          timestamp: new Date().toISOString(),
+          environment: 'staging',
+          baseUrl: CONFIG.apiUrl,
+        },
+        tests: results.tests,
+      },
+      null,
+      2
+    )
+  );
 
   log(`📄 Detailed results saved to: ${reportPath}`, 'info');
 
   // Exit with appropriate code
   const exitCode = results.failed > 0 ? 1 : 0;
-  
-  
+
   process.exit(exitCode);
 }
 
@@ -393,4 +405,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { runAllTests, testEmailService, testPushNotificationService }; 
+module.exports = { runAllTests, testEmailService, testPushNotificationService };

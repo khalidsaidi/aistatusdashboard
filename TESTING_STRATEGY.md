@@ -7,6 +7,7 @@ This document defines our unified testing strategy for the AI Status Dashboard, 
 ## 🎯 Testing Philosophy
 
 ### Core Principles
+
 1. **NO MOCKS ALLOWED** - All tests use real implementations
 2. **Test Pyramid Structure** - 70% Unit, 20% Integration, 10% E2E
 3. **Real Environment Testing** - Test against actual services when possible
@@ -62,12 +63,14 @@ __tests__/
 ## 🔧 Testing Tools & Libraries
 
 ### Primary Testing Stack
+
 - **Jest** - Unit and integration test runner
 - **Playwright** - E2E testing with real browsers
 - **Real HTTP Simulators** - No mocks, real HTTP implementations
 - **Test Containers** - Real database instances for testing
 
 ### Resilience Testing
+
 - **Bottleneck** - Rate limiting testing
 - **exponential-backoff** - Retry logic validation
 - **Circuit Breakers** - Failure handling testing
@@ -89,9 +92,9 @@ describe('StatusCalculator', () => {
     const result = calculator.determineStatus({
       httpStatus: 200,
       responseTime: 150,
-      errorRate: 0.01
+      errorRate: 0.01,
     });
-    
+
     expect(result.status).toBe('operational');
     expect(result.confidence).toBeGreaterThan(0.95);
   });
@@ -99,6 +102,7 @@ describe('StatusCalculator', () => {
 ```
 
 **Unit Test Requirements**:
+
 - ✅ Test pure functions and business logic
 - ✅ Validate error handling and edge cases
 - ✅ Test component rendering and state management
@@ -118,10 +122,10 @@ describe('StatusCalculator', () => {
 describe('StatusFetcher Integration', () => {
   it('should fetch real provider status with resilience', async () => {
     const fetcher = new EnhancedStatusFetcher();
-    
+
     // Use real HTTP simulator (not mock)
     const result = await fetcher.fetchStatus('test-provider');
-    
+
     expect(result.status).toBe('operational');
     expect(result.responseTime).toBeGreaterThan(0);
     expect(result.metadata).toBeDefined();
@@ -130,6 +134,7 @@ describe('StatusFetcher Integration', () => {
 ```
 
 **Integration Test Requirements**:
+
 - ✅ Test real HTTP calls with simulators
 - ✅ Validate database operations
 - ✅ Test service-to-service communication
@@ -149,25 +154,26 @@ describe('StatusFetcher Integration', () => {
 describe('Dashboard User Journey', () => {
   it('should display real-time status updates', async () => {
     await page.goto('/');
-    
+
     // Verify initial load
     await expect(page.locator('[data-testid="status-grid"]')).toBeVisible();
-    
+
     // Check real data loading
     const statusCards = page.locator('[data-testid="provider-card"]');
     await expect(statusCards).toHaveCountGreaterThan(10);
-    
+
     // Verify real-time updates
     const initialStatus = await statusCards.first().textContent();
     await page.waitForTimeout(60000); // Wait for refresh
     const updatedStatus = await statusCards.first().textContent();
-    
+
     expect(updatedStatus).toBeDefined();
   });
 });
 ```
 
 **E2E Test Requirements**:
+
 - ✅ Test complete user workflows
 - ✅ Validate real browser interactions
 - ✅ Test responsive design and accessibility
@@ -178,6 +184,7 @@ describe('Dashboard User Journey', () => {
 ## 🚀 Test Execution Strategy
 
 ### Local Development
+
 ```bash
 # Run unit tests (fast feedback)
 npm run test:unit
@@ -193,6 +200,7 @@ npm run test:all
 ```
 
 ### CI/CD Pipeline
+
 ```yaml
 # Parallel execution for speed
 jobs:
@@ -200,12 +208,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: npm run test:unit
-      
+
   integration-tests:
     runs-on: ubuntu-latest
     steps:
       - run: npm run test:integration
-      
+
   e2e-tests:
     runs-on: ubuntu-latest
     strategy:
@@ -218,6 +226,7 @@ jobs:
 ## 📊 Coverage Requirements
 
 ### Minimum Coverage Thresholds
+
 - **Overall Coverage**: 85%
 - **Unit Tests**: 90%
 - **Integration Tests**: 80%
@@ -225,6 +234,7 @@ jobs:
 - **Critical Paths**: 100%
 
 ### Coverage Exclusions
+
 - Third-party library code
 - Generated files and build artifacts
 - Test utilities and fixtures
@@ -233,6 +243,7 @@ jobs:
 ## 🔍 Quality Gates
 
 ### Test Quality Requirements
+
 1. **No Flaky Tests** - All tests must be deterministic
 2. **Fast Execution** - Unit tests < 100ms, Integration < 5s
 3. **Clear Assertions** - Each test validates specific behavior
@@ -240,6 +251,7 @@ jobs:
 5. **Error Scenarios** - Test failure cases and edge conditions
 
 ### CI/CD Gates
+
 - ✅ All tests must pass (100%)
 - ✅ Coverage thresholds must be met
 - ✅ No security vulnerabilities
@@ -249,12 +261,14 @@ jobs:
 ## 🛠 Test Data Management
 
 ### Test Data Strategy
+
 1. **Fixtures** - Static test data for predictable scenarios
 2. **Generators** - Dynamic data creation for varied testing
 3. **Simulators** - Real service behavior simulation
 4. **Sandboxes** - Isolated environments for integration tests
 
 ### Data Isolation
+
 - Each test runs with clean state
 - No shared mutable state between tests
 - Database transactions rolled back after tests
@@ -263,12 +277,14 @@ jobs:
 ## 🔄 Continuous Improvement
 
 ### Test Metrics Tracking
+
 - Test execution time trends
 - Flaky test identification and resolution
 - Coverage trend analysis
 - Test effectiveness measurement
 
 ### Regular Reviews
+
 - Monthly test strategy review
 - Quarterly test architecture assessment
 - Annual testing tool evaluation
@@ -277,6 +293,7 @@ jobs:
 ## 📚 Best Practices
 
 ### Writing Effective Tests
+
 1. **Arrange-Act-Assert** pattern
 2. **Descriptive test names** that explain the scenario
 3. **Single responsibility** - one concept per test
@@ -284,6 +301,7 @@ jobs:
 5. **Realistic scenarios** - mirror production usage
 
 ### Test Maintenance
+
 1. **Regular refactoring** to reduce duplication
 2. **Update tests** when requirements change
 3. **Remove obsolete tests** that no longer add value
@@ -293,6 +311,7 @@ jobs:
 ## 🎯 Success Metrics
 
 ### Key Performance Indicators
+
 - **Test Pass Rate**: 100% (no failures in CI)
 - **Test Coverage**: >85% overall
 - **Test Execution Time**: <10 minutes total
@@ -300,7 +319,8 @@ jobs:
 - **Bug Escape Rate**: <5% (bugs found in production)
 
 ### Quality Indicators
+
 - **Real World Reliability**: Tests catch actual production issues
 - **Developer Confidence**: High confidence in deployments
 - **Rapid Feedback**: Quick identification of regressions
-- **Maintenance Overhead**: Low effort to maintain test suite 
+- **Maintenance Overhead**: Low effort to maintain test suite

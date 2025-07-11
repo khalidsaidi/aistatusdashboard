@@ -17,7 +17,7 @@ beforeEach(() => {
   if (global.testUtils && global.testUtils.resetErrorTracking) {
     global.testUtils.resetErrorTracking();
   }
-  
+
   // Reset toast error tracking
   global.toastErrors = [];
   global.toastWarnings = [];
@@ -29,18 +29,20 @@ afterEach(() => {
   if (global.testUtils && global.testUtils.validateNoErrors) {
     global.testUtils.validateNoErrors();
   }
-  
+
   // Validate no toast errors occurred
   if (global.toastErrors.length > 0) {
     throw new Error(`TEST FAILED: Toast errors detected: ${global.toastErrors.join(', ')}`);
   }
-  
+
   if (global.toastWarnings.length > 0 && process.env.STRICT_TOAST_WARNINGS === 'true') {
     throw new Error(`TEST FAILED: Toast warnings detected: ${global.toastWarnings.join(', ')}`);
   }
-  
+
   if (global.applicationErrors.length > 0) {
-    throw new Error(`TEST FAILED: Application errors detected: ${global.applicationErrors.join(', ')}`);
+    throw new Error(
+      `TEST FAILED: Application errors detected: ${global.applicationErrors.join(', ')}`
+    );
   }
 });
 
@@ -64,7 +66,9 @@ if (typeof fetch === 'undefined') {
       global.Response = Response;
     } catch (error) {
       // NO FALLBACK - FAIL IMMEDIATELY IF UNDICI NOT AVAILABLE
-      throw new Error(`CRITICAL: undici fetch polyfill failed to load: ${error.message}. This indicates a real environment issue that must be fixed.`);
+      throw new Error(
+        `CRITICAL: undici fetch polyfill failed to load: ${error.message}. This indicates a real environment issue that must be fixed.`
+      );
     }
   } else {
     // For jsdom environment (unit tests) - use whatwg-fetch polyfill
@@ -81,7 +85,9 @@ if (typeof fetch === 'undefined') {
         global.Response = Response;
         console.log('✅ undici fetch polyfill loaded for jsdom environment');
       } catch (undiciError) {
-        throw new Error(`CRITICAL: No fetch polyfill available. Install whatwg-fetch or undici: ${error.message}, undici: ${undiciError.message}`);
+        throw new Error(
+          `CRITICAL: No fetch polyfill available. Install whatwg-fetch or undici: ${error.message}, undici: ${undiciError.message}`
+        );
       }
     }
   }
@@ -102,40 +108,40 @@ if (typeof window !== 'undefined') {
   // TOAST NOTIFICATION ERROR DETECTION
   // Set up proper toast interception by monkey-patching the useToast hook
   const originalRequire = require;
-  require = function(moduleName) {
+  require = function (moduleName) {
     const module = originalRequire.apply(this, arguments);
-    
+
     // Intercept the Toast module
     if (moduleName.includes('Toast') || moduleName.includes('toast')) {
       if (module && module.useToast) {
         const originalUseToast = module.useToast;
-        module.useToast = function() {
+        module.useToast = function () {
           const toastContext = originalUseToast();
-          
+
           if (toastContext) {
             // Wrap showError to capture errors
             const originalShowError = toastContext.showError;
-            toastContext.showError = function(title, message) {
+            toastContext.showError = function (title, message) {
               global.toastErrors.push(`${title}: ${message || 'No message'}`);
               return originalShowError.call(this, title, message);
             };
-            
+
             // Wrap showWarning to capture warnings
             const originalShowWarning = toastContext.showWarning;
-            toastContext.showWarning = function(title, message) {
+            toastContext.showWarning = function (title, message) {
               global.toastWarnings.push(`${title}: ${message || 'No message'}`);
               return originalShowWarning.call(this, title, message);
             };
           }
-          
+
           return toastContext;
         };
       }
     }
-    
+
     return module;
   };
-  
+
   console.log('✅ Toast hook interception enabled');
 
   // Provide window.matchMedia - use real polyfill
@@ -161,8 +167,12 @@ if (typeof window !== 'undefined') {
         this.title = title;
         this.options = options;
       }
-      static get permission() { return 'default'; }
-      static requestPermission() { return Promise.resolve('granted'); }
+      static get permission() {
+        return 'default';
+      }
+      static requestPermission() {
+        return Promise.resolve('granted');
+      }
     };
     console.log('✅ Notification API polyfill added');
   }
@@ -170,11 +180,12 @@ if (typeof window !== 'undefined') {
   // Service Worker API - provide basic polyfill
   if (!navigator.serviceWorker) {
     navigator.serviceWorker = {
-      register: () => Promise.resolve({
-        scope: '/',
-        unregister: () => Promise.resolve(true),
-        showNotification: () => Promise.resolve(),
-      }),
+      register: () =>
+        Promise.resolve({
+          scope: '/',
+          unregister: () => Promise.resolve(true),
+          showNotification: () => Promise.resolve(),
+        }),
       ready: Promise.resolve({
         scope: '/',
         showNotification: () => Promise.resolve(),
@@ -200,7 +211,7 @@ if (typeof window !== 'undefined') {
   if (document && !document.documentElement) {
     document.documentElement = document.createElement('html');
   }
-  
+
   // ENHANCED ERROR DETECTION: Monitor DOM for toast notifications
   if (document && typeof MutationObserver !== 'undefined') {
     const observer = new MutationObserver((mutations) => {
@@ -208,27 +219,32 @@ if (typeof window !== 'undefined') {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType === Node.ELEMENT_NODE) {
             const element = node;
-            
+
             // Check for toast error elements
-            if (element.classList?.contains('toast') || 
-                element.classList?.contains('notification') ||
-                element.querySelector?.('.toast, .notification')) {
-              
+            if (
+              element.classList?.contains('toast') ||
+              element.classList?.contains('notification') ||
+              element.querySelector?.('.toast, .notification')
+            ) {
               const textContent = element.textContent || '';
-              
+
               // Detect error toasts
-              if (textContent.includes('Error') || 
-                  textContent.includes('Failed') || 
-                  textContent.includes('Unable to') ||
-                  element.classList?.contains('error') ||
-                  element.classList?.contains('danger')) {
+              if (
+                textContent.includes('Error') ||
+                textContent.includes('Failed') ||
+                textContent.includes('Unable to') ||
+                element.classList?.contains('error') ||
+                element.classList?.contains('danger')
+              ) {
                 global.toastErrors.push(`DOM Toast Error: ${textContent.slice(0, 100)}`);
               }
-              
+
               // Detect warning toasts
-              if (textContent.includes('Warning') || 
-                  textContent.includes('Caution') ||
-                  element.classList?.contains('warning')) {
+              if (
+                textContent.includes('Warning') ||
+                textContent.includes('Caution') ||
+                element.classList?.contains('warning')
+              ) {
                 global.toastWarnings.push(`DOM Toast Warning: ${textContent.slice(0, 100)}`);
               }
             }
@@ -236,40 +252,41 @@ if (typeof window !== 'undefined') {
         });
       });
     });
-    
+
     // Start observing
     observer.observe(document.body, {
       childList: true,
-      subtree: true
+      subtree: true,
     });
-    
+
     console.log('✅ Toast notification DOM observer added');
   }
-  
+
   // DIRECT TOAST FUNCTION INTERCEPTION
   // Monitor global window for toast functions that might be called directly
   const originalSetTimeout = window.setTimeout;
-  window.setTimeout = function(callback, delay, ...args) {
+  window.setTimeout = function (callback, delay, ...args) {
     // Wrap callback to catch toast-related errors
-    const wrappedCallback = function() {
+    const wrappedCallback = function () {
       try {
         return callback.apply(this, arguments);
       } catch (error) {
-        if (error.message && (
-          error.message.includes('toast') || 
-          error.message.includes('notification') ||
-          error.message.includes('showError') ||
-          error.message.includes('showWarning')
-        )) {
+        if (
+          error.message &&
+          (error.message.includes('toast') ||
+            error.message.includes('notification') ||
+            error.message.includes('showError') ||
+            error.message.includes('showWarning'))
+        ) {
           global.applicationErrors.push(`Async Toast Error: ${error.message}`);
         }
         throw error;
       }
     };
-    
+
     return originalSetTimeout.call(this, wrappedCallback, delay, ...args);
   };
-  
+
   console.log('✅ Async toast error detection enabled');
 }
 
@@ -280,16 +297,16 @@ process.env.NODE_ENV = 'test';
 try {
   // Import the new secure configuration system
   const { getConfig, validateNoSensitiveData } = require('./lib/config-secure');
-  
+
   // Validate the configuration is secure
   validateNoSensitiveData();
-  
+
   // Get configuration for tests
   const config = getConfig();
   console.log('✅ Secure configuration initialized for tests');
   console.log(`   - Environment: ${config.environment}`);
   console.log(`   - Firebase Project: ${config.firebase.projectId}`);
-  
+
   // Make config available globally for tests
   global.testConfig = {
     getConfig: () => config,
@@ -297,52 +314,52 @@ try {
       http: {
         timeout: config.api.timeout,
         retries: config.api.retries,
-        userAgent: 'AI-Status-Dashboard-Test/1.0'
+        userAgent: 'AI-Status-Dashboard-Test/1.0',
       },
       circuitBreaker: {
         failureThreshold: 3,
-        resetTimeout: 30000
+        resetTimeout: 30000,
       },
       cache: {
-        ttl: config.performance.cacheTtl
-      }
+        ttl: config.performance.cacheTtl,
+      },
     }),
     getProviders: () => [],
-    getEnvironment: () => config.environment
+    getEnvironment: () => config.environment,
   };
 } catch (error) {
   // STRICT MODE: Configuration must work
   console.error('❌ CRITICAL: Failed to initialize secure configuration:', error.message);
-  
+
   // For tests, we can provide a minimal fallback configuration
   console.log('⚠️ Using fallback configuration for tests - THIS SHOULD BE FIXED');
-  
+
   // Set up minimal configuration for tests to continue
   const mockConfig = {
     getConfig: () => ({
       environment: 'test',
       api: { timeout: 10000, retries: 2 },
       performance: { cacheTtl: 60000 },
-      firebase: { projectId: 'ai-status-dashboard-dev' }
+      firebase: { projectId: 'ai-status-dashboard-dev' },
     }),
     getStatusFetcherConfig: () => ({
       http: {
         timeout: 10000,
         retries: 2,
-        userAgent: 'AI-Status-Dashboard-Test/1.0'
+        userAgent: 'AI-Status-Dashboard-Test/1.0',
       },
       circuitBreaker: {
         failureThreshold: 3,
-        resetTimeout: 30000
+        resetTimeout: 30000,
       },
       cache: {
-        ttl: 60000
-      }
+        ttl: 60000,
+      },
     }),
     getProviders: () => [],
-    getEnvironment: () => 'test'
+    getEnvironment: () => 'test',
   };
-  
+
   // Make the mock config available globally
   global.testConfig = mockConfig;
 }
@@ -351,16 +368,18 @@ try {
 const originalLog = console.log;
 console.log = (...args) => {
   const message = args.join(' ');
-  
+
   // Allow specific test-related logs but catch unexpected ones
-  if (message.includes('🔥 STRICT MODE') || 
-      message.includes('✅') || 
-      message.includes('⏭️') ||
-      message.includes('❌ CRITICAL') ||
-      message.includes('⚠️') ||
-      message.includes('Firebase initialized') ||
-      message.includes('Test passed') ||
-      message.includes('polyfill')) {
+  if (
+    message.includes('🔥 STRICT MODE') ||
+    message.includes('✅') ||
+    message.includes('⏭️') ||
+    message.includes('❌ CRITICAL') ||
+    message.includes('⚠️') ||
+    message.includes('Firebase initialized') ||
+    message.includes('Test passed') ||
+    message.includes('polyfill')
+  ) {
     originalLog(...args);
   } else {
     // Unexpected console.log might indicate debugging code left in
@@ -385,12 +404,16 @@ global.testUtils = {
     }
   },
   expectToastError: (expectedMessage) => {
-    const found = global.toastErrors.some(error => error.includes(expectedMessage));
+    const found = global.toastErrors.some((error) => error.includes(expectedMessage));
     if (!found) {
-      throw new Error(`Expected toast error containing "${expectedMessage}", but found: ${global.toastErrors.join(', ')}`);
+      throw new Error(
+        `Expected toast error containing "${expectedMessage}", but found: ${global.toastErrors.join(', ')}`
+      );
     }
-  }
+  },
 };
 
-console.log('🔥 STRICT MODE: Jest setup complete - Real implementations only, no error suppression');
-console.log('🔔 TOAST ERROR DETECTION: Monitoring for application errors in toast notifications'); 
+console.log(
+  '🔥 STRICT MODE: Jest setup complete - Real implementations only, no error suppression'
+);
+console.log('🔔 TOAST ERROR DETECTION: Monitoring for application errors in toast notifications');

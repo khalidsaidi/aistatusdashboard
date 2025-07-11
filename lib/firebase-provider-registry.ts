@@ -1,4 +1,14 @@
-import { getFirestore, collection, doc, setDoc, getDocs, query, where, orderBy, limit } from 'firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
 import { UnifiedProvider } from './types';
 
 const db = getFirestore();
@@ -21,7 +31,7 @@ export interface ProviderRegistryEntry {
 
 export class FirebaseProviderRegistry {
   private static instance: FirebaseProviderRegistry;
-  
+
   static getInstance(): FirebaseProviderRegistry {
     if (!this.instance) {
       this.instance = new FirebaseProviderRegistry();
@@ -29,10 +39,12 @@ export class FirebaseProviderRegistry {
     return this.instance;
   }
 
-  async registerProvider(provider: Omit<ProviderRegistryEntry, 'discoveredAt' | 'lastValidated'>): Promise<void> {
+  async registerProvider(
+    provider: Omit<ProviderRegistryEntry, 'discoveredAt' | 'lastValidated'>
+  ): Promise<void> {
     const now = new Date();
     const providerDoc = doc(db, 'providers', provider.id);
-    
+
     await setDoc(providerDoc, {
       ...provider,
       discoveredAt: now,
@@ -56,7 +68,7 @@ export class FirebaseProviderRegistry {
     }
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => {
+    return snapshot.docs.map((doc) => {
       const data = doc.data() as ProviderRegistryEntry;
       return {
         id: data.id,
@@ -81,7 +93,7 @@ export class FirebaseProviderRegistry {
     );
 
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => {
+    return snapshot.docs.map((doc) => {
       const data = doc.data() as ProviderRegistryEntry;
       return {
         id: data.id,
@@ -97,17 +109,21 @@ export class FirebaseProviderRegistry {
     });
   }
 
-  async updateProviderStatus(providerId: string, isActive: boolean, confidence?: number): Promise<void> {
+  async updateProviderStatus(
+    providerId: string,
+    isActive: boolean,
+    confidence?: number
+  ): Promise<void> {
     const providerDoc = doc(db, 'providers', providerId);
     const updateData: any = {
       isActive,
       lastValidated: new Date(),
     };
-    
+
     if (confidence !== undefined) {
       updateData.confidence = confidence;
     }
-    
+
     await setDoc(providerDoc, updateData, { merge: true });
   }
-} 
+}

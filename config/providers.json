@@ -99,10 +99,7 @@
       "statusPageUrl": "https://ai.meta.com",
       "format": "connectivity_check",
       "timeout": 5000,
-      "fallbackUrls": [
-        "https://llama.meta.com",
-        "https://www.meta.ai"
-      ],
+      "fallbackUrls": ["https://llama.meta.com", "https://www.meta.ai"],
       "enabled": true,
       "priority": 9
     },
@@ -114,10 +111,7 @@
       "statusPageUrl": "https://x.ai",
       "format": "connectivity_check",
       "timeout": 5000,
-      "fallbackUrls": [
-        "https://api.x.ai",
-        "https://grok.x.ai"
-      ],
+      "fallbackUrls": ["https://api.x.ai", "https://grok.x.ai"],
       "enabled": true,
       "priority": 10
     },
@@ -140,10 +134,7 @@
       "statusPageUrl": "https://mistral.ai",
       "format": "connectivity_check",
       "timeout": 5000,
-      "fallbackUrls": [
-        "https://api.mistral.ai",
-        "https://console.mistral.ai"
-      ],
+      "fallbackUrls": ["https://api.mistral.ai", "https://console.mistral.ai"],
       "enabled": true,
       "priority": 12
     },
@@ -170,4 +161,4 @@
       "priority": 14
     }
   ]
-} 
+}

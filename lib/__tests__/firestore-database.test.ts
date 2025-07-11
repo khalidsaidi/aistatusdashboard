@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
-import { initializeTestFirebase, cleanupTestFirebase, getTestFirebase } from '../test-firebase-config';
+import {
+  initializeTestFirebase,
+  cleanupTestFirebase,
+  getTestFirebase,
+} from '../test-firebase-config';
 import { getFirestore, collection, addDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore';
 import * as db from '../firestore-database';
 
@@ -12,7 +16,9 @@ describe('Firestore Database', () => {
       testFirebase = await initializeTestFirebase();
       console.log('✅ Firebase initialized for Firestore database tests');
     } catch (error) {
-      throw new Error(`CRITICAL: Firebase initialization failed: ${error instanceof Error ? error.message : String(error)}. This must be fixed for tests to run.`);
+      throw new Error(
+        `CRITICAL: Firebase initialization failed: ${error instanceof Error ? error.message : String(error)}. This must be fixed for tests to run.`
+      );
     }
   });
 
@@ -24,24 +30,30 @@ describe('Firestore Database', () => {
           try {
             await deleteDoc(doc(testFirebase.db, 'status_history', docId));
           } catch (error) {
-            throw new Error(`Cleanup failed for doc ${docId}: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(
+              `Cleanup failed for doc ${docId}: ${error instanceof Error ? error.message : String(error)}`
+            );
           }
         });
         await Promise.allSettled(cleanupPromises);
       } catch (error) {
-        throw new Error(`Test cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
+        throw new Error(
+          `Test cleanup failed: ${error instanceof Error ? error.message : String(error)}`
+        );
       }
     }
-    
+
     await cleanupTestFirebase();
   });
 
   describe('Configuration', () => {
     it('should have Firebase instance available', () => {
       if (!testFirebase) {
-        throw new Error('CRITICAL: Firebase instance not available - initialization must have failed');
+        throw new Error(
+          'CRITICAL: Firebase instance not available - initialization must have failed'
+        );
       }
-      
+
       expect(testFirebase).toBeDefined();
       expect(testFirebase.app).toBeDefined();
       expect(testFirebase.db).toBeDefined();
@@ -51,7 +63,7 @@ describe('Firestore Database', () => {
       if (!testFirebase) {
         throw new Error('CRITICAL: Firebase instance not available');
       }
-      
+
       const projectId = testFirebase.app.options.projectId;
       expect(projectId).toBe('ai-status-dashboard-dev');
     });
@@ -69,14 +81,16 @@ describe('Firestore Database', () => {
         status: 'operational' as const,
         lastChecked: new Date().toISOString(),
         responseTime: 150,
-        statusPageUrl: 'https://status.test.com'
+        statusPageUrl: 'https://status.test.com',
       };
 
       try {
         await db.saveStatusResult(testStatus);
         console.log('✅ Status result saved successfully');
       } catch (error) {
-        throw new Error(`saveStatusResult failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`);
+        throw new Error(
+          `saveStatusResult failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`
+        );
       }
     });
 
@@ -90,7 +104,9 @@ describe('Firestore Database', () => {
         expect(Array.isArray(history)).toBe(true);
         console.log(`✅ Retrieved ${history.length} provider history records`);
       } catch (error) {
-        throw new Error(`getProviderHistory failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`);
+        throw new Error(
+          `getProviderHistory failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`
+        );
       }
     });
 
@@ -103,18 +119,20 @@ describe('Firestore Database', () => {
         providerId: 'test-provider-' + Date.now(),
         status: 'operational' as const,
         timestamp: Timestamp.now(),
-        details: 'Test document for database integration'
+        details: 'Test document for database integration',
       };
 
       try {
         // Save test document
         const docRef = await addDoc(collection(testFirebase.db, 'status_history'), testDoc);
         testDocIds.push(docRef.id);
-        
+
         expect(docRef.id).toBeTruthy();
         console.log(`✅ Test document saved with ID: ${docRef.id}`);
       } catch (error) {
-        throw new Error(`Database write operation failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`);
+        throw new Error(
+          `Database write operation failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`
+        );
       }
     }, 15000);
   });
@@ -128,13 +146,15 @@ describe('Firestore Database', () => {
       try {
         const nonExistentProviderId = 'non-existent-provider-' + Date.now();
         const history = await db.getProviderHistory(nonExistentProviderId, 1);
-        
+
         expect(Array.isArray(history)).toBe(true);
         expect(history.length).toBe(0);
-        
+
         console.log('✅ Empty history handled correctly');
       } catch (error) {
-        throw new Error(`getProviderHistory for non-existent provider failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`);
+        throw new Error(
+          `getProviderHistory for non-existent provider failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`
+        );
       }
     }, 10000);
 
@@ -145,19 +165,21 @@ describe('Firestore Database', () => {
 
       try {
         const history = await db.getProviderHistory('openai', 1);
-        
+
         if (history.length > 0) {
           const record = history[0];
           expect(record).toHaveProperty('providerId');
           expect(record).toHaveProperty('status');
           expect(record).toHaveProperty('checkedAt');
-          
+
           console.log('✅ Provider history structure validated');
         } else {
           console.log('✅ No history records found (acceptable for clean test environment)');
         }
       } catch (error) {
-        throw new Error(`Provider history validation failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`);
+        throw new Error(
+          `Provider history validation failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`
+        );
       }
     }, 15000);
   });
@@ -172,7 +194,9 @@ describe('Firestore Database Integration', () => {
       testFirebase = await initializeTestFirebase();
       console.log('✅ Firebase initialized for integration tests');
     } catch (error) {
-      throw new Error(`CRITICAL: Firebase initialization failed: ${error instanceof Error ? error.message : String(error)}. This must be fixed for tests to run.`);
+      throw new Error(
+        `CRITICAL: Firebase initialization failed: ${error instanceof Error ? error.message : String(error)}. This must be fixed for tests to run.`
+      );
     }
   });
 
@@ -184,15 +208,19 @@ describe('Firestore Database Integration', () => {
           try {
             await deleteDoc(doc(testFirebase.db, 'status_history', docId));
           } catch (error) {
-            throw new Error(`Cleanup failed for doc ${docId}: ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(
+              `Cleanup failed for doc ${docId}: ${error instanceof Error ? error.message : String(error)}`
+            );
           }
         });
         await Promise.allSettled(cleanupPromises);
       } catch (error) {
-        throw new Error(`Test cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
+        throw new Error(
+          `Test cleanup failed: ${error instanceof Error ? error.message : String(error)}`
+        );
       }
     }
-    
+
     await cleanupTestFirebase();
   });
 
@@ -202,20 +230,24 @@ describe('Firestore Database Integration', () => {
         throw new Error('CRITICAL: Firebase instance not available');
       }
 
-      const completeStatuses = [{
-        id: 'test-complete-' + Date.now(),
-        name: 'Complete Test Provider',
-        status: 'operational' as const,
-        lastChecked: new Date().toISOString(),
-        responseTime: 200,
-        statusPageUrl: 'https://status.complete.test.com'
-      }];
+      const completeStatuses = [
+        {
+          id: 'test-complete-' + Date.now(),
+          name: 'Complete Test Provider',
+          status: 'operational' as const,
+          lastChecked: new Date().toISOString(),
+          responseTime: 200,
+          statusPageUrl: 'https://status.complete.test.com',
+        },
+      ];
 
       try {
         await db.saveStatusResults(completeStatuses);
         console.log('✅ Complete status results saved successfully');
       } catch (error) {
-        throw new Error(`Complete status save failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`);
+        throw new Error(
+          `Complete status save failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`
+        );
       }
     }, 15000);
 
@@ -226,7 +258,7 @@ describe('Firestore Database Integration', () => {
 
       try {
         const lastStatus = await db.getLastStatus('openai');
-        
+
         if (lastStatus) {
           expect(lastStatus).toHaveProperty('id');
           expect(lastStatus).toHaveProperty('status');
@@ -237,7 +269,9 @@ describe('Firestore Database Integration', () => {
         }
       } catch (error) {
         // STRICT MODE: ALL ERRORS MUST BE FIXED
-        throw new Error(`Firebase getLastStatus failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real configuration or connectivity issue that must be resolved.`);
+        throw new Error(
+          `Firebase getLastStatus failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real configuration or connectivity issue that must be resolved.`
+        );
       }
     }, 20000);
 
@@ -249,14 +283,15 @@ describe('Firestore Database Integration', () => {
       try {
         const nonExistentProviderId = 'non-existent-provider-' + Date.now();
         const lastStatus = await db.getLastStatus(nonExistentProviderId);
-        
+
         // Should return null for non-existent provider
         expect(lastStatus).toBeNull();
-        
       } catch (error) {
         // STRICT MODE: ALL ERRORS MUST BE FIXED
-        throw new Error(`Firebase getLastStatus for non-existent provider failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real configuration or connectivity issue that must be resolved.`);
+        throw new Error(
+          `Firebase getLastStatus for non-existent provider failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real configuration or connectivity issue that must be resolved.`
+        );
       }
     }, 15000);
   });
-}); 
+});

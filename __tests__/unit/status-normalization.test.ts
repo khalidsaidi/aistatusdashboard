@@ -6,7 +6,7 @@ describe('Status Normalization', () => {
       { input: 'major', expected: 'down' },
       { input: 'critical', expected: 'down' },
       { input: undefined, expected: 'unknown' },
-      { input: 'anything-else', expected: 'unknown' }
+      { input: 'anything-else', expected: 'unknown' },
     ];
 
     cases.forEach(({ input, expected }) => {
@@ -18,10 +18,14 @@ describe('Status Normalization', () => {
 
 function normalizeStatus(indicator?: string): string {
   switch (indicator) {
-    case 'none': return 'operational';
-    case 'minor': return 'degraded';
+    case 'none':
+      return 'operational';
+    case 'minor':
+      return 'degraded';
     case 'major':
-    case 'critical': return 'down';
-    default: return 'unknown';
+    case 'critical':
+      return 'down';
+    default:
+      return 'unknown';
   }
-} 
+}

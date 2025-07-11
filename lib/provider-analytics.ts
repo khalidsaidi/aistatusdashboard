@@ -1,12 +1,21 @@
 /**
  * PROVIDER ANALYTICS & COST MONITORING
- * 
+ *
  * Tracks user engagement with providers and monitors Firebase costs
  * to make data-driven decisions about which providers to prioritize.
  */
 
 import { log } from './logger';
-import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, increment, Timestamp } from 'firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  increment,
+  Timestamp,
+} from 'firebase/firestore';
 
 export interface ProviderInteraction {
   providerId: string;
@@ -51,11 +60,14 @@ export interface CostMetrics {
     storageUsage: number;
     estimatedCost: number;
   };
-  perProvider: Map<string, {
-    operations: number;
-    estimatedCost: number;
-    lastUpdated: Date;
-  }>;
+  perProvider: Map<
+    string,
+    {
+      operations: number;
+      estimatedCost: number;
+      lastUpdated: Date;
+    }
+  >;
   recommendations: string[];
 }
 
@@ -67,10 +79,10 @@ export class ProviderAnalyticsManager {
 
   // Firebase pricing (approximate, in USD)
   private readonly PRICING = {
-    firestoreRead: 0.06 / 100000,    // $0.06 per 100k reads
-    firestoreWrite: 0.18 / 100000,   // $0.18 per 100k writes
-    functionInvocation: 0.40 / 1000000, // $0.40 per 1M invocations
-    storageGB: 0.026,                // $0.026 per GB per month
+    firestoreRead: 0.06 / 100000, // $0.06 per 100k reads
+    firestoreWrite: 0.18 / 100000, // $0.18 per 100k writes
+    functionInvocation: 0.4 / 1000000, // $0.40 per 1M invocations
+    storageGB: 0.026, // $0.026 per GB per month
   };
 
   constructor() {
@@ -85,7 +97,7 @@ export class ProviderAnalyticsManager {
       log('info', 'Provider Analytics Manager initialized');
     } catch (error) {
       log('error', 'Failed to initialize Provider Analytics Manager', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -122,18 +134,21 @@ export class ProviderAnalyticsManager {
     log('info', 'Provider interaction tracked', {
       providerId: interaction.providerId,
       action: interaction.action,
-      source: interaction.metadata?.source
+      source: interaction.metadata?.source,
     });
   }
 
   /**
    * Track provider status check (for cost monitoring)
    */
-  async trackProviderStatusCheck(providerId: string, operations: {
-    reads?: number;
-    writes?: number;
-    functionCalls?: number;
-  }): Promise<void> {
+  async trackProviderStatusCheck(
+    providerId: string,
+    operations: {
+      reads?: number;
+      writes?: number;
+      functionCalls?: number;
+    }
+  ): Promise<void> {
     const { reads = 1, writes = 1, functionCalls = 1 } = operations;
 
     // Update current month metrics
@@ -145,15 +160,15 @@ export class ProviderAnalyticsManager {
     const providerMetrics = this.costMetrics.perProvider.get(providerId) || {
       operations: 0,
       estimatedCost: 0,
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
     };
 
-    const operationCost = 
-      (reads * this.PRICING.firestoreRead) +
-      (writes * this.PRICING.firestoreWrite) +
-      (functionCalls * this.PRICING.functionInvocation);
+    const operationCost =
+      reads * this.PRICING.firestoreRead +
+      writes * this.PRICING.firestoreWrite +
+      functionCalls * this.PRICING.functionInvocation;
 
-    providerMetrics.operations += (reads + writes + functionCalls);
+    providerMetrics.operations += reads + writes + functionCalls;
     providerMetrics.estimatedCost += operationCost;
     providerMetrics.lastUpdated = new Date();
 
@@ -194,20 +209,21 @@ export class ProviderAnalyticsManager {
           clicks: 0,
           subscriptions: 0,
           shares: 0,
-          bookmarks: 0
+          bookmarks: 0,
         },
         costMetrics: {
           monthlyChecks: costData?.operations || 0,
           estimatedMonthlyCost: costData?.estimatedCost || 0,
-          costPerInteraction: data.totalInteractions > 0 
-            ? (costData?.estimatedCost || 0) / data.totalInteractions 
-            : 0
-        }
+          costPerInteraction:
+            data.totalInteractions > 0
+              ? (costData?.estimatedCost || 0) / data.totalInteractions
+              : 0,
+        },
       };
     } catch (error) {
       log('error', 'Failed to get provider analytics', {
         providerId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       return null;
     }
@@ -223,10 +239,10 @@ export class ProviderAnalyticsManager {
       // In a real implementation, you'd use Firestore queries
       // For now, we'll simulate with stored data
       const providers: ProviderAnalytics[] = [];
-      
+
       // This would be replaced with actual Firestore query
       const mockProviders = ['openai', 'anthropic', 'google-ai', 'huggingface', 'cohere'];
-      
+
       for (const providerId of mockProviders) {
         const analytics = await this.getProviderAnalytics(providerId);
         if (analytics) {
@@ -234,12 +250,10 @@ export class ProviderAnalyticsManager {
         }
       }
 
-      return providers
-        .sort((a, b) => b.popularityScore - a.popularityScore)
-        .slice(0, limit);
+      return providers.sort((a, b) => b.popularityScore - a.popularityScore).slice(0, limit);
     } catch (error) {
       log('error', 'Failed to get top providers', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       return [];
     }
@@ -266,7 +280,7 @@ export class ProviderAnalyticsManager {
         providerId,
         cost: metrics.estimatedCost,
         operations: metrics.operations,
-        costEfficiency: metrics.operations > 0 ? metrics.estimatedCost / metrics.operations : 0
+        costEfficiency: metrics.operations > 0 ? metrics.estimatedCost / metrics.operations : 0,
       }))
       .sort((a, b) => b.cost - a.cost)
       .slice(0, 10);
@@ -280,8 +294,8 @@ export class ProviderAnalyticsManager {
       projectedMonthlyCost,
       costTrends: {
         dailyAverage,
-        weeklyTrend: 'stable' // Would be calculated from historical data
-      }
+        weeklyTrend: 'stable', // Would be calculated from historical data
+      },
     };
   }
 
@@ -321,14 +335,16 @@ export class ProviderAnalyticsManager {
     }
 
     if (costMetrics.topCostProviders.length > 0) {
-      optimizations.push(`Focus optimization on top cost provider: ${costMetrics.topCostProviders[0].providerId}`);
+      optimizations.push(
+        `Focus optimization on top cost provider: ${costMetrics.topCostProviders[0].providerId}`
+      );
     }
 
     return {
       addProviders,
       removeProviders,
       optimizations,
-      reasoning
+      reasoning,
     };
   }
 
@@ -357,22 +373,25 @@ export class ProviderAnalyticsManager {
 
       log('info', 'Flushed provider interactions', {
         totalInteractions: interactions.length,
-        providers: providerGroups.size
+        providers: providerGroups.size,
       });
     } catch (error) {
       log('error', 'Failed to flush interactions', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       // Put interactions back in buffer for retry
       this.interactionBuffer.unshift(...interactions);
     }
   }
 
-  private async updateProviderAnalytics(providerId: string, interactions: ProviderInteraction[]): Promise<void> {
+  private async updateProviderAnalytics(
+    providerId: string,
+    interactions: ProviderInteraction[]
+  ): Promise<void> {
     if (!this.db) return;
 
     const docRef = doc(this.db, 'provider_analytics', providerId);
-    
+
     try {
       // Count interactions by type
       const interactionCounts = {
@@ -380,21 +399,21 @@ export class ProviderAnalyticsManager {
         clicks: 0,
         subscriptions: 0,
         shares: 0,
-        bookmarks: 0
+        bookmarks: 0,
       };
 
       const uniqueUsers = new Set<string>();
       let latestInteraction = new Date(0);
 
-             for (const interaction of interactions) {
-         interactionCounts[interaction.action as keyof typeof interactionCounts]++;
-         if (interaction.userId) {
-           uniqueUsers.add(interaction.userId);
-         }
-         if (interaction.timestamp > latestInteraction) {
-           latestInteraction = interaction.timestamp;
-         }
-       }
+      for (const interaction of interactions) {
+        interactionCounts[interaction.action as keyof typeof interactionCounts]++;
+        if (interaction.userId) {
+          uniqueUsers.add(interaction.userId);
+        }
+        if (interaction.timestamp > latestInteraction) {
+          latestInteraction = interaction.timestamp;
+        }
+      }
 
       // Update document
       await updateDoc(docRef, {
@@ -409,33 +428,36 @@ export class ProviderAnalyticsManager {
       });
     } catch (error) {
       if (error instanceof Error && error.message.includes('No document to update')) {
-                 // Create new document
-         const uniqueUserIds = new Set(interactions.map(i => i.userId).filter(Boolean)).size;
-         const latestTimestamp = interactions.reduce((latest, interaction) => 
-           interaction.timestamp > latest ? interaction.timestamp : latest, new Date(0));
-         
-         // Recalculate interaction counts for new document
-         const newInteractionCounts = {
-           views: 0,
-           clicks: 0,
-           subscriptions: 0,
-           shares: 0,
-           bookmarks: 0
-         };
-         
-         for (const interaction of interactions) {
-           newInteractionCounts[interaction.action as keyof typeof newInteractionCounts]++;
-         }
-         
-         await setDoc(docRef, {
-           providerId,
-           providerName: providerId, // Would be populated from provider config
-           totalInteractions: interactions.length,
-           uniqueUsers: uniqueUserIds,
-           lastInteraction: Timestamp.fromDate(latestTimestamp),
-           interactionsByType: newInteractionCounts,
-           createdAt: Timestamp.now()
-         });
+        // Create new document
+        const uniqueUserIds = new Set(interactions.map((i) => i.userId).filter(Boolean)).size;
+        const latestTimestamp = interactions.reduce(
+          (latest, interaction) =>
+            interaction.timestamp > latest ? interaction.timestamp : latest,
+          new Date(0)
+        );
+
+        // Recalculate interaction counts for new document
+        const newInteractionCounts = {
+          views: 0,
+          clicks: 0,
+          subscriptions: 0,
+          shares: 0,
+          bookmarks: 0,
+        };
+
+        for (const interaction of interactions) {
+          newInteractionCounts[interaction.action as keyof typeof newInteractionCounts]++;
+        }
+
+        await setDoc(docRef, {
+          providerId,
+          providerName: providerId, // Would be populated from provider config
+          totalInteractions: interactions.length,
+          uniqueUsers: uniqueUserIds,
+          lastInteraction: Timestamp.fromDate(latestTimestamp),
+          interactionsByType: newInteractionCounts,
+          createdAt: Timestamp.now(),
+        });
       } else {
         throw error;
       }
@@ -448,7 +470,7 @@ export class ProviderAnalyticsManager {
       clicks: 2,
       subscriptions: 5,
       shares: 3,
-      bookmarks: 4
+      bookmarks: 4,
     };
 
     const interactions = data.interactionsByType || {};
@@ -459,10 +481,10 @@ export class ProviderAnalyticsManager {
     }
 
     // Factor in recency (interactions in last 7 days get bonus)
-    const daysSinceLastInteraction = data.lastInteraction 
+    const daysSinceLastInteraction = data.lastInteraction
       ? (Date.now() - data.lastInteraction.toDate().getTime()) / (1000 * 60 * 60 * 24)
       : 30;
-    
+
     const recencyMultiplier = daysSinceLastInteraction < 7 ? 1.5 : 1.0;
 
     return Math.round(score * recencyMultiplier);
@@ -470,7 +492,7 @@ export class ProviderAnalyticsManager {
 
   private calculateProviderTier(data: any): 'high' | 'medium' | 'low' {
     const score = this.calculatePopularityScore(data);
-    
+
     if (score >= 100) return 'high';
     if (score >= 25) return 'medium';
     return 'low';
@@ -479,12 +501,12 @@ export class ProviderAnalyticsManager {
   private updateCostMetrics(operation: string, providerId?: string): void {
     // Simple cost tracking
     this.costMetrics.currentMonth.functionInvocations += 1;
-    
+
     if (providerId) {
       const existing = this.costMetrics.perProvider.get(providerId) || {
         operations: 0,
         estimatedCost: 0,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       };
       existing.operations += 1;
       existing.estimatedCost += this.PRICING.functionInvocation;
@@ -494,11 +516,11 @@ export class ProviderAnalyticsManager {
 
   private updateCostRecommendations(): void {
     const recommendations: string[] = [];
-    
+
     if (this.costMetrics.currentMonth.estimatedCost > 50) {
       recommendations.push('Monthly costs exceeding $50 - consider optimization');
     }
-    
+
     if (this.costMetrics.perProvider.size > 50) {
       recommendations.push('Monitoring 50+ providers - implement tiered monitoring');
     }
@@ -521,13 +543,13 @@ export class ProviderAnalyticsManager {
       clearInterval(this.flushInterval);
       this.flushInterval = null;
     }
-    
+
     // Flush any remaining interactions
     this.flushInteractions();
-    
+
     log('info', 'Provider Analytics Manager destroyed');
   }
 }
 
 // Global instance
-export const globalProviderAnalytics = new ProviderAnalyticsManager(); 
+export const globalProviderAnalytics = new ProviderAnalyticsManager();

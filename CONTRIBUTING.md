@@ -1,11 +1,11 @@
 # Contributing to AI Status Dashboard
 
-Thank you for your interest in contributing! 
+Thank you for your interest in contributing!
 
 ## Quick Start
 
 1. Fork the repository
-2. Clone your fork locally  
+2. Clone your fork locally
 3. Create a feature branch
 4. Make your changes
 5. Test your changes

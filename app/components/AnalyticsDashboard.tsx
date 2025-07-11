@@ -1,7 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { globalProviderAnalytics, type ProviderAnalytics, type CostMetrics } from '@/lib/provider-analytics';
+import {
+  globalProviderAnalytics,
+  type ProviderAnalytics,
+  type CostMetrics,
+} from '@/lib/provider-analytics';
 
 interface AnalyticsDashboardProps {
   className?: string;
@@ -17,7 +21,9 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
     reasoning: Record<string, string>;
   } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedTab, setSelectedTab] = useState<'providers' | 'costs' | 'recommendations'>('providers');
+  const [selectedTab, setSelectedTab] = useState<'providers' | 'costs' | 'recommendations'>(
+    'providers'
+  );
 
   useEffect(() => {
     loadAnalyticsData();
@@ -26,11 +32,11 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
   const loadAnalyticsData = async () => {
     try {
       setLoading(true);
-      
+
       const [providers, costs, recs] = await Promise.all([
         globalProviderAnalytics.getTopProviders(15),
         Promise.resolve(globalProviderAnalytics.getCostMetrics()),
-        globalProviderAnalytics.getProviderRecommendations()
+        globalProviderAnalytics.getProviderRecommendations(),
       ]);
 
       setTopProviders(providers);
@@ -43,7 +49,10 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
     }
   };
 
-  const trackProviderInteraction = async (providerId: string, action: 'view' | 'click' | 'bookmark') => {
+  const trackProviderInteraction = async (
+    providerId: string,
+    action: 'view' | 'click' | 'bookmark'
+  ) => {
     try {
       await globalProviderAnalytics.trackProviderInteraction({
         providerId,
@@ -51,10 +60,10 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
         sessionId: 'web-session-' + Date.now(),
         timestamp: new Date(),
         metadata: {
-          source: 'dashboard'
-        }
+          source: 'dashboard',
+        },
       });
-      
+
       // Reload data to show updated metrics
       await loadAnalyticsData();
     } catch (error) {
@@ -67,15 +76,18 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
-      maximumFractionDigits: 4
+      maximumFractionDigits: 4,
     }).format(amount);
   };
 
   const getTierColor = (tier: 'high' | 'medium' | 'low') => {
     switch (tier) {
-      case 'high': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'low': return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+      case 'high':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'low':
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
     }
   };
 
@@ -112,7 +124,7 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
           {[
             { id: 'providers', label: 'Provider Analytics', icon: '📈' },
             { id: 'costs', label: 'Cost Monitoring', icon: '💰' },
-            { id: 'recommendations', label: 'Smart Recommendations', icon: '🎯' }
+            { id: 'recommendations', label: 'Smart Recommendations', icon: '🎯' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -148,9 +160,11 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
               </div>
               <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
                 <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                  {topProviders.filter(p => p.tier === 'high').length}
+                  {topProviders.filter((p) => p.tier === 'high').length}
                 </div>
-                <div className="text-sm text-purple-600 dark:text-purple-400">High-Tier Providers</div>
+                <div className="text-sm text-purple-600 dark:text-purple-400">
+                  High-Tier Providers
+                </div>
               </div>
             </div>
 
@@ -158,7 +172,7 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Top Providers by Engagement
               </h3>
-              
+
               {topProviders.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                   <div className="text-4xl mb-2">📊</div>
@@ -168,7 +182,7 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
               ) : (
                 <div className="space-y-3">
                   {topProviders.map((provider) => (
-                    <div 
+                    <div
                       key={provider.providerId}
                       className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                     >
@@ -177,7 +191,9 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
                           <h4 className="font-medium text-gray-900 dark:text-white">
                             {provider.providerName}
                           </h4>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTierColor(provider.tier)}`}>
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${getTierColor(provider.tier)}`}
+                          >
                             {provider.tier.toUpperCase()}
                           </span>
                         </div>
@@ -185,7 +201,9 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
                           <div className="text-lg font-semibold text-gray-900 dark:text-white">
                             {provider.popularityScore}
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">Popularity Score</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            Popularity Score
+                          </div>
                         </div>
                       </div>
 
@@ -264,7 +282,9 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
                 <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                   {formatCurrency(costMetrics.projectedMonthlyCost)}
                 </div>
-                <div className="text-sm text-orange-600 dark:text-orange-400">Projected Monthly</div>
+                <div className="text-sm text-orange-600 dark:text-orange-400">
+                  Projected Monthly
+                </div>
               </div>
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
@@ -284,16 +304,16 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Top Cost Providers
               </h3>
-              
+
               {costMetrics.topCostProviders.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                   <div className="text-4xl mb-2">💰</div>
                   <p>No cost data available yet</p>
                 </div>
               ) : (
-                                 <div className="space-y-3">
-                   {costMetrics.topCostProviders.map((provider: any, index: number) => (
-                    <div 
+                <div className="space-y-3">
+                  {costMetrics.topCostProviders.map((provider: any, index: number) => (
+                    <div
                       key={provider.providerId}
                       className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
                     >
@@ -310,7 +330,9 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
                           <div className="text-lg font-semibold text-gray-900 dark:text-white">
                             {formatCurrency(provider.cost)}
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">Monthly Cost</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            Monthly Cost
+                          </div>
                         </div>
                       </div>
 
@@ -339,8 +361,8 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
                 <h4 className="font-medium text-yellow-800 dark:text-yellow-200 mb-2">
                   💡 Cost Optimization Recommendations
                 </h4>
-                                 <ul className="list-disc list-inside space-y-1 text-sm text-yellow-700 dark:text-yellow-300">
-                   {costMetrics.recommendations.map((rec: string, index: number) => (
+                <ul className="list-disc list-inside space-y-1 text-sm text-yellow-700 dark:text-yellow-300">
+                  {costMetrics.recommendations.map((rec: string, index: number) => (
                     <li key={index}>{rec}</li>
                   ))}
                 </ul>
@@ -360,7 +382,9 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
                 <div className="space-y-2">
                   {recommendations.removeProviders.map((providerId) => (
                     <div key={providerId} className="flex items-center justify-between">
-                      <span className="font-medium text-red-700 dark:text-red-300">{providerId}</span>
+                      <span className="font-medium text-red-700 dark:text-red-300">
+                        {providerId}
+                      </span>
                       <span className="text-sm text-red-600 dark:text-red-400">
                         {recommendations.reasoning[providerId]}
                       </span>
@@ -383,15 +407,15 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
               </div>
             )}
 
-            {recommendations.addProviders.length === 0 && 
-             recommendations.removeProviders.length === 0 && 
-             recommendations.optimizations.length === 0 && (
-              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                <div className="text-4xl mb-2">🎯</div>
-                <p>No specific recommendations at this time</p>
-                <p className="text-sm mt-2">Your provider setup looks optimized!</p>
-              </div>
-            )}
+            {recommendations.addProviders.length === 0 &&
+              recommendations.removeProviders.length === 0 &&
+              recommendations.optimizations.length === 0 && (
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <div className="text-4xl mb-2">🎯</div>
+                  <p>No specific recommendations at this time</p>
+                  <p className="text-sm mt-2">Your provider setup looks optimized!</p>
+                </div>
+              )}
           </div>
         )}
       </div>
@@ -408,4 +432,4 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
       </div>
     </div>
   );
-} 
+}

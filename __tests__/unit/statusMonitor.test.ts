@@ -2,16 +2,16 @@
  * @jest-environment node
  */
 
-// Real status monitor tests 
+// Real status monitor tests
 describe('Status Monitor - Real Implementation', () => {
   describe('Function Module Loading', () => {
     it('should load status monitor function without errors', async () => {
       try {
         const statusMonitor = await import('../../functions/src/statusMonitor');
-        
+
         // Check that the function is exported
         expect(typeof statusMonitor.monitorProviderStatus).toBe('function');
-        
+
         console.log('Status monitor function loaded successfully');
       } catch (error) {
         console.log('Status monitor not available in test environment (expected)');
@@ -47,12 +47,12 @@ describe('Status Monitor - Real Implementation', () => {
 
       testCases.forEach(({ old, new: newStatus, shouldNotify }) => {
         const hasChanged = old !== newStatus;
-        const isSignificant = hasChanged && (
-          (old === 'operational' && newStatus !== 'operational') ||
-          (old !== 'operational' && newStatus === 'operational') ||
-          (old === 'degraded' && newStatus === 'down') ||
-          (old === 'down' && newStatus === 'degraded')
-        );
+        const isSignificant =
+          hasChanged &&
+          ((old === 'operational' && newStatus !== 'operational') ||
+            (old !== 'operational' && newStatus === 'operational') ||
+            (old === 'degraded' && newStatus === 'down') ||
+            (old === 'down' && newStatus === 'degraded'));
 
         expect(isSignificant).toBe(shouldNotify);
         console.log(`Status change ${old} -> ${newStatus}: ${shouldNotify ? 'notify' : 'ignore'}`);
@@ -72,7 +72,7 @@ describe('Status Monitor - Real Implementation', () => {
       edgeCases.forEach(({ old, new: newStatus, shouldHandle }) => {
         const canProcess = old !== undefined && newStatus !== undefined;
         expect(typeof canProcess).toBe('boolean');
-        
+
         if (shouldHandle) {
           // Edge case handled successfully
         }
@@ -83,23 +83,23 @@ describe('Status Monitor - Real Implementation', () => {
   describe('Provider Status Monitoring', () => {
     it('should validate provider list structure', () => {
       const expectedProviders = ['openai', 'anthropic', 'huggingface', 'google-ai'];
-      
-      expectedProviders.forEach(provider => {
+
+      expectedProviders.forEach((provider) => {
         expect(typeof provider).toBe('string');
         expect(provider.length).toBeGreaterThan(0);
-        
+
         // Validate provider name format
         const isValidFormat = /^[a-z0-9-]+$/.test(provider);
         expect(isValidFormat).toBe(true);
-        
+
         console.log(`✓ Provider ${provider} has valid format`);
       });
     });
 
     it('should handle provider-specific monitoring logic', () => {
       const providers = ['openai', 'anthropic', 'huggingface', 'google-ai'];
-      
-      providers.forEach(provider => {
+
+      providers.forEach((provider) => {
         // Test provider-specific configuration
         const config = {
           name: provider,
@@ -107,12 +107,12 @@ describe('Status Monitor - Real Implementation', () => {
           checkInterval: 5 * 60 * 1000, // 5 minutes
           timeout: 30000, // 30 seconds
         };
-        
+
         expect(config.name).toBe(provider);
         expect(config.displayName).toBeDefined();
         expect(config.checkInterval).toBeGreaterThan(0);
         expect(config.timeout).toBeGreaterThan(0);
-        
+
         console.log(`✓ Provider ${provider} configuration valid`);
       });
     });
@@ -135,23 +135,18 @@ describe('Status Monitor - Real Implementation', () => {
       expect(scheduleConfig.schedule).toBeDefined();
       expect(scheduleConfig.timeZone).toBe('UTC');
       expect(scheduleConfig.retryConfig.retryCount).toBe(3);
-      
+
       console.log('Scheduler configuration valid');
     });
 
     it('should handle scheduling errors gracefully', () => {
       // Test error handling for scheduling
-      const errorScenarios = [
-        'invalid-schedule-format',
-        '',
-        null,
-        undefined,
-      ];
+      const errorScenarios = ['invalid-schedule-format', '', null, undefined];
 
-      errorScenarios.forEach(schedule => {
+      errorScenarios.forEach((schedule) => {
         const isValid = typeof schedule === 'string' && schedule.length > 0;
         expect(typeof isValid).toBe('boolean');
-        
+
         if (!isValid) {
           console.log(`Invalid schedule format handled: ${schedule}`);
         }
@@ -164,7 +159,7 @@ describe('Status Monitor - Real Implementation', () => {
       // Test network error simulation
       try {
         const response = await fetch('https://invalid-url-that-does-not-exist.com');
-        
+
         if (!response.ok) {
           console.log(`Network error handled: ${response.status}`);
         }
@@ -201,13 +196,14 @@ describe('Status Monitor - Real Implementation', () => {
         '{"status": ""}',
       ];
 
-      malformedResponses.forEach(response => {
+      malformedResponses.forEach((response) => {
         try {
           const parsed = response ? JSON.parse(response) : null;
-          const hasValidStatus = parsed && typeof parsed.status === 'string' && parsed.status.length > 0;
-          
+          const hasValidStatus =
+            parsed && typeof parsed.status === 'string' && parsed.status.length > 0;
+
           expect(typeof hasValidStatus).toBe('boolean');
-          
+
           if (!hasValidStatus) {
             console.log(`Malformed response handled: ${response}`);
           }
@@ -221,13 +217,13 @@ describe('Status Monitor - Real Implementation', () => {
   describe('Performance and Memory Management', () => {
     it('should handle multiple concurrent status checks', async () => {
       const providers = ['openai', 'anthropic', 'huggingface', 'google-ai'];
-      
+
       // Simulate concurrent status checks
       const checkPromises = providers.map(async (provider) => {
         try {
           // Simulate status check delay
-          await new Promise(resolve => setTimeout(resolve, Math.random() * 100));
-          
+          await new Promise((resolve) => setTimeout(resolve, Math.random() * 100));
+
           return {
             provider,
             status: 'operational',
@@ -244,9 +240,9 @@ describe('Status Monitor - Real Implementation', () => {
       });
 
       const results = await Promise.allSettled(checkPromises);
-      
+
       expect(results.length).toBe(providers.length);
-      
+
       results.forEach((result, index) => {
         if (result.status === 'fulfilled') {
           expect(result.value.provider).toBe(providers[index]);
@@ -259,7 +255,7 @@ describe('Status Monitor - Real Implementation', () => {
     it('should not create memory leaks during repeated checks', () => {
       // Test memory efficiency with repeated operations
       const iterations = 1000;
-      
+
       for (let i = 0; i < iterations; i++) {
         const statusData = {
           provider: 'test-provider',
@@ -267,16 +263,16 @@ describe('Status Monitor - Real Implementation', () => {
           timestamp: new Date().toISOString(),
           iteration: i,
         };
-        
+
         // Simulate status processing
         const processed = {
           ...statusData,
           processed: true,
         };
-        
+
         expect(processed.iteration).toBe(i);
       }
-      
+
       // Memory efficiency test completed successfully
     });
   });
@@ -294,11 +290,11 @@ describe('Status Monitor - Real Implementation', () => {
       expect(typeof validStatusData.provider).toBe('string');
       expect(typeof validStatusData.status).toBe('string');
       expect(typeof validStatusData.timestamp).toBe('string');
-      
+
       // Validate timestamp format
       const timestampDate = new Date(validStatusData.timestamp);
       expect(timestampDate instanceof Date && !isNaN(timestampDate.getTime())).toBe(true);
-      
+
       console.log('Status data structure validation passed');
     });
 
@@ -310,7 +306,7 @@ describe('Status Monitor - Real Implementation', () => {
         'google-ai\x00\x01\x02',
       ];
 
-      unsafeProviderNames.forEach(unsafeName => {
+      unsafeProviderNames.forEach((unsafeName) => {
         // Simulate sanitization
         const sanitized = unsafeName
           .replace(/[<>]/g, '')
@@ -318,11 +314,11 @@ describe('Status Monitor - Real Implementation', () => {
           .replace(/[\x00-\x1f\x7f-\x9f]/g, '')
           .trim()
           .toLowerCase();
-        
+
         expect(sanitized.length).toBeGreaterThan(0);
         expect(sanitized).not.toContain('<script>');
         expect(sanitized).not.toContain('DROP TABLE');
-        
+
         console.log(`Sanitized "${unsafeName}" -> "${sanitized}"`);
       });
     });
@@ -344,7 +340,7 @@ describe('Status Monitor - Real Implementation', () => {
         expect(testStatusUpdate.provider).toBeDefined();
         expect(testStatusUpdate.status).toBeDefined();
         expect(testStatusUpdate.timestamp instanceof Date).toBe(true);
-        
+
         console.log('Firestore integration data structure valid');
       } catch (error) {
         console.log('Firestore integration test failed (expected without real connection)');
@@ -366,7 +362,7 @@ describe('Status Monitor - Real Implementation', () => {
       expect(notificationData.providerDisplayName).toBeDefined();
       expect(notificationData.oldStatus !== notificationData.newStatus).toBe(true);
       expect(notificationData.shouldSendNotification).toBe(true);
-      
+
       console.log('Push notification integration data structure valid');
     });
   });
@@ -375,10 +371,10 @@ describe('Status Monitor - Real Implementation', () => {
     it('should validate function exports match expected interface', async () => {
       try {
         const statusMonitor = await import('../../functions/src/statusMonitor');
-        
+
         // Check for expected exports
         expect(typeof statusMonitor.monitorProviderStatus).toBe('function');
-        
+
         console.log('✓ monitorStatusChanges function exported correctly');
       } catch (error) {
         console.log('Status monitor module not available in test environment (expected)');
@@ -397,7 +393,7 @@ describe('Status Monitor - Real Implementation', () => {
       expect(scheduledContext.timestamp).toBeDefined();
       expect(scheduledContext.eventId).toBeDefined();
       expect(scheduledContext.eventType).toBeDefined();
-      
+
       console.log('Scheduled execution context structure valid');
     });
   });
@@ -410,11 +406,13 @@ describe('Status Monitor - Real Implementation', () => {
         { name: 'relaxed', minutes: 15, milliseconds: 900000 },
       ];
 
-      intervals.forEach(interval => {
+      intervals.forEach((interval) => {
         expect(interval.milliseconds).toBe(interval.minutes * 60 * 1000);
         expect(interval.milliseconds).toBeGreaterThan(0);
-        
-        console.log(`✓ ${interval.name} interval: ${interval.minutes}min = ${interval.milliseconds}ms`);
+
+        console.log(
+          `✓ ${interval.name} interval: ${interval.minutes}min = ${interval.milliseconds}ms`
+        );
       });
     });
 
@@ -432,8 +430,8 @@ describe('Status Monitor - Real Implementation', () => {
       expect(config.checkInterval).toBeGreaterThan(config.timeout);
       expect(config.retries).toBeGreaterThan(0);
       expect(config.notificationThreshold).toBeGreaterThan(0);
-      
+
       console.log('Monitoring configuration validation passed');
     });
   });
-}); 
+});

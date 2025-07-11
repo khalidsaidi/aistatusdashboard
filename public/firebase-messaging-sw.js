@@ -7,14 +7,14 @@ self.addEventListener('message', (event) => {
     // Initialize Firebase with the config passed from main thread
     importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
     importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
-    
+
     firebase.initializeApp(event.data.config);
     const messaging = firebase.messaging();
-    
+
     // Handle background messages
     messaging.onBackgroundMessage((payload) => {
       console.log('Received background message:', payload);
-      
+
       const notificationTitle = payload.notification?.title || 'AI Status Dashboard';
       const notificationOptions = {
         body: payload.notification?.body || 'Service status update',
@@ -26,9 +26,9 @@ self.addEventListener('message', (event) => {
           {
             action: 'view',
             title: 'View Dashboard',
-            icon: '/icon-192x192.png'
-          }
-        ]
+            icon: '/icon-192x192.png',
+          },
+        ],
       };
 
       self.registration.showNotification(notificationTitle, notificationOptions);
@@ -39,12 +39,10 @@ self.addEventListener('message', (event) => {
 // Handle notification clicks
 self.addEventListener('notificationclick', (event) => {
   console.log('Notification clicked:', event);
-  
+
   event.notification.close();
-  
+
   if (event.action === 'view' || !event.action) {
-    event.waitUntil(
-      clients.openWindow('/')
-    );
+    event.waitUntil(clients.openWindow('/'));
   }
-}); 
+});

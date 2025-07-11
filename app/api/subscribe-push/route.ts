@@ -5,7 +5,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const firebaseUrl = getApiUrl('subscribePush');
-    
+
     const response = await fetch(firebaseUrl, {
       method: 'POST',
       headers: {
@@ -15,8 +15,8 @@ export async function POST(request: NextRequest) {
     });
 
     const data = await response.json();
-    
-    return NextResponse.json(data, { 
+
+    return NextResponse.json(data, {
       status: response.status,
       headers: {
         'Access-Control-Allow-Origin': '*',
@@ -25,11 +25,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -42,4 +38,4 @@ export async function OPTIONS() {
       'Access-Control-Allow-Headers': 'Content-Type',
     },
   });
-} 
+}

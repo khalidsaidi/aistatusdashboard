@@ -21,4 +21,4 @@ export function getCached<T>(key: string): T | null {
 
 export function setCache<T>(key: string, data: T): void {
   cache.set(key, { data, timestamp: Date.now() });
-} 
+}

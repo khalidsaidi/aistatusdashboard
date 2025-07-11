@@ -1,6 +1,6 @@
 /**
  * Production-Grade Firebase Configuration for Test Environments
- * 
+ *
  * Uses WSL2 Firebase Adapter to eliminate network limitations and offline mode warnings
  * for comprehensive testing without workarounds.
  */
@@ -9,7 +9,12 @@ import { FirebaseApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { initializeUnifiedFirebase, getUnifiedFirebase, shutdownUnifiedFirebase, isFirebaseReady } from './unified-firebase-adapter';
+import {
+  initializeUnifiedFirebase,
+  getUnifiedFirebase,
+  shutdownUnifiedFirebase,
+  isFirebaseReady,
+} from './unified-firebase-adapter';
 
 interface FirebaseTestConfig {
   projectId: string;
@@ -29,9 +34,9 @@ function loadFirebaseConfig(): FirebaseTestConfig {
   try {
     const configPath = join(process.cwd(), 'config', 'test.env');
     const configContent = readFileSync(configPath, 'utf-8');
-    
+
     const envVars: Record<string, string> = {};
-    configContent.split('\n').forEach(line => {
+    configContent.split('\n').forEach((line) => {
       line = line.trim();
       if (line && !line.startsWith('#')) {
         const [key, ...valueParts] = line.split('=');
@@ -47,7 +52,7 @@ function loadFirebaseConfig(): FirebaseTestConfig {
       authDomain: process.env.FIREBASE_AUTH_DOMAIN!,
       storageBucket: process.env.FIREBASE_STORAGE_BUCKET!,
       messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID!,
-      appId: process.env.FIREBASE_APP_ID!
+      appId: process.env.FIREBASE_APP_ID!,
     };
   } catch (error) {
     throw new Error(`Failed to load Firebase test configuration: ${error}`);
@@ -56,7 +61,7 @@ function loadFirebaseConfig(): FirebaseTestConfig {
 
 /**
  * Initialize Firebase with WSL2 optimization for production-grade testing
- * 
+ *
  * Uses the WSL2 Firebase Adapter to eliminate offline mode warnings and
  * network connectivity issues while maintaining full Firebase functionality.
  */
@@ -66,11 +71,11 @@ export async function initializeTestFirebase(): Promise<{ app: FirebaseApp; db: 
   }
 
   const config = loadFirebaseConfig();
-  
+
   console.log('🚀 Initializing WSL2-optimized Firebase for testing...');
   console.log(`   Project: ${config.projectId}`);
   console.log('   Mode: Production-grade with WSL2 optimization');
-  
+
   // Initialize Firebase using unified adapter
   const unifiedInstance = await initializeUnifiedFirebase(config, {
     environment: 'test',
@@ -78,12 +83,12 @@ export async function initializeTestFirebase(): Promise<{ app: FirebaseApp; db: 
     optimizeForWSL2: true,
     useRestOnlyMode: true,
     connectionTimeout: 10000,
-    maxRetries: 3
+    maxRetries: 3,
   });
-  
+
   testFirebaseInstance = {
     app: unifiedInstance.app,
-    db: unifiedInstance.db
+    db: unifiedInstance.db,
   };
 
   // Test connectivity using unified adapter
@@ -96,8 +101,6 @@ export async function initializeTestFirebase(): Promise<{ app: FirebaseApp; db: 
 
   return testFirebaseInstance;
 }
-
-
 
 /**
  * Cleanup Firebase resources after tests
@@ -122,4 +125,4 @@ export function getTestFirebase(): { app: FirebaseApp; db: Firestore } {
     throw new Error('Firebase not initialized. Call initializeTestFirebase() first.');
   }
   return testFirebaseInstance;
-} 
+}

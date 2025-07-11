@@ -11,10 +11,10 @@ async function testFirebaseConnectivity(): Promise<void> {
     console.log('   Initializing Firebase...');
     const firebase = await initializeTestFirebase();
     console.log('   ✅ Firebase initialization successful');
-    
+
     console.log('   Testing database connection...');
     const testDoc = doc(firebase.db, 'test', 'connectivity');
-    
+
     try {
       await getDoc(testDoc);
       console.log('   ✅ Database connection verified');
@@ -29,10 +29,10 @@ async function testFirebaseConnectivity(): Promise<void> {
         throw error;
       }
     }
-    
+
     // Cleanup
     await cleanupTestFirebase();
-    
+
     process.exit(0);
   } catch (error) {
     if (error instanceof Error) {
@@ -44,4 +44,4 @@ async function testFirebaseConnectivity(): Promise<void> {
   }
 }
 
-testFirebaseConnectivity(); 
+testFirebaseConnectivity();

@@ -12,18 +12,12 @@ const DEV_API_BASE = 'https://us-central1-ai-status-dashboard-dev.cloudfunctions
 const LOCAL_URL = 'http://localhost:3000';
 const TEST_EMAIL = 'hello@aistatusdashboard.com';
 
-
-
-
-
-
-
 async function runTests() {
   const results = {
     totalTests: 0,
     passed: 0,
     failed: 0,
-    details: []
+    details: [],
   };
 
   // Helper function to run test
@@ -33,32 +27,28 @@ async function runTests() {
       const result = await testFn();
       if (result.success) {
         results.passed++;
-        
       } else {
         results.failed++;
-        
       }
       results.details.push({ name, ...result });
     } catch (error) {
       results.failed++;
       const message = error.message || 'Unknown error';
-      
+
       results.details.push({ name, success: false, message });
     }
   }
 
   // 1. Test Dev Backend API Endpoints
-  
-  
 
   await test('Provider Status API', async () => {
     const fetch = (await import('node-fetch')).default;
     const response = await fetch(`${DEV_API_BASE}/status`);
     if (!response.ok) return { success: false, message: `HTTP ${response.status}` };
     const data = await response.json();
-    return { 
-      success: true, 
-      message: `${data.summary.total} providers, ${data.summary.operational} operational` 
+    return {
+      success: true,
+      message: `${data.summary.total} providers, ${data.summary.operational} operational`,
     };
   });
 
@@ -67,9 +57,9 @@ async function runTests() {
     const response = await fetch(`${DEV_API_BASE}/health`);
     if (!response.ok) return { success: false, message: `HTTP ${response.status}` };
     const data = await response.json();
-    return { 
-      success: true, 
-      message: `${data.healthy}/${data.totalProviders} providers healthy` 
+    return {
+      success: true,
+      message: `${data.healthy}/${data.totalProviders} providers healthy`,
     };
   });
 
@@ -81,8 +71,8 @@ async function runTests() {
       body: JSON.stringify({
         subscription: { endpoint: 'test-endpoint' },
         title: 'Test Notification',
-        body: 'Test from local environment'
-      })
+        body: 'Test from local environment',
+      }),
     });
     if (!response.ok) return { success: false, message: `HTTP ${response.status}` };
     const data = await response.json();
@@ -97,8 +87,8 @@ async function runTests() {
       body: JSON.stringify({
         token: 'test-token',
         title: 'Test Firebase Message',
-        body: 'Test from local environment'
-      })
+        body: 'Test from local environment',
+      }),
     });
     if (!response.ok) return { success: false, message: `HTTP ${response.status}` };
     const data = await response.json();
@@ -113,14 +103,14 @@ async function runTests() {
       body: JSON.stringify({
         to: TEST_EMAIL,
         subject: 'Test from Local Environment',
-        text: 'This is a test email from local development using dev backend'
-      })
+        text: 'This is a test email from local development using dev backend',
+      }),
     });
     if (!response.ok) return { success: false, message: `HTTP ${response.status}` };
     const data = await response.json();
-    return { 
-      success: true, 
-      message: data.success ? 'Email sent' : 'Email service responding (SMTP not configured)' 
+    return {
+      success: true,
+      message: data.success ? 'Email sent' : 'Email service responding (SMTP not configured)',
     };
   });
 
@@ -131,8 +121,8 @@ async function runTests() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: TEST_EMAIL,
-        providers: ['openai', 'anthropic', 'google-ai']
-      })
+        providers: ['openai', 'anthropic', 'google-ai'],
+      }),
     });
     if (!response.ok) return { success: false, message: `HTTP ${response.status}` };
     const data = await response.json();
@@ -146,8 +136,8 @@ async function runTests() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         webhookUrl: 'https://hooks.slack.com/test',
-        providers: ['openai', 'anthropic']
-      })
+        providers: ['openai', 'anthropic'],
+      }),
     });
     if (!response.ok) return { success: false, message: `HTTP ${response.status}` };
     const data = await response.json();
@@ -163,8 +153,8 @@ async function runTests() {
         token: 'test-push-token',
         providers: ['openai', 'anthropic'],
         endpoint: 'https://fcm.googleapis.com/test',
-        userAgent: 'Local-Test-Environment'
-      })
+        userAgent: 'Local-Test-Environment',
+      }),
     });
     if (!response.ok) return { success: false, message: `HTTP ${response.status}` };
     const data = await response.json();
@@ -178,8 +168,8 @@ async function runTests() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: TEST_EMAIL,
-        type: 'status'
-      })
+        type: 'status',
+      }),
     });
     if (!response.ok) return { success: false, message: `HTTP ${response.status}` };
     const data = await response.json();
@@ -191,7 +181,10 @@ async function runTests() {
     const response = await fetch(`${DEV_API_BASE}/comments`);
     if (!response.ok) return { success: false, message: `HTTP ${response.status}` };
     const data = await response.json();
-    return { success: true, message: `Comments endpoint working (${Array.isArray(data) ? data.length : 0} comments)` };
+    return {
+      success: true,
+      message: `Comments endpoint working (${Array.isArray(data) ? data.length : 0} comments)`,
+    };
   });
 
   await test('Incidents API', async () => {
@@ -199,7 +192,10 @@ async function runTests() {
     const response = await fetch(`${DEV_API_BASE}/incidents`);
     if (!response.ok) return { success: false, message: `HTTP ${response.status}` };
     const data = await response.json();
-    return { success: true, message: `${data.incidents ? data.incidents.length : 0} incidents found` };
+    return {
+      success: true,
+      message: `${data.incidents ? data.incidents.length : 0} incidents found`,
+    };
   });
 
   await test('RSS Feed', async () => {
@@ -214,8 +210,6 @@ async function runTests() {
   });
 
   // 2. Test Local Frontend (if running)
-  
-  
 
   await test('Local Frontend Accessibility', async () => {
     const fetch = (await import('node-fetch')).default;
@@ -235,8 +229,6 @@ async function runTests() {
   });
 
   // 3. Test Integration (Frontend + Backend)
-  
-  
 
   await test('Environment Configuration', async () => {
     // Check if local env is configured to use dev backend
@@ -251,8 +243,6 @@ async function runTests() {
   });
 
   // 4. Test Real Provider APIs
-  
-  
 
   const testProviders = ['openai', 'anthropic', 'huggingface'];
   for (const provider of testProviders) {
@@ -261,25 +251,23 @@ async function runTests() {
       const response = await fetch(`${DEV_API_BASE}/status?provider=${provider}`);
       if (!response.ok) return { success: false, message: `HTTP ${response.status}` };
       const data = await response.json();
-      return { 
-        success: true, 
-        message: `${data.status} (${data.responseTime}ms)` 
+      return {
+        success: true,
+        message: `${data.status} (${data.responseTime}ms)`,
       };
     });
   }
 
   // 5. Performance Tests
-  
-  
 
   await test('API Response Time', async () => {
     const fetch = (await import('node-fetch')).default;
     const start = Date.now();
     const response = await fetch(`${DEV_API_BASE}/status`);
     const responseTime = Date.now() - start;
-    
+
     if (!response.ok) return { success: false, message: `HTTP ${response.status}` };
-    
+
     if (responseTime < 5000) {
       return { success: true, message: `Response time: ${responseTime}ms (Good)` };
     } else {
@@ -288,60 +276,58 @@ async function runTests() {
   });
 
   // Results Summary
-  
-  
-  
+
   if (results.failed > 0) {
-    
     results.details
-      .filter(r => !r.success)
-      .forEach(r => 
+      .filter((r) => !r.success)
+      .forEach((r) => console.log(`❌ ${r.name}: ${r.message}`));
   }
 
   if (results.passed > 0) {
-    
     results.details
-      .filter(r => r.success)
-      .forEach(r => 
+      .filter((r) => r.success)
+      .forEach((r) => console.log(`✅ ${r.name}: ${r.message}`));
   }
 
   // Save detailed results
   const reportPath = 'local-dev-backend-test-results.json';
-  fs.writeFileSync(reportPath, JSON.stringify({
-    timestamp: new Date().toISOString(),
-    environment: 'local-with-dev-backend',
-    localUrl: LOCAL_URL,
-    devApiUrl: DEV_API_BASE,
-    testEmail: TEST_EMAIL,
-    results,
-    summary: {
-      total: results.totalTests,
-      passed: results.passed,
-      failed: results.failed,
-      successRate: `${((results.passed/results.totalTests)*100).toFixed(1)}%`
-    }
-  }, null, 2));
+  fs.writeFileSync(
+    reportPath,
+    JSON.stringify(
+      {
+        timestamp: new Date().toISOString(),
+        environment: 'local-with-dev-backend',
+        localUrl: LOCAL_URL,
+        devApiUrl: DEV_API_BASE,
+        testEmail: TEST_EMAIL,
+        results,
+        summary: {
+          total: results.totalTests,
+          passed: results.passed,
+          failed: results.failed,
+          successRate: `${((results.passed / results.totalTests) * 100).toFixed(1)}%`,
+        },
+      },
+      null,
+      2
+    )
+  );
 
-  
-  
   // Recommendations
-  
+
   if (results.failed === 0) {
-    
   } else {
-    
-    if (results.details.some(r => !r.success && r.name.includes('Local Frontend'))) {
-      
+    if (results.details.some((r) => !r.success && r.name.includes('Local Frontend'))) {
     }
-    if (results.details.some(r => !r.success && r.name.includes('Environment'))) {
-      
+    if (results.details.some((r) => !r.success && r.name.includes('Environment'))) {
     }
   }
 
-  
-  
   return results;
 }
 
 // Run the tests
-runTests().catch( 
+runTests().catch((error) => {
+  console.error('Test runner error:', error);
+  process.exit(1);
+});

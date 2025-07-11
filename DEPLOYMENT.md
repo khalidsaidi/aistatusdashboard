@@ -16,7 +16,7 @@ Copy the appropriate example file and configure:
 # For development
 cp env.example .env.local
 
-# For production  
+# For production
 cp env.production.example .env.production
 ```
 
@@ -74,7 +74,7 @@ firebase init
 
 # Select:
 # - Firestore
-# - Functions  
+# - Functions
 # - Hosting
 # - Storage
 ```
@@ -118,7 +118,7 @@ Edit `firebase.json` redirect destination:
 The included `firestore.rules` provides secure defaults:
 
 - ✅ Public read access to status data
-- ✅ Server-only write access  
+- ✅ Server-only write access
 - ✅ User-scoped subscriptions
 - ✅ Authenticated comments with validation
 
@@ -154,7 +154,7 @@ firebase deploy
 ### Production Deployment
 
 ```bash
-# Set production project  
+# Set production project
 firebase use prod
 
 # Deploy to production
@@ -186,18 +186,22 @@ After deployment, verify:
 ### Common Issues
 
 **Firebase project not found**
+
 - Check `.firebaserc` configuration
 - Verify project exists: `firebase projects:list`
 
 **Functions deployment fails**
+
 - Check `functions/package.json` dependencies
 - Verify Node.js version compatibility
 
 **Storage rules too restrictive**
+
 - Review `storage.rules` for your use case
 - Test with Firebase console
 
 **Environment variables not loading**
+
 - Check file names: `.env.local` vs `.env.development`
 - Verify no syntax errors in env files
 
@@ -209,4 +213,4 @@ After deployment, verify:
 
 ## 📝 License
 
-This project is MIT licensed. See [LICENSE](LICENSE) for details. 
+This project is MIT licensed. See [LICENSE](LICENSE) for details.

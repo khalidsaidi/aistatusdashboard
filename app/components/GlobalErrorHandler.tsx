@@ -12,7 +12,7 @@ export default function GlobalErrorHandler() {
     // Catch unhandled promise rejections
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       console.error('Unhandled promise rejection:', event.reason);
-      
+
       // Check if it's a font loading error
       if (event.reason?.message?.includes('font') || event.reason?.toString().includes('.woff')) {
         if (!fontErrorShown) {
@@ -29,7 +29,7 @@ export default function GlobalErrorHandler() {
           'Something went wrong. Please check your connection and try again.'
         );
       }
-      
+
       // Prevent default browser error handling
       event.preventDefault();
     };
@@ -37,18 +37,15 @@ export default function GlobalErrorHandler() {
     // Catch JavaScript errors
     const handleError = (event: ErrorEvent) => {
       console.error('JavaScript error:', event.error);
-      
+
       // Show user-friendly error message
-      showError(
-        'Application Error',
-        'An unexpected error occurred. Please refresh the page.'
-      );
+      showError('Application Error', 'An unexpected error occurred. Please refresh the page.');
     };
 
     // Catch resource loading errors (fonts, images, scripts, etc.)
     const handleResourceError = (event: Event) => {
       const target = event.target as HTMLElement;
-      
+
       if (target) {
         // Check for font loading errors
         if (target.tagName === 'LINK' && (target as HTMLLinkElement).href?.includes('.woff')) {
@@ -64,10 +61,7 @@ export default function GlobalErrorHandler() {
         // Check for image loading errors
         else if (target.tagName === 'IMG') {
           console.warn('Image loading error:', (target as HTMLImageElement).src);
-          showWarning(
-            'Image Loading Error',
-            'An image failed to load.'
-          );
+          showWarning('Image Loading Error', 'An image failed to load.');
         }
         // Check for script loading errors
         else if (target.tagName === 'SCRIPT') {
@@ -104,7 +98,7 @@ export default function GlobalErrorHandler() {
           }
         });
       });
-      
+
       try {
         observer.observe({ entryTypes: ['resource'] });
       } catch (e) {
@@ -116,16 +110,19 @@ export default function GlobalErrorHandler() {
     const originalConsoleError = console.error;
     console.error = (...args) => {
       const message = args.join(' ');
-      
+
       // Check for font-related errors in console
-      if ((message.includes('.woff') || (message.includes('font') && message.includes('404'))) && !fontErrorShown) {
+      if (
+        (message.includes('.woff') || (message.includes('font') && message.includes('404'))) &&
+        !fontErrorShown
+      ) {
         showWarning(
           'Font Loading Error',
           'Some fonts failed to load, but the site will continue to work with fallback fonts.'
         );
         fontErrorShown = true;
       }
-      
+
       // Call original console.error
       originalConsoleError.apply(console, args);
     };
@@ -134,7 +131,7 @@ export default function GlobalErrorHandler() {
     const originalConsoleWarn = console.warn;
     console.warn = (...args) => {
       const message = args.join(' ');
-      
+
       // Check for font-related warnings in console
       if ((message.includes('.woff') || message.includes('font')) && !fontErrorShown) {
         showWarning(
@@ -143,7 +140,7 @@ export default function GlobalErrorHandler() {
         );
         fontErrorShown = true;
       }
-      
+
       // Call original console.warn
       originalConsoleWarn.apply(console, args);
     };
@@ -152,11 +149,8 @@ export default function GlobalErrorHandler() {
     const handleReactError = (event: any) => {
       if (event.detail?.error) {
         console.error('React error:', event.detail.error);
-        
-        showError(
-          'Component Error',
-          'A component failed to load. Please try refreshing the page.'
-        );
+
+        showError('Component Error', 'A component failed to load. Please try refreshing the page.');
       }
     };
 
@@ -165,7 +159,7 @@ export default function GlobalErrorHandler() {
     window.fetch = async (...args) => {
       try {
         const response = await originalFetch(...args);
-        
+
         // Show toast for HTTP errors
         if (!response.ok) {
           // Get URL from fetch arguments
@@ -177,7 +171,7 @@ export default function GlobalErrorHandler() {
           } else if (args[0] instanceof URL) {
             url = args[0].toString();
           }
-          
+
           // Handle font loading errors specifically
           if (url.includes('.woff') && !fontErrorShown) {
             showWarning(
@@ -189,24 +183,15 @@ export default function GlobalErrorHandler() {
           // Skip showing toasts for other static assets
           else if (!url.includes('.css') && !url.includes('.js')) {
             if (response.status >= 500) {
-              showError(
-                'Server Error',
-                `Service temporarily unavailable (${response.status})`
-              );
+              showError('Server Error', `Service temporarily unavailable (${response.status})`);
             } else if (response.status === 404) {
-              showWarning(
-                'Not Found',
-                'The requested resource was not found'
-              );
+              showWarning('Not Found', 'The requested resource was not found');
             } else if (response.status === 401 || response.status === 403) {
-              showWarning(
-                'Access Denied',
-                'You don\'t have permission to access this resource'
-              );
+              showWarning('Access Denied', "You don't have permission to access this resource");
             }
           }
         }
-        
+
         return response;
       } catch (error) {
         // Network connectivity issues
@@ -244,7 +229,7 @@ export default function GlobalErrorHandler() {
       window.removeEventListener('error', handleError);
       window.removeEventListener('error', handleResourceError, true);
       window.removeEventListener('reactError', handleReactError);
-      
+
       // Restore original fetch and console methods
       window.fetch = originalFetch;
       console.error = originalConsoleError;
@@ -253,4 +238,4 @@ export default function GlobalErrorHandler() {
   }, [showError, showWarning]);
 
   return null; // This component doesn't render anything
-} 
+}

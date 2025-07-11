@@ -61,7 +61,9 @@ export function getAllProvidersList(): UnifiedProvider[] {
  * Get providers by category
  */
 export function getProvidersByCategory(category: string): UnifiedProvider[] {
-  return getEnabledProviders().filter((provider: UnifiedProvider) => provider.category === category);
+  return getEnabledProviders().filter(
+    (provider: UnifiedProvider) => provider.category === category
+  );
 }
 
 /**
@@ -81,11 +83,11 @@ export function getProviderCategories(): string[] {
 export function validateProviderConfig(): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
   const providers = getAllProviders();
-  
+
   if (providers.length === 0) {
     errors.push('No providers configured');
   }
-  
+
   providers.forEach((provider: UnifiedProvider) => {
     if (!provider.id) {
       errors.push('Provider missing ID');
@@ -100,10 +102,10 @@ export function validateProviderConfig(): { valid: boolean; errors: string[] } {
       errors.push(`Provider ${provider.id} missing statusPageUrl`);
     }
   });
-  
+
   return {
     valid: errors.length === 0,
-    errors
+    errors,
   };
 }
 
@@ -119,7 +121,7 @@ export const PROVIDERS = getEnabledProviders().map((provider: UnifiedProvider) =
   // Ensure all required fields are present
   timeout: provider.timeout || 10000,
   enabled: provider.enabled !== false,
-  priority: provider.priority || 999
+  priority: provider.priority || 999,
 }));
 
 /**
@@ -129,7 +131,7 @@ export function getProviderStats() {
   const all = getAllProviders();
   const enabled = getEnabledProviders();
   const categories = getProviderCategories();
-  
+
   return {
     total: all.length,
     enabled: enabled.length,
@@ -138,6 +140,6 @@ export function getProviderStats() {
     categoriesBreakdown: categories.reduce((acc: Record<string, number>, category: string) => {
       acc[category] = getProvidersByCategory(category).length;
       return acc;
-    }, {})
+    }, {}),
   };
-} 
+}

@@ -7,13 +7,15 @@ This project displays logos and trademarks from various AI service providers for
 ### Usage Declaration
 
 We use these trademarks under the principles of **nominative fair use** for:
+
 - **Identification** of the respective AI services
-- **Status monitoring** and reporting purposes  
+- **Status monitoring** and reporting purposes
 - **Reference** in a factual, non-commercial context
 
 ### No Endorsement or Affiliation
 
 The display of these trademarks does **not** imply:
+
 - Endorsement by the trademark owners
 - Partnership or business relationship
 - Sponsorship or approval of this project
@@ -22,6 +24,7 @@ The display of these trademarks does **not** imply:
 ### Trademark Compliance
 
 We adhere to the following guidelines:
+
 - ✅ Logos are downloaded at build time from public sources
 - ✅ No logos are modified, recolored, or distorted
 - ✅ Proper attribution and disclaimer provided
@@ -65,4 +68,4 @@ This trademark notice does not constitute legal advice. The use of trademarks in
 
 **Last Updated:** January 2025  
 **Project:** AI Status Dashboard  
-**Repository:** https://github.com/khalidsaidi/aistatusdashboard 
+**Repository:** https://github.com/khalidsaidi/aistatusdashboard

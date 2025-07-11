@@ -8,23 +8,23 @@ interface ClientTimestampProps {
   className?: string;
 }
 
-export default function ClientTimestamp({ 
-  format = 'datetime', 
+export default function ClientTimestamp({
+  format = 'datetime',
   date,
-  className = '' 
+  className = '',
 }: ClientTimestampProps) {
   const [mounted, setMounted] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     setMounted(true);
-    
+
     if (!date) {
       // Update current time every second if no specific date provided
       const interval = setInterval(() => {
         setCurrentTime(new Date());
       }, 1000);
-      
+
       return () => clearInterval(interval);
     }
   }, [date]);
@@ -45,9 +45,5 @@ export default function ClientTimestamp({
   };
 
   // Use conditional rendering instead of early return
-  return (
-    <span className={className}>
-      {mounted ? formatDate() : 'Loading...'}
-    </span>
-  );
-} 
+  return <span className={className}>{mounted ? formatDate() : 'Loading...'}</span>;
+}

@@ -5,9 +5,9 @@
  */
 
 // IMMEDIATE POLYFILL EXECUTION - No delays or conditions
-(function() {
+(function () {
   'use strict';
-  
+
   console.log('🔧 Loading aggressive Jest polyfills...');
 
   // Ensure globalThis exists first
@@ -44,7 +44,7 @@
         cache: this.cache,
         redirect: this.redirect,
         referrer: this.referrer,
-        mode: this.mode
+        mode: this.mode,
       });
     }
   };
@@ -89,7 +89,7 @@
         headers: Object.fromEntries(this.headers),
         redirected: this.redirected,
         type: this.type,
-        url: this.url
+        url: this.url,
       });
     }
   };
@@ -134,20 +134,22 @@
   if (typeof window !== 'undefined') contexts.push(window);
   if (typeof self !== 'undefined') contexts.push(self);
 
-  contexts.forEach(ctx => {
+  contexts.forEach((ctx) => {
     if (ctx) {
       // Force override even if they exist
       ctx.Request = RequestPolyfill;
       ctx.Response = ResponsePolyfill;
       ctx.Headers = HeadersPolyfill;
-      
+
       // Mock fetch
-      ctx.fetch = ctx.fetch || (async (url, options = {}) => {
-        return new ResponsePolyfill(JSON.stringify({ mock: true }), {
-          status: 200,
-          headers: { 'content-type': 'application/json' }
+      ctx.fetch =
+        ctx.fetch ||
+        (async (url, options = {}) => {
+          return new ResponsePolyfill(JSON.stringify({ mock: true }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+          });
         });
-      });
 
       // Mock URL
       if (!ctx.URL && typeof require !== 'undefined') {
@@ -165,30 +167,32 @@
       }
 
       // Mock AbortController
-      ctx.AbortController = ctx.AbortController || class AbortController {
-        constructor() {
-          this.signal = {
-            aborted: false,
-            addEventListener: () => {},
-            removeEventListener: () => {}
-          };
-        }
-        abort() {
-          this.signal.aborted = true;
-        }
-      };
+      ctx.AbortController =
+        ctx.AbortController ||
+        class AbortController {
+          constructor() {
+            this.signal = {
+              aborted: false,
+              addEventListener: () => {},
+              removeEventListener: () => {},
+            };
+          }
+          abort() {
+            this.signal.aborted = true;
+          }
+        };
 
       // Mock performance
       ctx.performance = ctx.performance || {
-        now: () => Date.now()
+        now: () => Date.now(),
       };
 
       // Mock crypto
       ctx.crypto = ctx.crypto || {
         randomUUID: () => {
-          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            const r = Math.random() * 16 | 0;
-            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            const r = (Math.random() * 16) | 0;
+            const v = c === 'x' ? r : (r & 0x3) | 0x8;
             return v.toString(16);
           });
         },
@@ -197,7 +201,7 @@
             arr[i] = Math.floor(Math.random() * 256);
           }
           return arr;
-        }
+        },
       };
     }
   });
@@ -208,4 +212,4 @@
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {};
-} 
+}

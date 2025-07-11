@@ -15,12 +15,9 @@
     {
       "name": "Hugging Face Models",
       "url": "https://huggingface.co/models",
-      "type": "html", 
+      "type": "html",
       "enabled": true,
-      "patterns": [
-        "\"([a-z0-9-]+)\\/[^\"]*\"",
-        "([a-z0-9-]+)\\s+(?:model|api|inference)"
-      ],
+      "patterns": ["\"([a-z0-9-]+)\\/[^\"]*\"", "([a-z0-9-]+)\\s+(?:model|api|inference)"],
       "confidence": 0.9,
       "description": "Leading ML model repository"
     },
@@ -42,11 +39,7 @@
       "url": "https://www.producthunt.com/topics/artificial-intelligence",
       "type": "html",
       "enabled": true,
-      "patterns": [
-        "([a-z0-9-]+)\\.ai",
-        "([a-z0-9-]+)\\s+AI",
-        "data-name=\"([a-z0-9-]+)\""
-      ],
+      "patterns": ["([a-z0-9-]+)\\.ai", "([a-z0-9-]+)\\s+AI", "data-name=\"([a-z0-9-]+)\""],
       "confidence": 0.6,
       "description": "Latest AI product launches"
     },
@@ -79,11 +72,11 @@
   ],
   "knownProviders": [
     "openai",
-    "anthropic", 
+    "anthropic",
     "google-ai",
     "huggingface",
     "cohere",
-    "replicate", 
+    "replicate",
     "groq",
     "deepseek",
     "meta",
@@ -103,9 +96,28 @@
     "minLength": 3,
     "maxLength": 20,
     "excludeWords": [
-      "api", "www", "http", "https", "com", "org", "net", "github", 
-      "model", "chat", "gpt", "bot", "test", "demo", "example",
-      "admin", "user", "login", "auth", "docs", "help", "support"
+      "api",
+      "www",
+      "http",
+      "https",
+      "com",
+      "org",
+      "net",
+      "github",
+      "model",
+      "chat",
+      "gpt",
+      "bot",
+      "test",
+      "demo",
+      "example",
+      "admin",
+      "user",
+      "login",
+      "auth",
+      "docs",
+      "help",
+      "support"
     ],
     "requiredConfidence": 0.5
   },
@@ -133,4 +145,4 @@
     "keepHistoryDays": 30,
     "maxResultsPerRun": 50
   }
-} 
+}

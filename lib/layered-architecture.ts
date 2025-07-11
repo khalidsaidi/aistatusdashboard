@@ -1,6 +1,6 @@
 /**
  * LAYERED ARCHITECTURE
- * 
+ *
  * Implements proper separation of concerns with:
  * - Repository Layer (Data Access)
  * - Service Layer (Business Logic)
@@ -11,21 +11,21 @@
 import { log } from './logger';
 import { withErrorHandling, ErrorContext } from './unified-error-handler';
 import { UnifiedFirebaseInstance } from './unified-firebase-adapter';
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  getDoc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  where, 
-  orderBy, 
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
   limit,
   Timestamp,
   DocumentData,
-  QuerySnapshot
+  QuerySnapshot,
 } from 'firebase/firestore';
 
 // =============================================================================
@@ -102,139 +102,163 @@ export class FirestoreProviderRepository implements ProviderRepository {
   constructor(private firebase: UnifiedFirebaseInstance) {}
 
   async findAll(): Promise<Provider[]> {
-    return withErrorHandling(async () => {
-      const snapshot = await getDocs(collection(this.firebase.db, this.collectionName));
-      return this.mapSnapshotToProviders(snapshot);
-    }, {
-      component: 'ProviderRepository',
-      operation: 'findAll'
-    });
+    return withErrorHandling(
+      async () => {
+        const snapshot = await getDocs(collection(this.firebase.db, this.collectionName));
+        return this.mapSnapshotToProviders(snapshot);
+      },
+      {
+        component: 'ProviderRepository',
+        operation: 'findAll',
+      }
+    );
   }
 
   async findById(id: string): Promise<Provider | null> {
-    return withErrorHandling(async () => {
-      const docRef = doc(this.firebase.db, this.collectionName, id);
-      const snapshot = await getDoc(docRef);
-      
-      if (!snapshot.exists()) {
-        return null;
-      }
+    return withErrorHandling(
+      async () => {
+        const docRef = doc(this.firebase.db, this.collectionName, id);
+        const snapshot = await getDoc(docRef);
 
-      return this.mapDocToProvider(id, snapshot.data());
-    }, {
-      component: 'ProviderRepository',
-      operation: 'findById',
-      metadata: { providerId: id }
-    });
+        if (!snapshot.exists()) {
+          return null;
+        }
+
+        return this.mapDocToProvider(id, snapshot.data());
+      },
+      {
+        component: 'ProviderRepository',
+        operation: 'findById',
+        metadata: { providerId: id },
+      }
+    );
   }
 
   async findByStatus(status: Provider['status']): Promise<Provider[]> {
-    return withErrorHandling(async () => {
-      const q = query(
-        collection(this.firebase.db, this.collectionName),
-        where('status', '==', status),
-        orderBy('priority', 'desc'),
-        orderBy('name', 'asc')
-      );
-      
-      const snapshot = await getDocs(q);
-      return this.mapSnapshotToProviders(snapshot);
-    }, {
-      component: 'ProviderRepository',
-      operation: 'findByStatus',
-      metadata: { status }
-    });
+    return withErrorHandling(
+      async () => {
+        const q = query(
+          collection(this.firebase.db, this.collectionName),
+          where('status', '==', status),
+          orderBy('priority', 'desc'),
+          orderBy('name', 'asc')
+        );
+
+        const snapshot = await getDocs(q);
+        return this.mapSnapshotToProviders(snapshot);
+      },
+      {
+        component: 'ProviderRepository',
+        operation: 'findByStatus',
+        metadata: { status },
+      }
+    );
   }
 
   async findByPriority(priority: Provider['priority']): Promise<Provider[]> {
-    return withErrorHandling(async () => {
-      const q = query(
-        collection(this.firebase.db, this.collectionName),
-        where('priority', '==', priority),
-        orderBy('name', 'asc')
-      );
-      
-      const snapshot = await getDocs(q);
-      return this.mapSnapshotToProviders(snapshot);
-    }, {
-      component: 'ProviderRepository',
-      operation: 'findByPriority',
-      metadata: { priority }
-    });
+    return withErrorHandling(
+      async () => {
+        const q = query(
+          collection(this.firebase.db, this.collectionName),
+          where('priority', '==', priority),
+          orderBy('name', 'asc')
+        );
+
+        const snapshot = await getDocs(q);
+        return this.mapSnapshotToProviders(snapshot);
+      },
+      {
+        component: 'ProviderRepository',
+        operation: 'findByPriority',
+        metadata: { priority },
+      }
+    );
   }
 
   async create(providerData: Omit<Provider, 'id' | 'createdAt' | 'updatedAt'>): Promise<Provider> {
-    return withErrorHandling(async () => {
-      const now = new Date();
-      const data = {
-        ...providerData,
-        createdAt: Timestamp.fromDate(now),
-        updatedAt: Timestamp.fromDate(now)
-      };
+    return withErrorHandling(
+      async () => {
+        const now = new Date();
+        const data = {
+          ...providerData,
+          createdAt: Timestamp.fromDate(now),
+          updatedAt: Timestamp.fromDate(now),
+        };
 
-      const docRef = await addDoc(collection(this.firebase.db, this.collectionName), data);
-      
-      return {
-        id: docRef.id,
-        ...providerData,
-        createdAt: now,
-        updatedAt: now
-      };
-    }, {
-      component: 'ProviderRepository',
-      operation: 'create',
-      metadata: { providerName: providerData.name }
-    });
+        const docRef = await addDoc(collection(this.firebase.db, this.collectionName), data);
+
+        return {
+          id: docRef.id,
+          ...providerData,
+          createdAt: now,
+          updatedAt: now,
+        };
+      },
+      {
+        component: 'ProviderRepository',
+        operation: 'create',
+        metadata: { providerName: providerData.name },
+      }
+    );
   }
 
   async update(id: string, updates: Partial<Provider>): Promise<Provider> {
-    return withErrorHandling(async () => {
-      const docRef = doc(this.firebase.db, this.collectionName, id);
-      const updateData = {
-        ...updates,
-        updatedAt: Timestamp.fromDate(new Date())
-      };
+    return withErrorHandling(
+      async () => {
+        const docRef = doc(this.firebase.db, this.collectionName, id);
+        const updateData = {
+          ...updates,
+          updatedAt: Timestamp.fromDate(new Date()),
+        };
 
-      await updateDoc(docRef, updateData);
-      
-      const updated = await this.findById(id);
-      if (!updated) {
-        throw new Error(`Provider ${id} not found after update`);
+        await updateDoc(docRef, updateData);
+
+        const updated = await this.findById(id);
+        if (!updated) {
+          throw new Error(`Provider ${id} not found after update`);
+        }
+
+        return updated;
+      },
+      {
+        component: 'ProviderRepository',
+        operation: 'update',
+        metadata: { providerId: id },
       }
-
-      return updated;
-    }, {
-      component: 'ProviderRepository',
-      operation: 'update',
-      metadata: { providerId: id }
-    });
+    );
   }
 
   async delete(id: string): Promise<boolean> {
-    return withErrorHandling(async () => {
-      const docRef = doc(this.firebase.db, this.collectionName, id);
-      await deleteDoc(docRef);
-      return true;
-    }, {
-      component: 'ProviderRepository',
-      operation: 'delete',
-      metadata: { providerId: id }
-    });
+    return withErrorHandling(
+      async () => {
+        const docRef = doc(this.firebase.db, this.collectionName, id);
+        await deleteDoc(docRef);
+        return true;
+      },
+      {
+        component: 'ProviderRepository',
+        operation: 'delete',
+        metadata: { providerId: id },
+      }
+    );
   }
 
   async count(): Promise<number> {
-    return withErrorHandling(async () => {
-      const snapshot = await getDocs(collection(this.firebase.db, this.collectionName));
-      return snapshot.size;
-    }, {
-      component: 'ProviderRepository',
-      operation: 'count'
-    });
+    return withErrorHandling(
+      async () => {
+        const snapshot = await getDocs(collection(this.firebase.db, this.collectionName));
+        return snapshot.size;
+      },
+      {
+        component: 'ProviderRepository',
+        operation: 'count',
+      }
+    );
   }
 
   // Private helper methods
   private mapSnapshotToProviders(snapshot: QuerySnapshot<DocumentData>): Provider[] {
-    return snapshot.docs.map(doc => this.mapDocToProvider(doc.id, doc.data()));
+    return snapshot.docs.map((doc) => this.mapDocToProvider(doc.id, doc.data()));
   }
 
   private mapDocToProvider(id: string, data: DocumentData): Provider {
@@ -248,7 +272,7 @@ export class FirestoreProviderRepository implements ProviderRepository {
       priority: data.priority || 'medium',
       metadata: data.metadata,
       createdAt: data.createdAt?.toDate() || new Date(),
-      updatedAt: data.updatedAt?.toDate() || new Date()
+      updatedAt: data.updatedAt?.toDate() || new Date(),
     };
   }
 }
@@ -259,132 +283,150 @@ export class FirestoreStatusCheckRepository implements StatusCheckRepository {
   constructor(private firebase: UnifiedFirebaseInstance) {}
 
   async findByProviderId(providerId: string, limitCount = 100): Promise<StatusCheck[]> {
-    return withErrorHandling(async () => {
-      const q = query(
-        collection(this.firebase.db, this.collectionName),
-        where('providerId', '==', providerId),
-        orderBy('timestamp', 'desc'),
-        limit(limitCount)
-      );
-      
-      const snapshot = await getDocs(q);
-      return this.mapSnapshotToStatusChecks(snapshot);
-    }, {
-      component: 'StatusCheckRepository',
-      operation: 'findByProviderId',
-      metadata: { providerId, limit: limitCount }
-    });
+    return withErrorHandling(
+      async () => {
+        const q = query(
+          collection(this.firebase.db, this.collectionName),
+          where('providerId', '==', providerId),
+          orderBy('timestamp', 'desc'),
+          limit(limitCount)
+        );
+
+        const snapshot = await getDocs(q);
+        return this.mapSnapshotToStatusChecks(snapshot);
+      },
+      {
+        component: 'StatusCheckRepository',
+        operation: 'findByProviderId',
+        metadata: { providerId, limit: limitCount },
+      }
+    );
   }
 
   async findByTimeRange(start: Date, end: Date): Promise<StatusCheck[]> {
-    return withErrorHandling(async () => {
-      const q = query(
-        collection(this.firebase.db, this.collectionName),
-        where('timestamp', '>=', Timestamp.fromDate(start)),
-        where('timestamp', '<=', Timestamp.fromDate(end)),
-        orderBy('timestamp', 'desc')
-      );
-      
-      const snapshot = await getDocs(q);
-      return this.mapSnapshotToStatusChecks(snapshot);
-    }, {
-      component: 'StatusCheckRepository',
-      operation: 'findByTimeRange',
-      metadata: { start: start.toISOString(), end: end.toISOString() }
-    });
+    return withErrorHandling(
+      async () => {
+        const q = query(
+          collection(this.firebase.db, this.collectionName),
+          where('timestamp', '>=', Timestamp.fromDate(start)),
+          where('timestamp', '<=', Timestamp.fromDate(end)),
+          orderBy('timestamp', 'desc')
+        );
+
+        const snapshot = await getDocs(q);
+        return this.mapSnapshotToStatusChecks(snapshot);
+      },
+      {
+        component: 'StatusCheckRepository',
+        operation: 'findByTimeRange',
+        metadata: { start: start.toISOString(), end: end.toISOString() },
+      }
+    );
   }
 
   async findByProviderAndTimeRange(
-    providerId: string, 
-    start: Date, 
+    providerId: string,
+    start: Date,
     end: Date
   ): Promise<StatusCheck[]> {
-    return withErrorHandling(async () => {
-      const q = query(
-        collection(this.firebase.db, this.collectionName),
-        where('providerId', '==', providerId),
-        where('timestamp', '>=', Timestamp.fromDate(start)),
-        where('timestamp', '<=', Timestamp.fromDate(end)),
-        orderBy('timestamp', 'desc')
-      );
-      
-      const snapshot = await getDocs(q);
-      return this.mapSnapshotToStatusChecks(snapshot);
-    }, {
-      component: 'StatusCheckRepository',
-      operation: 'findByProviderAndTimeRange',
-      metadata: { 
-        providerId, 
-        start: start.toISOString(), 
-        end: end.toISOString() 
+    return withErrorHandling(
+      async () => {
+        const q = query(
+          collection(this.firebase.db, this.collectionName),
+          where('providerId', '==', providerId),
+          where('timestamp', '>=', Timestamp.fromDate(start)),
+          where('timestamp', '<=', Timestamp.fromDate(end)),
+          orderBy('timestamp', 'desc')
+        );
+
+        const snapshot = await getDocs(q);
+        return this.mapSnapshotToStatusChecks(snapshot);
+      },
+      {
+        component: 'StatusCheckRepository',
+        operation: 'findByProviderAndTimeRange',
+        metadata: {
+          providerId,
+          start: start.toISOString(),
+          end: end.toISOString(),
+        },
       }
-    });
+    );
   }
 
   async create(statusCheckData: Omit<StatusCheck, 'id'>): Promise<StatusCheck> {
-    return withErrorHandling(async () => {
-      const data = {
-        ...statusCheckData,
-        timestamp: Timestamp.fromDate(statusCheckData.timestamp)
-      };
+    return withErrorHandling(
+      async () => {
+        const data = {
+          ...statusCheckData,
+          timestamp: Timestamp.fromDate(statusCheckData.timestamp),
+        };
 
-      const docRef = await addDoc(collection(this.firebase.db, this.collectionName), data);
-      
-      return {
-        id: docRef.id,
-        ...statusCheckData
-      };
-    }, {
-      component: 'StatusCheckRepository',
-      operation: 'create',
-      metadata: { providerId: statusCheckData.providerId }
-    });
+        const docRef = await addDoc(collection(this.firebase.db, this.collectionName), data);
+
+        return {
+          id: docRef.id,
+          ...statusCheckData,
+        };
+      },
+      {
+        component: 'StatusCheckRepository',
+        operation: 'create',
+        metadata: { providerId: statusCheckData.providerId },
+      }
+    );
   }
 
   async createBatch(statusChecks: Array<Omit<StatusCheck, 'id'>>): Promise<StatusCheck[]> {
-    return withErrorHandling(async () => {
-      const results: StatusCheck[] = [];
-      
-      // Process in batches of 500 (Firestore batch limit)
-      const batchSize = 500;
-      for (let i = 0; i < statusChecks.length; i += batchSize) {
-        const batch = statusChecks.slice(i, i + batchSize);
-        const batchResults = await Promise.all(
-          batch.map(statusCheck => this.create(statusCheck))
-        );
-        results.push(...batchResults);
-      }
+    return withErrorHandling(
+      async () => {
+        const results: StatusCheck[] = [];
 
-      return results;
-    }, {
-      component: 'StatusCheckRepository',
-      operation: 'createBatch',
-      metadata: { count: statusChecks.length }
-    });
+        // Process in batches of 500 (Firestore batch limit)
+        const batchSize = 500;
+        for (let i = 0; i < statusChecks.length; i += batchSize) {
+          const batch = statusChecks.slice(i, i + batchSize);
+          const batchResults = await Promise.all(
+            batch.map((statusCheck) => this.create(statusCheck))
+          );
+          results.push(...batchResults);
+        }
+
+        return results;
+      },
+      {
+        component: 'StatusCheckRepository',
+        operation: 'createBatch',
+        metadata: { count: statusChecks.length },
+      }
+    );
   }
 
   async deleteOlderThan(date: Date): Promise<number> {
-    return withErrorHandling(async () => {
-      const q = query(
-        collection(this.firebase.db, this.collectionName),
-        where('timestamp', '<', Timestamp.fromDate(date))
-      );
-      
-      const snapshot = await getDocs(q);
-      const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
-      
-      await Promise.all(deletePromises);
-      return snapshot.size;
-    }, {
-      component: 'StatusCheckRepository',
-      operation: 'deleteOlderThan',
-      metadata: { cutoffDate: date.toISOString() }
-    });
+    return withErrorHandling(
+      async () => {
+        const q = query(
+          collection(this.firebase.db, this.collectionName),
+          where('timestamp', '<', Timestamp.fromDate(date))
+        );
+
+        const snapshot = await getDocs(q);
+        const deletePromises = snapshot.docs.map((doc) => deleteDoc(doc.ref));
+
+        await Promise.all(deletePromises);
+        return snapshot.size;
+      },
+      {
+        component: 'StatusCheckRepository',
+        operation: 'deleteOlderThan',
+        metadata: { cutoffDate: date.toISOString() },
+      }
+    );
   }
 
   // Private helper methods
   private mapSnapshotToStatusChecks(snapshot: QuerySnapshot<DocumentData>): StatusCheck[] {
-    return snapshot.docs.map(doc => this.mapDocToStatusCheck(doc.id, doc.data()));
+    return snapshot.docs.map((doc) => this.mapDocToStatusCheck(doc.id, doc.data()));
   }
 
   private mapDocToStatusCheck(id: string, data: DocumentData): StatusCheck {
@@ -395,7 +437,7 @@ export class FirestoreStatusCheckRepository implements StatusCheckRepository {
       responseTime: data.responseTime || 0,
       timestamp: data.timestamp?.toDate() || new Date(),
       error: data.error,
-      metadata: data.metadata
+      metadata: data.metadata,
     };
   }
 }
@@ -413,17 +455,28 @@ export interface ProviderService {
   updateProvider(id: string, updates: Partial<Provider>): Promise<Provider>;
   deleteProvider(id: string): Promise<boolean>;
   getProviderMetrics(providerId: string, days?: number): Promise<ProviderMetrics>;
-  updateProviderStatus(id: string, status: Provider['status'], responseTime: number): Promise<Provider>;
+  updateProviderStatus(
+    id: string,
+    status: Provider['status'],
+    responseTime: number
+  ): Promise<Provider>;
 }
 
 export interface StatusService {
-  recordStatusCheck(providerId: string, status: Provider['status'], responseTime: number, error?: string): Promise<StatusCheck>;
-  recordBatchStatusChecks(checks: Array<{
-    providerId: string;
-    status: Provider['status'];
-    responseTime: number;
-    error?: string;
-  }>): Promise<StatusCheck[]>;
+  recordStatusCheck(
+    providerId: string,
+    status: Provider['status'],
+    responseTime: number,
+    error?: string
+  ): Promise<StatusCheck>;
+  recordBatchStatusChecks(
+    checks: Array<{
+      providerId: string;
+      status: Provider['status'];
+      responseTime: number;
+      error?: string;
+    }>
+  ): Promise<StatusCheck[]>;
   getProviderHistory(providerId: string, limit?: number): Promise<StatusCheck[]>;
   getSystemOverview(): Promise<{
     totalProviders: number;
@@ -468,10 +521,10 @@ export class ProviderServiceImpl implements ProviderService {
     // Set defaults
     const provider = {
       ...providerData,
-      status: providerData.status || 'unknown' as Provider['status'],
+      status: providerData.status || ('unknown' as Provider['status']),
       lastChecked: providerData.lastChecked || new Date(),
       responseTime: providerData.responseTime || 0,
-      priority: providerData.priority || 'medium' as Provider['priority']
+      priority: providerData.priority || ('medium' as Provider['priority']),
     };
 
     return this.providerRepo.create(provider);
@@ -497,11 +550,11 @@ export class ProviderServiceImpl implements ProviderService {
 
   async getProviderMetrics(providerId: string, days = 7): Promise<ProviderMetrics> {
     const endDate = new Date();
-    const startDate = new Date(endDate.getTime() - (days * 24 * 60 * 60 * 1000));
+    const startDate = new Date(endDate.getTime() - days * 24 * 60 * 60 * 1000);
 
     const checks = await this.statusCheckRepo.findByProviderAndTimeRange(
-      providerId, 
-      startDate, 
+      providerId,
+      startDate,
       endDate
     );
 
@@ -512,21 +565,21 @@ export class ProviderServiceImpl implements ProviderService {
         averageResponseTime: 0,
         errorRate: 0,
         checksCount: 0,
-        period: { start: startDate, end: endDate }
+        period: { start: startDate, end: endDate },
       };
     }
 
-    const operationalChecks = checks.filter(c => c.status === 'operational');
+    const operationalChecks = checks.filter((c) => c.status === 'operational');
     const uptime = (operationalChecks.length / checks.length) * 100;
-    
+
     const totalResponseTime = checks.reduce((sum, c) => sum + c.responseTime, 0);
     const averageResponseTime = totalResponseTime / checks.length;
-    
-    const errorChecks = checks.filter(c => c.error);
+
+    const errorChecks = checks.filter((c) => c.error);
     const errorRate = (errorChecks.length / checks.length) * 100;
 
     const lastIncident = checks
-      .filter(c => c.status !== 'operational')
+      .filter((c) => c.status !== 'operational')
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0]?.timestamp;
 
     return {
@@ -536,19 +589,19 @@ export class ProviderServiceImpl implements ProviderService {
       errorRate,
       lastIncident,
       checksCount: checks.length,
-      period: { start: startDate, end: endDate }
+      period: { start: startDate, end: endDate },
     };
   }
 
   async updateProviderStatus(
-    id: string, 
-    status: Provider['status'], 
+    id: string,
+    status: Provider['status'],
     responseTime: number
   ): Promise<Provider> {
     return this.providerRepo.update(id, {
       status,
       responseTime,
-      lastChecked: new Date()
+      lastChecked: new Date(),
     });
   }
 }
@@ -569,7 +622,7 @@ export class StatusServiceImpl implements StatusService {
     await this.providerRepo.update(providerId, {
       status,
       responseTime,
-      lastChecked: new Date()
+      lastChecked: new Date(),
     });
 
     // Record status check
@@ -578,34 +631,36 @@ export class StatusServiceImpl implements StatusService {
       status,
       responseTime,
       timestamp: new Date(),
-      error
+      error,
     });
   }
 
-  async recordBatchStatusChecks(checks: Array<{
-    providerId: string;
-    status: Provider['status'];
-    responseTime: number;
-    error?: string;
-  }>): Promise<StatusCheck[]> {
+  async recordBatchStatusChecks(
+    checks: Array<{
+      providerId: string;
+      status: Provider['status'];
+      responseTime: number;
+      error?: string;
+    }>
+  ): Promise<StatusCheck[]> {
     // Update all providers
-    const providerUpdates = checks.map(check =>
+    const providerUpdates = checks.map((check) =>
       this.providerRepo.update(check.providerId, {
         status: check.status,
         responseTime: check.responseTime,
-        lastChecked: new Date()
+        lastChecked: new Date(),
       })
     );
 
     await Promise.all(providerUpdates);
 
     // Record all status checks
-    const statusChecks = checks.map(check => ({
+    const statusChecks = checks.map((check) => ({
       providerId: check.providerId,
       status: check.status,
       responseTime: check.responseTime,
       timestamp: new Date(),
-      error: check.error
+      error: check.error,
     }));
 
     return this.statusCheckRepo.createBatch(statusChecks);
@@ -623,12 +678,12 @@ export class StatusServiceImpl implements StatusService {
     averageResponseTime: number;
   }> {
     const allProviders = await this.providerRepo.findAll();
-    
+
     const totalProviders = allProviders.length;
-    const operationalProviders = allProviders.filter(p => p.status === 'operational').length;
-    const degradedProviders = allProviders.filter(p => p.status === 'degraded').length;
-    const outageProviders = allProviders.filter(p => 
-      p.status === 'partial_outage' || p.status === 'major_outage'
+    const operationalProviders = allProviders.filter((p) => p.status === 'operational').length;
+    const degradedProviders = allProviders.filter((p) => p.status === 'degraded').length;
+    const outageProviders = allProviders.filter(
+      (p) => p.status === 'partial_outage' || p.status === 'major_outage'
     ).length;
 
     const totalResponseTime = allProviders.reduce((sum, p) => sum + p.responseTime, 0);
@@ -639,14 +694,14 @@ export class StatusServiceImpl implements StatusService {
       operationalProviders,
       degradedProviders,
       outageProviders,
-      averageResponseTime
+      averageResponseTime,
     };
   }
 
   async cleanupOldChecks(daysToKeep = 30): Promise<number> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
-    
+
     return this.statusCheckRepo.deleteOlderThan(cutoffDate);
   }
 }
@@ -664,7 +719,7 @@ export function createRepositories(firebase: UnifiedFirebaseInstance): {
 } {
   return {
     providerRepo: new FirestoreProviderRepository(firebase),
-    statusCheckRepo: new FirestoreStatusCheckRepository(firebase)
+    statusCheckRepo: new FirestoreStatusCheckRepository(firebase),
   };
 }
 
@@ -680,7 +735,7 @@ export function createServices(
 } {
   return {
     providerService: new ProviderServiceImpl(providerRepo, statusCheckRepo),
-    statusService: new StatusServiceImpl(providerRepo, statusCheckRepo)
+    statusService: new StatusServiceImpl(providerRepo, statusCheckRepo),
   };
 }
 
@@ -696,6 +751,6 @@ export function createLayeredArchitecture(firebase: UnifiedFirebaseInstance): {
 
   return {
     repositories,
-    services
+    services,
   };
-} 
+}

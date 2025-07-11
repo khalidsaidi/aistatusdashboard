@@ -8,25 +8,16 @@
 const fs = require('fs');
 const path = require('path');
 
-
-
-
 // Check command line arguments
 const args = process.argv.slice(2);
 const environment = args[0]?.toLowerCase();
 
 if (!environment || !['dev', 'development', 'prod', 'production'].includes(environment)) {
-  
-  
-  
-  
   process.exit(1);
 }
 
 const isDev = ['dev', 'development'].includes(environment);
 const envType = isDev ? 'development' : 'production';
-
-
 
 // Environment-specific configurations
 const configs = {
@@ -41,7 +32,7 @@ const configs = {
     NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: 'ai-status-dashboard-dev.firebasestorage.app',
     RATE_LIMIT_MAX_REQUESTS: '100',
     envFile: '.env.local',
-    description: 'Development environment with dev Firebase project'
+    description: 'Development environment with dev Firebase project',
   },
   production: {
     APP_ENVIRONMENT: 'production',
@@ -56,8 +47,8 @@ const configs = {
     FORCE_HTTPS: 'true',
     SECURE_COOKIES: 'true',
     envFile: '.env.production',
-    description: 'Production environment with production Firebase project'
-  }
+    description: 'Production environment with production Firebase project',
+  },
 };
 
 const config = configs[envType];
@@ -147,10 +138,7 @@ SECURE_COOKIES=${config.SECURE_COOKIES}
 // Write environment file
 try {
   fs.writeFileSync(config.envFile, envContent);
-  
-  
 } catch (error) {
-  
   process.exit(1);
 }
 
@@ -159,54 +147,14 @@ try {
 try {
   const { execSync } = require('child_process');
   execSync(`firebase use ${isDev ? 'dev' : 'prod'}`, { stdio: 'inherit' });
-  
-} catch (error) {
-  
-  
-}
+} catch (error) {}
 
 // Provide next steps
 
-
-
 if (isDev) {
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
 } else {
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
 }
 
-
-
-
-
 if (envType === 'development') {
-  
 } else {
-  
-} 
+}

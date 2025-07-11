@@ -6,63 +6,60 @@ import { emailService } from './emailService';
 const db = getFirestore();
 
 // Subscribe to email notifications
-export const subscribeEmail = onRequest(
-  { cors: true, region: 'us-central1' },
-  async (req, res) => {
-    if (req.method !== 'POST') {
-      res.status(405).json({ error: 'Method not allowed' });
+export const subscribeEmail = onRequest({ cors: true, region: 'us-central1' }, async (req, res) => {
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
+  try {
+    const { email, providers } = req.body;
+
+    if (!email || !Array.isArray(providers)) {
+      res.status(400).json({ error: 'Email and providers array required' });
       return;
     }
 
-    try {
-      const { email, providers } = req.body;
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      res.status(400).json({ error: 'Invalid email format' });
+      return;
+    }
 
-      if (!email || !Array.isArray(providers)) {
-        res.status(400).json({ error: 'Email and providers array required' });
-        return;
-      }
+    // Store subscription in Firestore
+    const subscriptionRef = db.collection('email_subscriptions').doc(email);
+    await subscriptionRef.set({
+      email,
+      providers,
+      subscribedAt: new Date(),
+      active: true,
+    });
 
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        res.status(400).json({ error: 'Invalid email format' });
-        return;
-      }
+    logger.info('Email subscription created', { email, providers });
 
-      // Store subscription in Firestore
-      const subscriptionRef = db.collection('email_subscriptions').doc(email);
-      await subscriptionRef.set({
-        email,
-        providers,
-        subscribedAt: new Date(),
-        active: true
-      });
-
-      logger.info('Email subscription created', { email, providers });
-      
-      // Send confirmation email
-      await emailService.sendEmail({
-        to: email,
-        subject: 'AI Status Dashboard - Subscription Confirmed',
-        html: `
+    // Send confirmation email
+    await emailService.sendEmail({
+      to: email,
+      subject: 'AI Status Dashboard - Subscription Confirmed',
+      html: `
           <h2>Subscription Confirmed!</h2>
           <p>You've successfully subscribed to AI status notifications for:</p>
           <ul>
-            ${providers.map(provider => `<li>${provider}</li>`).join('')}
+            ${providers.map((provider) => `<li>${provider}</li>`).join('')}
           </ul>
           <p>You'll receive alerts when these services experience status changes.</p>
           <hr>
           <p><small>To unsubscribe, visit <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com'}">AI Status Dashboard</a></small></p>
-        `
-      });
+        `,
+    });
 
-      res.json({ success: true, message: 'Subscription created successfully' });
-    } catch (error) {
-      logger.error('Error creating email subscription', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
+    res.json({ success: true, message: 'Subscription created successfully' });
+  } catch (error) {
+    logger.error('Error creating email subscription', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
-);
+});
 
 // Unsubscribe from email notifications
 export const unsubscribeEmail = onRequest(
@@ -126,7 +123,7 @@ export const subscribeWebhook = onRequest(
         webhookUrl,
         providers,
         subscribedAt: new Date(),
-        active: true
+        active: true,
       });
 
       logger.info('Webhook subscription created', { webhookUrl, providers });
@@ -156,13 +153,13 @@ export const sendTestNotification = onRequest(
       }
 
       let success = false;
-      
+
       if (type === 'incident') {
         success = await emailService.sendIncidentAlert(email, {
           title: 'Test Incident Alert',
           status: 'investigating',
           impact: 'minor',
-          body: 'This is a test incident notification to verify your email subscription is working correctly.'
+          body: 'This is a test incident notification to verify your email subscription is working correctly.',
         });
       } else {
         success = await emailService.sendStatusAlert(email, 'OpenAI GPT-4', 'degraded');
@@ -178,4 +175,4 @@ export const sendTestNotification = onRequest(
       res.status(500).json({ error: 'Internal server error' });
     }
   }
-); 
+);

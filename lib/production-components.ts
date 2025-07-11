@@ -1,6 +1,6 @@
 /**
  * PRODUCTION-READY COMPONENTS
- * 
+ *
  * Missing critical components for production scalability:
  * - Thread-safe cache with atomic operations
  * - Atomic lock manager for concurrent operations
@@ -34,17 +34,20 @@ export class AtomicCache<T> {
     misses: 0,
     sets: 0,
     evictions: 0,
-    size: 0
+    size: 0,
   };
 
   constructor(maxSize = 10000, defaultTtl = 3600) {
     this.maxSize = maxSize;
     this.defaultTtl = defaultTtl;
-    
+
     // Cleanup expired entries every 5 minutes
-    this.cleanupInterval = setInterval(() => {
-      this.cleanup();
-    }, 5 * 60 * 1000);
+    this.cleanupInterval = setInterval(
+      () => {
+        this.cleanup();
+      },
+      5 * 60 * 1000
+    );
   }
 
   /**
@@ -53,7 +56,7 @@ export class AtomicCache<T> {
   async get(key: string): Promise<T | null> {
     // Wait for any pending operations on this key
     await this.waitForLock(key);
-    
+
     const entry = this.cache.get(key);
     if (!entry) {
       this.stats.misses++;
@@ -71,7 +74,7 @@ export class AtomicCache<T> {
     entry.accessCount++;
     entry.lastAccessed = Date.now();
     this.stats.hits++;
-    
+
     return entry.value;
   }
 
@@ -80,13 +83,13 @@ export class AtomicCache<T> {
    */
   async set(key: string, value: T, ttl?: number): Promise<void> {
     const lock = this.acquireLock(key);
-    
+
     try {
       await lock;
-      
-      const expires = Date.now() + ((ttl ?? this.defaultTtl) * 1000);
+
+      const expires = Date.now() + (ttl ?? this.defaultTtl) * 1000;
       const size = this.estimateSize(value);
-      
+
       // Check if we need to evict items
       if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
         await this.evictLeastRecentlyUsed();
@@ -97,13 +100,12 @@ export class AtomicCache<T> {
         expires,
         accessCount: 0,
         lastAccessed: Date.now(),
-        size
+        size,
       };
 
       this.cache.set(key, entry);
       this.stats.sets++;
       this.stats.size = this.cache.size;
-      
     } finally {
       this.releaseLock(key);
     }
@@ -114,7 +116,7 @@ export class AtomicCache<T> {
    */
   async delete(key: string): Promise<boolean> {
     const lock = this.acquireLock(key);
-    
+
     try {
       await lock;
       const existed = this.cache.delete(key);
@@ -128,21 +130,17 @@ export class AtomicCache<T> {
   /**
    * Atomic get-or-set operation
    */
-  async getOrSet(
-    key: string, 
-    factory: () => Promise<T>, 
-    ttl?: number
-  ): Promise<T> {
+  async getOrSet(key: string, factory: () => Promise<T>, ttl?: number): Promise<T> {
     const existing = await this.get(key);
     if (existing !== null) {
       return existing;
     }
 
     const lock = this.acquireLock(key);
-    
+
     try {
       await lock;
-      
+
       // Double-check after acquiring lock
       const doubleCheck = await this.get(key);
       if (doubleCheck !== null) {
@@ -152,7 +150,6 @@ export class AtomicCache<T> {
       const value = await factory();
       await this.set(key, value, ttl);
       return value;
-      
     } finally {
       this.releaseLock(key);
     }
@@ -162,14 +159,15 @@ export class AtomicCache<T> {
    * Get cache statistics
    */
   getStats() {
-    const hitRate = this.stats.hits + this.stats.misses > 0 
-      ? this.stats.hits / (this.stats.hits + this.stats.misses) 
-      : 0;
+    const hitRate =
+      this.stats.hits + this.stats.misses > 0
+        ? this.stats.hits / (this.stats.hits + this.stats.misses)
+        : 0;
 
     return {
       ...this.stats,
       hitRate,
-      memoryUsage: this.getMemoryUsage()
+      memoryUsage: this.getMemoryUsage(),
     };
   }
 
@@ -179,7 +177,7 @@ export class AtomicCache<T> {
   async clear(): Promise<void> {
     // Wait for all locks to clear
     await Promise.all(this.locks.values());
-    
+
     this.cache.clear();
     this.stats = { hits: 0, misses: 0, sets: 0, evictions: 0, size: 0 };
   }
@@ -203,12 +201,12 @@ export class AtomicCache<T> {
     }
 
     let resolver: () => void;
-    const promise = new Promise<void>(resolve => {
+    const promise = new Promise<void>((resolve) => {
       resolver = resolve;
     });
 
     this.locks.set(key, promise);
-    
+
     // Resolve immediately since we're the first to acquire
     resolver!();
     return promise;
@@ -295,11 +293,7 @@ export class AtomicLockManager {
   /**
    * Acquire a lock with timeout
    */
-  async acquireLock(
-    lockKey: string, 
-    holderId: string, 
-    timeout?: number
-  ): Promise<boolean> {
+  async acquireLock(lockKey: string, holderId: string, timeout?: number): Promise<boolean> {
     const lockTimeout = timeout ?? this.defaultTimeout;
     const now = Date.now();
 
@@ -309,7 +303,7 @@ export class AtomicLockManager {
       this.locks.set(lockKey, {
         acquired: now,
         timeout: now + lockTimeout,
-        holder: holderId
+        holder: holderId,
       });
       return true;
     }
@@ -319,7 +313,7 @@ export class AtomicLockManager {
       this.locks.set(lockKey, {
         acquired: now,
         timeout: now + lockTimeout,
-        holder: holderId
+        holder: holderId,
       });
       this.notifyWaiters(lockKey);
       return true;
@@ -328,7 +322,7 @@ export class AtomicLockManager {
     // Wait for lock to be released
     return new Promise((resolve) => {
       const waitQueue = this.waitQueues.get(lockKey) || [];
-      
+
       const timeoutHandle = setTimeout(() => {
         this.removeFromWaitQueue(lockKey, resolver);
         resolve(false);
@@ -336,14 +330,14 @@ export class AtomicLockManager {
 
       const resolver = () => {
         clearTimeout(timeoutHandle);
-        
+
         // Try to acquire lock again
         const currentLock = this.locks.get(lockKey);
         if (!currentLock || Date.now() > currentLock.timeout) {
           this.locks.set(lockKey, {
             acquired: Date.now(),
             timeout: Date.now() + lockTimeout,
-            holder: holderId
+            holder: holderId,
           });
           resolve(true);
         } else {
@@ -376,13 +370,13 @@ export class AtomicLockManager {
   isLocked(lockKey: string): boolean {
     const lock = this.locks.get(lockKey);
     if (!lock) return false;
-    
+
     if (Date.now() > lock.timeout) {
       this.locks.delete(lockKey);
       this.notifyWaiters(lockKey);
       return false;
     }
-    
+
     return true;
   }
 
@@ -392,13 +386,13 @@ export class AtomicLockManager {
   getLockHolder(lockKey: string): string | null {
     const lock = this.locks.get(lockKey);
     if (!lock) return null;
-    
+
     if (Date.now() > lock.timeout) {
       this.locks.delete(lockKey);
       this.notifyWaiters(lockKey);
       return null;
     }
-    
+
     return lock.holder;
   }
 
@@ -432,7 +426,7 @@ export class AtomicLockManager {
         activeLocks.push({
           key,
           holder: lock.holder,
-          remaining: lock.timeout - now
+          remaining: lock.timeout - now,
         });
       }
     }
@@ -445,10 +439,10 @@ export class AtomicLockManager {
    */
   shutdown(): void {
     this.locks.clear();
-    
+
     // Notify all waiters
     for (const [key, waiters] of this.waitQueues.entries()) {
-      waiters.forEach(waiter => waiter());
+      waiters.forEach((waiter) => waiter());
     }
     this.waitQueues.clear();
   }
@@ -461,7 +455,7 @@ export class AtomicLockManager {
       if (waiter) {
         waiter();
       }
-      
+
       if (waiters.length === 0) {
         this.waitQueues.delete(lockKey);
       }
@@ -475,7 +469,7 @@ export class AtomicLockManager {
       if (index > -1) {
         waiters.splice(index, 1);
       }
-      
+
       if (waiters.length === 0) {
         this.waitQueues.delete(lockKey);
       }
@@ -532,12 +526,12 @@ export class HTTPConnectionPool {
 
       const response = await fetch(url, {
         ...options,
-        signal: controller.signal
+        signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
       this.releaseConnection(connection);
-      
+
       return response;
     } catch (error) {
       this.releaseConnection(connection, true); // Mark as failed
@@ -559,14 +553,14 @@ export class HTTPConnectionPool {
 
     for (const [host, connections] of this.connections.entries()) {
       totalConnections += connections.length;
-      activeConnections += connections.filter(c => c.inUse).length;
+      activeConnections += connections.filter((c) => c.inUse).length;
       connectionsByHost[host] = connections.length;
     }
 
     return {
       totalConnections,
       activeConnections,
-      connectionsByHost
+      connectionsByHost,
     };
   }
 
@@ -584,10 +578,10 @@ export class HTTPConnectionPool {
   // Private methods
   private acquireConnection(host: string, url: string): PooledConnection {
     let hostConnections = this.connections.get(host) || [];
-    
+
     // Find available connection
-    let connection = hostConnections.find(c => !c.inUse);
-    
+    let connection = hostConnections.find((c) => !c.inUse);
+
     if (!connection) {
       // Create new connection if under limit
       if (hostConnections.length < this.maxConnectionsPerHost) {
@@ -596,13 +590,13 @@ export class HTTPConnectionPool {
           created: Date.now(),
           lastUsed: Date.now(),
           inUse: true,
-          requestCount: 0
+          requestCount: 0,
         };
         hostConnections.push(connection);
         this.connections.set(host, hostConnections);
       } else {
         // Reuse oldest connection
-        connection = hostConnections.reduce((oldest, current) => 
+        connection = hostConnections.reduce((oldest, current) =>
           current.lastUsed < oldest.lastUsed ? current : oldest
         );
       }
@@ -611,13 +605,13 @@ export class HTTPConnectionPool {
     connection.inUse = true;
     connection.lastUsed = Date.now();
     connection.requestCount++;
-    
+
     return connection;
   }
 
   private releaseConnection(connection: PooledConnection, failed = false): void {
     connection.inUse = false;
-    
+
     if (failed) {
       // Remove failed connections
       for (const [host, connections] of this.connections.entries()) {
@@ -638,16 +632,15 @@ export class HTTPConnectionPool {
     let cleaned = 0;
 
     for (const [host, connections] of this.connections.entries()) {
-      const validConnections = connections.filter(connection => {
+      const validConnections = connections.filter((connection) => {
         const age = now - connection.created;
         const idle = now - connection.lastUsed;
-        
-        return age < this.maxConnectionAge && 
-               (connection.inUse || idle < this.connectionTimeout);
+
+        return age < this.maxConnectionAge && (connection.inUse || idle < this.connectionTimeout);
       });
 
       cleaned += connections.length - validConnections.length;
-      
+
       if (validConnections.length === 0) {
         this.connections.delete(host);
       } else {
@@ -690,7 +683,7 @@ export class PerformanceMonitor {
 
   constructor(config?: { maxMetrics?: number; monitoringIntervalMs?: number }) {
     this.maxMetrics = config?.maxMetrics ?? this.maxMetrics;
-    
+
     const intervalMs = config?.monitoringIntervalMs ?? 30000;
     this.monitoringInterval = setInterval(() => {
       this.collectSystemMetrics();
@@ -705,11 +698,11 @@ export class PerformanceMonitor {
       name,
       value,
       timestamp: Date.now(),
-      tags
+      tags,
     };
 
     this.metrics.push(metric);
-    
+
     // Maintain size limit
     if (this.metrics.length > this.maxMetrics) {
       this.metrics.splice(0, this.metrics.length - this.maxMetrics);
@@ -729,25 +722,22 @@ export class PerformanceMonitor {
   /**
    * Get metrics by name and time range
    */
-  getMetrics(
-    name: string, 
-    startTime?: number, 
-    endTime?: number
-  ): PerformanceMetric[] {
+  getMetrics(name: string, startTime?: number, endTime?: number): PerformanceMetric[] {
     const start = startTime ?? 0;
     const end = endTime ?? Date.now();
 
-    return this.metrics.filter(m => 
-      m.name === name && 
-      m.timestamp >= start && 
-      m.timestamp <= end
+    return this.metrics.filter(
+      (m) => m.name === name && m.timestamp >= start && m.timestamp <= end
     );
   }
 
   /**
    * Get aggregated statistics
    */
-  getStats(name: string, windowMs = 300000): {
+  getStats(
+    name: string,
+    windowMs = 300000
+  ): {
     count: number;
     average: number;
     min: number;
@@ -755,15 +745,13 @@ export class PerformanceMonitor {
     percentile95: number;
   } {
     const cutoff = Date.now() - windowMs;
-    const recent = this.metrics.filter(m => 
-      m.name === name && m.timestamp >= cutoff
-    );
+    const recent = this.metrics.filter((m) => m.name === name && m.timestamp >= cutoff);
 
     if (recent.length === 0) {
       return { count: 0, average: 0, min: 0, max: 0, percentile95: 0 };
     }
 
-    const values = recent.map(m => m.value).sort((a, b) => a - b);
+    const values = recent.map((m) => m.value).sort((a, b) => a - b);
     const sum = values.reduce((acc, val) => acc + val, 0);
     const p95Index = Math.floor(values.length * 0.95);
 
@@ -772,7 +760,7 @@ export class PerformanceMonitor {
       average: sum / values.length,
       min: values[0],
       max: values[values.length - 1],
-      percentile95: values[p95Index] || 0
+      percentile95: values[p95Index] || 0,
     };
   }
 
@@ -809,15 +797,13 @@ export class PerformanceMonitor {
 
       if (triggered) {
         const state = this.alertStates.get(rule.name) || { triggered: 0, notified: 0 };
-        
+
         if (state.triggered === 0) {
           state.triggered = Date.now();
         }
 
         const duration = Date.now() - state.triggered;
-        if (duration >= rule.duration && 
-            Date.now() - state.notified > rule.duration) {
-          
+        if (duration >= rule.duration && Date.now() - state.notified > rule.duration) {
           rule.callback(metric);
           state.notified = Date.now();
         }
@@ -846,7 +832,7 @@ export class PerformanceMonitor {
       }
     } catch (error) {
       log('warn', 'Failed to collect system metrics', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -859,10 +845,7 @@ export class PerformanceMonitor {
 /**
  * Create production-ready cache
  */
-export function createProductionCache<T>(
-  maxSize = 10000, 
-  defaultTtl = 3600
-): AtomicCache<T> {
+export function createProductionCache<T>(maxSize = 10000, defaultTtl = 3600): AtomicCache<T> {
   return new AtomicCache<T>(maxSize, defaultTtl);
 }
 
@@ -900,9 +883,9 @@ export function createPerformanceMonitor(): PerformanceMonitor {
     callback: (metric) => {
       log('warn', 'High memory usage detected', {
         value: metric.value,
-        threshold: '1GB'
+        threshold: '1GB',
       });
-    }
+    },
   });
 
   monitor.addAlert({
@@ -914,10 +897,10 @@ export function createPerformanceMonitor(): PerformanceMonitor {
     callback: (metric) => {
       log('warn', 'Slow response time detected', {
         value: metric.value,
-        threshold: '5000ms'
+        threshold: '5000ms',
       });
-    }
+    },
   });
 
   return monitor;
-} 
+}

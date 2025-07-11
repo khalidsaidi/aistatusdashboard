@@ -18,86 +18,86 @@ const PROVIDERS: Provider[] = [
     id: 'openai',
     name: 'OpenAI',
     url: 'https://status.openai.com/api/v2/status.json',
-    statusPageUrl: 'https://status.openai.com'
+    statusPageUrl: 'https://status.openai.com',
   },
   {
     id: 'anthropic',
     name: 'Anthropic',
     url: 'https://status.anthropic.com/api/v2/summary.json',
-    statusPageUrl: 'https://status.anthropic.com'
+    statusPageUrl: 'https://status.anthropic.com',
   },
   {
     id: 'huggingface',
     name: 'HuggingFace',
     url: 'https://status.huggingface.co/api/v2/summary.json',
-    statusPageUrl: 'https://status.huggingface.co'
+    statusPageUrl: 'https://status.huggingface.co',
   },
   {
     id: 'google-ai',
     name: 'Google AI',
     url: 'https://status.cloud.google.com/incidents.json',
-    statusPageUrl: 'https://status.cloud.google.com'
+    statusPageUrl: 'https://status.cloud.google.com',
   },
   {
     id: 'cohere',
     name: 'Cohere',
     url: 'https://status.cohere.com/api/v2/status.json',
-    statusPageUrl: 'https://status.cohere.com'
+    statusPageUrl: 'https://status.cohere.com',
   },
   {
     id: 'replicate',
     name: 'Replicate',
     url: 'https://www.replicatestatus.com/api/v2/status.json',
-    statusPageUrl: 'https://www.replicatestatus.com'
+    statusPageUrl: 'https://www.replicatestatus.com',
   },
   {
     id: 'groq',
     name: 'Groq',
     url: 'https://groqstatus.com/api/v2/status.json',
-    statusPageUrl: 'https://groqstatus.com'
+    statusPageUrl: 'https://groqstatus.com',
   },
   {
     id: 'deepseek',
     name: 'DeepSeek',
     url: 'https://status.deepseek.com/api/v2/status.json',
-    statusPageUrl: 'https://status.deepseek.com'
+    statusPageUrl: 'https://status.deepseek.com',
   },
   {
     id: 'meta',
     name: 'Meta AI',
     url: 'https://ai.meta.com',
-    statusPageUrl: 'https://ai.meta.com'
+    statusPageUrl: 'https://ai.meta.com',
   },
   {
     id: 'xai',
     name: 'xAI',
     url: 'https://x.ai',
-    statusPageUrl: 'https://x.ai'
+    statusPageUrl: 'https://x.ai',
   },
   {
     id: 'perplexity',
     name: 'Perplexity AI',
     url: 'https://status.perplexity.ai',
-    statusPageUrl: 'https://status.perplexity.ai'
+    statusPageUrl: 'https://status.perplexity.ai',
   },
   {
     id: 'mistral',
     name: 'Mistral AI',
     url: 'https://mistral.ai',
-    statusPageUrl: 'https://mistral.ai'
+    statusPageUrl: 'https://mistral.ai',
   },
   {
     id: 'aws',
     name: 'AWS AI Services',
     url: 'https://status.aws.amazon.com/rss/all.rss',
-    statusPageUrl: 'https://status.aws.amazon.com'
+    statusPageUrl: 'https://status.aws.amazon.com',
   },
   {
     id: 'azure',
     name: 'Azure AI Services',
     url: 'https://azurestatuscdn.azureedge.net/en-us/status/feed',
-    statusPageUrl: 'https://status.azure.com'
-  }
+    statusPageUrl: 'https://status.azure.com',
+  },
 ];
 
 interface ProviderStatus {
@@ -112,30 +112,30 @@ interface ProviderStatus {
 
 async function fetchProviderStatus(provider: Provider): Promise<ProviderStatus> {
   const startTime = Date.now();
-  
+
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
-    
+
     const response = await fetch(provider.url, {
       method: 'GET',
       headers: {
         'User-Agent': 'AI-Status-Dashboard/1.0',
-        'Accept': 'application/json,text/html,application/rss+xml,*/*',
-        'Cache-Control': 'no-cache'
+        Accept: 'application/json,text/html,application/rss+xml,*/*',
+        'Cache-Control': 'no-cache',
       },
-      signal: controller.signal
+      signal: controller.signal,
     });
-    
+
     clearTimeout(timeoutId);
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
-    
+
     const responseTime = Date.now() - startTime;
     let status: 'operational' | 'degraded' | 'down';
-    
+
     // Handle different response formats based on provider
     if (provider.id === 'aws' || provider.id === 'azure') {
       const textResponse = await response.text();
@@ -148,10 +148,14 @@ async function fetchProviderStatus(provider: Provider): Promise<ProviderStatus> 
         try {
           const data = JSON.parse(textResponse);
           const indicator = data.status?.indicator || 'unknown';
-          status = indicator === 'none' ? 'operational' : 
-                   indicator === 'minor' ? 'degraded' :
-                   (indicator === 'major' || indicator === 'critical') ? 'down' :
-                   'operational';
+          status =
+            indicator === 'none'
+              ? 'operational'
+              : indicator === 'minor'
+                ? 'degraded'
+                : indicator === 'major' || indicator === 'critical'
+                  ? 'down'
+                  : 'operational';
         } catch {
           status = 'operational';
         }
@@ -161,19 +165,21 @@ async function fetchProviderStatus(provider: Provider): Promise<ProviderStatus> 
     } else {
       try {
         const data = await response.json();
-        
+
         if (provider.id === 'google-ai') {
           const incidents = data as Array<{
             id: string;
             end?: string;
             status_impact?: string;
           }>;
-          const hasActiveIncidents = Array.isArray(incidents) && 
-            incidents.length > 0 && 
-            incidents.some(incident => 
-              !incident.end && 
-              incident.status_impact && 
-              ['SERVICE_OUTAGE', 'SERVICE_DISRUPTION'].includes(incident.status_impact)
+          const hasActiveIncidents =
+            Array.isArray(incidents) &&
+            incidents.length > 0 &&
+            incidents.some(
+              (incident) =>
+                !incident.end &&
+                incident.status_impact &&
+                ['SERVICE_OUTAGE', 'SERVICE_DISRUPTION'].includes(incident.status_impact)
             );
           status = hasActiveIncidents ? 'degraded' : 'operational';
         } else {
@@ -181,28 +187,32 @@ async function fetchProviderStatus(provider: Provider): Promise<ProviderStatus> 
             status?: { indicator?: string };
           };
           const indicator = statusData.status?.indicator || 'unknown';
-          
-          status = indicator === 'none' ? 'operational' : 
-                   indicator === 'minor' ? 'degraded' :
-                   (indicator === 'major' || indicator === 'critical') ? 'down' :
-                   'operational';
+
+          status =
+            indicator === 'none'
+              ? 'operational'
+              : indicator === 'minor'
+                ? 'degraded'
+                : indicator === 'major' || indicator === 'critical'
+                  ? 'down'
+                  : 'operational';
         }
       } catch (jsonError) {
         status = 'degraded';
         logger.warn('Failed to parse JSON response', {
           provider: provider.id,
-          error: jsonError instanceof Error ? jsonError.message : 'Unknown JSON error'
+          error: jsonError instanceof Error ? jsonError.message : 'Unknown JSON error',
         });
       }
     }
-    
+
     return {
       id: provider.id,
       name: provider.name,
       status,
       responseTime,
       statusCode: response.status,
-      lastChecked: new Date().toISOString()
+      lastChecked: new Date().toISOString(),
     };
   } catch (error) {
     const responseTime = Date.now() - startTime;
@@ -213,7 +223,7 @@ async function fetchProviderStatus(provider: Provider): Promise<ProviderStatus> 
       responseTime,
       statusCode: 0,
       lastChecked: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
 }
@@ -227,48 +237,48 @@ export const monitorProviderStatus = onSchedule(
   },
   async (event) => {
     logger.info('Starting scheduled status monitoring');
-    
+
     try {
       // Fetch current status for all providers
-      const statusPromises = PROVIDERS.map(provider => fetchProviderStatus(provider));
+      const statusPromises = PROVIDERS.map((provider) => fetchProviderStatus(provider));
       const currentStatuses = await Promise.all(statusPromises);
-      
+
       // Get previous statuses from Firestore
       const previousStatusesSnapshot = await db.collection('current_status').get();
       const previousStatuses = new Map<string, ProviderStatus>();
-      
-      previousStatusesSnapshot.docs.forEach(doc => {
+
+      previousStatusesSnapshot.docs.forEach((doc) => {
         const data = doc.data() as ProviderStatus;
         previousStatuses.set(data.id, data);
       });
-      
+
       // Check for status changes and send notifications
       const batch = db.batch();
       const statusChanges: Array<{
         provider: ProviderStatus;
         previous: ProviderStatus | null;
       }> = [];
-      
+
       for (const currentStatus of currentStatuses) {
         const previousStatus = previousStatuses.get(currentStatus.id) || null;
-        
+
         // Update current status in Firestore
         const statusRef = db.collection('current_status').doc(currentStatus.id);
         batch.set(statusRef, currentStatus);
-        
+
         // Check if status changed
         if (previousStatus && currentStatus.status !== previousStatus.status) {
           logger.info('Status change detected', {
             provider: currentStatus.id,
             previous: previousStatus.status,
-            current: currentStatus.status
+            current: currentStatus.status,
           });
-          
+
           statusChanges.push({
             provider: currentStatus,
-            previous: previousStatus
+            previous: previousStatus,
           });
-          
+
           // Send push notification
           try {
             await sendStatusChangePushNotifications(
@@ -280,36 +290,34 @@ export const monitorProviderStatus = onSchedule(
           } catch (error) {
             logger.error('Failed to send push notification', {
               provider: currentStatus.id,
-              error: error instanceof Error ? error.message : 'Unknown error'
+              error: error instanceof Error ? error.message : 'Unknown error',
             });
           }
         }
-        
+
         // Log status result
         const logRef = db.collection('status_logs').doc();
         batch.set(logRef, {
           ...currentStatus,
           timestamp: new Date(),
-          statusChanged: previousStatus ? currentStatus.status !== previousStatus.status : false
+          statusChanged: previousStatus ? currentStatus.status !== previousStatus.status : false,
         });
       }
-      
+
       // Commit all updates
       await batch.commit();
-      
+
       logger.info('Status monitoring completed', {
         totalProviders: currentStatuses.length,
         statusChanges: statusChanges.length,
-        operational: currentStatuses.filter(s => s.status === 'operational').length,
-        degraded: currentStatuses.filter(s => s.status === 'degraded').length,
-        down: currentStatuses.filter(s => s.status === 'down').length
+        operational: currentStatuses.filter((s) => s.status === 'operational').length,
+        degraded: currentStatuses.filter((s) => s.status === 'degraded').length,
+        down: currentStatuses.filter((s) => s.status === 'down').length,
       });
-      
+
       // Create incidents for new outages
       for (const change of statusChanges) {
-        if (change.previous?.status === 'operational' && 
-            change.provider.status !== 'operational') {
-          
+        if (change.previous?.status === 'operational' && change.provider.status !== 'operational') {
           // Create incident
           const incidentRef = db.collection('incidents').doc();
           await incidentRef.set({
@@ -321,49 +329,47 @@ export const monitorProviderStatus = onSchedule(
             startTime: new Date(),
             lastUpdate: new Date(),
             description: `${change.provider.name} is experiencing ${change.provider.status === 'down' ? 'service outages' : 'performance issues'}`,
-            statusPageUrl: PROVIDERS.find(p => p.id === change.provider.id)?.statusPageUrl
+            statusPageUrl: PROVIDERS.find((p) => p.id === change.provider.id)?.statusPageUrl,
           });
-          
+
           logger.info('Incident created', {
             provider: change.provider.id,
             incidentId: incidentRef.id,
-            status: change.provider.status
+            status: change.provider.status,
           });
         }
-        
+
         // Update incident when service recovers
-        if (change.previous?.status !== 'operational' && 
-            change.provider.status === 'operational') {
-          
+        if (change.previous?.status !== 'operational' && change.provider.status === 'operational') {
           // Find and update the most recent incident
-          const incidentsSnapshot = await db.collection('incidents')
+          const incidentsSnapshot = await db
+            .collection('incidents')
             .where('provider', '==', change.provider.id)
             .where('endTime', '==', null)
             .orderBy('startTime', 'desc')
             .limit(1)
             .get();
-          
+
           if (!incidentsSnapshot.empty) {
             const incidentDoc = incidentsSnapshot.docs[0];
             await incidentDoc.ref.update({
               status: 'resolved',
               endTime: new Date(),
               lastUpdate: new Date(),
-              description: `${change.provider.name} services have been restored and are operating normally`
+              description: `${change.provider.name} services have been restored and are operating normally`,
             });
-            
+
             logger.info('Incident resolved', {
               provider: change.provider.id,
-              incidentId: incidentDoc.id
+              incidentId: incidentDoc.id,
             });
           }
         }
       }
-      
     } catch (error) {
       logger.error('Status monitoring failed', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
-); 
+);

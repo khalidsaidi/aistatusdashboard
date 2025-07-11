@@ -1,6 +1,6 @@
 /**
  * UNIFIED CONFIGURATION MANAGER
- * 
+ *
  * Consolidates all configuration systems into a single, type-safe,
  * environment-aware configuration manager.
  */
@@ -116,42 +116,42 @@ class EnvironmentConfigSource implements ConfigSource {
           storageBucket: process.env.FIREBASE_STORAGE_BUCKET || '',
           messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '',
           appId: process.env.FIREBASE_APP_ID || '',
-          measurementId: process.env.FIREBASE_MEASUREMENT_ID
+          measurementId: process.env.FIREBASE_MEASUREMENT_ID,
         },
-                 ...(process.env.DB_MAX_CONNECTIONS && {
-           database: {
-             maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS),
-             connectionTimeout: parseInt(process.env.DB_CONNECTION_TIMEOUT || '10000'),
-             queryTimeout: parseInt(process.env.DB_QUERY_TIMEOUT || '30000'),
-             batchSize: parseInt(process.env.DB_BATCH_SIZE || '25'),
-             indexOptimization: process.env.DB_INDEX_OPTIMIZATION === 'true'
-           }
-         }),
-         ...(process.env.SCALING_MAX_CONCURRENCY && {
-           scaling: {
-             maxConcurrency: parseInt(process.env.SCALING_MAX_CONCURRENCY),
-             batchSize: parseInt(process.env.SCALING_BATCH_SIZE || '50'),
-             scalingThreshold: parseInt(process.env.SCALING_THRESHOLD || '100'),
-             autoScaleEnabled: process.env.AUTO_SCALE_ENABLED === 'true',
-             resourceLimits: {
-               memory: parseInt(process.env.SCALING_MEMORY_LIMIT || '512'),
-               cpu: parseInt(process.env.SCALING_CPU_LIMIT || '2')
-             }
-           }
-         }),
+        ...(process.env.DB_MAX_CONNECTIONS && {
+          database: {
+            maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS),
+            connectionTimeout: parseInt(process.env.DB_CONNECTION_TIMEOUT || '10000'),
+            queryTimeout: parseInt(process.env.DB_QUERY_TIMEOUT || '30000'),
+            batchSize: parseInt(process.env.DB_BATCH_SIZE || '25'),
+            indexOptimization: process.env.DB_INDEX_OPTIMIZATION === 'true',
+          },
+        }),
+        ...(process.env.SCALING_MAX_CONCURRENCY && {
+          scaling: {
+            maxConcurrency: parseInt(process.env.SCALING_MAX_CONCURRENCY),
+            batchSize: parseInt(process.env.SCALING_BATCH_SIZE || '50'),
+            scalingThreshold: parseInt(process.env.SCALING_THRESHOLD || '100'),
+            autoScaleEnabled: process.env.AUTO_SCALE_ENABLED === 'true',
+            resourceLimits: {
+              memory: parseInt(process.env.SCALING_MEMORY_LIMIT || '512'),
+              cpu: parseInt(process.env.SCALING_CPU_LIMIT || '2'),
+            },
+          },
+        }),
         features: {
           enableEmulators: process.env.USE_FIREBASE_EMULATORS === 'true',
           optimizeForWSL2: process.env.OPTIMIZE_FOR_WSL2 === 'true',
           useRestOnlyMode: process.env.FIREBASE_REST_ONLY === 'true',
           enableCaching: process.env.ENABLE_CACHING !== 'false',
-          enableMetrics: process.env.ENABLE_METRICS !== 'false'
-        }
+          enableMetrics: process.env.ENABLE_METRICS !== 'false',
+        },
       };
 
       return this.removeUndefinedValues(config);
     } catch (error) {
       log('warn', 'Failed to load environment configuration', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       return null;
     }
@@ -160,15 +160,15 @@ class EnvironmentConfigSource implements ConfigSource {
   private removeUndefinedValues(obj: any): any {
     if (obj === null || obj === undefined) return obj;
     if (typeof obj !== 'object') return obj;
-    
+
     const cleaned: any = Array.isArray(obj) ? [] : {};
-    
+
     for (const [key, value] of Object.entries(obj)) {
       if (value !== undefined) {
         cleaned[key] = this.removeUndefinedValues(value);
       }
     }
-    
+
     return cleaned;
   }
 }
@@ -181,18 +181,13 @@ class FileConfigSource implements ConfigSource {
   priority = 2;
 
   load(): Partial<UnifiedConfig> | null {
-    const configPaths = [
-      'config/config.json',
-      'config/config.js',
-      'config.json',
-      '.env.json'
-    ];
+    const configPaths = ['config/config.json', 'config/config.js', 'config.json', '.env.json'];
 
     for (const configPath of configPaths) {
       try {
         if (existsSync(configPath)) {
           const content = readFileSync(configPath, 'utf-8');
-          
+
           if (configPath.endsWith('.json')) {
             return JSON.parse(content);
           } else if (configPath.endsWith('.js')) {
@@ -203,7 +198,7 @@ class FileConfigSource implements ConfigSource {
         }
       } catch (error) {
         log('warn', `Failed to load config from ${configPath}`, {
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }
@@ -224,29 +219,25 @@ class TestConfigSource implements ConfigSource {
       return null;
     }
 
-    const testConfigPaths = [
-      'config/test.env',
-      'config/test.json',
-      'test.env'
-    ];
+    const testConfigPaths = ['config/test.env', 'config/test.json', 'test.env'];
 
     for (const configPath of testConfigPaths) {
       try {
         if (existsSync(configPath)) {
           const content = readFileSync(configPath, 'utf-8');
-          
+
           if (configPath.endsWith('.env')) {
             // Parse .env format
             const config: any = {};
             const lines = content.split('\n');
-            
+
             for (const line of lines) {
               const trimmed = line.trim();
               if (trimmed && !trimmed.startsWith('#')) {
                 const [key, ...valueParts] = trimmed.split('=');
                 if (key && valueParts.length > 0) {
                   const value = valueParts.join('=').replace(/^["']|["']$/g, '');
-                  
+
                   // Map to config structure
                   if (key.startsWith('FIREBASE_')) {
                     config.firebase = config.firebase || {};
@@ -255,14 +246,15 @@ class TestConfigSource implements ConfigSource {
                     else if (fbKey === 'api_key') config.firebase.apiKey = value;
                     else if (fbKey === 'auth_domain') config.firebase.authDomain = value;
                     else if (fbKey === 'storage_bucket') config.firebase.storageBucket = value;
-                    else if (fbKey === 'messaging_sender_id') config.firebase.messagingSenderId = value;
+                    else if (fbKey === 'messaging_sender_id')
+                      config.firebase.messagingSenderId = value;
                     else if (fbKey === 'app_id') config.firebase.appId = value;
                     else if (fbKey === 'measurement_id') config.firebase.measurementId = value;
                   }
                 }
               }
             }
-            
+
             return config;
           } else if (configPath.endsWith('.json')) {
             return JSON.parse(content);
@@ -270,7 +262,7 @@ class TestConfigSource implements ConfigSource {
         }
       } catch (error) {
         log('warn', `Failed to load test config from ${configPath}`, {
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'Unknown error',
         });
       }
     }
@@ -294,7 +286,7 @@ class DefaultConfigSource implements ConfigSource {
         connectionTimeout: 10000,
         queryTimeout: 30000,
         batchSize: 25,
-        indexOptimization: true
+        indexOptimization: true,
       },
       scaling: {
         maxConcurrency: 20,
@@ -303,23 +295,23 @@ class DefaultConfigSource implements ConfigSource {
         autoScaleEnabled: true,
         resourceLimits: {
           memory: 512,
-          cpu: 2
-        }
+          cpu: 2,
+        },
       },
       security: {
         rateLimiting: {
           windowMs: 60000,
-          maxRequests: 1000
+          maxRequests: 1000,
         },
         circuitBreaker: {
           threshold: 20,
           timeout: 30000,
-          resetTimeout: 60000
+          resetTimeout: 60000,
         },
         authentication: {
           required: false,
-          tokenExpiry: 3600
-        }
+          tokenExpiry: 3600,
+        },
       },
       monitoring: {
         enabled: true,
@@ -327,20 +319,20 @@ class DefaultConfigSource implements ConfigSource {
         alertThresholds: {
           errorRate: 5,
           responseTime: 5000,
-          memoryUsage: 80
+          memoryUsage: 80,
         },
         logging: {
           level: 'info',
-          structured: true
-        }
+          structured: true,
+        },
       },
       features: {
         enableEmulators: false,
         optimizeForWSL2: false,
         useRestOnlyMode: false,
         enableCaching: true,
-        enableMetrics: true
-      }
+        enableMetrics: true,
+      },
     };
   }
 }
@@ -360,7 +352,7 @@ export class UnifiedConfigManager {
       new EnvironmentConfigSource(),
       new FileConfigSource(),
       new TestConfigSource(),
-      new DefaultConfigSource()
+      new DefaultConfigSource(),
     ].sort((a, b) => a.priority - b.priority);
   }
 
@@ -392,7 +384,7 @@ export class UnifiedConfigManager {
         const sourceConfig = source.load();
         if (sourceConfig) {
           mergedConfig = this.deepMerge(mergedConfig, sourceConfig);
-                     log('info', `Loaded configuration from source: ${source.name}`);
+          log('info', `Loaded configuration from source: ${source.name}`);
         }
       }
 
@@ -402,15 +394,14 @@ export class UnifiedConfigManager {
 
       log('info', 'Unified configuration loaded successfully', {
         environment: this.config.environment,
-        sources: this.sources.map(s => s.name),
-        features: this.config.features
+        sources: this.sources.map((s) => s.name),
+        features: this.config.features,
       });
 
       return this.config;
-
     } catch (error) {
       log('error', 'Failed to load unified configuration', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       throw error;
     }
@@ -507,36 +498,36 @@ export class UnifiedConfigManager {
       throw new Error('Firebase API key is required');
     }
 
-         // Ensure features object exists
-     config.features = config.features || {
-       enableEmulators: false,
-       optimizeForWSL2: false,
-       useRestOnlyMode: false,
-       enableCaching: true,
-       enableMetrics: true
-     };
+    // Ensure features object exists
+    config.features = config.features || {
+      enableEmulators: false,
+      optimizeForWSL2: false,
+      useRestOnlyMode: false,
+      enableCaching: true,
+      enableMetrics: true,
+    };
 
-     // Auto-detect WSL2 if not explicitly set
-     if (config.features.optimizeForWSL2 === undefined) {
-       config.features.optimizeForWSL2 = this.detectWSL2();
-     }
+    // Auto-detect WSL2 if not explicitly set
+    if (config.features.optimizeForWSL2 === undefined) {
+      config.features.optimizeForWSL2 = this.detectWSL2();
+    }
 
-     // Auto-enable REST mode for WSL2
-     if (config.features.optimizeForWSL2 && config.features.useRestOnlyMode === undefined) {
-       config.features.useRestOnlyMode = true;
-     }
+    // Auto-enable REST mode for WSL2
+    if (config.features.optimizeForWSL2 && config.features.useRestOnlyMode === undefined) {
+      config.features.useRestOnlyMode = true;
+    }
 
-     // Environment-specific adjustments
-     if (config.environment === 'test') {
-       config.features.enableEmulators = config.features.enableEmulators ?? false;
-       config.monitoring = config.monitoring || {
-         enabled: false,
-         metricsInterval: 30000,
-         alertThresholds: { errorRate: 5, responseTime: 5000, memoryUsage: 80 },
-         logging: { level: 'info', structured: true }
-       };
-       config.monitoring.enabled = false; // Disable monitoring in tests
-     }
+    // Environment-specific adjustments
+    if (config.environment === 'test') {
+      config.features.enableEmulators = config.features.enableEmulators ?? false;
+      config.monitoring = config.monitoring || {
+        enabled: false,
+        metricsInterval: 30000,
+        alertThresholds: { errorRate: 5, responseTime: 5000, memoryUsage: 80 },
+        logging: { level: 'info', structured: true },
+      };
+      config.monitoring.enabled = false; // Disable monitoring in tests
+    }
 
     return config as UnifiedConfig;
   }
@@ -548,15 +539,13 @@ export class UnifiedConfigManager {
     try {
       if (existsSync('/proc/version')) {
         const version = readFileSync('/proc/version', 'utf8');
-        return version.toLowerCase().includes('microsoft') || 
-               version.toLowerCase().includes('wsl');
+        return version.toLowerCase().includes('microsoft') || version.toLowerCase().includes('wsl');
       }
     } catch {
       // Ignore errors
     }
-    
-    return process.env.WSL_DISTRO_NAME !== undefined ||
-           process.env.WSLENV !== undefined;
+
+    return process.env.WSL_DISTRO_NAME !== undefined || process.env.WSLENV !== undefined;
   }
 }
 
@@ -574,4 +563,4 @@ export function getUnifiedConfig(): UnifiedConfig {
 
 export function isConfigLoaded(): boolean {
   return globalConfigManager.isConfigLoaded();
-} 
+}

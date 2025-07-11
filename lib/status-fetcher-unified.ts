@@ -1,6 +1,6 @@
 /**
  * UNIFIED STATUS FETCHER - Single, Simple Implementation
- * 
+ *
  * Replaces 6+ over-engineered status fetchers with one clean solution.
  * Designed for 50-200 providers with exponential user growth.
  */
@@ -72,8 +72,8 @@ export class StatusFetcher {
           signal: controller.signal,
           headers: {
             'User-Agent': 'AI-Status-Dashboard/1.0',
-            'Accept': 'application/json,text/html,*/*'
-          }
+            Accept: 'application/json,text/html,*/*',
+          },
         });
 
         clearTimeout(timeoutId);
@@ -86,24 +86,23 @@ export class StatusFetcher {
           statusPageUrl: provider.statusPageUrl,
           responseTime,
           lastChecked: new Date().toISOString(),
-          error: lastError
+          error: lastError,
         };
 
         // Cache successful results
         this.setCached(provider.id, result);
-        
+
         log('info', 'Provider status checked', {
           provider: provider.id,
           status: result.status,
           responseTime,
-          attempt: attempt + 1
+          attempt: attempt + 1,
         });
 
         return result;
-
       } catch (error) {
         lastError = error instanceof Error ? error.message : 'Unknown error';
-        
+
         if (attempt === retries) {
           // Final attempt failed
           const result: StatusResult = {
@@ -113,20 +112,20 @@ export class StatusFetcher {
             statusPageUrl: provider.statusPageUrl,
             responseTime: Date.now() - startTime,
             lastChecked: new Date().toISOString(),
-            error: lastError
+            error: lastError,
           };
 
           log('error', 'Provider status check failed', {
             provider: provider.id,
             error: lastError,
-            attempts: retries + 1
+            attempts: retries + 1,
           });
 
           return result;
         }
 
         // Wait before retry (exponential backoff)
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+        await new Promise((resolve) => setTimeout(resolve, Math.pow(2, attempt) * 1000));
       }
     }
 
@@ -138,12 +137,15 @@ export class StatusFetcher {
    * Check multiple providers efficiently
    * Uses Promise.allSettled for reliability
    */
-  async checkProviders(providers: Provider[], options: StatusFetchOptions = {}): Promise<StatusResult[]> {
-    const enabledProviders = providers.filter(p => p.enabled !== false);
-    
+  async checkProviders(
+    providers: Provider[],
+    options: StatusFetchOptions = {}
+  ): Promise<StatusResult[]> {
+    const enabledProviders = providers.filter((p) => p.enabled !== false);
+
     log('info', 'Starting batch status check', {
       totalProviders: enabledProviders.length,
-      parallel: options.parallel !== false
+      parallel: options.parallel !== false,
     });
 
     let completed = 0;
@@ -172,7 +174,7 @@ export class StatusFetcher {
       });
 
       const settledResults = await Promise.allSettled(promises);
-      
+
       return settledResults.map((result, index) => {
         if (result.status === 'fulfilled') {
           return result.value;
@@ -186,7 +188,7 @@ export class StatusFetcher {
             statusPageUrl: provider.statusPageUrl,
             responseTime: 0,
             lastChecked: new Date().toISOString(),
-            error: 'Promise rejected: ' + result.reason
+            error: 'Promise rejected: ' + result.reason,
           };
         }
       });
@@ -210,7 +212,7 @@ export class StatusFetcher {
   private setCached(providerId: string, result: StatusResult): void {
     this.cache.set(providerId, {
       result,
-      expires: Date.now() + this.cacheTTL
+      expires: Date.now() + this.cacheTTL,
     });
   }
 
@@ -240,7 +242,7 @@ export class StatusFetcher {
    */
   getCacheStats(): { size: number; hitRate?: number } {
     return {
-      size: this.cache.size
+      size: this.cache.size,
     };
   }
 }
@@ -252,7 +254,7 @@ export const statusFetcher = new StatusFetcher();
  * Convenience function for checking all providers
  */
 export async function checkAllProviders(
-  providers: Provider[], 
+  providers: Provider[],
   options?: StatusFetchOptions
 ): Promise<StatusResult[]> {
   return statusFetcher.checkProviders(providers, options);
@@ -262,8 +264,8 @@ export async function checkAllProviders(
  * Convenience function for checking single provider
  */
 export async function checkProvider(
-  provider: Provider, 
+  provider: Provider,
   options?: StatusFetchOptions
 ): Promise<StatusResult> {
   return statusFetcher.checkProvider(provider, options);
-} 
+}

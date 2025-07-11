@@ -27,4 +27,4 @@ describe('README Trademark Compliance', () => {
     expect(readmeContent).toMatch(/rate.*limit/i);
     expect(readmeContent).toMatch(/robots\.txt/i);
   });
-}); 
+});

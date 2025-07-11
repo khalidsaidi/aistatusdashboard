@@ -41,7 +41,9 @@ describe('Resilience Tools Comprehensive Coverage', () => {
           }
         }
 
-        getState() { return this.state; }
+        getState() {
+          return this.state;
+        }
       }
 
       const breaker = new SimpleCircuitBreaker();
@@ -76,7 +78,7 @@ describe('Resilience Tools Comprehensive Coverage', () => {
           const now = Date.now();
           const timePassed = (now - this.lastRefill) / 1000;
           const tokensToAdd = timePassed * this.refillRate;
-          
+
           this.tokens = Math.min(this.capacity, this.tokens + tokensToAdd);
           this.lastRefill = now;
         }
@@ -104,16 +106,16 @@ describe('Resilience Tools Comprehensive Coverage', () => {
           } catch (error) {
             attempts++;
             lastError = error as Error;
-            
+
             if (attempts >= maxAttempts) {
               throw lastError;
             }
 
             const delay = baseDelay * Math.pow(2, attempts - 1);
-            await new Promise(resolve => setTimeout(resolve, Math.min(delay, 100))); // Cap for tests
+            await new Promise((resolve) => setTimeout(resolve, Math.min(delay, 100))); // Cap for tests
           }
         }
-        
+
         throw lastError!;
       }
 
@@ -152,7 +154,7 @@ describe('Resilience Tools Comprehensive Coverage', () => {
 
           this.cache.set(key, {
             value,
-            expires: Date.now() + ttl
+            expires: Date.now() + ttl,
           });
         }
 
@@ -168,7 +170,7 @@ describe('Resilience Tools Comprehensive Coverage', () => {
           // Move to end (LRU behavior)
           this.cache.delete(key);
           this.cache.set(key, entry);
-          
+
           return entry.value;
         }
 
@@ -185,10 +187,10 @@ describe('Resilience Tools Comprehensive Coverage', () => {
       cache.set('a', 'value-a');
       cache.set('b', 'value-b');
       cache.set('c', 'value-c');
-      
+
       expect(cache.get('a')).toBe('value-a');
       expect(cache.size()).toBe(3);
-      
+
       // Should evict oldest when adding new item
       cache.set('d', 'value-d');
       expect(cache.size()).toBe(3);
@@ -207,9 +209,9 @@ describe('Resilience Tools Comprehensive Coverage', () => {
 
         getConnection(host: string): any {
           const connections = this.activeConnections.get(host) || [];
-          
+
           // Try to reuse existing connection
-          const availableConnection = connections.find(conn => !conn.inUse);
+          const availableConnection = connections.find((conn) => !conn.inUse);
           if (availableConnection) {
             availableConnection.inUse = true;
             return availableConnection;
@@ -221,7 +223,7 @@ describe('Resilience Tools Comprehensive Coverage', () => {
               id: `${host}-${Date.now()}`,
               host,
               inUse: true,
-              created: Date.now()
+              created: Date.now(),
             };
             connections.push(newConnection);
             this.activeConnections.set(host, connections);
@@ -238,10 +240,10 @@ describe('Resilience Tools Comprehensive Coverage', () => {
         getStats() {
           let totalConnections = 0;
           let activeConnections = 0;
-          
-          this.activeConnections.forEach(connections => {
+
+          this.activeConnections.forEach((connections) => {
             totalConnections += connections.length;
-            activeConnections += connections.filter(c => c.inUse).length;
+            activeConnections += connections.filter((c) => c.inUse).length;
           });
 
           return { totalConnections, activeConnections };
@@ -251,11 +253,11 @@ describe('Resilience Tools Comprehensive Coverage', () => {
       const pool = new ConnectionPool(3);
       const conn1 = pool.getConnection('api.example.com');
       const conn2 = pool.getConnection('api.example.com');
-      
+
       expect(conn1).toBeDefined();
       expect(conn2).toBeDefined();
       expect(pool.getStats().activeConnections).toBe(2);
-      
+
       pool.releaseConnection(conn1);
       expect(pool.getStats().activeConnections).toBe(1);
     });
@@ -269,12 +271,12 @@ describe('Resilience Tools Comprehensive Coverage', () => {
         recordMetric(name: string, value: number): void {
           const values = this.metrics.get(name) || [];
           values.push(value);
-          
+
           // Keep only last 100 values
           if (values.length > 100) {
             values.shift();
           }
-          
+
           this.metrics.set(name, values);
         }
 
@@ -289,7 +291,7 @@ describe('Resilience Tools Comprehensive Coverage', () => {
             count: values.length,
             average: sum / values.length,
             min: Math.min(...values),
-            max: Math.max(...values)
+            max: Math.max(...values),
           };
         }
       }
@@ -314,12 +316,12 @@ describe('Resilience Tools Comprehensive Coverage', () => {
         TIMEOUT = 'timeout',
         AUTHENTICATION = 'authentication',
         VALIDATION = 'validation',
-        UNKNOWN = 'unknown'
+        UNKNOWN = 'unknown',
       }
 
       function classifyError(error: Error): ErrorType {
         const message = error.message.toLowerCase();
-        
+
         if (message.includes('network') || message.includes('connection')) {
           return ErrorType.NETWORK;
         }
@@ -332,7 +334,7 @@ describe('Resilience Tools Comprehensive Coverage', () => {
         if (message.includes('validation') || message.includes('invalid')) {
           return ErrorType.VALIDATION;
         }
-        
+
         return ErrorType.UNKNOWN;
       }
 
@@ -350,10 +352,7 @@ describe('Resilience Tools Comprehensive Coverage', () => {
         private primaryService: () => Promise<string>;
         private fallbackService: () => Promise<string>;
 
-        constructor(
-          primary: () => Promise<string>,
-          fallback: () => Promise<string>
-        ) {
+        constructor(primary: () => Promise<string>, fallback: () => Promise<string>) {
           this.primaryService = primary;
           this.fallbackService = fallback;
         }
@@ -375,11 +374,13 @@ describe('Resilience Tools Comprehensive Coverage', () => {
       }
 
       const service = new ServiceWithFallback(
-        async () => { throw new Error('Primary failed'); },
+        async () => {
+          throw new Error('Primary failed');
+        },
         async () => 'fallback-data'
       );
 
-      return service.getData().then(result => {
+      return service.getData().then((result) => {
         expect(result.data).toBe('fallback-data');
         expect(result.source).toBe('fallback');
       });
@@ -400,7 +401,7 @@ describe('Resilience Tools Comprehensive Coverage', () => {
         }
 
         cleanupAll(): void {
-          this.resources.forEach(resource => {
+          this.resources.forEach((resource) => {
             try {
               resource.cleanup();
             } catch (error) {
@@ -417,9 +418,11 @@ describe('Resilience Tools Comprehensive Coverage', () => {
 
       const manager = new ResourceManager();
       let cleanupCalled = false;
-      
+
       const resource = {
-        cleanup: () => { cleanupCalled = true; }
+        cleanup: () => {
+          cleanupCalled = true;
+        },
       };
 
       manager.addResource(resource);
@@ -430,4 +433,4 @@ describe('Resilience Tools Comprehensive Coverage', () => {
       expect(manager.getResourceCount()).toBe(0);
     });
   });
-}); 
+});

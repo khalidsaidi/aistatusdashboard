@@ -12,30 +12,39 @@ const availableScripts = Object.keys(packageJson.scripts || {});
 const actionSchemas = {
   '8398a7/action-slack@v3': {
     inputs: ['status', 'text', 'mention', 'if_mention', 'job_name', 'fields', 'custom_payload'],
-    env: ['SLACK_WEBHOOK_URL']
+    env: ['SLACK_WEBHOOK_URL'],
   },
   'actions/checkout@v4': {
-    inputs: ['repository', 'ref', 'token', 'ssh-key', 'path', 'clean', 'fetch-depth', 'lfs', 'submodules']
+    inputs: [
+      'repository',
+      'ref',
+      'token',
+      'ssh-key',
+      'path',
+      'clean',
+      'fetch-depth',
+      'lfs',
+      'submodules',
+    ],
   },
   'actions/setup-node@v4': {
-    inputs: ['node-version', 'node-version-file', 'architecture', 'cache', 'cache-dependency-path']
+    inputs: ['node-version', 'node-version-file', 'architecture', 'cache', 'cache-dependency-path'],
   },
   'actions/upload-artifact@v3': {
-    inputs: ['name', 'path', 'retention-days', 'if-no-files-found']
+    inputs: ['name', 'path', 'retention-days', 'if-no-files-found'],
   },
   'actions/download-artifact@v3': {
-    inputs: ['name', 'path']
+    inputs: ['name', 'path'],
   },
   'codecov/codecov-action@v3': {
-    inputs: ['token', 'files', 'flags', 'fail_ci_if_error', 'verbose']
+    inputs: ['token', 'files', 'flags', 'fail_ci_if_error', 'verbose'],
   },
   'actions/github-script@v7': {
-    inputs: ['script', 'github-token', 'previews', 'user-agent', 'debug', 'result-encoding']
-  }
+    inputs: ['script', 'github-token', 'previews', 'user-agent', 'debug', 'result-encoding'],
+  },
 };
 
 function validateWorkflow(workflowPath) {
-  
   const content = fs.readFileSync(workflowPath, 'utf8');
   const workflow = yaml.load(content);
   const errors = [];
@@ -53,7 +62,7 @@ function validateWorkflow(workflowPath) {
               job: jobName,
               step: stepIndex + 1,
               error: `npm script '${script}' not found in package.json`,
-              line: step.run
+              line: step.run,
             });
           }
         }
@@ -67,7 +76,7 @@ function validateWorkflow(workflowPath) {
                 job: jobName,
                 step: stepIndex + 1,
                 error: `Referenced file '${ref}' not found`,
-                line: step.run
+                line: step.run,
               });
             }
           }
@@ -79,7 +88,7 @@ function validateWorkflow(workflowPath) {
         const actionMatch = step.uses.match(/^([^@]+@v\d+)/);
         if (actionMatch && actionSchemas[actionMatch[1]]) {
           const schema = actionSchemas[actionMatch[1]];
-          
+
           // Check for invalid inputs
           if (step.with) {
             for (const input of Object.keys(step.with)) {
@@ -88,12 +97,12 @@ function validateWorkflow(workflowPath) {
                   job: jobName,
                   step: stepIndex + 1,
                   error: `Invalid input '${input}' for action ${step.uses}`,
-                  suggestion: `Valid inputs: ${schema.inputs.join(', ')}`
+                  suggestion: `Valid inputs: ${schema.inputs.join(', ')}`,
                 });
               }
             }
           }
-          
+
           // Check if env vars should be used instead of inputs
           if (step.with && schema.env) {
             for (const envVar of schema.env) {
@@ -103,7 +112,7 @@ function validateWorkflow(workflowPath) {
                   job: jobName,
                   step: stepIndex + 1,
                   error: `Use environment variable ${envVar} instead of input`,
-                  suggestion: `env:\n  ${envVar}: \${{ secrets.YOUR_SECRET }}`
+                  suggestion: `env:\n  ${envVar}: \${{ secrets.YOUR_SECRET }}`,
                 });
               }
             }
@@ -118,8 +127,9 @@ function validateWorkflow(workflowPath) {
 
 // Validate all workflows
 const workflowDir = '.github/workflows';
-const workflows = fs.readdirSync(workflowDir)
-  .filter(f => f.endsWith('.yml') || f.endsWith('.yaml'));
+const workflows = fs
+  .readdirSync(workflowDir)
+  .filter((f) => f.endsWith('.yml') || f.endsWith('.yaml'));
 
 let hasErrors = false;
 
@@ -127,21 +137,16 @@ for (const workflow of workflows) {
   const errors = validateWorkflow(path.join(workflowDir, workflow));
   if (errors.length > 0) {
     hasErrors = true;
-    
-    errors.forEach(err => {
-      
+
+    errors.forEach((err) => {
       if (err.suggestion) {
-        
       }
     });
   } else {
-    
   }
 }
 
 if (hasErrors) {
-  
   process.exit(1);
 } else {
-  
-} 
+}

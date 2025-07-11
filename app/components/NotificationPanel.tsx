@@ -2,7 +2,10 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { getApiUrl } from '../../lib/utils';
-import { subscribeToPushNotifications, unsubscribeFromPushNotifications } from '../../lib/firebase-messaging';
+import {
+  subscribeToPushNotifications,
+  unsubscribeFromPushNotifications,
+} from '../../lib/firebase-messaging';
 
 interface EmailSubscription {
   id: string;
@@ -76,13 +79,14 @@ export default function NotificationPanel() {
   // Check for push notification support
   useEffect(() => {
     const checkPushSupport = () => {
-      const supported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
+      const supported =
+        'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
       setPushSupported(supported);
-      
+
       if (supported && Notification.permission === 'granted') {
         // Check if already subscribed
-        navigator.serviceWorker.ready.then(registration => {
-          registration.pushManager.getSubscription().then(subscription => {
+        navigator.serviceWorker.ready.then((registration) => {
+          registration.pushManager.getSubscription().then((subscription) => {
             if (subscription) {
               setPushEnabled(true);
               setPushSubscription(subscription);
@@ -157,11 +161,21 @@ export default function NotificationPanel() {
         }
       } else {
         // Subscribe with selected providers (default to all if none selected)
-        const providersToUse = selectedProviders.length > 0 ? selectedProviders : [
-          'OpenAI', 'Anthropic', 'Google AI', 'Hugging Face', 'Cohere',
-          'AWS Bedrock', 'Azure OpenAI', 'Replicate', 'Stability AI'
-        ];
-        
+        const providersToUse =
+          selectedProviders.length > 0
+            ? selectedProviders
+            : [
+                'OpenAI',
+                'Anthropic',
+                'Google AI',
+                'Hugging Face',
+                'Cohere',
+                'AWS Bedrock',
+                'Azure OpenAI',
+                'Replicate',
+                'Stability AI',
+              ];
+
         const success = await subscribeToPushNotifications(providersToUse);
         if (success) {
           setPushEnabled(true);
@@ -254,12 +268,23 @@ export default function NotificationPanel() {
   };
 
   const providers = [
-    'OpenAI', 'Anthropic', 'Google AI', 'Hugging Face', 'Cohere',
-    'AWS Bedrock', 'Azure OpenAI', 'Replicate', 'Stability AI'
+    'OpenAI',
+    'Anthropic',
+    'Google AI',
+    'Hugging Face',
+    'Cohere',
+    'AWS Bedrock',
+    'Azure OpenAI',
+    'Replicate',
+    'Stability AI',
   ];
 
   const notificationTypes = [
-    'outages', 'degraded_performance', 'maintenance', 'incidents', 'updates'
+    'outages',
+    'degraded_performance',
+    'maintenance',
+    'incidents',
+    'updates',
   ];
 
   const handleTabChange = (tab: string) => {
@@ -322,7 +347,10 @@ export default function NotificationPanel() {
           <div className="space-y-6">
             <form onSubmit={handleEmailSubscription} className="space-y-4">
               <div>
-                <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="email-address"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Email Address
                 </label>
                 <input
@@ -350,7 +378,7 @@ export default function NotificationPanel() {
                           if (e.target.checked) {
                             setSelectedProviders([...selectedProviders, provider]);
                           } else {
-                            setSelectedProviders(selectedProviders.filter(p => p !== provider));
+                            setSelectedProviders(selectedProviders.filter((p) => p !== provider));
                           }
                         }}
                         className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -375,7 +403,9 @@ export default function NotificationPanel() {
                           if (e.target.checked) {
                             setSelectedNotificationTypes([...selectedNotificationTypes, type]);
                           } else {
-                            setSelectedNotificationTypes(selectedNotificationTypes.filter(t => t !== type));
+                            setSelectedNotificationTypes(
+                              selectedNotificationTypes.filter((t) => t !== type)
+                            );
                           }
                         }}
                         className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -390,7 +420,12 @@ export default function NotificationPanel() {
 
               <button
                 type="submit"
-                disabled={loading || !email || selectedProviders.length === 0 || selectedNotificationTypes.length === 0}
+                disabled={
+                  loading ||
+                  !email ||
+                  selectedProviders.length === 0 ||
+                  selectedNotificationTypes.length === 0
+                }
                 className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium py-2 px-4 rounded-md transition-colors"
               >
                 {loading ? '🔄 Subscribing...' : '📧 Subscribe to Email Alerts'}
@@ -405,7 +440,10 @@ export default function NotificationPanel() {
                 </h3>
                 <div className="space-y-3">
                   {subscriptions.map((subscription) => (
-                    <div key={subscription.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+                    <div
+                      key={subscription.id}
+                      className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md"
+                    >
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-medium text-gray-900 dark:text-white">
@@ -418,11 +456,13 @@ export default function NotificationPanel() {
                             Types: {subscription.notificationTypes.join(', ')}
                           </p>
                           <p className="text-sm">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              subscription.confirmed 
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                            }`}>
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                subscription.confirmed
+                                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                  : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                              }`}
+                            >
                               {subscription.confirmed ? '✅ Confirmed' : '⏳ Pending Confirmation'}
                             </span>
                           </p>
@@ -451,7 +491,8 @@ export default function NotificationPanel() {
                   ⚠️ Web Push Not Supported
                 </h4>
                 <p className="text-sm text-yellow-800 dark:text-yellow-300">
-                  Your browser doesn&apos;t support web push notifications. Please use a modern browser like Chrome, Firefox, or Safari.
+                  Your browser doesn&apos;t support web push notifications. Please use a modern
+                  browser like Chrome, Firefox, or Safari.
                 </p>
               </div>
             ) : (
@@ -459,7 +500,7 @@ export default function NotificationPanel() {
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                   Browser Push Notifications
                 </h3>
-                
+
                 {pushEnabled ? (
                   <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-md">
                     <div className="flex items-center justify-between">
@@ -468,7 +509,8 @@ export default function NotificationPanel() {
                           ✅ Push Notifications Enabled
                         </h4>
                         <p className="text-sm text-green-800 dark:text-green-300">
-                          You&apos;ll receive real-time notifications about AI service status changes.
+                          You&apos;ll receive real-time notifications about AI service status
+                          changes.
                         </p>
                       </div>
                       <button
@@ -488,7 +530,8 @@ export default function NotificationPanel() {
                           🔔 Enable Push Notifications
                         </h4>
                         <p className="text-sm text-blue-800 dark:text-blue-300">
-                          Get instant notifications when AI services experience issues or maintenance.
+                          Get instant notifications when AI services experience issues or
+                          maintenance.
                         </p>
                       </div>
                       <button
@@ -523,7 +566,10 @@ export default function NotificationPanel() {
           <div className="space-y-6">
             <form onSubmit={handleWebhookSubmission} className="space-y-4">
               <div>
-                <label htmlFor="webhook-url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="webhook-url"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Webhook URL
                 </label>
                 <input
@@ -538,7 +584,10 @@ export default function NotificationPanel() {
               </div>
 
               <div>
-                <label htmlFor="webhook-secret" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  htmlFor="webhook-secret"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Secret (Optional)
                 </label>
                 <input
@@ -636,13 +685,15 @@ export default function NotificationPanel() {
                       <h4 className="font-medium text-gray-900 dark:text-white">
                         {incident.title}
                       </h4>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        incident.status === 'resolved' 
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                          : incident.status === 'investigating'
-                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                      }`}>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          incident.status === 'resolved'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                            : incident.status === 'investigating'
+                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                              : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                        }`}
+                      >
                         {incident.status}
                       </span>
                     </div>
@@ -674,4 +725,4 @@ export default function NotificationPanel() {
       </div>
     </div>
   );
-} 
+}

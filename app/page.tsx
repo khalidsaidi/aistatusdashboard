@@ -21,7 +21,8 @@ function ErrorFallback({ error }: { error: string }) {
               Service Temporarily Unavailable
             </h2>
             <p className="text-red-600 dark:text-red-400 mb-6 max-w-md mx-auto">
-              We&apos;re experiencing issues fetching provider status data. Please try refreshing the page.
+              We&apos;re experiencing issues fetching provider status data. Please try refreshing
+              the page.
             </p>
             <div className="bg-red-100 dark:bg-red-900/40 border border-red-200 dark:border-red-700 rounded-md p-4 mb-6">
               <p className="text-sm text-red-700 dark:text-red-300">
@@ -67,14 +68,14 @@ function setCachedStatuses(data: any[]): void {
 
 // Generate fallback statuses
 function getFallbackStatuses(): any[] {
-  return getProviders().map(provider => ({
+  return getProviders().map((provider) => ({
     id: provider.id,
     name: provider.name,
     status: 'unknown' as const,
     statusPageUrl: provider.statusPageUrl,
     responseTime: 0,
     lastChecked: new Date().toISOString(),
-    error: 'Service temporarily unavailable'
+    error: 'Service temporarily unavailable',
   }));
 }
 
@@ -83,7 +84,7 @@ export default async function DashboardPage() {
   // PERFORMANCE: Skip heavy operations for HEAD requests
   const headersList = await headers();
   const isHeadRequest = headersList.get('x-request-method') === 'HEAD';
-  
+
   if (isHeadRequest) {
     const fallbackStatuses = getFallbackStatuses();
     return (
@@ -109,9 +110,9 @@ export default async function DashboardPage() {
     } else {
       // Fetch all provider statuses with true concurrency
       const providers = [...getProviders()]; // Convert readonly array to mutable
-      
+
       log('info', 'Fetching provider statuses', { count: providers.length });
-      
+
       // Use the simplified fetcher with true concurrency
       statuses = await checkAllProviders(providers);
 
@@ -127,30 +128,29 @@ export default async function DashboardPage() {
     }
 
     // Log results
-    const operational = statuses.filter(s => s.status === 'operational').length;
-    const degraded = statuses.filter(s => s.status === 'degraded').length;
-    const down = statuses.filter(s => s.status === 'down').length;
-    const unknown = statuses.filter(s => s.status === 'unknown').length;
+    const operational = statuses.filter((s) => s.status === 'operational').length;
+    const degraded = statuses.filter((s) => s.status === 'degraded').length;
+    const down = statuses.filter((s) => s.status === 'down').length;
+    const unknown = statuses.filter((s) => s.status === 'unknown').length;
 
     log('info', 'Successfully fetched provider statuses', {
       total: statuses.length,
       operational,
       degraded,
       down,
-      unknown
+      unknown,
     });
 
     // Show warning if many providers failed
     if (unknown > statuses.length / 2) {
       error = `${unknown} out of ${statuses.length} providers are unavailable`;
     }
-
   } catch (fetchError) {
     error = fetchError instanceof Error ? fetchError.message : 'Unknown error occurred';
-    
-    log('error', 'Failed to fetch provider statuses', { 
+
+    log('error', 'Failed to fetch provider statuses', {
       error,
-      providersCount: getProviders().length 
+      providersCount: getProviders().length,
     });
 
     // Try cached data as fallback
@@ -194,4 +194,4 @@ export default async function DashboardPage() {
       </div>
     </main>
   );
-} 
+}

@@ -5,11 +5,7 @@ import React from 'react';
 
 // Test wrapper to prevent React hooks crashes
 function TestWrapper({ children }: { children: React.ReactNode }) {
-  return (
-    <div data-testid="test-wrapper">
-      {children}
-    </div>
-  );
+  return <div data-testid="test-wrapper">{children}</div>;
 }
 
 // Helper function to safely perform user interactions
@@ -23,13 +19,13 @@ async function safeUserInteraction(callback: () => Promise<void>) {
 async function renderAndWaitForAsyncOps(ui: React.ReactElement) {
   const user = userEvent.setup();
   let result: any;
-  
+
   await act(async () => {
     result = render(ui);
     // Wait for all async operations to complete
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
   });
-  
+
   return {
     user,
     ...result,
@@ -43,15 +39,15 @@ const testStatuses = [
     status: 'operational' as const,
     responseTime: 85,
     lastChecked: '2025-01-07T10:00:00Z',
-    statusPageUrl: 'https://status.openai.com'
+    statusPageUrl: 'https://status.openai.com',
   },
   {
-    id: 'anthropic', 
+    id: 'anthropic',
     name: 'Anthropic',
     status: 'degraded' as const,
     responseTime: 250,
     lastChecked: '2025-01-07T10:00:00Z',
-    statusPageUrl: 'https://status.anthropic.com'
+    statusPageUrl: 'https://status.anthropic.com',
   },
   {
     id: 'meta',
@@ -59,7 +55,7 @@ const testStatuses = [
     status: 'down' as const,
     responseTime: 1500,
     lastChecked: '2025-01-07T10:00:00Z',
-    statusPageUrl: 'https://status.meta.com'
+    statusPageUrl: 'https://status.meta.com',
   },
   {
     id: 'google-ai',
@@ -67,17 +63,13 @@ const testStatuses = [
     status: 'unknown' as const,
     responseTime: 0,
     lastChecked: '2025-01-07T10:00:00Z',
-    statusPageUrl: 'https://status.cloud.google.com'
-  }
+    statusPageUrl: 'https://status.cloud.google.com',
+  },
 ];
 
 // Helper function to render with error boundary
 function renderWithErrorBoundary(component: React.ReactElement) {
-  return render(
-    <TestWrapper>
-      {component}
-    </TestWrapper>
-  );
+  return render(<TestWrapper>{component}</TestWrapper>);
 }
 
 describe('Dashboard Filters', () => {
@@ -88,12 +80,12 @@ describe('Dashboard Filters', () => {
           <DashboardTabs statuses={testStatuses} />
         </TestWrapper>
       );
-      
+
       // Check for any of the expected dashboard content
       expect(
         screen.getByText('🔴 Service Issues Detected') ||
-        screen.getByText('System Status:') ||
-        screen.getByText('Operational')
+          screen.getByText('System Status:') ||
+          screen.getByText('Operational')
       ).toBeInTheDocument();
     });
 
@@ -103,7 +95,7 @@ describe('Dashboard Filters', () => {
           <DashboardTabs statuses={testStatuses} />
         </TestWrapper>
       );
-      
+
       expect(screen.getByText('OpenAI')).toBeInTheDocument();
       expect(screen.getByText('Anthropic')).toBeInTheDocument();
       expect(screen.getByText('Meta AI')).toBeInTheDocument();
@@ -116,7 +108,7 @@ describe('Dashboard Filters', () => {
           <DashboardTabs statuses={testStatuses} />
         </TestWrapper>
       );
-      
+
       expect(screen.getByPlaceholderText(/search providers/i)).toBeInTheDocument();
     });
 
@@ -126,7 +118,7 @@ describe('Dashboard Filters', () => {
           <DashboardTabs statuses={testStatuses} />
         </TestWrapper>
       );
-      
+
       expect(screen.getByLabelText('Status:')).toBeInTheDocument();
       expect(screen.getByLabelText('Speed:')).toBeInTheDocument();
       expect(screen.getByLabelText('Uptime:')).toBeInTheDocument();
@@ -143,16 +135,19 @@ describe('Dashboard Filters', () => {
       );
 
       const searchInput = screen.getByPlaceholderText(/search providers/i);
-      
+
       // Focus search with keyboard shortcut
       await safeUserInteraction(async () => {
         await user.keyboard('/');
       });
 
       // Wait for focus to be applied
-      await waitFor(() => {
-        expect(searchInput).toHaveFocus();
-      }, { timeout: 500 });
+      await waitFor(
+        () => {
+          expect(searchInput).toHaveFocus();
+        },
+        { timeout: 500 }
+      );
     });
 
     it('should filter providers by name (functional test)', async () => {
@@ -163,13 +158,13 @@ describe('Dashboard Filters', () => {
       );
 
       const searchInput = screen.getByPlaceholderText(/search providers/i);
-      
+
       // Test that input has correct attributes for filtering functionality
       expect(searchInput).toBeInTheDocument();
       expect(searchInput).toHaveAttribute('type', 'text');
       expect(searchInput).toHaveAttribute('placeholder', 'Search providers... (Press / to focus)');
       expect(searchInput).toHaveValue(''); // Default empty state
-      
+
       // Verify the input is properly configured for search
       expect(searchInput).toHaveClass('block', 'w-full');
     });
@@ -182,14 +177,14 @@ describe('Dashboard Filters', () => {
       );
 
       const searchInput = screen.getByPlaceholderText(/search providers/i);
-      
+
       // Test that search input is properly configured for keyboard interaction
       expect(searchInput).toBeInTheDocument();
       expect(searchInput).toHaveAttribute('placeholder', 'Search providers... (Press / to focus)');
-      
+
       // Verify the input has the expected empty state (what Escape would reset to)
       expect(searchInput).toHaveValue('');
-      
+
       // Test that the input is interactive
       expect(searchInput).not.toBeDisabled();
     });
@@ -259,8 +254,8 @@ describe('Dashboard Filters', () => {
 
       const statusFilter = screen.getByLabelText('Status:');
       expect(statusFilter).toHaveValue('all');
-      
-      const options = Array.from(statusFilter.querySelectorAll('option')).map(opt => opt.value);
+
+      const options = Array.from(statusFilter.querySelectorAll('option')).map((opt) => opt.value);
       expect(options).toEqual(['all', 'operational', 'degraded', 'down', 'unknown']);
     });
 
@@ -273,8 +268,8 @@ describe('Dashboard Filters', () => {
 
       const speedFilter = screen.getByLabelText('Speed:');
       expect(speedFilter).toHaveValue('all');
-      
-      const options = Array.from(speedFilter.querySelectorAll('option')).map(opt => opt.value);
+
+      const options = Array.from(speedFilter.querySelectorAll('option')).map((opt) => opt.value);
       expect(options).toEqual(['all', 'fast', 'medium', 'slow']);
     });
 
@@ -287,8 +282,8 @@ describe('Dashboard Filters', () => {
 
       const uptimeFilter = screen.getByLabelText('Uptime:');
       expect(uptimeFilter).toHaveValue('all');
-      
-      const options = Array.from(uptimeFilter.querySelectorAll('option')).map(opt => opt.value);
+
+      const options = Array.from(uptimeFilter.querySelectorAll('option')).map((opt) => opt.value);
       expect(options).toEqual(['all', 'excellent', 'good', 'poor']);
     });
 
@@ -301,8 +296,8 @@ describe('Dashboard Filters', () => {
 
       const sortFilter = screen.getByLabelText('Sort:');
       expect(sortFilter).toHaveValue('name');
-      
-      const options = Array.from(sortFilter.querySelectorAll('option')).map(opt => opt.value);
+
+      const options = Array.from(sortFilter.querySelectorAll('option')).map((opt) => opt.value);
       expect(options).toEqual(['name', 'status', 'responseTime', 'lastChecked']);
     });
   });
@@ -329,8 +324,8 @@ describe('Dashboard Filters', () => {
       // Check OpenAI card
       expect(screen.getByText('OpenAI')).toBeInTheDocument();
       expect(screen.getByText('85ms')).toBeInTheDocument();
-      
-      // Check Anthropic card  
+
+      // Check Anthropic card
       expect(screen.getByText('Anthropic')).toBeInTheDocument();
       expect(screen.getByText('250ms')).toBeInTheDocument();
     });
@@ -348,10 +343,10 @@ describe('Dashboard Filters', () => {
       // (Button only appears when filters are active, so we test the structure)
       const searchInput = screen.getByPlaceholderText(/search providers/i);
       expect(searchInput).toBeInTheDocument();
-      
+
       // Verify the component renders without the clear button initially
       expect(screen.queryByTestId('clear-filters-button')).not.toBeInTheDocument();
-      
+
       // Test that all filter controls exist (required for clear functionality)
       expect(screen.getByLabelText('Status:')).toBeInTheDocument();
       expect(screen.getByLabelText('Speed:')).toBeInTheDocument();
@@ -420,13 +415,13 @@ describe('Dashboard Filters', () => {
       );
 
       const statusFilter = screen.getByLabelText('Status:');
-      
+
       // Test that filter can be changed
       await safeUserInteraction(async () => {
         await user.selectOptions(statusFilter, 'operational');
       });
       expect(statusFilter).toHaveValue('operational');
-      
+
       // Test that filter can be reset
       await safeUserInteraction(async () => {
         await user.selectOptions(statusFilter, 'all');
@@ -442,13 +437,13 @@ describe('Dashboard Filters', () => {
       );
 
       const searchInput = screen.getByPlaceholderText(/search providers/i);
-      
+
       // Test typing in search
       await safeUserInteraction(async () => {
         await user.type(searchInput, 'OpenAI');
       });
       expect(searchInput).toHaveValue('OpenAI');
-      
+
       // Test clearing search
       await safeUserInteraction(async () => {
         await user.clear(searchInput);

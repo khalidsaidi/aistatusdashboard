@@ -1,7 +1,6 @@
-
 /**
  * HORIZONTAL SCALING MANAGER
- * 
+ *
  * CRITICAL FIXES:
  * - Added proper cleanup and event listener removal
  * - Fixed memory leaks in worker tracking
@@ -17,10 +16,10 @@ export interface ScalingConfig {
   minWorkers: number;
   maxWorkers: number;
   targetConcurrency: number;
-  scaleUpThreshold: number;   // Queue length to trigger scale up
+  scaleUpThreshold: number; // Queue length to trigger scale up
   scaleDownThreshold: number; // Queue length to trigger scale down
-  scaleUpCooldown: number;    // Cooldown period after scaling up (ms)
-  scaleDownCooldown: number;  // Cooldown period after scaling down (ms)
+  scaleUpCooldown: number; // Cooldown period after scaling up (ms)
+  scaleDownCooldown: number; // Cooldown period after scaling down (ms)
   healthCheckInterval: number; // Health check frequency (ms)
 }
 
@@ -71,7 +70,7 @@ export class HorizontalScalingManager extends EventEmitter {
       scaleDownThreshold: parseInt(process.env.SCALE_DOWN_THRESHOLD || '10'),
       scaleUpCooldown: parseInt(process.env.SCALE_UP_COOLDOWN || '300000'), // 5 minutes
       scaleDownCooldown: parseInt(process.env.SCALE_DOWN_COOLDOWN || '600000'), // 10 minutes
-      healthCheckInterval: parseInt(process.env.HEALTH_CHECK_INTERVAL || '30000') // 30 seconds
+      healthCheckInterval: parseInt(process.env.HEALTH_CHECK_INTERVAL || '30000'), // 30 seconds
     }
   ) {
     super();
@@ -144,14 +143,14 @@ export class HorizontalScalingManager extends EventEmitter {
         worker.metrics.jobsProcessed++;
         if (data.result?.processingTime) {
           worker.metrics.avgProcessingTime = worker.metrics.avgProcessingTime
-            ? (worker.metrics.avgProcessingTime * 0.9) + (data.result.processingTime * 0.1)
+            ? worker.metrics.avgProcessingTime * 0.9 + data.result.processingTime * 0.1
             : data.result.processingTime;
         }
         break;
       case 'failed':
       case 'stalled':
         worker.metrics.errorRate = worker.metrics.errorRate
-          ? (worker.metrics.errorRate * 0.9) + (0.1)
+          ? worker.metrics.errorRate * 0.9 + 0.1
           : 0.1;
         break;
     }
@@ -162,9 +161,9 @@ export class HorizontalScalingManager extends EventEmitter {
   @monitorPerformance('scaleUp')
   async scaleUp(reason: string = 'manual'): Promise<boolean> {
     if (this.isShuttingDown) return false;
-    
+
     const now = Date.now();
-    
+
     // Check cooldown period
     if (now - this.lastScaleUp < this.config.scaleUpCooldown) {
       console.log('Scale up blocked by cooldown period');
@@ -179,10 +178,10 @@ export class HorizontalScalingManager extends EventEmitter {
 
     try {
       const newWorkerId = `worker_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
+
       // Add new worker to queue system
       await this.workerQueue.addWorker(newWorkerId, this.config.targetConcurrency);
-      
+
       // Track the worker
       this.workers.set(newWorkerId, {
         id: newWorkerId,
@@ -193,23 +192,26 @@ export class HorizontalScalingManager extends EventEmitter {
         metrics: {
           jobsProcessed: 0,
           avgProcessingTime: 0,
-          errorRate: 0
-        }
+          errorRate: 0,
+        },
       });
 
       this.lastScaleUp = now;
-      
-      this.emit('scaledUp', { 
-        workerId: newWorkerId, 
+
+      this.emit('scaledUp', {
+        workerId: newWorkerId,
         totalWorkers: this.workers.size,
-        reason 
+        reason,
       });
-      
+
       console.log(`Scaled up: Added worker ${newWorkerId} (${this.workers.size} total workers)`);
       return true;
     } catch (error) {
       console.error('Failed to scale up:', error);
-      this.emit('scaleError', { action: 'scale_up', error: error instanceof Error ? error.message : 'Unknown error' });
+      this.emit('scaleError', {
+        action: 'scale_up',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
       return false;
     }
   }
@@ -217,9 +219,9 @@ export class HorizontalScalingManager extends EventEmitter {
   @monitorPerformance('scaleDown')
   async scaleDown(reason: string = 'manual'): Promise<boolean> {
     if (this.isShuttingDown) return false;
-    
+
     const now = Date.now();
-    
+
     // Check cooldown period
     if (now - this.lastScaleDown < this.config.scaleDownCooldown) {
       console.log('Scale down blocked by cooldown period');
@@ -242,23 +244,28 @@ export class HorizontalScalingManager extends EventEmitter {
 
       // Remove worker from queue system
       await this.workerQueue.removeWorker(workerToRemove.id);
-      
+
       // Remove from tracking
       this.workers.delete(workerToRemove.id);
 
       this.lastScaleDown = now;
-      
-      this.emit('scaledDown', { 
-        workerId: workerToRemove.id, 
+
+      this.emit('scaledDown', {
+        workerId: workerToRemove.id,
         totalWorkers: this.workers.size,
-        reason 
+        reason,
       });
-      
-      console.log(`Scaled down: Removed worker ${workerToRemove.id} (${this.workers.size} total workers)`);
+
+      console.log(
+        `Scaled down: Removed worker ${workerToRemove.id} (${this.workers.size} total workers)`
+      );
       return true;
     } catch (error) {
       console.error('Failed to scale down:', error);
-      this.emit('scaleError', { action: 'scale_down', error: error instanceof Error ? error.message : 'Unknown error' });
+      this.emit('scaleError', {
+        action: 'scale_down',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
       return false;
     }
   }
@@ -270,10 +277,10 @@ export class HorizontalScalingManager extends EventEmitter {
     for (const worker of this.workers.values()) {
       // Don't remove workers that just started
       if (Date.now() - worker.startTime < 60000) continue;
-      
+
       // Calculate activity score (lower is less active)
-      const activityScore = worker.metrics.jobsProcessed + (worker.metrics.errorRate * -10);
-      
+      const activityScore = worker.metrics.jobsProcessed + worker.metrics.errorRate * -10;
+
       if (activityScore < lowestActivity) {
         lowestActivity = activityScore;
         leastActive = worker;
@@ -285,16 +292,22 @@ export class HorizontalScalingManager extends EventEmitter {
 
   async scaleToWorkerCount(targetCount: number): Promise<void> {
     const currentCount = this.workers.size;
-    
+
     if (targetCount > currentCount) {
       // Scale up
-      const workersToAdd = Math.min(targetCount - currentCount, this.config.maxWorkers - currentCount);
+      const workersToAdd = Math.min(
+        targetCount - currentCount,
+        this.config.maxWorkers - currentCount
+      );
       for (let i = 0; i < workersToAdd; i++) {
         await this.scaleUp('initialization');
       }
     } else if (targetCount < currentCount) {
       // Scale down
-      const workersToRemove = Math.max(currentCount - targetCount, currentCount - this.config.minWorkers);
+      const workersToRemove = Math.max(
+        currentCount - targetCount,
+        currentCount - this.config.minWorkers
+      );
       for (let i = 0; i < workersToRemove; i++) {
         await this.scaleDown('initialization');
       }
@@ -317,11 +330,11 @@ export class HorizontalScalingManager extends EventEmitter {
     // CRITICAL PERFORMANCE FIX: Convert to O(N) instead of O(N²)
     // Process all workers in a single pass
     const workerEntries = Array.from(this.workers.entries());
-    
+
     for (const [workerId, worker] of workerEntries) {
       // Check if worker hasn't reported activity recently
       const timeSinceLastCheck = now - worker.lastHealthCheck;
-      
+
       if (timeSinceLastCheck > this.config.healthCheckInterval * 2) {
         worker.status = 'failed';
         unhealthyWorkers.push(workerId);
@@ -335,10 +348,10 @@ export class HorizontalScalingManager extends EventEmitter {
     // CRITICAL FIX: Atomic worker removal to prevent race conditions
     if (unhealthyWorkers.length > 0) {
       console.log(`Processing ${unhealthyWorkers.length} unhealthy workers atomically`);
-      
+
       // ATOMIC OPERATION: Remove workers one by one with proper error handling
-      const removalResults: Array<{workerId: string; success: boolean; error?: string}> = [];
-      
+      const removalResults: Array<{ workerId: string; success: boolean; error?: string }> = [];
+
       for (const workerId of unhealthyWorkers) {
         try {
           // CRITICAL FIX: Check if worker still exists before removal (prevents race conditions)
@@ -346,25 +359,28 @@ export class HorizontalScalingManager extends EventEmitter {
             console.log(`Worker ${workerId} already removed by another process`);
             continue;
           }
-          
+
           // Atomic removal: queue first, then local tracking
           await this.workerQueue.removeWorker(workerId);
-          
+
           // Only delete from local map after successful queue removal
           const deleted = this.workers.delete(workerId);
-          
+
           if (deleted) {
             removalResults.push({ workerId, success: true });
             console.log(`Successfully removed unhealthy worker: ${workerId}`);
           } else {
-            removalResults.push({ workerId, success: false, error: 'Worker not found in local map' });
+            removalResults.push({
+              workerId,
+              success: false,
+              error: 'Worker not found in local map',
+            });
           }
-          
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
           console.error(`Failed to remove unhealthy worker ${workerId}:`, errorMessage);
           removalResults.push({ workerId, success: false, error: errorMessage });
-          
+
           // CRITICAL FIX: Mark worker as failed but don't remove from tracking
           // This prevents orphaned workers
           const worker = this.workers.get(workerId);
@@ -374,14 +390,16 @@ export class HorizontalScalingManager extends EventEmitter {
         }
       }
 
-      const successfulRemovals = removalResults.filter(r => r.success).length;
-      console.log(`Successfully removed ${successfulRemovals}/${unhealthyWorkers.length} unhealthy workers`);
+      const successfulRemovals = removalResults.filter((r) => r.success).length;
+      console.log(
+        `Successfully removed ${successfulRemovals}/${unhealthyWorkers.length} unhealthy workers`
+      );
 
       // CRITICAL FIX: Sequential worker replacement to prevent race conditions
       const workersNeeded = Math.max(0, this.config.minWorkers - this.workers.size);
       if (workersNeeded > 0) {
         console.log(`Scaling up ${workersNeeded} workers to maintain minimum (sequential)`);
-        
+
         // ATOMIC OPERATION: Add workers sequentially to prevent race conditions
         for (let i = 0; i < workersNeeded; i++) {
           try {
@@ -390,9 +408,9 @@ export class HorizontalScalingManager extends EventEmitter {
               console.warn(`Failed to add replacement worker ${i + 1}/${workersNeeded}`);
               break; // Stop trying if we can't add workers
             }
-            
+
             // Small delay between additions to prevent overwhelming the system
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise((resolve) => setTimeout(resolve, 100));
           } catch (error) {
             console.error(`Error adding replacement worker ${i + 1}:`, error);
             break;
@@ -400,11 +418,14 @@ export class HorizontalScalingManager extends EventEmitter {
         }
       }
 
-      this.emit('healthCheckCompleted', { 
+      this.emit('healthCheckCompleted', {
         removedWorkers: unhealthyWorkers,
         successfulRemovals,
         totalWorkers: this.workers.size,
-        workersAdded: Math.min(workersNeeded, this.workers.size - (this.workers.size - workersNeeded))
+        workersAdded: Math.min(
+          workersNeeded,
+          this.workers.size - (this.workers.size - workersNeeded)
+        ),
       });
     }
   }
@@ -419,17 +440,23 @@ export class HorizontalScalingManager extends EventEmitter {
     try {
       const queueMetrics = await this.workerQueue.getMetrics();
       const queueLength = queueMetrics.waitingJobs + queueMetrics.activeJobs;
-      
+
       // Scale up if queue is getting long
-      if (queueLength > this.config.scaleUpThreshold && this.workers.size < this.config.maxWorkers) {
+      if (
+        queueLength > this.config.scaleUpThreshold &&
+        this.workers.size < this.config.maxWorkers
+      ) {
         const success = await this.scaleUp(`queue_length_${queueLength}`);
         if (success) {
           console.log(`Auto-scaled up due to queue length: ${queueLength}`);
         }
       }
-      
+
       // Scale down if queue is very short and we have extra workers
-      else if (queueLength < this.config.scaleDownThreshold && this.workers.size > this.config.minWorkers) {
+      else if (
+        queueLength < this.config.scaleDownThreshold &&
+        this.workers.size > this.config.minWorkers
+      ) {
         const success = await this.scaleDown(`queue_length_${queueLength}`);
         if (success) {
           console.log(`Auto-scaled down due to low queue length: ${queueLength}`);
@@ -442,21 +469,30 @@ export class HorizontalScalingManager extends EventEmitter {
 
   async getScalingMetrics(): Promise<ScalingMetrics> {
     const queueMetrics = await this.workerQueue.getMetrics();
-    const healthyWorkers = Array.from(this.workers.values()).filter(w => w.status === 'healthy');
-    
-    const totalJobsProcessed = Array.from(this.workers.values())
-      .reduce((sum, worker) => sum + worker.metrics.jobsProcessed, 0);
-    
-    const avgResponseTime = Array.from(this.workers.values())
-      .reduce((sum, worker) => sum + worker.metrics.avgProcessingTime, 0) / this.workers.size;
-    
-    const avgErrorRate = Array.from(this.workers.values())
-      .reduce((sum, worker) => sum + worker.metrics.errorRate, 0) / this.workers.size;
+    const healthyWorkers = Array.from(this.workers.values()).filter((w) => w.status === 'healthy');
+
+    const totalJobsProcessed = Array.from(this.workers.values()).reduce(
+      (sum, worker) => sum + worker.metrics.jobsProcessed,
+      0
+    );
+
+    const avgResponseTime =
+      Array.from(this.workers.values()).reduce(
+        (sum, worker) => sum + worker.metrics.avgProcessingTime,
+        0
+      ) / this.workers.size;
+
+    const avgErrorRate =
+      Array.from(this.workers.values()).reduce((sum, worker) => sum + worker.metrics.errorRate, 0) /
+      this.workers.size;
 
     return {
       totalWorkers: this.workers.size,
       healthyWorkers: healthyWorkers.length,
-      totalConcurrency: Array.from(this.workers.values()).reduce((sum, w) => sum + w.concurrency, 0),
+      totalConcurrency: Array.from(this.workers.values()).reduce(
+        (sum, w) => sum + w.concurrency,
+        0
+      ),
       queueLength: queueMetrics.waitingJobs + queueMetrics.activeJobs,
       throughput: queueMetrics.throughput,
       avgResponseTime,
@@ -464,8 +500,8 @@ export class HorizontalScalingManager extends EventEmitter {
       lastScalingAction: {
         action: 'none',
         timestamp: Math.max(this.lastScaleUp, this.lastScaleDown),
-        reason: 'auto-scaling'
-      }
+        reason: 'auto-scaling',
+      },
     };
   }
 
@@ -473,7 +509,7 @@ export class HorizontalScalingManager extends EventEmitter {
     if (!this.isInitialized) {
       throw new Error('HorizontalScalingManager not initialized');
     }
-    
+
     return this.workerQueue.queueBatch(providerIds, undefined, priority);
   }
 
@@ -481,7 +517,7 @@ export class HorizontalScalingManager extends EventEmitter {
     if (!this.isInitialized) {
       throw new Error('HorizontalScalingManager not initialized');
     }
-    
+
     return this.workerQueue.queueProvider(providerId, priority);
   }
 
@@ -491,24 +527,24 @@ export class HorizontalScalingManager extends EventEmitter {
   }> {
     const queueStatus = await this.workerQueue.getQueueStatus();
     const scalingMetrics = await this.getScalingMetrics();
-    
+
     let status: 'healthy' | 'degraded' | 'critical' = 'healthy';
-    
+
     // Determine overall system health
     if (scalingMetrics.healthyWorkers < this.config.minWorkers) {
       status = 'critical';
     } else if (scalingMetrics.errorRate > 0.1 || queueStatus.health === 'degraded') {
       status = 'degraded';
     }
-    
+
     return {
       status,
       details: {
         scalingMetrics,
         queueStatus: queueStatus.details,
         workers: Array.from(this.workers.values()),
-        config: this.config
-      }
+        config: this.config,
+      },
     };
   }
 
@@ -523,50 +559,53 @@ export class HorizontalScalingManager extends EventEmitter {
 
     // Generate unique worker ID with timestamp and random suffix
     const id = workerId || `worker_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     // CRITICAL FIX: Use atomic lock to prevent race conditions
-    return globalLockManager.withLock(`worker:${id}`, async () => {
-      // Double-check worker doesn't exist (race condition protection)
-      if (this.workers.has(id)) {
-        throw new Error(`Worker ${id} already exists`);
-      }
+    return globalLockManager.withLock(
+      `worker:${id}`,
+      async () => {
+        // Double-check worker doesn't exist (race condition protection)
+        if (this.workers.has(id)) {
+          throw new Error(`Worker ${id} already exists`);
+        }
 
-             const worker: WorkerInstance = {
-         id,
-         concurrency: 1, // Default concurrency for new workers
-         status: 'starting',
-         startTime: Date.now(),
-         lastHealthCheck: Date.now(),
-         metrics: {
-           jobsProcessed: 0,
-           avgProcessingTime: 0,
-           errorRate: 0
-         }
-       };
+        const worker: WorkerInstance = {
+          id,
+          concurrency: 1, // Default concurrency for new workers
+          status: 'starting',
+          startTime: Date.now(),
+          lastHealthCheck: Date.now(),
+          metrics: {
+            jobsProcessed: 0,
+            avgProcessingTime: 0,
+            errorRate: 0,
+          },
+        };
 
-       try {
-         // ATOMIC OPERATION: Add to queue first, then local tracking
-         await this.workerQueue.addWorker(id, 1); // Pass concurrency as number
-         
-         // Only add to local map after successful queue addition
-         this.workers.set(id, worker);
-         worker.status = 'healthy'; // Use valid status
-        
-        console.log(`✅ Worker ${id} added successfully (${this.workers.size} total workers)`);
-        this.emit('workerAdded', { workerId: id, totalWorkers: this.workers.size });
-        
-        return id;
-        
-      } catch (error) {
-        // CRITICAL FIX: Cleanup on failure to prevent orphaned state
-        this.workers.delete(id);
-        
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        console.error(`❌ Failed to add worker ${id}:`, errorMessage);
-        
-        throw new Error(`Failed to add worker: ${errorMessage}`);
-      }
-    }, { timeout: 10000, priority: 1 });
+        try {
+          // ATOMIC OPERATION: Add to queue first, then local tracking
+          await this.workerQueue.addWorker(id, 1); // Pass concurrency as number
+
+          // Only add to local map after successful queue addition
+          this.workers.set(id, worker);
+          worker.status = 'healthy'; // Use valid status
+
+          console.log(`✅ Worker ${id} added successfully (${this.workers.size} total workers)`);
+          this.emit('workerAdded', { workerId: id, totalWorkers: this.workers.size });
+
+          return id;
+        } catch (error) {
+          // CRITICAL FIX: Cleanup on failure to prevent orphaned state
+          this.workers.delete(id);
+
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          console.error(`❌ Failed to add worker ${id}:`, errorMessage);
+
+          throw new Error(`Failed to add worker: ${errorMessage}`);
+        }
+      },
+      { timeout: 10000, priority: 1 }
+    );
   }
 
   /**
@@ -574,7 +613,7 @@ export class HorizontalScalingManager extends EventEmitter {
    */
   async destroy(): Promise<void> {
     console.log('🔄 Shutting down Horizontal Scaling Manager...');
-    
+
     this.isShuttingDown = true;
 
     // Stop health checks
@@ -608,9 +647,9 @@ export class HorizontalScalingManager extends EventEmitter {
     });
 
     const shutdownResults = await Promise.allSettled(shutdownPromises);
-    const successfulShutdowns = shutdownResults
-      .filter(result => result.status === 'fulfilled' && result.value.success)
-      .length;
+    const successfulShutdowns = shutdownResults.filter(
+      (result) => result.status === 'fulfilled' && result.value.success
+    ).length;
 
     console.log(`Successfully shut down ${successfulShutdowns}/${this.workers.size} workers`);
 
@@ -622,4 +661,4 @@ export class HorizontalScalingManager extends EventEmitter {
 }
 
 // Global scaling manager instance
-export const globalScalingManager = new HorizontalScalingManager(); 
+export const globalScalingManager = new HorizontalScalingManager();

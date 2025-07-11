@@ -24,12 +24,12 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Error logging handled by error boundary - no console pollution needed
-    
+
     this.setState({
       error,
       errorInfo,
     });
-    
+
     // Log to analytics or error reporting service
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'exception', {
@@ -57,8 +57,10 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="error-boundary">
           <h2>Something went wrong</h2>
-          <p>We&apos;re sorry, but something unexpected happened. Please try refreshing the page.</p>
-          
+          <p>
+            We&apos;re sorry, but something unexpected happened. Please try refreshing the page.
+          </p>
+
           <div className="flex gap-4 justify-center mt-4">
             <button
               onClick={this.handleReset}
@@ -76,7 +78,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
           {process.env.NODE_ENV === 'development' && this.state.error && (
             <details className="mt-4 p-4 bg-gray-100 rounded text-left">
-              <summary className="cursor-pointer font-semibold">Error Details (Development)</summary>
+              <summary className="cursor-pointer font-semibold">
+                Error Details (Development)
+              </summary>
               <pre className="mt-2 text-sm overflow-auto">
                 {this.state.error.toString()}
                 {this.state.errorInfo?.componentStack}
@@ -128,4 +132,4 @@ export function ComponentErrorBoundary({ children }: { children: React.ReactNode
       {children}
     </ErrorBoundary>
   );
-} 
+}

@@ -13,31 +13,35 @@
 Experience the dashboard in action with real-time status monitoring of 15 AI providers:
 
 - **30-120ms response times** with intelligent caching
-- **15/15 providers operational** with 99%+ uptime tracking  
+- **15/15 providers operational** with 99%+ uptime tracking
 - **100+ historical data points** with 30-day retention
 - **Real-time notifications** via email and webhooks
 
 ## ✨ Features Overview
 
 ### 🎛️ **Real-Time Monitoring**
+
 - **15 AI Providers**: OpenAI, Anthropic, HuggingFace, Google AI, Cohere, Replicate, Groq, DeepSeek, Meta AI, xAI, Perplexity AI, Claude, Mistral AI, AWS AI Services, Azure AI Services
 - **Live Status Updates**: 60-second refresh with visual indicators
 - **Performance Metrics**: Response times and 24h uptime percentages
 - **Provider Logos**: Beautiful SVG logos for visual identification
 
-### 📊 **Analytics & Insights** 
+### 📊 **Analytics & Insights**
+
 - **Historical Data**: 30-day retention with hourly/daily aggregation
 - **Status Badges**: Embeddable SVG badges for documentation
 - **RSS Feeds**: Real-time status updates and incident reports
 - **Performance Charts**: Response time and uptime trending
 
 ### 🔔 **Advanced Notifications**
+
 - **Email Alerts**: Incident, recovery, and degradation notifications
 - **Webhooks**: HTTP callbacks with HMAC signature verification
 - **Incident Tracking**: Automatic incident creation and resolution
 - **RSS Feeds**: Status updates and daily summaries
 
 ### 🛡️ **Enterprise Features**
+
 - **Rate Limiting**: DDoS protection with custom limits per endpoint
 - **Structured Logging**: JSON logs with performance metrics
 - **Error Handling**: Graceful degradation with comprehensive error boundaries
@@ -46,6 +50,7 @@ Experience the dashboard in action with real-time status monitoring of 15 AI pro
 ## 🏗️ Architecture
 
 ### Horizontal Scaling System
+
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   API Gateway   │    │  Scaling Manager │    │  Worker Queues  │
@@ -65,8 +70,9 @@ Experience the dashboard in action with real-time status monitoring of 15 AI pro
 ```
 
 ### Processing Methods
+
 1. **Horizontal Scaling** (1000+ providers): Worker queues with auto-scaling
-2. **Enterprise Batch** (50-1000 providers): Controlled batch processing  
+2. **Enterprise Batch** (50-1000 providers): Controlled batch processing
 3. **Public API** (<50 providers): Ultra-resilient direct fetching
 
 ## 🔧 Technical Stack
@@ -81,6 +87,7 @@ Experience the dashboard in action with real-time status monitoring of 15 AI pro
 ## 📡 API Endpoints
 
 ### Core Monitoring
+
 ```bash
 # Get all provider status
 GET /api/status
@@ -93,6 +100,7 @@ GET /api/health
 ```
 
 ### Advanced Features
+
 ```bash
 # Status badges
 GET /api/badge/openai
@@ -118,7 +126,8 @@ See [API Reference](./API-REFERENCE.md) for complete documentation.
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm/yarn/pnpm
 
 ### Installation
@@ -156,10 +165,11 @@ Visit `http://localhost:3000` to see the dashboard.
 **Required for full functionality:**
 
 1. **Firebase Setup** (required for data persistence and cloud functions):
+
    ```bash
    # Copy environment template
    cp .env.example .env.local
-   
+
    # Edit .env.local with your Firebase project credentials
    ```
 
@@ -174,6 +184,7 @@ Visit `http://localhost:3000` to see the dashboard.
 ## 📊 Performance Metrics
 
 ### Current Performance
+
 - **Response Times**: 30-120ms (excellent)
 - **Cache Hit Rate**: >90% efficiency
 - **Database**: 100+ status records with full history
@@ -181,8 +192,9 @@ Visit `http://localhost:3000` to see the dashboard.
 - **Error Rate**: 0% - clean operation
 
 ### Rate Limits
+
 - **Status API**: 60 requests/minute
-- **Provider API**: 120 requests/minute  
+- **Provider API**: 120 requests/minute
 - **Badge API**: 180 requests/minute
 - **Webhooks**: 10 registrations/minute
 - **Email**: 5 subscriptions/minute
@@ -190,6 +202,7 @@ Visit `http://localhost:3000` to see the dashboard.
 ## 🔔 Notification Features
 
 ### Email Notifications
+
 Subscribe to status change alerts:
 
 ```bash
@@ -203,6 +216,7 @@ curl -X POST https://aistatusdashboard.com/api/notifications \
 ```
 
 ### Webhooks
+
 Register webhooks for real-time status changes:
 
 ```bash
@@ -216,6 +230,7 @@ curl -X POST https://aistatusdashboard.com/api/webhooks \
 ```
 
 ### Status Badges
+
 Embed live status badges in your documentation:
 
 ```markdown
@@ -226,6 +241,7 @@ Embed live status badges in your documentation:
 ## 📋 Incident Management
 
 Automatic incident tracking with:
+
 - **Detection**: Status change → incident creation
 - **Classification**: Severity levels (Low, Medium, High, Critical)
 - **Resolution**: Auto-resolve when service recovers
@@ -234,6 +250,7 @@ Automatic incident tracking with:
 ## 🛠️ Development
 
 ### Project Structure
+
 ```
 aistatusdashboard/
 ├── app/                    # Next.js App Router
@@ -254,6 +271,7 @@ aistatusdashboard/
 ```
 
 ### Core Libraries
+
 - **Status Fetcher**: Monitors provider APIs with timeout protection
 - **Database**: SQLite with 30-day retention and automatic cleanup
 - **Cache**: 60-second TTL with Map-based storage
@@ -263,6 +281,7 @@ aistatusdashboard/
 ## 🚀 Production Deployment
 
 ### Vercel (Recommended)
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -275,6 +294,7 @@ vercel env add NEXT_PUBLIC_GA_MEASUREMENT_ID
 ```
 
 ### Docker
+
 ```bash
 # Build image
 docker build -t ai-status-dashboard .
@@ -284,6 +304,7 @@ docker run -p 3000:3000 ai-status-dashboard
 ```
 
 ### Traditional VPS
+
 ```bash
 # Build for production
 npm run build
@@ -295,7 +316,9 @@ npm start
 ## 📈 Monitoring & Observability
 
 ### Structured Logging
+
 All operations logged in JSON format:
+
 ```json
 {
   "timestamp": "2025-01-07T02:00:00.000Z",
@@ -308,14 +331,17 @@ All operations logged in JSON format:
 ```
 
 ### Health Checks
+
 Monitor system health:
+
 ```bash
 curl https://aistatusdashboard.com/api/health
 ```
 
 ### Performance Tracking
+
 - Response time monitoring
-- Cache hit/miss ratios  
+- Cache hit/miss ratios
 - Database operation metrics
 - Rate limit enforcement
 
@@ -324,6 +350,7 @@ curl https://aistatusdashboard.com/api/health
 We welcome contributions! Please see our [GitHub Workflow Documentation](docs/GITHUB_WORKFLOW.md) for detailed development process.
 
 **Quick Start:**
+
 1. **Fork** the repository
 2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
 3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
@@ -331,6 +358,7 @@ We welcome contributions! Please see our [GitHub Workflow Documentation](docs/GI
 5. **Open** a Pull Request
 
 **Development Process:**
+
 - **Single branch strategy** with `main` as primary branch
 - **Automated CI/CD** on every push to main
 - **Pull Request validation** with preview deployments
@@ -341,6 +369,7 @@ See [docs/GITHUB_WORKFLOW.md](docs/GITHUB_WORKFLOW.md) for complete workflow doc
 ## ⚖️ Trademark Compliance
 
 ### Logo Usage Guidelines
+
 This dashboard displays official logos from AI service providers for identification purposes only. All logos are used in accordance with their respective trademark guidelines:
 
 - **Official Files Only**: We use only official SVG/PNG files from provider brand kits
@@ -350,11 +379,13 @@ This dashboard displays official logos from AI service providers for identificat
 - **Clear Space**: Appropriate breathing room maintained around all logos
 
 ### Compliance Measures
+
 - **Rate Limits**: Respects robots.txt and API rate limits to prevent unauthorized access claims
 - **Non-Commercial**: This is a free reference tool with no commercial logo bundling
 - **Educational Use**: Status monitoring falls under nominative fair use for identification
 
 ### Rights Holder Removal
+
 If you are a rights holder and want your trademark removed, please contact us at [legal@aistatusdashboard.com](mailto:legal@aistatusdashboard.com) and we'll comply within 24 hours.
 
 **Disclaimer**: All trademarks and logos are the property of their respective owners and are used here for identification purposes only. No endorsement or partnership is implied.
@@ -366,7 +397,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🎯 Roadmap
 
 - [x] **Phase 1**: Foundation & Core Monitoring
-- [x] **Phase 2**: Database & API Development  
+- [x] **Phase 2**: Database & API Development
 - [x] **Phase 3**: Enhanced UI & SEO
 - [x] **Phase 4**: Advanced Notifications & Incident Management
 - [ ] **Phase 5**: Production Deployment & Scaling
@@ -374,12 +405,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📚 Documentation
 
 ### **Core Documentation**
+
 - **[GitHub Workflow](docs/GITHUB_WORKFLOW.md)** - Complete CI/CD and development process
 - **[Trademark Notice](TRADEMARKS.md)** - Legal compliance and logo usage
 - **[Master Implementation Plan](MASTER_IMPLEMENTATION_PLAN.md)** - TDD-based development plan
 - **[UI Specification](UI_SPECIFICATION.md)** - Complete component specifications
 
 ### **Technical Guides**
+
 - **[Comprehensive UI Audit](COMPREHENSIVE_UI_AUDIT.md)** - Component inventory and issues
 - **[License](LICENSE)** - MIT License terms
 
@@ -397,4 +430,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Made with ❤️ for the AI community
 
-</div> 
+</div>

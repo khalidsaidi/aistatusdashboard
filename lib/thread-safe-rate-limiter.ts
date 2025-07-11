@@ -1,6 +1,6 @@
 /**
  * REAL THREAD-SAFE RATE LIMITER
- * 
+ *
  * NO MOCKS - This is a production-ready implementation with:
  * - Atomic operations for thread safety
  * - Memory leak prevention
@@ -38,7 +38,7 @@ export class ThreadSafeRateLimiter {
 
     log('info', 'Thread-safe rate limiter initialized', {
       maxEntries: this.maxEntries,
-      cleanupInterval: this.cleanupIntervalMs
+      cleanupInterval: this.cleanupIntervalMs,
     });
   }
 
@@ -46,12 +46,12 @@ export class ThreadSafeRateLimiter {
    * REAL rate limit check with atomic operations
    */
   async checkRateLimit(
-    key: string, 
-    limit: number, 
+    key: string,
+    limit: number,
     windowMs: number = 60000
   ): Promise<RateLimitResult> {
     const now = Date.now();
-    
+
     // Get or create entry atomically
     let entry = this.entries.get(key);
     if (!entry || now >= entry.resetTime) {
@@ -59,7 +59,7 @@ export class ThreadSafeRateLimiter {
         count: 0,
         resetTime: now + windowMs,
         lastRequest: now,
-        window: []
+        window: [],
       };
       this.entries.set(key, entry);
     }
@@ -69,7 +69,7 @@ export class ThreadSafeRateLimiter {
 
     // Sliding window cleanup - remove old requests
     const windowStart = now - windowMs;
-    entry.window = entry.window.filter(timestamp => timestamp > windowStart);
+    entry.window = entry.window.filter((timestamp) => timestamp > windowStart);
 
     // Add current request
     entry.window.push(now);
@@ -78,7 +78,7 @@ export class ThreadSafeRateLimiter {
     // Check if limit exceeded
     const allowed = entry.count <= limit;
     const remaining = Math.max(0, limit - entry.count);
-    
+
     // Calculate retry after if not allowed
     let retryAfter: number | undefined;
     if (!allowed && entry.window.length > 0) {
@@ -93,7 +93,7 @@ export class ThreadSafeRateLimiter {
         limit,
         current: entry.count,
         retryAfter,
-        windowMs
+        windowMs,
       });
     }
 
@@ -101,7 +101,7 @@ export class ThreadSafeRateLimiter {
       allowed,
       remaining,
       resetTime: entry.resetTime,
-      retryAfter
+      retryAfter,
     };
   }
 
@@ -115,15 +115,15 @@ export class ThreadSafeRateLimiter {
     }
 
     const now = Date.now();
-    
+
     // Clean up old entries in window
     const windowStart = now - windowMs;
-    const activeRequests = entry.window.filter(timestamp => timestamp > windowStart);
-    
+    const activeRequests = entry.window.filter((timestamp) => timestamp > windowStart);
+
     return {
       allowed: activeRequests.length < entry.count,
       remaining: Math.max(0, entry.count - activeRequests.length),
-      resetTime: entry.resetTime
+      resetTime: entry.resetTime,
     };
   }
 
@@ -144,13 +144,14 @@ export class ThreadSafeRateLimiter {
     memoryUsage: number;
   } {
     const now = Date.now();
-    const activeKeys = Array.from(this.entries.values())
-      .filter(entry => now < entry.resetTime).length;
+    const activeKeys = Array.from(this.entries.values()).filter(
+      (entry) => now < entry.resetTime
+    ).length;
 
     return {
       totalKeys: this.entries.size,
       activeKeys,
-      memoryUsage: this.entries.size * 200 // Approximate bytes per entry
+      memoryUsage: this.entries.size * 200, // Approximate bytes per entry
     };
   }
 
@@ -173,18 +174,18 @@ export class ThreadSafeRateLimiter {
     // Aggressive cleanup if too many entries
     if (this.entries.size > this.maxEntries) {
       const entries = Array.from(this.entries.entries())
-        .sort(([,a], [,b]) => b.lastRequest - a.lastRequest)
+        .sort(([, a], [, b]) => b.lastRequest - a.lastRequest)
         .slice(0, Math.floor(this.maxEntries * 0.8));
 
       this.entries.clear();
       entries.forEach(([key, entry]) => this.entries.set(key, entry));
-      
+
       cleaned += initialSize - this.entries.size;
-      
+
       log('warn', 'Aggressive rate limiter cleanup performed', {
         maxEntries: this.maxEntries,
         finalSize: this.entries.size,
-        cleaned: cleaned
+        cleaned: cleaned,
       });
     }
 
@@ -192,7 +193,7 @@ export class ThreadSafeRateLimiter {
       log('info', 'Rate limiter cleanup completed', {
         initialSize,
         finalSize: this.entries.size,
-        cleaned
+        cleaned,
       });
     }
   }
@@ -207,7 +208,7 @@ export class ThreadSafeRateLimiter {
     this.entries.clear();
     log('info', 'Thread-safe rate limiter destroyed');
   }
-} 
+}
 
 // Global instance
 export const globalRateLimiter = new ThreadSafeRateLimiter();
@@ -216,8 +217,8 @@ export const globalRateLimiter = new ThreadSafeRateLimiter();
  * REAL rate limiting functions (backwards compatible)
  */
 export async function checkRateLimit(
-  key: string, 
-  limit: number, 
+  key: string,
+  limit: number,
   windowMs?: number
 ): Promise<{
   allowed: boolean;
@@ -247,4 +248,4 @@ export function getRateLimiterStats(): {
   memoryUsage: number;
 } {
   return globalRateLimiter.getStats();
-} 
+}

@@ -7,7 +7,7 @@ import { log } from './logger';
 
 /**
  * Enterprise cache configuration for handling thousands of providers
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST support Redis clustering for horizontal scaling
  * - MUST provide intelligent cache warming strategies
@@ -15,15 +15,15 @@ import { log } from './logger';
  * - MUST prevent cache stampede scenarios
  */
 interface EnterpriseCacheConfig {
-  readonly defaultTtl: number;           // Default TTL in milliseconds (5 minutes)
-  readonly warmupTtl: number;           // Warmup cache TTL (30 minutes) 
-  readonly maxMemoryMb: number;         // Max memory usage (512MB)
+  readonly defaultTtl: number; // Default TTL in milliseconds (5 minutes)
+  readonly warmupTtl: number; // Warmup cache TTL (30 minutes)
+  readonly maxMemoryMb: number; // Max memory usage (512MB)
   readonly compressionThreshold: number; // Compress values > 1KB
   readonly batchInvalidationSize: number; // Batch size for invalidation (100)
-  readonly warmupConcurrency: number;   // Concurrent warmup requests (10)
+  readonly warmupConcurrency: number; // Concurrent warmup requests (10)
   readonly stallWhileRevalidate: number; // Serve stale while revalidating (60s)
-  readonly redisUrl?: string;           // Redis connection URL
-  readonly useRedis: boolean;           // Enable Redis backend
+  readonly redisUrl?: string; // Redis connection URL
+  readonly useRedis: boolean; // Enable Redis backend
 }
 
 /**
@@ -38,7 +38,7 @@ const CACHE_CONFIG: EnterpriseCacheConfig = {
   warmupConcurrency: parseInt(process.env.CACHE_WARMUP_CONCURRENCY || '10'),
   stallWhileRevalidate: parseInt(process.env.CACHE_STALE_WHILE_REVALIDATE || '60000'),
   redisUrl: process.env.REDIS_URL,
-  useRedis: process.env.REDIS_URL !== undefined
+  useRedis: process.env.REDIS_URL !== undefined,
 };
 
 /**
@@ -84,7 +84,7 @@ class EnterpriseCacheManager {
     memoryUsage: 0,
     compressionRatio: 0,
     warmupHits: 0,
-    staleServed: 0
+    staleServed: 0,
   };
   private warmupQueue = new Set<string>();
   private revalidationQueue = new Map<string, Promise<any>>();
@@ -107,12 +107,12 @@ class EnterpriseCacheManager {
       // Note: Redis integration will be available when redis package is installed
       // For now, using in-memory cache with Redis-compatible interface
       log('info', 'Redis not available, using enterprise in-memory cache', {
-        redisUrl: CACHE_CONFIG.redisUrl ? 'configured' : 'not configured'
+        redisUrl: CACHE_CONFIG.redisUrl ? 'configured' : 'not configured',
       });
       this.redisClient = null;
     } catch (error) {
       log('warn', 'Redis initialization failed, falling back to memory cache', {
-        error: (error as Error).message
+        error: (error as Error).message,
       });
       this.redisClient = null;
     }
@@ -120,7 +120,7 @@ class EnterpriseCacheManager {
 
   /**
    * Get value from cache with stale-while-revalidate support
-   * 
+   *
    * AI CONSTRAINTS:
    * - MUST check Redis first, then memory cache
    * - MUST support stale-while-revalidate pattern
@@ -170,11 +170,10 @@ class EnterpriseCacheManager {
       }
 
       return entry.value;
-
     } catch (error) {
       log('error', 'Cache get operation failed', {
         key,
-        error: (error as Error).message
+        error: (error as Error).message,
       });
       this.stats.misses++;
       return null;
@@ -183,7 +182,7 @@ class EnterpriseCacheManager {
 
   /**
    * Set value in cache with compression and TTL
-   * 
+   *
    * AI CONSTRAINTS:
    * - MUST compress large values
    * - MUST set TTL appropriately
@@ -203,7 +202,7 @@ class EnterpriseCacheManager {
         hits: 0,
         compressed: shouldCompress,
         warmup: false,
-        size
+        size,
       };
 
       // Set in Redis if available
@@ -222,13 +221,12 @@ class EnterpriseCacheManager {
         key,
         size,
         compressed: shouldCompress,
-        ttl: effectiveTtl
+        ttl: effectiveTtl,
       });
-
     } catch (error) {
       log('error', 'Cache set operation failed', {
         key,
-        error: (error as Error).message
+        error: (error as Error).message,
       });
     }
   }
@@ -246,11 +244,10 @@ class EnterpriseCacheManager {
       this.stats.deletes++;
 
       log('info', 'Cache delete operation completed', { key });
-
     } catch (error) {
       log('error', 'Cache delete operation failed', {
         key,
-        error: (error as Error).message
+        error: (error as Error).message,
       });
     }
   }
@@ -265,12 +262,12 @@ class EnterpriseCacheManager {
     }
 
     for (const batch of batches) {
-      await Promise.all(batch.map(key => this.delete(key)));
+      await Promise.all(batch.map((key) => this.delete(key)));
     }
 
     log('info', 'Batch delete operation completed', {
       totalKeys: keys.length,
-      batches: batches.length
+      batches: batches.length,
     });
   }
 
@@ -292,25 +289,24 @@ class EnterpriseCacheManager {
    */
   private enforceMemoryLimits(): void {
     const currentMemoryMb = this.calculateMemoryUsage();
-    
+
     if (currentMemoryMb <= CACHE_CONFIG.maxMemoryMb) {
       return;
     }
 
     // Sort entries by last access time (LRU eviction)
-    const entries = Array.from(this.inMemoryCache.entries())
-      .sort(([, a], [, b]) => {
-        const aLastAccess = a.timestamp + (a.hits * 1000); // Approximate last access
-        const bLastAccess = b.timestamp + (b.hits * 1000);
-        return aLastAccess - bLastAccess;
-      });
+    const entries = Array.from(this.inMemoryCache.entries()).sort(([, a], [, b]) => {
+      const aLastAccess = a.timestamp + a.hits * 1000; // Approximate last access
+      const bLastAccess = b.timestamp + b.hits * 1000;
+      return aLastAccess - bLastAccess;
+    });
 
     let evicted = 0;
     for (const [key] of entries) {
       if (this.calculateMemoryUsage() <= CACHE_CONFIG.maxMemoryMb * 0.8) {
         break; // Stop when we're at 80% of limit
       }
-      
+
       this.inMemoryCache.delete(key);
       evicted++;
       this.stats.evictions++;
@@ -319,7 +315,7 @@ class EnterpriseCacheManager {
     log('info', 'Memory limit enforcement completed', {
       evicted,
       currentMemoryMb: this.calculateMemoryUsage(),
-      limit: CACHE_CONFIG.maxMemoryMb
+      limit: CACHE_CONFIG.maxMemoryMb,
     });
   }
 
@@ -328,20 +324,20 @@ class EnterpriseCacheManager {
    */
   private calculateMemoryUsage(): number {
     let totalSize = 0;
-    
-    this.inMemoryCache.forEach(entry => {
+
+    this.inMemoryCache.forEach((entry) => {
       totalSize += entry.size;
     });
-    
+
     const memoryMb = totalSize / (1024 * 1024);
     this.stats.memoryUsage = memoryMb;
-    
+
     return memoryMb;
   }
 
   /**
    * Warm up cache with provider data
-   * 
+   *
    * AI CONSTRAINTS:
    * - MUST handle thousands of providers efficiently
    * - MUST respect concurrency limits
@@ -354,12 +350,12 @@ class EnterpriseCacheManager {
   ): Promise<void> {
     log('info', 'Starting cache warmup', {
       totalProviders: providers.length,
-      concurrency: CACHE_CONFIG.warmupConcurrency
+      concurrency: CACHE_CONFIG.warmupConcurrency,
     });
 
     let completed = 0;
     const batches = [];
-    
+
     // Split providers into batches for controlled concurrency
     for (let i = 0; i < providers.length; i += CACHE_CONFIG.warmupConcurrency) {
       batches.push(providers.slice(i, i + CACHE_CONFIG.warmupConcurrency));
@@ -371,29 +367,28 @@ class EnterpriseCacheManager {
           try {
             const result = await fetcher(provider);
             const key = `status:${provider.id}`;
-            
+
             // Set with warmup TTL
             await this.set(key, result, CACHE_CONFIG.warmupTtl);
-            
+
             // Mark as warmup entry
             const entry = this.inMemoryCache.get(key);
             if (entry) {
               entry.warmup = true;
             }
-            
+
             completed++;
-            
+
             if (progressCallback) {
               progressCallback({
                 completed,
-                total: providers.length
+                total: providers.length,
               });
             }
-            
           } catch (error) {
             log('warn', 'Cache warmup failed for provider', {
               provider: provider.id,
-              error: (error as Error).message
+              error: (error as Error).message,
             });
             completed++;
           }
@@ -403,7 +398,7 @@ class EnterpriseCacheManager {
 
     log('info', 'Cache warmup completed', {
       totalProviders: providers.length,
-      completed
+      completed,
     });
   }
 
@@ -414,7 +409,7 @@ class EnterpriseCacheManager {
     return {
       ...this.stats,
       memoryUsageMb: this.calculateMemoryUsage(),
-      cacheSize: this.inMemoryCache.size
+      cacheSize: this.inMemoryCache.size,
     };
   }
 
@@ -425,9 +420,9 @@ class EnterpriseCacheManager {
     if (this.redisClient) {
       await this.redisClient.flushAll();
     }
-    
+
     this.inMemoryCache.clear();
-    
+
     // Reset stats
     this.stats = {
       hits: 0,
@@ -438,7 +433,7 @@ class EnterpriseCacheManager {
       memoryUsage: 0,
       compressionRatio: 0,
       warmupHits: 0,
-      staleServed: 0
+      staleServed: 0,
     };
 
     log('info', 'Cache cleared successfully');
@@ -451,7 +446,7 @@ class EnterpriseCacheManager {
 
 /**
  * Global enterprise cache instance
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST be singleton for consistent state
  * - MUST be initialized once per process
@@ -471,7 +466,7 @@ function getEnterpriseCache(): EnterpriseCacheManager {
 
 /**
  * Get cached value with enterprise features
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST provide simple interface for consumers
  * - MUST handle all error cases gracefully
@@ -521,7 +516,10 @@ export async function warmupCacheEnterprise(
 /**
  * Get cache statistics for monitoring
  */
-export function getCacheStatsEnterprise(): CacheStats & { memoryUsageMb: number; cacheSize: number } {
+export function getCacheStatsEnterprise(): CacheStats & {
+  memoryUsageMb: number;
+  cacheSize: number;
+} {
   const cache = getEnterpriseCache();
   return cache.getStats();
 }
@@ -536,7 +534,7 @@ export async function clearCacheEnterprise(): Promise<void> {
 
 /**
  * Invalidate cache entries by pattern
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST support wildcard patterns for bulk invalidation
  * - MUST be efficient for thousands of keys
@@ -545,14 +543,12 @@ export async function clearCacheEnterprise(): Promise<void> {
 export async function invalidateCachePattern(pattern: string): Promise<number> {
   const cache = getEnterpriseCache();
   const stats = cache.getStats();
-  
+
   // Convert simple wildcard pattern to regex
-  const regexPattern = pattern
-    .replace(/\*/g, '.*')
-    .replace(/\?/g, '.');
-  
+  const regexPattern = pattern.replace(/\*/g, '.*').replace(/\?/g, '.');
+
   const regex = new RegExp(`^${regexPattern}$`);
-  
+
   // Find matching keys in memory cache
   const matchingKeys: string[] = [];
   cache['inMemoryCache'].forEach((_, key) => {
@@ -560,17 +556,17 @@ export async function invalidateCachePattern(pattern: string): Promise<number> {
       matchingKeys.push(key);
     }
   });
-  
+
   // Batch delete matching keys
   if (matchingKeys.length > 0) {
     await cache.deleteBatch(matchingKeys);
   }
-  
+
   log('info', 'Cache pattern invalidation completed', {
     pattern,
-    matchingKeys: matchingKeys.length
+    matchingKeys: matchingKeys.length,
   });
-  
+
   return matchingKeys.length;
 }
 
@@ -580,7 +576,7 @@ export async function invalidateCachePattern(pattern: string): Promise<number> {
 
 /**
  * Intelligent cache warming based on provider priority and usage patterns
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST prioritize high-traffic providers
  * - MUST respect system resource limits
@@ -592,9 +588,9 @@ export async function intelligentCacheWarmup(
   options?: {
     priorityProviders?: string[];
     maxConcurrency?: number;
-    progressCallback?: (progress: { 
-      completed: number; 
-      total: number; 
+    progressCallback?: (progress: {
+      completed: number;
+      total: number;
       currentProvider: string;
       phase: 'priority' | 'standard';
     }) => void;
@@ -608,22 +604,22 @@ export async function intelligentCacheWarmup(
   const cache = getEnterpriseCache();
   const priorityProviders = options?.priorityProviders || [];
   const maxConcurrency = options?.maxConcurrency || CACHE_CONFIG.warmupConcurrency;
-  
+
   log('info', 'Starting intelligent cache warmup', {
     totalProviders: providers.length,
     priorityProviders: priorityProviders.length,
-    maxConcurrency
+    maxConcurrency,
   });
-  
+
   let totalCompleted = 0;
   let priorityWarmed = 0;
   let standardWarmed = 0;
   let errors = 0;
-  
+
   // Phase 1: Warm priority providers first
-  const priorityProviderList = providers.filter(p => priorityProviders.includes(p.id));
-  const standardProviderList = providers.filter(p => !priorityProviders.includes(p.id));
-  
+  const priorityProviderList = providers.filter((p) => priorityProviders.includes(p.id));
+  const standardProviderList = providers.filter((p) => !priorityProviders.includes(p.id));
+
   // Warm priority providers
   if (priorityProviderList.length > 0) {
     for (const provider of priorityProviderList) {
@@ -632,33 +628,32 @@ export async function intelligentCacheWarmup(
         await cache.set(`status:${provider.id}`, result, CACHE_CONFIG.warmupTtl);
         priorityWarmed++;
         totalCompleted++;
-        
+
         if (options?.progressCallback) {
           options.progressCallback({
             completed: totalCompleted,
             total: providers.length,
             currentProvider: provider.id,
-            phase: 'priority'
+            phase: 'priority',
           });
         }
-        
       } catch (error) {
         errors++;
         totalCompleted++;
         log('warn', 'Priority provider warmup failed', {
           provider: provider.id,
-          error: (error as Error).message
+          error: (error as Error).message,
         });
       }
     }
   }
-  
+
   // Phase 2: Warm standard providers with concurrency
   const batches = [];
   for (let i = 0; i < standardProviderList.length; i += maxConcurrency) {
     batches.push(standardProviderList.slice(i, i + maxConcurrency));
   }
-  
+
   for (const batch of batches) {
     await Promise.all(
       batch.map(async (provider) => {
@@ -667,36 +662,35 @@ export async function intelligentCacheWarmup(
           await cache.set(`status:${provider.id}`, result, CACHE_CONFIG.warmupTtl);
           standardWarmed++;
           totalCompleted++;
-          
+
           if (options?.progressCallback) {
             options.progressCallback({
               completed: totalCompleted,
               total: providers.length,
               currentProvider: provider.id,
-              phase: 'standard'
+              phase: 'standard',
             });
           }
-          
         } catch (error) {
           errors++;
           totalCompleted++;
           log('warn', 'Standard provider warmup failed', {
             provider: provider.id,
-            error: (error as Error).message
+            error: (error as Error).message,
           });
         }
       })
     );
   }
-  
+
   const result = {
     totalWarmed: priorityWarmed + standardWarmed,
     priorityWarmed,
     standardWarmed,
-    errors
+    errors,
   };
-  
+
   log('info', 'Intelligent cache warmup completed', result);
-  
+
   return result;
-} 
+}

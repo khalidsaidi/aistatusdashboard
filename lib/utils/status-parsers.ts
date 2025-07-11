@@ -3,7 +3,7 @@ import { validateStatusResult } from '../validation';
 
 /**
  * Status Parsing Utilities
- * 
+ *
  * AI CONSTRAINTS:
  * - Each function does ONE thing only
  * - MUST return ProviderStatus type
@@ -13,7 +13,7 @@ import { validateStatusResult } from '../validation';
 
 /**
  * Parse StatusPage.io v2 API response
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST return one of: 'operational' | 'degraded' | 'down' | 'unknown'
  * - MUST handle missing indicator gracefully
@@ -27,7 +27,7 @@ export function parseStatusPageResponse(data: any): ProviderStatus {
     }
 
     const indicator = data.status?.indicator;
-    
+
     // Map StatusPage indicators to our status types
     switch (indicator) {
       case 'none':
@@ -47,7 +47,7 @@ export function parseStatusPageResponse(data: any): ProviderStatus {
 
 /**
  * Parse Google Cloud status API response
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST handle array of incidents
  * - MUST check for active incidents only
@@ -61,11 +61,12 @@ export function parseGoogleCloudResponse(data: any): ProviderStatus {
     }
 
     // Check for active incidents with significant impact
-    const hasActiveIncidents = data.some(incident => 
-      incident &&
-      !incident.end && // Incident is ongoing
-      incident.status_impact && 
-      ['SERVICE_OUTAGE', 'SERVICE_DISRUPTION'].includes(incident.status_impact)
+    const hasActiveIncidents = data.some(
+      (incident) =>
+        incident &&
+        !incident.end && // Incident is ongoing
+        incident.status_impact &&
+        ['SERVICE_OUTAGE', 'SERVICE_DISRUPTION'].includes(incident.status_impact)
     );
 
     return hasActiveIncidents ? 'degraded' : 'operational';
@@ -76,7 +77,7 @@ export function parseGoogleCloudResponse(data: any): ProviderStatus {
 
 /**
  * Parse RSS/XML feed (basic availability check)
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST check for non-empty content
  * - MUST handle text responses
@@ -95,7 +96,7 @@ export function parseRssFeedResponse(data: any): ProviderStatus {
 
 /**
  * Parse HTML response for status indicators
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST look for common status keywords
  * - MUST handle HTML content safely
@@ -108,17 +109,17 @@ export function parseHtmlResponse(data: any): ProviderStatus {
     }
 
     const html = data.toLowerCase();
-    
-    // Look for status indicators in HTML
-    const hasIncidents = html.includes('incident') || 
-                        html.includes('outage') || 
-                        html.includes('down') ||
-                        html.includes('degraded') ||
-                        html.includes('issues');
 
-    const isOperational = html.includes('operational') ||
-                         html.includes('all systems') ||
-                         html.includes('no issues');
+    // Look for status indicators in HTML
+    const hasIncidents =
+      html.includes('incident') ||
+      html.includes('outage') ||
+      html.includes('down') ||
+      html.includes('degraded') ||
+      html.includes('issues');
+
+    const isOperational =
+      html.includes('operational') || html.includes('all systems') || html.includes('no issues');
 
     if (hasIncidents && !isOperational) {
       return 'degraded';
@@ -132,7 +133,7 @@ export function parseHtmlResponse(data: any): ProviderStatus {
 
 /**
  * Determine status from connectivity check results
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST calculate percentage of successful endpoints
  * - MUST handle empty results array
@@ -146,7 +147,7 @@ export function parseConnectivityResults(
       return 'unknown';
     }
 
-    const successfulCount = results.filter(r => r.success).length;
+    const successfulCount = results.filter((r) => r.success).length;
     const totalCount = results.length;
     const successRate = successfulCount / totalCount;
 
@@ -167,7 +168,7 @@ export function parseConnectivityResults(
 
 /**
  * Calculate response time with validation
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST return non-negative number
  * - MUST handle invalid start times
@@ -188,7 +189,7 @@ export function calculateResponseTime(startTime: number): number {
 
 /**
  * Create ISO timestamp string
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST return valid ISO 8601 string
  * - MUST handle Date creation errors
@@ -206,7 +207,7 @@ export function createTimestamp(date?: Date): string {
 
 /**
  * Validate and sanitize provider ID
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST return non-empty string
  * - MUST handle null/undefined input
@@ -227,7 +228,7 @@ export function sanitizeProviderId(id: any): string {
 
 /**
  * Format provider name safely
- * 
+ *
  * AI CONSTRAINTS:
  * - MUST return non-empty string
  * - MUST handle null/undefined input
@@ -243,4 +244,4 @@ export function formatProviderName(name: any): string {
   } catch (error) {
     return 'Unknown Provider';
   }
-} 
+}

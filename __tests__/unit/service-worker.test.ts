@@ -2,17 +2,17 @@
  * @jest-environment jsdom
  */
 
-// Real service worker tests 
+// Real service worker tests
 describe('Service Worker - Real Implementation', () => {
   beforeEach(() => {
     // Reset DOM state
     document.head.innerHTML = '';
     document.body.innerHTML = '';
-    
+
     // Clear any existing service workers
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(registrations => {
-        registrations.forEach(registration => registration.unregister());
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => registration.unregister());
       });
     }
   });
@@ -37,10 +37,10 @@ describe('Service Worker - Real Implementation', () => {
         try {
           // Attempt to register service worker
           const registration = await navigator.serviceWorker.register('/sw.js');
-          
+
           expect(registration).toBeDefined();
           expect(registration.scope).toBeDefined();
-          
+
           console.log('Service worker registered successfully');
         } catch (error) {
           // Expected in test environment where sw.js might not exist
@@ -55,15 +55,15 @@ describe('Service Worker - Real Implementation', () => {
 
     it('should handle multiple registration attempts gracefully', async () => {
       if ('serviceWorker' in navigator) {
-        const promises = Array.from({ length: 5 }, () => 
+        const promises = Array.from({ length: 5 }, () =>
           navigator.serviceWorker.register('/sw.js').catch(() => null)
         );
-        
+
         const results = await Promise.allSettled(promises);
-        
+
         // Should handle concurrent registrations without crashing
         expect(results.length).toBe(5);
-        
+
         console.log('Handled multiple registration attempts');
       }
     });
@@ -73,10 +73,10 @@ describe('Service Worker - Real Implementation', () => {
     it('should validate notification API availability', () => {
       const hasNotification = 'Notification' in window;
       const hasServiceWorker = 'serviceWorker' in navigator;
-      
+
       console.log(`Notification API: ${hasNotification}`);
       console.log(`Service Worker API: ${hasServiceWorker}`);
-      
+
       // Test environment should have these APIs available
       expect(typeof hasNotification).toBe('boolean');
       expect(typeof hasServiceWorker).toBe('boolean');
@@ -85,7 +85,7 @@ describe('Service Worker - Real Implementation', () => {
     it('should handle notification permission states', () => {
       if ('Notification' in window) {
         const permission = Notification.permission;
-        
+
         expect(['default', 'granted', 'denied']).toContain(permission);
         console.log(`Current notification permission: ${permission}`);
       } else {
@@ -98,7 +98,7 @@ describe('Service Worker - Real Implementation', () => {
         try {
           const registration = await navigator.serviceWorker.ready;
           const hasPushManager = 'pushManager' in registration;
-          
+
           expect(typeof hasPushManager).toBe('boolean');
           console.log(`Push Manager available: ${hasPushManager}`);
         } catch (error) {
@@ -114,11 +114,11 @@ describe('Service Worker - Real Implementation', () => {
         try {
           // Test message passing to service worker
           const channel = new MessageChannel();
-          
+
           // This tests the message channel API
           expect(channel.port1).toBeDefined();
           expect(channel.port2).toBeDefined();
-          
+
           console.log('Message channel created successfully');
         } catch (error) {
           console.log('Message channel not available in test environment');
@@ -132,9 +132,9 @@ describe('Service Worker - Real Implementation', () => {
           // Test posting message to service worker
           navigator.serviceWorker.controller.postMessage({
             type: 'TEST_MESSAGE',
-            data: { test: true }
+            data: { test: true },
           });
-          
+
           console.log('Posted test message to service worker');
         } catch (error) {
           console.log('No active service worker to message (expected in test)');
@@ -150,7 +150,7 @@ describe('Service Worker - Real Implementation', () => {
       if ('caches' in window) {
         try {
           const cacheNames = await caches.keys();
-          
+
           expect(Array.isArray(cacheNames)).toBe(true);
           console.log(`Cache API available, found ${cacheNames.length} caches`);
         } catch (error) {
@@ -165,12 +165,12 @@ describe('Service Worker - Real Implementation', () => {
       if ('caches' in window) {
         try {
           const testCache = await caches.open('test-cache');
-          
+
           expect(testCache).toBeDefined();
-          
+
           // Clean up test cache
           await caches.delete('test-cache');
-          
+
           console.log('Cache operations working');
         } catch (error) {
           console.log('Cache operations not available in test environment');
@@ -190,13 +190,13 @@ describe('Service Worker - Real Implementation', () => {
           projectId: 'test-project',
           storageBucket: 'test.appspot.com',
           messagingSenderId: '123456789',
-          appId: 'test-app-id'
+          appId: 'test-app-id',
         };
-        
+
         // Test configuration validation
         expect(realFirebaseConfig.apiKey).toBeDefined();
         expect(realFirebaseConfig.projectId).toBeDefined();
-        
+
         console.log('Firebase configuration structure valid');
       } catch (error) {
         console.log('Firebase not available in test environment (expected)');
@@ -206,15 +206,15 @@ describe('Service Worker - Real Implementation', () => {
     it('should validate VAPID key format', () => {
       // Test VAPID key validation logic
       const testVapidKey = 'BExample-VAPID-Key-String-That-Should-Be-Base64-URL-Safe';
-      
+
       // Basic format validation
       expect(typeof testVapidKey).toBe('string');
       expect(testVapidKey.length).toBeGreaterThan(0);
-      
+
       // VAPID keys should be base64url encoded
       const isValidFormat = /^[A-Za-z0-9_-]+$/.test(testVapidKey);
       expect(typeof isValidFormat).toBe('boolean');
-      
+
       console.log('VAPID key format validation working');
     });
   });
@@ -237,7 +237,7 @@ describe('Service Worker - Real Implementation', () => {
       // Test network error simulation
       try {
         const response = await fetch('/non-existent-endpoint');
-        
+
         if (!response.ok) {
           console.log(`Network error handled: ${response.status}`);
         }
@@ -260,7 +260,7 @@ describe('Service Worker - Real Implementation', () => {
             // Expected in test environment
           }
         }
-        
+
         console.log('Memory leak test completed');
         expect(true).toBe(true);
       }
@@ -273,13 +273,13 @@ describe('Service Worker - Real Implementation', () => {
           try {
             navigator.serviceWorker.controller.postMessage({
               type: 'RAPID_TEST',
-              id: i
+              id: i,
             });
           } catch (error) {
             // Expected if no controller
           }
         }
-        
+
         console.log('Rapid message posting test completed');
       }
     });
@@ -287,11 +287,11 @@ describe('Service Worker - Real Implementation', () => {
 
   describe('Real Environment Validation', () => {
     it('should work with actual browser service worker implementation', () => {
-      // Test that we're using real browser APIs, 
+      // Test that we're using real browser APIs,
       if ('serviceWorker' in navigator) {
         expect(navigator.serviceWorker.register).toBe(navigator.serviceWorker.register);
         expect(typeof navigator.serviceWorker.ready).toBe('object');
-        
+
         console.log('Using real browser service worker APIs');
       }
     });
@@ -303,11 +303,11 @@ describe('Service Worker - Real Implementation', () => {
           navigator.serviceWorker.addEventListener('controllerchange', () => {
             console.log('Service worker controller changed');
           });
-          
+
           navigator.serviceWorker.addEventListener('message', (event) => {
             console.log('Received message from service worker:', event.data);
           });
-          
+
           // Event listeners should be attached without errors
           expect(true).toBe(true);
         } catch (error) {
@@ -324,15 +324,15 @@ describe('Service Worker - Real Implementation', () => {
           const notification = new Notification('Test Notification', {
             body: 'This is a test notification',
             icon: '/test-icon.png',
-            tag: 'test-notification'
+            tag: 'test-notification',
           });
-          
+
           expect(notification).toBeDefined();
           expect(notification.title).toBe('Test Notification');
-          
+
           // Clean up
           notification.close();
-          
+
           console.log('Notification creation working');
         } catch (error) {
           console.log('Notification creation error (expected if permission not granted)');
@@ -349,14 +349,14 @@ describe('Service Worker - Real Implementation', () => {
             body: 'Test notification with actions',
             actions: [
               { action: 'view', title: 'View' },
-              { action: 'dismiss', title: 'Dismiss' }
-            ]
+              { action: 'dismiss', title: 'Dismiss' },
+            ],
           };
-          
+
           // Test that options are properly structured
           expect(Array.isArray(notificationOptions.actions)).toBe(true);
           expect(notificationOptions.actions.length).toBe(2);
-          
+
           console.log('Notification actions structure valid');
         } catch (error) {
           console.log('Notification actions not supported');
@@ -368,18 +368,16 @@ describe('Service Worker - Real Implementation', () => {
   describe('Integration Testing', () => {
     it('should integrate all service worker components', async () => {
       // Test complete service worker integration
-      const hasAllAPIs = 
-        'serviceWorker' in navigator &&
-        'Notification' in window &&
-        'caches' in window;
-      
+      const hasAllAPIs =
+        'serviceWorker' in navigator && 'Notification' in window && 'caches' in window;
+
       console.log(`All required APIs available: ${hasAllAPIs}`);
-      
+
       if (hasAllAPIs) {
         try {
           // Test complete flow
           const registration = await navigator.serviceWorker.register('/sw.js');
-          
+
           if (registration) {
             console.log('Service worker integration test passed');
             await registration.unregister();
@@ -390,4 +388,4 @@ describe('Service Worker - Real Implementation', () => {
       }
     });
   });
-}); 
+});

@@ -8,11 +8,11 @@ describe('Push Notifications Integration - Real Implementation', () => {
     // Reset DOM state
     document.head.innerHTML = '';
     document.body.innerHTML = '';
-    
+
     // Clear any existing service worker registrations
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(registrations => {
-        registrations.forEach(registration => registration.unregister());
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => registration.unregister());
       });
     }
   });
@@ -22,10 +22,10 @@ describe('Push Notifications Integration - Real Implementation', () => {
       // Test real browser API availability
       const hasNotifications = 'Notification' in window;
       const hasServiceWorker = 'serviceWorker' in navigator;
-      
+
       console.log(`Notification API: ${hasNotifications}`);
       console.log(`Service Worker API: ${hasServiceWorker}`);
-      
+
       expect(typeof hasNotifications).toBe('boolean');
       expect(typeof hasServiceWorker).toBe('boolean');
 
@@ -42,7 +42,7 @@ describe('Push Notifications Integration - Real Implementation', () => {
           const registration = await navigator.serviceWorker.register('/sw.js');
           expect(registration).toBeDefined();
           console.log('Service worker registered successfully');
-          
+
           // Clean up
           await registration.unregister();
         } catch (error) {
@@ -60,19 +60,19 @@ describe('Push Notifications Integration - Real Implementation', () => {
             providers: ['openai'],
           }),
         });
-        
+
         // CRITICAL: These endpoints should work! 400 errors are blocking deployment
         expect(response.status).not.toBe(404); // Endpoint should exist
         expect(response.status).not.toBe(500); // Should not have server errors
-        
+
         // For invalid tokens, we expect 400 (bad request) which is acceptable
         // But the endpoint should exist and handle requests properly
         if (response.status !== 400) {
           expect(response.status).toBeLessThan(400); // Should be successful for valid requests
         }
-        
+
         console.log(`API endpoint responded with: ${response.status}`);
-        
+
         // If we get 400, check that it's due to invalid token, not missing endpoint
         if (response.status === 400) {
           const errorData = await response.json();
@@ -88,14 +88,14 @@ describe('Push Notifications Integration - Real Implementation', () => {
     it('should handle different notification permission states', async () => {
       if ('Notification' in window) {
         const permission = Notification.permission;
-        
+
         // Test that we can read the actual permission state
         expect(['default', 'granted', 'denied']).toContain(permission);
         console.log(`Notification permission state: ${permission}`);
-        
+
         // Test permission request functionality exists
         expect(typeof Notification.requestPermission).toBe('function');
-        
+
         if (permission === 'denied') {
           console.log('Notifications are blocked - cannot proceed with subscription');
         } else if (permission === 'granted') {
@@ -113,11 +113,11 @@ describe('Push Notifications Integration - Real Implementation', () => {
         try {
           // Test actual service worker registration
           const registration = await navigator.serviceWorker.register('/sw.js');
-          
+
           expect(registration).toBeDefined();
           expect(typeof registration.scope).toBe('string');
           console.log(`Service worker registered with scope: ${registration.scope}`);
-          
+
           // Clean up
           await registration.unregister();
         } catch (error) {
@@ -140,16 +140,16 @@ describe('Push Notifications Integration - Real Implementation', () => {
           projectId: 'test-project',
           storageBucket: 'test.appspot.com',
           messagingSenderId: '123456789',
-          appId: 'test-app-id'
+          appId: 'test-app-id',
         };
-        
+
         // Test configuration structure
         expect(realFirebaseConfig.apiKey).toBeDefined();
         expect(realFirebaseConfig.projectId).toBeDefined();
         expect(realFirebaseConfig.messagingSenderId).toBeDefined();
-        
+
         console.log('Firebase configuration structure valid');
-        
+
         // In real environment, would test FCM token retrieval
         console.log('FCM token retrieval would be tested with real Firebase config');
       } catch (error) {
@@ -163,7 +163,7 @@ describe('Push Notifications Integration - Real Implementation', () => {
       let unsubscribeStatus = 0;
       let subscribeError = '';
       let unsubscribeError = '';
-      
+
       try {
         const response = await fetch('/api/subscribePush', {
           method: 'POST',
@@ -176,13 +176,13 @@ describe('Push Notifications Integration - Real Implementation', () => {
 
         subscribeStatus = response.status;
         console.log(`Subscribe API responded with status: ${subscribeStatus}`);
-        
+
         if (subscribeStatus === 400) {
           const errorData = await response.json();
           subscribeError = errorData.error || 'Unknown error';
           console.log(`400 error reason: ${subscribeError}`);
         }
-        
+
         // Test unsubscribe endpoint
         const unsubResponse = await fetch('/api/unsubscribePush', {
           method: 'POST',
@@ -191,10 +191,10 @@ describe('Push Notifications Integration - Real Implementation', () => {
             token: 'test-invalid-token',
           }),
         });
-        
+
         unsubscribeStatus = unsubResponse.status;
         console.log(`Unsubscribe API responded with status: ${unsubscribeStatus}`);
-        
+
         if (unsubscribeStatus === 400) {
           const errorData = await unsubResponse.json();
           unsubscribeError = errorData.error || 'Unknown error';
@@ -204,16 +204,20 @@ describe('Push Notifications Integration - Real Implementation', () => {
         console.log('API endpoints not available in test environment (expected)');
         return; // Skip validation if endpoints aren't available
       }
-      
+
       // CRITICAL: These validations run OUTSIDE the try/catch to ensure they fail the test
       if (subscribeStatus === 400) {
-        fail(`🚨 CRITICAL: /api/subscribePush returning 400 errors! This should block deployment. Error: ${subscribeError}`);
+        fail(
+          `🚨 CRITICAL: /api/subscribePush returning 400 errors! This should block deployment. Error: ${subscribeError}`
+        );
       }
-      
+
       if (unsubscribeStatus === 400) {
-        fail(`🚨 CRITICAL: /api/unsubscribePush returning 400 errors! This should block deployment. Error: ${unsubscribeError}`);
+        fail(
+          `🚨 CRITICAL: /api/unsubscribePush returning 400 errors! This should block deployment. Error: ${unsubscribeError}`
+        );
       }
-      
+
       // Endpoints should exist and work properly
       expect(subscribeStatus).not.toBe(404);
       expect(unsubscribeStatus).not.toBe(404);
@@ -236,12 +240,12 @@ describe('Push Notifications Integration - Real Implementation', () => {
               url: 'https://test.com',
             },
           };
-          
+
           // Test that showNotification method exists
           expect(typeof registration.showNotification).toBe('function');
-          
+
           console.log('Service worker notification functionality validated');
-          
+
           // Clean up
           await registration.unregister();
         } catch (error) {
@@ -264,7 +268,7 @@ describe('Push Notifications Integration - Real Implementation', () => {
       // Validate click event structure
       expect(clickEvent.action).toBe('view');
       expect(clickEvent.notification.data.url).toBe('https://test.com');
-      
+
       // In real environment, service worker would handle this
       console.log('Notification click would open:', clickEvent.notification.data.url);
     });
@@ -319,7 +323,7 @@ describe('Push Notifications Integration - Real Implementation', () => {
       expect(notificationPayload.notification.title).toBe('🚨 OpenAI Issue Detected');
       expect(notificationPayload.data.providerId).toBe('openai');
       expect(notificationPayload.data.status).toBe('down');
-      
+
       console.log('Notification payload validated for status change');
     });
 
@@ -341,7 +345,7 @@ describe('Push Notifications Integration - Real Implementation', () => {
       // Should not send notification for Anthropic since not subscribed
       const shouldSendNotification = testSubscription.providers.includes(statusChange.providerId);
       expect(shouldSendNotification).toBe(false);
-      
+
       console.log('Correctly filtered out notification for non-subscribed provider');
     });
 
@@ -363,7 +367,7 @@ describe('Push Notifications Integration - Real Implementation', () => {
       // Should send notification for any provider when subscribed to all
       const shouldSendNotification = testSubscription.providers.length === 0; // Empty = all providers
       expect(shouldSendNotification).toBe(true);
-      
+
       const notificationPayload = {
         token: testSubscription.token,
         notification: {
@@ -371,10 +375,10 @@ describe('Push Notifications Integration - Real Implementation', () => {
           body: 'Anthropic is experiencing issues. Current status: down',
         },
       };
-      
+
       expect(notificationPayload.token).toBe('test-fcm-token');
       expect(notificationPayload.notification.title).toContain('Anthropic');
-      
+
       console.log('Correctly allowed notification for all-providers subscription');
     });
   });
@@ -394,9 +398,9 @@ describe('Push Notifications Integration - Real Implementation', () => {
       expect(unsubscribeRequest.method).toBe('POST');
       expect(unsubscribeRequest.headers['Content-Type']).toBe('application/json');
       expect(JSON.parse(unsubscribeRequest.body)).toEqual({ token: 'test-fcm-token' });
-      
+
       console.log('Unsubscription request structure validated');
-      
+
       // In real environment, would test actual API call
       try {
         const response = await fetch('/api/unsubscribePush', unsubscribeRequest);
@@ -417,9 +421,9 @@ describe('Push Notifications Integration - Real Implementation', () => {
       // Validate error request structure
       expect(invalidRequest.method).toBe('POST');
       expect(JSON.parse(invalidRequest.body).token).toBe('invalid-token');
-      
+
       console.log('Invalid token request structure validated');
-      
+
       // In real environment, would test actual error response
       try {
         const response = await fetch('/api/unsubscribePush', invalidRequest);
@@ -442,9 +446,9 @@ describe('Push Notifications Integration - Real Implementation', () => {
       // Validate request structure
       expect(networkRequest.method).toBe('POST');
       expect(JSON.parse(networkRequest.body).token).toBe('test-token');
-      
+
       console.log('Network error request structure validated');
-      
+
       // In real environment, would test network error handling
       try {
         const response = await fetch('/api/subscribePush', networkRequest);
@@ -470,9 +474,9 @@ describe('Push Notifications Integration - Real Implementation', () => {
       const requestData = JSON.parse(invalidTokenRequest.body);
       expect(requestData.token).toBe('invalid-token');
       expect(requestData.providers).toEqual(['openai']);
-      
+
       console.log('Invalid token error request structure validated');
-      
+
       // In real environment, would test actual error response
       try {
         const response = await fetch('/api/subscribePush', invalidTokenRequest);
@@ -501,20 +505,20 @@ describe('Push Notifications Integration - Real Implementation', () => {
       expect(batches.length).toBe(2); // 2 batches of 500
       expect(batches[0].length).toBe(500);
       expect(batches[1].length).toBe(500);
-      
+
       // Test notification payload structure for batch
-      const batchNotifications = batches[0].map(sub => ({
+      const batchNotifications = batches[0].map((sub) => ({
         token: sub.token,
         notification: {
           title: '🚨 OpenAI Issue Detected',
           body: 'OpenAI is experiencing issues.',
         },
       }));
-      
+
       expect(batchNotifications.length).toBe(500);
       expect(batchNotifications[0].token).toBe('token-0');
       expect(batchNotifications[0].notification.title).toContain('OpenAI');
-      
+
       console.log('Batch processing structure validated for 1000 subscriptions');
     });
 
@@ -539,14 +543,14 @@ describe('Push Notifications Integration - Real Implementation', () => {
       // Validate batch structure
       expect(batchTokens.length).toBe(5);
       expect(expectedResponses.length).toBe(5);
-      
+
       // Count expected successes and failures
-      const successCount = expectedResponses.filter(r => r.success).length;
-      const failureCount = expectedResponses.filter(r => !r.success).length;
-      
+      const successCount = expectedResponses.filter((r) => r.success).length;
+      const failureCount = expectedResponses.filter((r) => !r.success).length;
+
       expect(successCount).toBe(3);
       expect(failureCount).toBe(2);
-      
+
       console.log('Partial failure handling structure validated');
     });
   });
@@ -565,9 +569,9 @@ describe('Push Notifications Integration - Real Implementation', () => {
       const requestData = JSON.parse(invalidRequest.body);
       expect(requestData.token).toBeUndefined();
       expect(requestData.providers).toBeUndefined();
-      
+
       console.log('Missing fields validation request structure validated');
-      
+
       // In real environment, would test actual validation response
       try {
         const response = await fetch('/api/subscribePush', invalidRequest);
@@ -588,12 +592,12 @@ describe('Push Notifications Integration - Real Implementation', () => {
       // Validate request structure
       expect(malformedRequest.method).toBe('POST');
       expect(malformedRequest.body).toBe('invalid-json');
-      
+
       // Test that it's actually invalid JSON
       expect(() => JSON.parse(malformedRequest.body)).toThrow();
-      
+
       console.log('Malformed request structure validated');
-      
+
       // In real environment, would test actual malformed request handling
       try {
         const response = await fetch('/api/subscribePush', malformedRequest);
@@ -603,4 +607,4 @@ describe('Push Notifications Integration - Real Implementation', () => {
       }
     });
   });
-}); 
+});

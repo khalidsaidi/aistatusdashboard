@@ -14,13 +14,6 @@
     "esm": false,
     "experimentalSpecifierResolution": "node"
   },
-  "include": [
-    "scripts/**/*.ts",
-    "lib/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    ".next",
-    "out"
-  ]
-} 
+  "include": ["scripts/**/*.ts", "lib/**/*.ts"],
+  "exclude": ["node_modules", ".next", "out"]
+}

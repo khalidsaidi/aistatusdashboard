@@ -14,7 +14,7 @@ import { log } from './logger';
 export class ProductionRateLimiter {
   private limiters = new Map<string, Bottleneck>();
   private limiterConfigs = new Map<string, { maxConcurrent: number; minTime: number }>();
-  
+
   constructor() {
     log('info', 'Production rate limiter initialized with Bottleneck');
   }
@@ -25,13 +25,13 @@ export class ProductionRateLimiter {
   private getLimiter(key: string, maxConcurrent = 10, minTime = 100): Bottleneck {
     if (!this.limiters.has(key)) {
       const limiter = new Bottleneck({
-        reservoir: 100,              // Start with 100 requests
+        reservoir: 100, // Start with 100 requests
         reservoirRefreshAmount: 100, // Refill 100 requests
         reservoirRefreshInterval: 60 * 1000, // Every minute
-        maxConcurrent,               // Max concurrent requests
-        minTime,                     // Minimum time between requests
-        highWater: 1000,            // Queue size limit
-        strategy: Bottleneck.strategy.LEAK
+        maxConcurrent, // Max concurrent requests
+        minTime, // Minimum time between requests
+        highWater: 1000, // Queue size limit
+        strategy: Bottleneck.strategy.LEAK,
       });
 
       // Store configuration for stats
@@ -48,23 +48,23 @@ export class ProductionRateLimiter {
 
       this.limiters.set(key, limiter);
     }
-    
+
     return this.limiters.get(key)!;
   }
 
   /**
    * Execute operation with rate limiting
    */
-  async execute<T>(key: string, operation: () => Promise<T>, options?: {
-    maxConcurrent?: number;
-    minTime?: number;
-  }): Promise<T> {
-    const limiter = this.getLimiter(
-      key, 
-      options?.maxConcurrent, 
-      options?.minTime
-    );
-    
+  async execute<T>(
+    key: string,
+    operation: () => Promise<T>,
+    options?: {
+      maxConcurrent?: number;
+      minTime?: number;
+    }
+  ): Promise<T> {
+    const limiter = this.getLimiter(key, options?.maxConcurrent, options?.minTime);
+
     return limiter.schedule(operation);
   }
 
@@ -74,8 +74,10 @@ export class ProductionRateLimiter {
   canProceed(key: string): boolean {
     const limiter = this.limiters.get(key);
     if (!limiter) return true;
-    
-    return (limiter as any).reservoir > 0 && (limiter as any).running < (limiter as any).maxConcurrent;
+
+    return (
+      (limiter as any).reservoir > 0 && (limiter as any).running < (limiter as any).maxConcurrent
+    );
   }
 
   /**
@@ -85,13 +87,13 @@ export class ProductionRateLimiter {
     const limiter = this.limiters.get(key);
     const config = this.limiterConfigs.get(key);
     if (!limiter || !config) return null;
-    
+
     return {
       reservoir: (limiter as any).reservoir || 0,
       running: (limiter as any).running || 0,
       queued: limiter.queued(),
       maxConcurrent: config.maxConcurrent,
-      minTime: config.minTime
+      minTime: config.minTime,
     };
   }
 
@@ -137,7 +139,7 @@ export class ProductionRetryManager {
       maxDelay = 30000,
       jitter = 'full',
       delayFirstAttempt = false,
-      retry: retryCondition
+      retry: retryCondition,
     } = options;
 
     return backOff(operation, {
@@ -146,16 +148,18 @@ export class ProductionRetryManager {
       maxDelay,
       jitter,
       delayFirstAttempt,
-      retry: retryCondition || ((error: any, attemptNumber: number) => {
-        log('warn', `Backoff attempt ${attemptNumber} failed:`, error?.message || error);
-        
-        // Don't retry on auth errors
-        if (error?.message?.includes('401') || error?.message?.includes('403')) {
-          return false;
-        }
-        
-        return true;
-      })
+      retry:
+        retryCondition ||
+        ((error: any, attemptNumber: number) => {
+          log('warn', `Backoff attempt ${attemptNumber} failed:`, error?.message || error);
+
+          // Don't retry on auth errors
+          if (error?.message?.includes('401') || error?.message?.includes('403')) {
+            return false;
+          }
+
+          return true;
+        }),
     });
   }
 
@@ -179,38 +183,37 @@ export class ProductionRetryManager {
       minTimeout = 1000,
       maxTimeout = 30000,
       randomize = true,
-      onRetry
+      onRetry,
     } = options;
 
     let lastError: Error;
-    
+
     for (let attempt = 1; attempt <= retries + 1; attempt++) {
       try {
         return await operation();
       } catch (error) {
         lastError = error instanceof Error ? error : new Error('Unknown error');
-        
+
         // Don't retry on certain errors
         if (lastError.message.includes('401') || lastError.message.includes('403')) {
           throw lastError;
         }
-        
+
         if (attempt <= retries) {
-          const delay = Math.min(
-            minTimeout * Math.pow(factor, attempt - 1),
-            maxTimeout
-          );
-          
+          const delay = Math.min(minTimeout * Math.pow(factor, attempt - 1), maxTimeout);
+
           const finalDelay = randomize ? delay * (0.5 + Math.random() * 0.5) : delay;
-          
-          log('warn', `Retry attempt ${attempt} failed, waiting ${finalDelay}ms:`, { error: lastError.message });
+
+          log('warn', `Retry attempt ${attempt} failed, waiting ${finalDelay}ms:`, {
+            error: lastError.message,
+          });
           onRetry?.(lastError, attempt);
-          
-          await new Promise(resolve => setTimeout(resolve, finalDelay));
+
+          await new Promise((resolve) => setTimeout(resolve, finalDelay));
         }
       }
     }
-    
+
     throw lastError!;
   }
 }
@@ -220,19 +223,22 @@ export class ProductionRetryManager {
 // =============================================================================
 
 export class ProductionCircuitBreaker {
-  private circuits = new Map<string, {
-    state: 'closed' | 'open' | 'half-open';
-    failures: number;
-    lastFailure: number;
-    lastSuccess: number;
-    threshold: number;
-    timeout: number;
-    monitor: {
-      totalRequests: number;
-      failedRequests: number;
-      successfulRequests: number;
-    };
-  }>();
+  private circuits = new Map<
+    string,
+    {
+      state: 'closed' | 'open' | 'half-open';
+      failures: number;
+      lastFailure: number;
+      lastSuccess: number;
+      threshold: number;
+      timeout: number;
+      monitor: {
+        totalRequests: number;
+        failedRequests: number;
+        successfulRequests: number;
+      };
+    }
+  >();
 
   constructor() {
     log('info', 'Production circuit breaker initialized');
@@ -250,11 +256,7 @@ export class ProductionCircuitBreaker {
       resetTimeout?: number;
     } = {}
   ): Promise<T> {
-    const {
-      threshold = 5,
-      timeout = 60000,
-      resetTimeout = 30000
-    } = options;
+    const { threshold = 5, timeout = 60000, resetTimeout = 30000 } = options;
 
     let circuit = this.circuits.get(key);
     if (!circuit) {
@@ -268,8 +270,8 @@ export class ProductionCircuitBreaker {
         monitor: {
           totalRequests: 0,
           failedRequests: 0,
-          successfulRequests: 0
-        }
+          successfulRequests: 0,
+        },
       };
       this.circuits.set(key, circuit);
     }
@@ -289,30 +291,29 @@ export class ProductionCircuitBreaker {
 
     try {
       const result = await operation();
-      
+
       // Success - reset circuit if it was half-open
       if (circuit.state === 'half-open') {
         circuit.state = 'closed';
         circuit.failures = 0;
         log('info', `Circuit breaker ${key} reset to closed`);
       }
-      
+
       circuit.lastSuccess = Date.now();
       circuit.monitor.successfulRequests++;
-      
+
       return result;
-      
     } catch (error) {
       circuit.failures++;
       circuit.lastFailure = Date.now();
       circuit.monitor.failedRequests++;
-      
+
       // Open circuit if threshold exceeded
       if (circuit.failures >= circuit.threshold && circuit.state === 'closed') {
         circuit.state = 'open';
         log('error', `Circuit breaker ${key} opened after ${circuit.failures} failures`);
       }
-      
+
       throw error;
     }
   }
@@ -330,14 +331,14 @@ export class ProductionCircuitBreaker {
   getStats(key: string) {
     const circuit = this.circuits.get(key);
     if (!circuit) return null;
-    
+
     return {
       state: circuit.state,
       failures: circuit.failures,
       threshold: circuit.threshold,
       lastFailure: circuit.lastFailure,
       lastSuccess: circuit.lastSuccess,
-      monitor: { ...circuit.monitor }
+      monitor: { ...circuit.monitor },
     };
   }
 
@@ -362,7 +363,7 @@ export class ProductionCircuitBreaker {
       stats[key] = {
         state: circuit.state,
         failures: circuit.failures,
-        monitor: { ...circuit.monitor }
+        monitor: { ...circuit.monitor },
       };
     }
     return stats;
@@ -382,7 +383,7 @@ export class IntegratedResilienceManager {
     this.rateLimiter = new ProductionRateLimiter();
     this.retryManager = new ProductionRetryManager();
     this.circuitBreaker = new ProductionCircuitBreaker();
-    
+
     log('info', 'Integrated resilience manager initialized with all production tools');
   }
 
@@ -407,10 +408,10 @@ export class IntegratedResilienceManager {
     } = {}
   ): Promise<T> {
     // Wrap with circuit breaker
-    const circuitProtectedOperation = () => 
+    const circuitProtectedOperation = () =>
       this.circuitBreaker.execute(key, operation, {
         threshold: options.circuitThreshold,
-        timeout: options.circuitTimeout
+        timeout: options.circuitTimeout,
       });
 
     // Wrap with retry logic
@@ -419,13 +420,13 @@ export class IntegratedResilienceManager {
         retries: options.retries,
         factor: options.retryFactor,
         minTimeout: options.minTimeout,
-        maxTimeout: options.maxTimeout
+        maxTimeout: options.maxTimeout,
       });
 
     // Wrap with rate limiting
     return this.rateLimiter.execute(key, retryProtectedOperation, {
       maxConcurrent: options.maxConcurrent,
-      minTime: options.minTime
+      minTime: options.minTime,
     });
   }
 
@@ -435,10 +436,12 @@ export class IntegratedResilienceManager {
   getStats() {
     return {
       circuits: this.circuitBreaker.getAllStats(),
-      rateLimiters: Array.from(['api', 'status', 'health']).map(key => ({
-        key,
-        stats: this.rateLimiter.getStats(key)
-      })).filter(item => item.stats !== null)
+      rateLimiters: Array.from(['api', 'status', 'health'])
+        .map((key) => ({
+          key,
+          stats: this.rateLimiter.getStats(key),
+        }))
+        .filter((item) => item.stats !== null),
     };
   }
 
@@ -450,21 +453,21 @@ export class IntegratedResilienceManager {
     details: Record<string, any>;
   }> {
     const stats = this.getStats();
-    
+
     // Check for open circuits
-    const openCircuits = Object.entries(stats.circuits)
-      .filter(([_, circuit]) => circuit.state === 'open');
-    
+    const openCircuits = Object.entries(stats.circuits).filter(
+      ([_, circuit]) => circuit.state === 'open'
+    );
+
     // Check rate limiter health
-    const rateLimiterIssues = stats.rateLimiters
-      .filter(rl => rl.stats && rl.stats.queued > 100);
+    const rateLimiterIssues = stats.rateLimiters.filter((rl) => rl.stats && rl.stats.queued > 100);
 
     let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
-    
+
     if (openCircuits.length > 0) {
       status = openCircuits.length > 2 ? 'unhealthy' : 'degraded';
     }
-    
+
     if (rateLimiterIssues.length > 0) {
       status = status === 'healthy' ? 'degraded' : 'unhealthy';
     }
@@ -474,8 +477,8 @@ export class IntegratedResilienceManager {
       details: {
         openCircuits: openCircuits.length,
         rateLimiterIssues: rateLimiterIssues.length,
-        stats
-      }
+        stats,
+      },
     };
   }
 
@@ -506,4 +509,4 @@ export function createProductionCircuitBreaker(): ProductionCircuitBreaker {
 
 export function createIntegratedResilienceManager(): IntegratedResilienceManager {
   return new IntegratedResilienceManager();
-} 
+}

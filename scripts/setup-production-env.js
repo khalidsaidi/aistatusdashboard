@@ -50,25 +50,24 @@ FCM_VAPID_PRIVATE_KEY=your-production-vapid-private-key
 
 async function setupProductionEnvironment() {
   console.log('🚀 Setting up production environment configuration...');
-  
+
   try {
     // Write production environment template
     const envProdPath = path.join(process.cwd(), '.env.production.template');
     fs.writeFileSync(envProdPath, PRODUCTION_ENV_CONFIG);
     console.log('✅ Created .env.production.template');
-    
+
     console.log('\n📋 PRODUCTION SETUP INSTRUCTIONS:');
     console.log('1. Copy .env.production.template to .env.production');
     console.log('2. Update SMTP_PASSWORD with your Microsoft app password');
     console.log('3. Update FCM_VAPID_PRIVATE_KEY with your production VAPID private key');
     console.log('4. Deploy Firebase Functions to production project');
     console.log('5. Update NEXT_PUBLIC_API_BASE_URL to production Firebase Functions URL');
-    
+
     console.log('\n🔧 KEY DIFFERENCES - DEV vs PROD:');
     console.log('📧 Email: khalidsaidi66@gmail.com (dev) → khalid@microsoft.com (prod)');
     console.log('🔗 API: ai-status-dashboard-dev → ai-status-dashboard-prod');
     console.log('🌐 Site: localhost:3000 → aistatusdashboard.com');
-    
   } catch (error) {
     console.error('❌ Failed to setup production environment:', error.message);
     process.exit(1);
@@ -79,4 +78,4 @@ if (require.main === module) {
   setupProductionEnvironment();
 }
 
-module.exports = { setupProductionEnvironment }; 
+module.exports = { setupProductionEnvironment };
