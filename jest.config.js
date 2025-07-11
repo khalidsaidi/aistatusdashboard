@@ -5,7 +5,6 @@ const createJestConfig = nextJest({
 })
 
 const customJestConfig = {
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jsdom',
   moduleDirectories: ['node_modules', '<rootDir>/'],
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/__tests__/e2e/'],
@@ -62,7 +61,11 @@ const customJestConfig = {
     '/test-utils/',
     '/mocks/',
     '.d.ts'
-  ]
+  ],
+  // Fix for Next.js 15 and Node.js compatibility
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  // Mock Web APIs for Node.js environment
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.polyfills.js']
 }
 
 module.exports = createJestConfig(customJestConfig) 
