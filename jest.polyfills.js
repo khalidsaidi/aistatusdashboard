@@ -3,46 +3,99 @@
  * Provides Web API mocks for testing environment
  */
 
-// Mock Request and Response for Node.js environment
+// CRITICAL FIX: Comprehensive Request polyfill for CI environment
+const RequestPolyfill = class Request {
+  constructor(input, init = {}) {
+    this.url = typeof input === 'string' ? input : input.url;
+    this.method = init.method || 'GET';
+    this.headers = new Map(Object.entries(init.headers || {}));
+    this.body = init.body;
+    this.credentials = init.credentials || 'same-origin';
+    this.cache = init.cache || 'default';
+    this.redirect = init.redirect || 'follow';
+    this.referrer = init.referrer || '';
+    this.mode = init.mode || 'cors';
+  }
+
+  clone() {
+    return new RequestPolyfill(this.url, {
+      method: this.method,
+      headers: Object.fromEntries(this.headers),
+      body: this.body,
+      credentials: this.credentials,
+      cache: this.cache,
+      redirect: this.redirect,
+      referrer: this.referrer,
+      mode: this.mode
+    });
+  }
+};
+
+// Apply polyfills to all global contexts
 if (typeof global.Request === 'undefined') {
-  global.Request = class Request {
-    constructor(input, init = {}) {
-      this.url = typeof input === 'string' ? input : input.url;
-      this.method = init.method || 'GET';
-      this.headers = new Map(Object.entries(init.headers || {}));
-      this.body = init.body;
-    }
-  };
+  global.Request = RequestPolyfill;
 }
-
-// Ensure Request is available globally
 if (typeof globalThis.Request === 'undefined') {
-  globalThis.Request = global.Request;
+  globalThis.Request = RequestPolyfill;
+}
+if (typeof window !== 'undefined' && typeof window.Request === 'undefined') {
+  window.Request = RequestPolyfill;
 }
 
-if (typeof global.Response === 'undefined') {
-  global.Response = class Response {
-    constructor(body, init = {}) {
-      this.body = body;
-      this.status = init.status || 200;
-      this.statusText = init.statusText || 'OK';
-      this.headers = new Map(Object.entries(init.headers || {}));
-      this.ok = this.status >= 200 && this.status < 300;
-    }
+// CRITICAL FIX: Comprehensive Response polyfill for CI environment
+const ResponsePolyfill = class Response {
+  constructor(body, init = {}) {
+    this.body = body;
+    this.status = init.status || 200;
+    this.statusText = init.statusText || 'OK';
+    this.headers = new Map(Object.entries(init.headers || {}));
+    this.ok = this.status >= 200 && this.status < 300;
+    this.redirected = init.redirected || false;
+    this.type = init.type || 'default';
+    this.url = init.url || '';
+  }
 
-    async json() {
+  async json() {
+    try {
       return JSON.parse(this.body);
+    } catch {
+      throw new Error('Failed to parse response as JSON');
     }
+  }
 
-    async text() {
-      return this.body;
-    }
-  };
+  async text() {
+    return String(this.body || '');
+  }
+
+  async arrayBuffer() {
+    return new ArrayBuffer(0);
+  }
+
+  async blob() {
+    return new Blob([this.body || '']);
+  }
+
+  clone() {
+    return new ResponsePolyfill(this.body, {
+      status: this.status,
+      statusText: this.statusText,
+      headers: Object.fromEntries(this.headers),
+      redirected: this.redirected,
+      type: this.type,
+      url: this.url
+    });
+  }
+};
+
+// Apply polyfills to all global contexts
+if (typeof global.Response === 'undefined') {
+  global.Response = ResponsePolyfill;
 }
-
-// Ensure Response is available globally
 if (typeof globalThis.Response === 'undefined') {
-  globalThis.Response = global.Response;
+  globalThis.Response = ResponsePolyfill;
+}
+if (typeof window !== 'undefined' && typeof window.Response === 'undefined') {
+  window.Response = ResponsePolyfill;
 }
 
 // Mock Headers if not available
