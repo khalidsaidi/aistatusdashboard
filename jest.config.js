@@ -48,8 +48,12 @@ const customJestConfig = {
   },
   // CRITICAL: Transform Firebase ESM modules for Jest compatibility
   transformIgnorePatterns: [
-    'node_modules/(?!(firebase|@firebase)/)'
+    'node_modules/(?!(firebase|@firebase|undici)/)'
   ],
+  // Force transform Firebase modules
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }],
+  },
 }
 
 module.exports = createJestConfig(customJestConfig) 

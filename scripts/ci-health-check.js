@@ -20,7 +20,7 @@ const http = require('http');
 
 // Configuration
 const CONFIG = {
-  BASE_URL: 'http://localhost:3001',
+  BASE_URL: 'http://localhost:3000',
   TIMEOUT: 10000,
   CRITICAL_ENDPOINTS: [
     {
