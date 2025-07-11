@@ -330,3 +330,27 @@ temp/
 *.pfx
 secrets.json
 credentials.json
+
+# Additional secret files that should NEVER be committed
+service-account*.json
+*service-account*.json
+firebase-adminsdk*.json
+*firebase-adminsdk*.json
+.env.production
+.env.staging
+.env.secrets
+config/secrets.*
+config/production.*
+config/staging.*
+
+# API keys and tokens
+*.token
+*.api-key
+.firebase-token
+.github-token
+.slack-webhook
+
+# Test environment files with real credentials
+jest.env.local.js
+test.env.local
+*.test.env.local
