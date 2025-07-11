@@ -1,0 +1,11 @@
+{
+  "firebase/firestore-send-email": {
+    "EMAIL_COLLECTION": "mail",
+    "SMTP_CONNECTION_URI": "smtps://your-email@yourdomain.com:your-app-password@smtp.gmail.com:465",
+    "DEFAULT_FROM": "noreply@yourdomain.com",
+    "DEFAULT_REPLY_TO": "support@yourdomain.com",
+    "USERS_COLLECTION": "users",
+    "TEMPLATES_COLLECTION": "email_templates",
+    "TTL_SECONDS": "86400"
+  }
+} 

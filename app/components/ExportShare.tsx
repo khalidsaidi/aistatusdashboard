@@ -80,7 +80,7 @@ export default function ExportShare({ statuses, className = '' }: ExportSharePro
       URL.revokeObjectURL(url);
 
     } catch (error) {
-      console.error('Export failed:', error);
+      // Export error handled - show user feedback instead
       alert('Failed to export data. Please try again.');
     } finally {
       setIsExporting(false);
@@ -107,13 +107,13 @@ export default function ExportShare({ statuses, className = '' }: ExportSharePro
         alert('Status copied to clipboard!');
       }
     } catch (error) {
-      console.error('Share failed:', error);
+      // Share error handled - show user feedback instead
       // Fallback: copy to clipboard
       try {
         await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
         alert('Status copied to clipboard!');
       } catch (clipboardError) {
-        console.error('Clipboard failed:', clipboardError);
+        // Clipboard fallback failed - silent handling
         alert('Unable to share. Please copy the URL manually.');
       }
     }
@@ -125,7 +125,7 @@ export default function ExportShare({ statuses, className = '' }: ExportSharePro
       await navigator.clipboard.writeText(apiUrl);
       alert('API URL copied to clipboard!');
     } catch (error) {
-      console.error('Copy failed:', error);
+      // Copy operation failed - show user feedback
       alert('Unable to copy. Please copy manually: ' + apiUrl);
     }
   };

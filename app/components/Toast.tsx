@@ -28,22 +28,26 @@ function ToastItem({ toast, onClose }: ToastItemProps) {
 
   const handleClose = useCallback(() => {
     setIsLeaving(true);
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       onClose(toast.id);
     }, 300);
+    return () => clearTimeout(timer);
   }, [toast.id, onClose]);
 
   useEffect(() => {
     // Trigger enter animation
-    setTimeout(() => setIsVisible(true), 10);
+    const enterTimer = setTimeout(() => setIsVisible(true), 10);
 
     // Auto-close after duration
     const duration = toast.duration || 5000;
-    const timer = setTimeout(() => {
+    const autoCloseTimer = setTimeout(() => {
       handleClose();
     }, duration);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(enterTimer);
+      clearTimeout(autoCloseTimer);
+    };
   }, [toast.duration, handleClose]);
 
   const getIcon = () => {

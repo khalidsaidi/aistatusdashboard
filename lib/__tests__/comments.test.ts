@@ -13,14 +13,9 @@ import {
 } from '../comments';
 import { CommentCreate, CommentFilter } from '../types';
 
-// Mock the logger
-jest.mock('../logger', () => ({
-  log: jest.fn()
-}));
-
 describe('Comments System', () => {
   beforeEach(() => {
-    // Clear the comments Map before each test
+    // Clear the comments Map before each test for isolation
     _testOnlyComments.clear();
   });
 
@@ -189,9 +184,19 @@ describe('Comments System', () => {
       
       // Comments should be sorted newest first
       for (let i = 1; i < comments.length; i++) {
-        const prevDate = new Date(comments[i - 1].createdAt);
-        const currentDate = new Date(comments[i].createdAt);
-        expect(prevDate.getTime()).toBeGreaterThanOrEqual(currentDate.getTime());
+        const prevCreatedAt = comments[i - 1].createdAt;
+        const currentCreatedAt = comments[i].createdAt;
+        
+        // Handle both string dates and Firebase Timestamp objects
+        const prevTime = typeof prevCreatedAt === 'string' 
+          ? new Date(prevCreatedAt).getTime()
+          : (prevCreatedAt as any)._seconds ? (prevCreatedAt as any)._seconds * 1000 : Date.now();
+        
+        const currentTime = typeof currentCreatedAt === 'string' 
+          ? new Date(currentCreatedAt).getTime()
+          : (currentCreatedAt as any)._seconds ? (currentCreatedAt as any)._seconds * 1000 : Date.now();
+        
+        expect(prevTime).toBeGreaterThanOrEqual(currentTime);
       }
     });
   });

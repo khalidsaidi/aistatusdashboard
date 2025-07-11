@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
-import { getApiUrl } from '../config';
+import { getApiUrl } from '../config-secure';
 
 describe('Firebase Configuration', () => {
   describe('API URL Configuration', () => {
@@ -8,7 +8,8 @@ describe('Firebase Configuration', () => {
       
       // Should contain the correct endpoint
       expect(apiUrl).toContain('/status');
-      expect(apiUrl).toMatch(/https:\/\/.*cloudfunctions\.net\/api\/status/);
+      // In dev environment, should use local API or cloud functions
+      expect(apiUrl).toMatch(/^(\/api\/status|https:\/\/.*cloudfunctions\.net\/status)$/);
     });
 
     it('should handle different endpoints', () => {
@@ -17,13 +18,21 @@ describe('Firebase Configuration', () => {
       
       expect(statusUrl).toContain('/status');
       expect(commentsUrl).toContain('/comments');
+      
+      // Both should be valid URL formats
+      expect(statusUrl).toMatch(/^(\/api\/|https:\/\/)/);
+      expect(commentsUrl).toMatch(/^(\/api\/|https:\/\/)/);
     });
 
-    it('should return valid URLs', () => {
+    it('should return valid URLs or paths', () => {
       const apiUrl = getApiUrl('status');
       
-      expect(() => new URL(apiUrl)).not.toThrow();
-      expect(apiUrl).toMatch(/^https?:\/\//);
+      // Should be either a valid URL or a valid path
+      if (apiUrl.startsWith('http')) {
+        expect(() => new URL(apiUrl)).not.toThrow();
+      } else {
+        expect(apiUrl).toMatch(/^\/api\//);
+      }
     });
   });
 
@@ -42,7 +51,16 @@ describe('Firebase Configuration', () => {
       
       expect(fs.existsSync('functions/package.json')).toBe(true);
       expect(fs.existsSync('functions/tsconfig.json')).toBe(true);
-      expect(fs.existsSync('functions/src/index.ts')).toBe(true);
+      
+      // Check for actual function source files
+      expect(fs.existsSync('functions/src')).toBe(true);
+      
+      // Check for at least one function file
+      const srcFiles = fs.readdirSync('functions/src').filter((file: string) => file.endsWith('.ts'));
+      expect(srcFiles.length).toBeGreaterThan(0);
+      
+      // Check for compiled output
+      expect(fs.existsSync('functions/lib')).toBe(true);
     });
   });
 }); 

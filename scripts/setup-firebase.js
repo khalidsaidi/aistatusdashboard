@@ -3,20 +3,20 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔥 Firebase Setup Script');
-console.log('========================');
+
+
 
 // Read service account keys
 const devKeyPath = path.join(process.cwd(), 'dev-servicekey.json');
 const prodKeyPath = path.join(process.cwd(), 'prod-servicekey.json');
 
 if (!fs.existsSync(devKeyPath)) {
-  console.error('❌ dev-servicekey.json not found in root directory');
+  
   process.exit(1);
 }
 
 if (!fs.existsSync(prodKeyPath)) {
-  console.error('❌ prod-servicekey.json not found in root directory');
+  
   process.exit(1);
 }
 
@@ -84,8 +84,8 @@ NEXT_PUBLIC_SITE_URL="https://ai-status-dashboard.web.app"
   fs.writeFileSync('.env.local', devEnvContent);
   fs.writeFileSync('.env.production', prodEnvContent);
 
-  console.log('✅ Created .env.local (development)');
-  console.log('✅ Created .env.production (production)');
+  
+  
   
   // Update .gitignore to ensure service keys and env files are ignored
   const gitignorePath = '.gitignore';
@@ -114,16 +114,16 @@ NEXT_PUBLIC_SITE_URL="https://ai-status-dashboard.web.app"
   
   if (needsUpdate) {
     fs.writeFileSync(gitignorePath, gitignoreContent);
-    console.log('✅ Updated .gitignore');
+    
   }
 
-  console.log('\n🎉 Firebase setup complete!');
-  console.log('\nNext steps:');
-  console.log('1. Run: firebase login');
-  console.log('2. Run: firebase use ai-status-dashboard-dev');
-  console.log('3. Run: npm run firebase:init');
+  
+  
+  
+  
+  
 
 } catch (error) {
-  console.error('❌ Error reading service account keys:', error.message);
+  
   process.exit(1);
 } 

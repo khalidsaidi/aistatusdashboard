@@ -35,7 +35,7 @@ const actionSchemas = {
 };
 
 function validateWorkflow(workflowPath) {
-  console.log(`\nValidating ${workflowPath}...`);
+  
   const content = fs.readFileSync(workflowPath, 'utf8');
   const workflow = yaml.load(content);
   const errors = [];
@@ -127,21 +127,21 @@ for (const workflow of workflows) {
   const errors = validateWorkflow(path.join(workflowDir, workflow));
   if (errors.length > 0) {
     hasErrors = true;
-    console.error(`\n❌ Errors in ${workflow}:`);
+    
     errors.forEach(err => {
-      console.error(`  - Job '${err.job}', Step ${err.step}: ${err.error}`);
+      
       if (err.suggestion) {
-        console.error(`    💡 ${err.suggestion}`);
+        
       }
     });
   } else {
-    console.log(`✅ ${workflow} is valid`);
+    
   }
 }
 
 if (hasErrors) {
-  console.error('\n❌ Workflow validation failed');
+  
   process.exit(1);
 } else {
-  console.log('\n✅ All workflows are valid');
+  
 } 

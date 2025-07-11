@@ -9,14 +9,19 @@ interface OfflineIndicatorProps {
 export default function OfflineIndicator({ className = '' }: OfflineIndicatorProps) {
   const [isOnline, setIsOnline] = useState(true);
   const [lastOnline, setLastOnline] = useState<Date | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+    
     const updateOnlineStatus = () => {
-      const online = navigator.onLine;
-      setIsOnline(online);
-      
-      if (!online && isOnline) {
-        setLastOnline(new Date());
+      if (typeof navigator !== 'undefined') {
+        const online = navigator.onLine;
+        setIsOnline(online);
+        
+        if (!online && isOnline) {
+          setLastOnline(new Date());
+        }
       }
     };
 
@@ -24,17 +29,20 @@ export default function OfflineIndicator({ className = '' }: OfflineIndicatorPro
     updateOnlineStatus();
 
     // Listen for online/offline events
-    window.addEventListener('online', updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
 
-    return () => {
-      window.removeEventListener('online', updateOnlineStatus);
-      window.removeEventListener('offline', updateOnlineStatus);
-    };
+      return () => {
+        window.removeEventListener('online', updateOnlineStatus);
+        window.removeEventListener('offline', updateOnlineStatus);
+      };
+    }
   }, [isOnline]);
 
-  if (isOnline) {
-    return null; // Don't show anything when online
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted || isOnline) {
+    return null;
   }
 
   return (
@@ -60,7 +68,11 @@ export default function OfflineIndicator({ className = '' }: OfflineIndicatorPro
             </p>
           </div>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.location.reload();
+              }
+            }}
             className="flex-shrink-0 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium py-2 px-3 rounded-md transition-colors"
           >
             Retry
@@ -78,11 +90,13 @@ export class StatusCache {
 
   static save(data: any): void {
     try {
-      const cacheData = {
-        timestamp: Date.now(),
-        data
-      };
-      localStorage.setItem(this.CACHE_KEY, JSON.stringify(cacheData));
+      if (typeof localStorage !== 'undefined') {
+        const cacheData = {
+          timestamp: Date.now(),
+          data
+        };
+        localStorage.setItem(this.CACHE_KEY, JSON.stringify(cacheData));
+      }
     } catch (error) {
       console.warn('Failed to save to cache:', error);
     }
@@ -90,6 +104,8 @@ export class StatusCache {
 
   static load(): any | null {
     try {
+      if (typeof localStorage === 'undefined') return null;
+      
       const cached = localStorage.getItem(this.CACHE_KEY);
       if (!cached) return null;
 
@@ -112,7 +128,9 @@ export class StatusCache {
 
   static clear(): void {
     try {
-      localStorage.removeItem(this.CACHE_KEY);
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(this.CACHE_KEY);
+      }
     } catch (error) {
       console.warn('Failed to clear cache:', error);
     }
@@ -120,6 +138,8 @@ export class StatusCache {
 
   static isStale(): boolean {
     try {
+      if (typeof localStorage === 'undefined') return true;
+      
       const cached = localStorage.getItem(this.CACHE_KEY);
       if (!cached) return true;
 

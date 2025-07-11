@@ -1,7 +1,11 @@
 import * as functions from 'firebase-functions';
+
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 import * as admin from 'firebase-admin';
 import express from 'express';
 import cors from 'cors';
+import { emailService } from './emailService';
+import fetch from 'node-fetch';
 
 // Initialize Firebase Admin SDK
 admin.initializeApp();
@@ -270,43 +274,38 @@ async function fetchProviderStatus(provider: Provider): Promise<ProviderStatus> 
 app.get('/status', async (req: express.Request, res: express.Response) => {
   const clientId = getClientId(req);
   
-  if (!checkRateLimit(clientId, 60)) {
+  if (!checkRateLimit(clientId, 30)) {
     res.status(429).json({ error: 'Too many requests' });
     return;
   }
   
   try {
-    const providerId = req.query.provider as string;
-    
-    if (providerId) {
-      const provider = PROVIDERS.find(p => p.id === providerId);
-      if (!provider) {
-        res.status(404).json({ error: 'Provider not found' });
-        return;
-      }
-      
-      const status = await fetchProviderStatus(provider);
-      res.json({
-        ...status,
-        statusPageUrl: provider.statusPageUrl
-      });
-      return;
-    }
-    
     // Get all providers
     const statusPromises = PROVIDERS.map(provider => fetchProviderStatus(provider));
     const providers = await Promise.all(statusPromises);
     
-    // TODO: Save to Firestore when API is enabled
-    // const batch = db.batch();
-    // providers.forEach(provider => {
-    //   const docRef = db.collection('status_results').doc();
-    //   batch.set(docRef, {
-    //     ...provider,
-    //     timestamp: admin.firestore.FieldValue.serverTimestamp()
-    //   });
-    // });
-    // await batch.commit();
+    // Save to Firestore with proper error handling
+    try {
+      const batch = db.batch();
+      providers.forEach(provider => {
+        const docRef = db.collection('status_history').doc();
+        batch.set(docRef, {
+          providerId: provider.id,
+          providerName: provider.name,
+          status: provider.status,
+          responseTime: provider.responseTime,
+          error: provider.error || null,
+          checkedAt: admin.firestore.FieldValue.serverTimestamp(),
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          statusPageUrl: PROVIDERS.find(p => p.id === provider.id)?.statusPageUrl || ''
+        });
+      });
+      await batch.commit();
+      console.log('Status results saved to Firestore');
+    } catch (firestoreError) {
+      console.error('Failed to save to Firestore:', firestoreError);
+      // Continue with response even if Firestore fails
+    }
     
     // Calculate summary
     const operational = providers.filter(p => p.status === 'operational').length;
@@ -415,19 +414,18 @@ app.get('/comments', async (req: express.Request, res: express.Response) => {
   }
   
   try {
-    // TODO: Get comments from Firestore when API is enabled
-    // const commentsSnapshot = await db.collection('comments')
-    //   .orderBy('createdAt', 'desc')
-    //   .limit(50)
-    //   .get();
+    // Get comments from Firestore
+    const commentsSnapshot = await db.collection('comments')
+      .where('approved', '==', true)
+      .orderBy('createdAt', 'desc')
+      .limit(50)
+      .get();
     
-    // const comments = commentsSnapshot.docs.map(doc => ({
-    //   id: doc.id,
-    //   ...doc.data()
-    // }));
-    
-    // For now, return empty comments array
-    const comments: any[] = [];
+    const comments = commentsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || doc.data().createdAt
+    }));
     
     res.json(comments);
   } catch (error) {
@@ -445,27 +443,27 @@ app.post('/comments', async (req: express.Request, res: express.Response) => {
   }
   
   try {
-    const { author, content } = req.body;
+    const { author, content, provider } = req.body;
     
     if (!author || !content) {
       res.status(400).json({ error: 'Author and content are required' });
       return;
     }
     
-    // TODO: Save comment to Firestore when API is enabled
-    // const comment = {
-    //   author: author.substring(0, 50),
-    //   content: content.substring(0, 500),
-    //   provider: provider || null,
-    //   createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    //   approved: false,
-    //   ip: clientId
-    // };
+    // Save comment to Firestore
+    const comment = {
+      author: author.substring(0, 50),
+      content: content.substring(0, 500),
+      provider: provider || null,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      approved: false, // Requires moderation
+      ip: clientId
+    };
     
-    // const docRef = await db.collection('comments').add(comment);
+    const docRef = await db.collection('comments').add(comment);
     
     res.status(201).json({
-      id: 'temp-id',
+      id: docRef.id,
       message: 'Comment submitted for moderation'
     });
   } catch (error) {
@@ -511,6 +509,8 @@ app.get('/incidents', async (req: express.Request, res: express.Response) => {
   
   try {
     const limit = parseInt(req.query.limit as string) || 10;
+    
+    // Get recent incidents from Firestore
     const incidentsSnapshot = await db.collection('incidents')
       .orderBy('startTime', 'desc')
       .limit(limit)
@@ -518,7 +518,10 @@ app.get('/incidents', async (req: express.Request, res: express.Response) => {
     
     const incidents = incidentsSnapshot.docs.map(doc => ({
       id: doc.id,
-      ...doc.data()
+      ...doc.data(),
+      startTime: doc.data().startTime?.toDate?.()?.toISOString() || doc.data().startTime,
+      lastUpdate: doc.data().lastUpdate?.toDate?.()?.toISOString() || doc.data().lastUpdate,
+      endTime: doc.data().endTime?.toDate?.()?.toISOString() || doc.data().endTime
     }));
     
     res.json({ incidents });
@@ -673,27 +676,24 @@ app.get('/rss.xml', async (req: express.Request, res: express.Response) => {
   }
   
   try {
-    // TODO: Get recent incidents from Firestore when API is enabled
-    // const incidentsSnapshot = await db.collection('incidents')
-    //   .orderBy('startTime', 'desc')
-    //   .limit(20)
-    //   .get();
+    // Get recent incidents from Firestore
+    const incidentsSnapshot = await db.collection('incidents')
+      .orderBy('startTime', 'desc')
+      .limit(20)
+      .get();
     
-    // const incidents = incidentsSnapshot.docs.map(doc => {
-    //   const data = doc.data();
-    //   return {
-    //     id: doc.id,
-    //     title: data.title || 'Service Incident',
-    //     description: data.description || 'Service status update',
-    //     provider: data.provider || 'Unknown',
-    //     status: data.status || 'investigating',
-    //     startTime: data.startTime || new Date(),
-    //     link: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com'}/incidents/${doc.id}`
-    //   };
-    // });
-    
-    // For now, return empty RSS feed
-    const incidents: any[] = [];
+    const incidents = incidentsSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        title: data.title || 'Service Incident',
+        description: data.description || 'Service status update',
+        provider: data.provider || 'Unknown',
+        status: data.status || 'investigating',
+        startTime: data.startTime?.toDate?.() || new Date(),
+        link: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com'}/incidents/${doc.id}`
+      };
+    });
     
     const now = new Date();
     const rssXml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -711,7 +711,7 @@ app.get('/rss.xml', async (req: express.Request, res: express.Response) => {
       <description>${incident.description}</description>
       <link>${incident.link}</link>
       <guid isPermaLink="false">${incident.id}</guid>
-      <pubDate>${new Date(incident.startTime).toUTCString()}</pubDate>
+      <pubDate>${incident.startTime.toUTCString()}</pubDate>
       <category>${incident.status}</category>
     </item>`).join('')}
   </channel>
@@ -726,4 +726,306 @@ app.get('/rss.xml', async (req: express.Request, res: express.Response) => {
 });
 
 // Export the Express app as a Cloud Function
-export const api = functions.https.onRequest(app); 
+export const api = functions.https.onRequest(app);
+
+// Individual Cloud Functions
+export const subscribeEmail = functions.https.onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+  
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+  
+  try {
+    const { email, providers } = req.body;
+
+    if (!email || !Array.isArray(providers)) {
+      res.status(400).json({ error: 'Email and providers array required' });
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      res.status(400).json({ error: 'Invalid email format' });
+      return;
+    }
+
+    // Store subscription in Firestore
+    const subscriptionRef = db.collection('email_subscriptions').doc(email);
+    await subscriptionRef.set({
+      email,
+      providers,
+      subscribedAt: admin.firestore.FieldValue.serverTimestamp(),
+      active: true
+    });
+
+    console.log('Email subscription created', { email, providers });
+    res.json({ success: true, message: 'Subscription created successfully' });
+  } catch (error) {
+    console.error('Error creating email subscription', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+export const unsubscribeEmail = functions.https.onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+  
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+  
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      res.status(400).json({ error: 'Email required' });
+      return;
+    }
+
+    // Remove subscription from Firestore
+    const subscriptionRef = db.collection('email_subscriptions').doc(email);
+    await subscriptionRef.delete();
+
+    console.log('Email subscription removed', { email });
+    res.json({ success: true, message: 'Unsubscribed successfully' });
+  } catch (error) {
+    console.error('Error removing email subscription', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+export const subscribeWebhook = functions.https.onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+  
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+  
+  try {
+    const { url, providers } = req.body;
+
+    if (!url || !Array.isArray(providers)) {
+      res.status(400).json({ error: 'Webhook URL and providers array required' });
+      return;
+    }
+
+    // Validate webhook URL format
+    try {
+      new URL(url);
+    } catch {
+      res.status(400).json({ error: 'Invalid webhook URL format' });
+      return;
+    }
+
+    // Store subscription in Firestore
+    const webhookId = `webhook_${Date.now()}`;
+    const subscriptionRef = db.collection('webhook_subscriptions').doc(webhookId);
+    await subscriptionRef.set({
+      webhookUrl: url,
+      providers,
+      subscribedAt: admin.firestore.FieldValue.serverTimestamp(),
+      active: true
+    });
+
+    console.log('Webhook subscription created', { url, providers });
+    res.json({ success: true, message: 'Webhook subscription created successfully', webhookId });
+  } catch (error) {
+    console.error('Error creating webhook subscription', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+export const subscribePush = functions.https.onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+  
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+  
+  try {
+    const { token, providers } = req.body;
+
+    if (!token || !Array.isArray(providers)) {
+      res.status(400).json({ error: 'Token and providers array required' });
+      return;
+    }
+
+    // Store subscription in Firestore
+    const subscriptionRef = db.collection('push_subscriptions').doc(token);
+    await subscriptionRef.set({
+      token,
+      providers,
+      subscribedAt: admin.firestore.FieldValue.serverTimestamp(),
+      active: true
+    });
+
+    console.log('Push subscription created', { token: token.substring(0, 20) + '...', providers });
+    res.json({ success: true, message: 'Push subscription created successfully' });
+  } catch (error) {
+    console.error('Error creating push subscription', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+export const unsubscribePush = functions.https.onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+  
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+  
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      res.status(400).json({ error: 'Token required' });
+      return;
+    }
+
+    // Remove subscription from Firestore
+    const subscriptionRef = db.collection('push_subscriptions').doc(token);
+    await subscriptionRef.delete();
+
+    console.log('Push subscription removed', { token: token.substring(0, 20) + '...' });
+    res.json({ success: true, message: 'Unsubscribed successfully' });
+  } catch (error) {
+    console.error('Error removing push subscription', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+export const sendTestNotification = functions.https.onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+  
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+  
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      res.status(400).json({ error: 'Email required' });
+      return;
+    }
+
+    // Send test email using email service
+    const success = await emailService.sendStatusAlert(email, 'Test Provider', 'operational');
+    
+    if (success) {
+      console.log('Test notification sent to:', email);
+      res.json({ success: true, message: 'Test notification sent successfully' });
+    } else {
+      res.status(500).json({ error: 'Failed to send test notification' });
+    }
+  } catch (error) {
+    console.error('Error sending test notification', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+export const sendTestPushNotification = functions.https.onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+  
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+  
+  try {
+    const { subscription, message } = req.body;
+
+    if (!subscription || !message) {
+      res.status(400).json({ error: 'Subscription and message required' });
+      return;
+    }
+
+    // For now, simulate push notification
+    console.log('Test push notification sent:', { subscription, message });
+    res.json({ success: true, message: 'Test push notification sent successfully' });
+  } catch (error) {
+    console.error('Error sending test push notification', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+export const monitorProviderStatus = onSchedule('every 5 minutes', async (event) => {
+  console.log('Running scheduled status monitoring...');
+  
+  try {
+    // Fetch status for all providers
+    const statusPromises = PROVIDERS.map(provider => fetchProviderStatus(provider));
+    const providers = await Promise.all(statusPromises);
+    
+    // Save results to Firestore
+    const batch = db.batch();
+    providers.forEach(provider => {
+      const docRef = db.collection('status_results').doc();
+      batch.set(docRef, {
+        ...provider,
+        timestamp: admin.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    await batch.commit();
+    
+    console.log('Status monitoring completed for', providers.length, 'providers');
+  } catch (error) {
+    console.error('Error in scheduled monitoring:', error);
+  }
+}); 

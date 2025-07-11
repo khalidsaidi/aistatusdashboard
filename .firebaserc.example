@@ -1,0 +1,27 @@
+{
+  "projects": {
+    "default": "your-dev-project-id",
+    "dev": "your-dev-project-id", 
+    "prod": "your-prod-project-id"
+  },
+  "targets": {
+    "your-prod-project-id": {
+      "hosting": {
+        "production": [
+          "your-production-site-id"
+        ],
+        "main": [
+          "your-main-site-id"
+        ]
+      }
+    },
+    "your-dev-project-id": {
+      "hosting": {
+        "development": [
+          "your-dev-site-id"
+        ]
+      }
+    }
+  },
+  "etags": {}
+} 

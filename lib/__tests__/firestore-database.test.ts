@@ -1,122 +1,262 @@
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
-import path from 'path';
-import fs from 'fs';
-
-const DEV_SERVICE_KEY_PATH = path.join(process.cwd(), 'config/firebase/dev-servicekey.json');
-
-// Check if Firebase credentials are available
-const hasFirebaseCredentials = () => {
-  return fs.existsSync(DEV_SERVICE_KEY_PATH);
-};
-
-// Conditionally import Firebase functions
-const getFirebaseFunctions = async () => {
-  if (!hasFirebaseCredentials()) {
-    return null;
-  }
-  
-  // Set up Firebase credentials for testing
-  process.env.GOOGLE_APPLICATION_CREDENTIALS = DEV_SERVICE_KEY_PATH;
-  process.env.FIREBASE_PROJECT_ID = 'ai-status-dashboard-dev';
-  
-  return await import('../firestore-database');
-};
+import { initializeTestFirebase, cleanupTestFirebase, getTestFirebase } from '../test-firebase-config';
+import { getFirestore, collection, addDoc, deleteDoc, doc, Timestamp } from 'firebase/firestore';
+import * as db from '../firestore-database';
 
 describe('Firestore Database', () => {
+  let testFirebase: { app: any; db: any };
+  let testDocIds: string[] = [];
+
   beforeAll(async () => {
-    // Set up Firebase for testing
-    if (hasFirebaseCredentials()) {
-      process.env.GOOGLE_APPLICATION_CREDENTIALS = DEV_SERVICE_KEY_PATH;
-      process.env.FIREBASE_PROJECT_ID = 'ai-status-dashboard-dev';
+    try {
+      testFirebase = await initializeTestFirebase();
+      console.log('✅ Firebase initialized for Firestore database tests');
+    } catch (error) {
+      throw new Error(`CRITICAL: Firebase initialization failed: ${error instanceof Error ? error.message : String(error)}. This must be fixed for tests to run.`);
     }
   });
 
   afterAll(async () => {
-    // Clean up environment variables
-    delete process.env.GOOGLE_APPLICATION_CREDENTIALS;
-    delete process.env.FIREBASE_PROJECT_ID;
+    // Cleanup test documents
+    if (testFirebase && testDocIds.length > 0) {
+      try {
+        const cleanupPromises = testDocIds.map(async (docId) => {
+          try {
+            await deleteDoc(doc(testFirebase.db, 'status_history', docId));
+          } catch (error) {
+            throw new Error(`Cleanup failed for doc ${docId}: ${error instanceof Error ? error.message : String(error)}`);
+          }
+        });
+        await Promise.allSettled(cleanupPromises);
+      } catch (error) {
+        throw new Error(`Test cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+    
+    await cleanupTestFirebase();
   });
 
-  describe('saveStatusResults', () => {
-    it('should save status results to Firestore', async () => {
-      const firebase = await getFirebaseFunctions();
-      if (!firebase) {
-        console.log('⏭️  Skipping Firebase test - service key not found at config/firebase/dev-servicekey.json');
-        return;
+  describe('Configuration', () => {
+    it('should have Firebase instance available', () => {
+      if (!testFirebase) {
+        throw new Error('CRITICAL: Firebase instance not available - initialization must have failed');
       }
-
-      const mockStatusResults = [
-        {
-          id: 'test-provider-' + Date.now(),
-          name: 'Test Provider',
-          status: 'operational' as const,
-          lastChecked: new Date().toISOString(),
-          responseTime: 100,
-          statusPageUrl: 'https://status.test.com',
-        },
-      ];
-
-      // This should not throw if Firebase is properly configured
-      await expect(firebase.saveStatusResults(mockStatusResults)).resolves.not.toThrow();
+      
+      expect(testFirebase).toBeDefined();
+      expect(testFirebase.app).toBeDefined();
+      expect(testFirebase.db).toBeDefined();
     });
-  });
 
-  describe('getRecentStatuses', () => {
-    it('should retrieve recent statuses from Firestore', async () => {
-      const firebase = await getFirebaseFunctions();
-      if (!firebase) {
-        console.log('⏭️  Skipping Firebase test - service key not found');
-        return;
+    it('should connect to test Firebase project', () => {
+      if (!testFirebase) {
+        throw new Error('CRITICAL: Firebase instance not available');
       }
-
-      const results = await firebase.getRecentStatuses(1); // Get last 1 hour
-
-      expect(Array.isArray(results)).toBe(true);
-      // Results might be empty, which is fine for tests
+      
+      const projectId = testFirebase.app.options.projectId;
+      expect(projectId).toBe('ai-status-dashboard-dev');
     });
   });
 
-  describe('calculateUptime', () => {
-    it('should calculate uptime percentage correctly', async () => {
-      const firebase = await getFirebaseFunctions();
-      if (!firebase) {
-        console.log('⏭️  Skipping Firebase test - service key not found');
-        return;
+  describe('Database Operations', () => {
+    it('should save status result', async () => {
+      if (!testFirebase) {
+        throw new Error('CRITICAL: Firebase instance not available');
       }
 
-      const uptime = await firebase.calculateUptime('test-provider', 1);
+      const testStatus = {
+        id: 'test-provider',
+        name: 'Test Provider',
+        status: 'operational' as const,
+        lastChecked: new Date().toISOString(),
+        responseTime: 150,
+        statusPageUrl: 'https://status.test.com'
+      };
 
-      expect(typeof uptime).toBe('number');
-      expect(uptime).toBeGreaterThanOrEqual(0);
-      expect(uptime).toBeLessThanOrEqual(100);
+      try {
+        await db.saveStatusResult(testStatus);
+        console.log('✅ Status result saved successfully');
+      } catch (error) {
+        throw new Error(`saveStatusResult failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`);
+      }
     });
+
+    it('should get provider history', async () => {
+      if (!testFirebase) {
+        throw new Error('CRITICAL: Firebase instance not available');
+      }
+
+      try {
+        const history = await db.getProviderHistory('openai', 1);
+        expect(Array.isArray(history)).toBe(true);
+        console.log(`✅ Retrieved ${history.length} provider history records`);
+      } catch (error) {
+        throw new Error(`getProviderHistory failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`);
+      }
+    });
+
+    it('should save and retrieve test document', async () => {
+      if (!testFirebase) {
+        throw new Error('CRITICAL: Firebase instance not available');
+      }
+
+      const testDoc = {
+        providerId: 'test-provider-' + Date.now(),
+        status: 'operational' as const,
+        timestamp: Timestamp.now(),
+        details: 'Test document for database integration'
+      };
+
+      try {
+        // Save test document
+        const docRef = await addDoc(collection(testFirebase.db, 'status_history'), testDoc);
+        testDocIds.push(docRef.id);
+        
+        expect(docRef.id).toBeTruthy();
+        console.log(`✅ Test document saved with ID: ${docRef.id}`);
+      } catch (error) {
+        throw new Error(`Database write operation failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`);
+      }
+    }, 15000);
   });
 
-  describe('getAverageResponseTime', () => {
-    it('should calculate average response time correctly', async () => {
-      const firebase = await getFirebaseFunctions();
-      if (!firebase) {
-        console.log('⏭️  Skipping Firebase test - service key not found');
-        return;
+  describe('Status History Operations', () => {
+    it('should handle empty history gracefully', async () => {
+      if (!testFirebase) {
+        throw new Error('CRITICAL: Firebase instance not available');
       }
 
-      const avgTime = await firebase.getAverageResponseTime('test-provider', 1);
+      try {
+        const nonExistentProviderId = 'non-existent-provider-' + Date.now();
+        const history = await db.getProviderHistory(nonExistentProviderId, 1);
+        
+        expect(Array.isArray(history)).toBe(true);
+        expect(history.length).toBe(0);
+        
+        console.log('✅ Empty history handled correctly');
+      } catch (error) {
+        throw new Error(`getProviderHistory for non-existent provider failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`);
+      }
+    }, 10000);
 
-      expect(typeof avgTime).toBe('number');
-      expect(avgTime).toBeGreaterThanOrEqual(0);
-    });
-
-    it('should return 0 for no data', async () => {
-      const firebase = await getFirebaseFunctions();
-      if (!firebase) {
-        console.log('⏭️  Skipping Firebase test - service key not found');
-        return;
+    it('should validate provider history structure', async () => {
+      if (!testFirebase) {
+        throw new Error('CRITICAL: Firebase instance not available');
       }
 
-      // Use a non-existent provider to get no data
-      const avgTime = await firebase.getAverageResponseTime('non-existent-provider-' + Date.now(), 1);
+      try {
+        const history = await db.getProviderHistory('openai', 1);
+        
+        if (history.length > 0) {
+          const record = history[0];
+          expect(record).toHaveProperty('providerId');
+          expect(record).toHaveProperty('status');
+          expect(record).toHaveProperty('checkedAt');
+          
+          console.log('✅ Provider history structure validated');
+        } else {
+          console.log('✅ No history records found (acceptable for clean test environment)');
+        }
+      } catch (error) {
+        throw new Error(`Provider history validation failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`);
+      }
+    }, 15000);
+  });
+});
 
-      expect(avgTime).toBe(0);
-    });
+describe('Firestore Database Integration', () => {
+  let testFirebase: { app: any; db: any };
+  let testDocIds: string[] = [];
+
+  beforeAll(async () => {
+    try {
+      testFirebase = await initializeTestFirebase();
+      console.log('✅ Firebase initialized for integration tests');
+    } catch (error) {
+      throw new Error(`CRITICAL: Firebase initialization failed: ${error instanceof Error ? error.message : String(error)}. This must be fixed for tests to run.`);
+    }
+  });
+
+  afterAll(async () => {
+    // Cleanup test documents
+    if (testFirebase && testDocIds.length > 0) {
+      try {
+        const cleanupPromises = testDocIds.map(async (docId) => {
+          try {
+            await deleteDoc(doc(testFirebase.db, 'status_history', docId));
+          } catch (error) {
+            throw new Error(`Cleanup failed for doc ${docId}: ${error instanceof Error ? error.message : String(error)}`);
+          }
+        });
+        await Promise.allSettled(cleanupPromises);
+      } catch (error) {
+        throw new Error(`Test cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+    
+    await cleanupTestFirebase();
+  });
+
+  describe('Provider Status Operations', () => {
+    it('should save status results with all fields', async () => {
+      if (!testFirebase) {
+        throw new Error('CRITICAL: Firebase instance not available');
+      }
+
+      const completeStatuses = [{
+        id: 'test-complete-' + Date.now(),
+        name: 'Complete Test Provider',
+        status: 'operational' as const,
+        lastChecked: new Date().toISOString(),
+        responseTime: 200,
+        statusPageUrl: 'https://status.complete.test.com'
+      }];
+
+      try {
+        await db.saveStatusResults(completeStatuses);
+        console.log('✅ Complete status results saved successfully');
+      } catch (error) {
+        throw new Error(`Complete status save failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real database issue that must be fixed.`);
+      }
+    }, 15000);
+
+    it('should get last status for provider', async () => {
+      if (!testFirebase) {
+        throw new Error('CRITICAL: Firebase instance not available');
+      }
+
+      try {
+        const lastStatus = await db.getLastStatus('openai');
+        
+        if (lastStatus) {
+          expect(lastStatus).toHaveProperty('id');
+          expect(lastStatus).toHaveProperty('status');
+          expect(lastStatus).toHaveProperty('lastChecked');
+          console.log('✅ Last status retrieved successfully');
+        } else {
+          console.log('✅ No last status found (acceptable for clean test environment)');
+        }
+      } catch (error) {
+        // STRICT MODE: ALL ERRORS MUST BE FIXED
+        throw new Error(`Firebase getLastStatus failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real configuration or connectivity issue that must be resolved.`);
+      }
+    }, 20000);
+
+    it('should return null for non-existent provider', async () => {
+      if (!testFirebase) {
+        throw new Error('CRITICAL: Firebase instance not available');
+      }
+
+      try {
+        const nonExistentProviderId = 'non-existent-provider-' + Date.now();
+        const lastStatus = await db.getLastStatus(nonExistentProviderId);
+        
+        // Should return null for non-existent provider
+        expect(lastStatus).toBeNull();
+        
+      } catch (error) {
+        // STRICT MODE: ALL ERRORS MUST BE FIXED
+        throw new Error(`Firebase getLastStatus for non-existent provider failed: ${error instanceof Error ? error.message : String(error)}. This indicates a real configuration or connectivity issue that must be resolved.`);
+      }
+    }, 15000);
   });
 }); 

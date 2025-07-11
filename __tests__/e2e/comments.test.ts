@@ -50,7 +50,7 @@ test.describe('Comments Feature', () => {
     // Switch to comments tab
     await page.click('button:has-text("💬 Comments")');
     
-    // Mock the Firebase API response for comment submission
+    // Simulate the Firebase API response for comment submission
     await page.route('**/comments', async route => {
       if (route.request().method() === 'POST') {
         route.fulfill({
@@ -170,7 +170,7 @@ test.describe('Comments Feature', () => {
     // Switch to comments tab
     await page.click('button:has-text("💬 Comments")');
     
-    // Mock API to simulate loading delay
+    // Simulate API to test loading delay
     await page.route('**/comments**', async route => {
       if (route.request().method() === 'GET') {
         // Add delay to see loading state
@@ -201,7 +201,7 @@ test.describe('Comments Feature', () => {
     // Switch to comments tab
     await page.click('button:has-text("💬 Comments")');
     
-    // Mock rate limiting response
+    // Simulate rate limiting response
     await page.route('**/comments', async route => {
       if (route.request().method() === 'POST') {
         route.fulfill({

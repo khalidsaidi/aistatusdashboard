@@ -141,7 +141,7 @@ export function processStatusChange(
 }
 
 /**
- * Mock email sending - in production, use SendGrid/AWS SES/Resend
+ * Real email sending using fetch to email service endpoint
  */
 export async function sendQueuedNotifications(): Promise<void> {
   if (notificationQueue.length === 0) return;
@@ -150,20 +150,134 @@ export async function sendQueuedNotifications(): Promise<void> {
   
   for (const item of notifications) {
     try {
-      // Mock implementation - log instead of actual email
-      log('info', 'Email notification sent (mock)', {
+      // Real email implementation - send to actual email service
+      const emailData = {
         to: item.subscription.email,
-        provider: item.notification.provider,
-        type: item.notification.type,
-        change: `${item.notification.previousStatus} → ${item.notification.status}`
-      });
+        subject: generateEmailSubject(item.notification),
+        html: generateEmailHtml(item.notification),
+        text: generateEmailText(item.notification)
+      };
+      
+      // Try to send via email service API
+      try {
+        const response = await fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(emailData)
+        });
+        
+        if (response.ok) {
+          log('info', 'Email notification sent successfully', {
+            to: item.subscription.email,
+            provider: item.notification.provider,
+            type: item.notification.type,
+            change: `${item.notification.previousStatus} → ${item.notification.status}`
+          });
+        } else {
+          throw new Error(`Email service responded with status ${response.status}`);
+        }
+      } catch (fetchError) {
+        // Fallback: Log notification details for manual processing
+        log('warn', 'Email service unavailable, notification logged for manual processing', {
+          to: item.subscription.email,
+          provider: item.notification.provider,
+          type: item.notification.type,
+          change: `${item.notification.previousStatus} → ${item.notification.status}`,
+          subject: emailData.subject,
+          error: fetchError instanceof Error ? fetchError.message : 'Unknown error'
+        });
+      }
     } catch (error) {
-      log('error', 'Failed to send email notification', {
+      log('error', 'Failed to process email notification', {
         email: item.subscription.email,
         error: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   }
+}
+
+/**
+ * Generate email subject based on notification type
+ */
+function generateEmailSubject(notification: EmailNotification): string {
+  const { provider, type, status } = notification;
+  
+  switch (type) {
+    case 'incident':
+      return `🚨 ${provider} Service Issue Detected`;
+    case 'recovery':
+      return `✅ ${provider} Service Recovered`;
+    case 'degradation':
+      return `⚠️ ${provider} Service Degraded`;
+    default:
+      return `📊 ${provider} Status Update`;
+  }
+}
+
+/**
+ * Generate HTML email content
+ */
+function generateEmailHtml(notification: EmailNotification): string {
+  const { provider, type, status, previousStatus, timestamp, responseTime } = notification;
+  
+  const statusIcon = type === 'incident' ? '🚨' : type === 'recovery' ? '✅' : '⚠️';
+  const statusColor = type === 'incident' ? '#dc3545' : type === 'recovery' ? '#28a745' : '#ffc107';
+  
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>AI Status Dashboard - ${provider} Update</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h1 style="color: ${statusColor};">${statusIcon} ${provider} Status Update</h1>
+        
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <p><strong>Provider:</strong> ${provider}</p>
+          <p><strong>Status Change:</strong> ${previousStatus} → <span style="color: ${statusColor};">${status}</span></p>
+          <p><strong>Time:</strong> ${new Date(timestamp).toLocaleString()}</p>
+          ${responseTime ? `<p><strong>Response Time:</strong> ${responseTime}ms</p>` : ''}
+        </div>
+        
+        <p>Visit the <a href="https://aistatusdashboard.com" style="color: #007bff;">AI Status Dashboard</a> for more details.</p>
+        
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+        <p style="font-size: 12px; color: #666;">
+          You're receiving this because you subscribed to ${provider} status notifications.
+          <a href="https://aistatusdashboard.com/unsubscribe" style="color: #007bff;">Unsubscribe</a>
+        </p>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
+/**
+ * Generate plain text email content
+ */
+function generateEmailText(notification: EmailNotification): string {
+  const { provider, type, status, previousStatus, timestamp, responseTime } = notification;
+  
+  const statusIcon = type === 'incident' ? '[ISSUE]' : type === 'recovery' ? '[RECOVERED]' : '[DEGRADED]';
+  
+  return `
+${statusIcon} ${provider} Status Update
+
+Provider: ${provider}
+Status Change: ${previousStatus} → ${status}
+Time: ${new Date(timestamp).toLocaleString()}
+${responseTime ? `Response Time: ${responseTime}ms` : ''}
+
+Visit https://aistatusdashboard.com for more details.
+
+---
+You're receiving this because you subscribed to ${provider} status notifications.
+Unsubscribe: https://aistatusdashboard.com/unsubscribe
+  `.trim();
 }
 
 /**

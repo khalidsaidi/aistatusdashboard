@@ -174,7 +174,7 @@ console.log('Provider statuses:', data);
 // Fetch system health
 const healthResponse = await fetch('${CLOUD_FUNCTIONS_BASE}/health');
 const healthData = await healthResponse.json();
-console.log('System health:', healthData);`}
+console.log('Health data:', healthData);`}
             </pre>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { StatusResult, ProviderStatus, StatusHistoryRecord } from './types';
+import { DatabaseInterface } from './database-interface';
 import { log } from './logger';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore, Firestore, Timestamp } from 'firebase-admin/firestore';
@@ -380,6 +381,23 @@ export async function getRecentStatuses(limit: number = 100): Promise<StatusHist
       error: error instanceof Error ? error.message : 'Unknown error'
     });
     return [];
+  }
+}
+
+/**
+ * Check if database is healthy
+ */
+export async function isHealthy(): Promise<boolean> {
+  try {
+    const db = getDatabase();
+    // Try a simple read operation
+    await db.collection('_health_check').limit(1).get();
+    return true;
+  } catch (error) {
+    log('error', 'Database health check failed', {
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+    return false;
   }
 }
 

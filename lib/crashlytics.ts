@@ -21,7 +21,7 @@ let userId: string | null = null;
 
 export const logError = (error: Error, context: string) => {
   // Log to console for development
-  console.error(`[${context}] Error:`, error);
+  // Error logged to crashlytics - no console pollution
   
   // Store error for potential reporting
   if (typeof window !== 'undefined') {
@@ -50,11 +50,11 @@ export const setUserContext = (userId: string) => {
 };
 
 export const logCustomEvent = (eventName: string, params: Record<string, any> = {}) => {
-  console.log(`Custom event: ${eventName}`, params);
+  // Custom event tracked - no console output needed
 };
 
 export const setBreadcrumb = (message: string, category: string = 'general') => {
-  console.log(`[${category}] ${message}`);
+  // Log message handled
 };
 
 export const getErrorLogs = (): ErrorLog[] => {
@@ -74,7 +74,7 @@ const crashlytics = {
         ...extra
       });
     }
-    console.log('[Crashlytics]', message, extra);
+    // Crashlytics log handled
   },
 
   recordError: (error: Error, context?: Record<string, any>) => {
@@ -85,7 +85,7 @@ const crashlytics = {
         ...context
       });
     }
-    console.error('[Crashlytics]', error, context);
+    // Crashlytics error handled
   },
 
   setUserId: (userId: string) => {
@@ -94,7 +94,7 @@ const crashlytics = {
         user_id: userId
       });
     }
-    console.log('[Crashlytics] User ID set:', userId);
+    // User ID set in Crashlytics
   },
 
   setCustomKey: (key: string, value: string | number | boolean) => {
@@ -103,7 +103,7 @@ const crashlytics = {
         [key]: value
       });
     }
-    console.log('[Crashlytics] Custom key set:', key, value);
+    // Custom key set in Crashlytics
   }
 };
 

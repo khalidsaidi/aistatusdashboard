@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { UserComment } from '../../lib/types';
-import { getApiUrl } from '../../lib/config';
+import { getApiUrl } from '../../lib/utils';
 
 interface CommentSectionProps {
   providerId?: string;
@@ -41,22 +41,27 @@ export default function CommentSection({ providerId, title = "Comments", classNa
       const data = await response.json();
       
       if (response.ok) {
+        // Ensure data is an array
+        const commentsData = Array.isArray(data) ? data : (data.comments && Array.isArray(data.comments) ? data.comments : []);
+        
         if (loadMore) {
-          setComments(prev => [...prev, ...data]);
+          setComments(prev => [...prev, ...commentsData]);
         } else {
-          setComments(data);
+          setComments(commentsData);
           setOffset(0);
         }
         
-        setHasMore(data.length === limit);
+        setHasMore(commentsData.length === limit);
         if (loadMore) {
           setOffset(prev => prev + limit);
         }
       } else {
         setMessage(`❌ Error: ${data.error}`);
+        setComments([]); // Ensure comments is always an array
       }
     } catch (error) {
       setMessage('❌ Failed to load comments');
+      setComments([]); // Ensure comments is always an array
     } finally {
       setLoading(false);
     }
@@ -131,7 +136,8 @@ export default function CommentSection({ providerId, title = "Comments", classNa
         }
         
         // Clear message after 3 seconds
-        setTimeout(() => setMessage(''), 3000);
+        const timer = setTimeout(() => setMessage(''), 3000);
+        return () => clearTimeout(timer);
       } else {
         setMessage(`❌ Error: ${data.error}`);
       }
@@ -343,7 +349,7 @@ export default function CommentSection({ providerId, title = "Comments", classNa
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             Loading comments...
           </div>
-        ) : comments.length === 0 ? (
+        ) : !Array.isArray(comments) || comments.length === 0 ? (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             No comments yet. Be the first to share your thoughts!
           </div>

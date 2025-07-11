@@ -1,12 +1,16 @@
-import { PROVIDERS } from '@/lib/providers';
-import { fetchProviderStatus } from '@/lib/status-fetcher';
-// import { saveStatusResults } from '@/lib/database'; // Now handled by Cloud Functions
+import { getProviders } from '@/lib/providers';
+import { checkAllProviders } from '@/lib/status-fetcher-unified';
 import { log } from '@/lib/logger';
 import DashboardTabs from './components/DashboardTabs';
 import ClientWrapper from './components/ClientWrapper';
+import { headers } from 'next/headers';
+
+// Simple in-memory cache for server-side rendering
+const statusCache = new Map<string, { data: any[]; timestamp: number }>();
+const CACHE_TTL = 60000; // 1 minute cache
 
 // Fallback component for when status fetching fails
-function ErrorFallback({ error, retry }: { error: string; retry?: () => void }) {
+function ErrorFallback({ error }: { error: string }) {
   return (
     <main className="flex-1 bg-gray-50 dark:bg-gray-900">
       <div className="px-4 sm:px-6 py-8">
@@ -17,7 +21,7 @@ function ErrorFallback({ error, retry }: { error: string; retry?: () => void }) 
               Service Temporarily Unavailable
             </h2>
             <p className="text-red-600 dark:text-red-400 mb-6 max-w-md mx-auto">
-              We&apos;re experiencing issues fetching provider status data. This may be due to high load or temporary network issues.
+              We&apos;re experiencing issues fetching provider status data. Please try refreshing the page.
             </p>
             <div className="bg-red-100 dark:bg-red-900/40 border border-red-200 dark:border-red-700 rounded-md p-4 mb-6">
               <p className="text-sm text-red-700 dark:text-red-300">
@@ -41,116 +45,125 @@ function ErrorFallback({ error, retry }: { error: string; retry?: () => void }) 
               </a>
             </div>
           </div>
-          
-          {/* Fallback status information */}
-          <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Expected Providers
-            </h3>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {PROVIDERS.map(provider => (
-                <div key={provider.id} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                  <div className="w-6 h-6 bg-gray-300 dark:bg-gray-600 rounded"></div>
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">{provider.name}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Status unavailable</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </main>
   );
 }
 
-// This is a server component by default in Next.js 13+
+// Get cached status data
+function getCachedStatuses(): any[] | null {
+  const cached = statusCache.get('statuses');
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+  return null;
+}
+
+// Set cached status data
+function setCachedStatuses(data: any[]): void {
+  statusCache.set('statuses', { data, timestamp: Date.now() });
+}
+
+// Generate fallback statuses
+function getFallbackStatuses(): any[] {
+  return getProviders().map(provider => ({
+    id: provider.id,
+    name: provider.name,
+    status: 'unknown' as const,
+    statusPageUrl: provider.statusPageUrl,
+    responseTime: 0,
+    lastChecked: new Date().toISOString(),
+    error: 'Service temporarily unavailable'
+  }));
+}
+
+// Main dashboard page component
 export default async function DashboardPage() {
+  // PERFORMANCE: Skip heavy operations for HEAD requests
+  const headersList = headers();
+  const isHeadRequest = headersList.get('x-request-method') === 'HEAD';
+  
+  if (isHeadRequest) {
+    const fallbackStatuses = getFallbackStatuses();
+    return (
+      <main className="flex-1 bg-gray-50 dark:bg-gray-900">
+        <div className="px-4 sm:px-6 py-8">
+          <ClientWrapper>
+            <DashboardTabs statuses={fallbackStatuses} />
+          </ClientWrapper>
+        </div>
+      </main>
+    );
+  }
+
   let statuses;
   let error: string | null = null;
 
   try {
-    // Fetch all provider statuses with timeout
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Request timeout after 30 seconds')), 30000);
-    });
+    // Check cache first
+    const cachedStatuses = getCachedStatuses();
+    if (cachedStatuses) {
+      log('info', 'Using cached status data');
+      statuses = cachedStatuses;
+    } else {
+      // Fetch all provider statuses with true concurrency
+      const providers = [...getProviders()]; // Convert readonly array to mutable
+      
+      log('info', 'Fetching provider statuses', { count: providers.length });
+      
+      // Use the simplified fetcher with true concurrency
+      statuses = await checkAllProviders(providers);
 
-    const statusPromise = Promise.all(
-      PROVIDERS.map(async (provider) => {
-        try {
-          return await fetchProviderStatus(provider);
-        } catch (providerError) {
-          // Return a fallback status for this provider
-          log('warn', 'Individual provider fetch failed', {
-            provider: provider.id,
-            error: providerError instanceof Error ? providerError.message : 'Unknown error'
-          });
-          
-          return {
-            id: provider.id,
-            name: provider.name,
-            status: 'unknown' as const,
-            statusPageUrl: provider.statusPageUrl,
-            responseTime: 0,
-            lastChecked: new Date().toISOString(),
-            error: providerError instanceof Error ? providerError.message : 'Unknown error'
-          };
-        }
-      })
-    );
+      // Cache successful results
+      if (Array.isArray(statuses) && statuses.length > 0) {
+        setCachedStatuses(statuses);
+      }
+    }
 
-    statuses = await Promise.race([statusPromise, timeoutPromise]) as any;
-
-    // Validate that we got valid results
+    // Validate results
     if (!Array.isArray(statuses) || statuses.length === 0) {
       throw new Error('No provider statuses received');
     }
 
-    // Check if too many providers failed
-    const failedProviders = statuses.filter(s => s.status === 'unknown' || s.error);
-    if (failedProviders.length === statuses.length) {
-      throw new Error('All providers failed to respond');
-    }
-
-    // Log partial failures
-    if (failedProviders.length > 0) {
-      log('warn', 'Some providers failed to respond', {
-        totalProviders: statuses.length,
-        failedProviders: failedProviders.length,
-        failedIds: failedProviders.map(p => p.id)
-      });
-    }
+    // Log results
+    const operational = statuses.filter(s => s.status === 'operational').length;
+    const degraded = statuses.filter(s => s.status === 'degraded').length;
+    const down = statuses.filter(s => s.status === 'down').length;
+    const unknown = statuses.filter(s => s.status === 'unknown').length;
 
     log('info', 'Successfully fetched provider statuses', {
-      totalProviders: statuses.length,
-      operational: statuses.filter(s => s.status === 'operational').length,
-      degraded: statuses.filter(s => s.status === 'degraded').length,
-      down: statuses.filter(s => s.status === 'down').length,
-      unknown: statuses.filter(s => s.status === 'unknown').length
+      total: statuses.length,
+      operational,
+      degraded,
+      down,
+      unknown
     });
+
+    // Show warning if many providers failed
+    if (unknown > statuses.length / 2) {
+      error = `${unknown} out of ${statuses.length} providers are unavailable`;
+    }
 
   } catch (fetchError) {
     error = fetchError instanceof Error ? fetchError.message : 'Unknown error occurred';
     
     log('error', 'Failed to fetch provider statuses', { 
       error,
-      providersCount: PROVIDERS.length 
+      providersCount: getProviders().length 
     });
 
-    // Try to provide some fallback data
-    statuses = PROVIDERS.map(provider => ({
-      id: provider.id,
-      name: provider.name,
-      status: 'unknown' as const,
-      statusPageUrl: provider.statusPageUrl,
-      responseTime: 0,
-      lastChecked: new Date().toISOString(),
-      error: 'Service temporarily unavailable'
-    }));
+    // Try cached data as fallback
+    const cachedStatuses = getCachedStatuses();
+    if (cachedStatuses) {
+      log('info', 'Using stale cached data due to fetch error');
+      statuses = cachedStatuses;
+    } else {
+      statuses = getFallbackStatuses();
+    }
   }
 
-  // If we have a critical error, show error page
+  // Show error page for critical failures
   if (error && (!statuses || statuses.every((s: any) => s.status === 'unknown'))) {
     return <ErrorFallback error={error} />;
   }
@@ -169,7 +182,7 @@ export default async function DashboardPage() {
                 </p>
               </div>
               <p className="text-yellow-600 dark:text-yellow-400 text-sm mt-2">
-                Some provider data may be stale or unavailable. The system is working to restore full functionality.
+                {error}. Some data may be stale or unavailable.
               </p>
             </div>
           </div>

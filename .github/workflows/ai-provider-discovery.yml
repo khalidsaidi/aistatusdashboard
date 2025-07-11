@@ -43,25 +43,58 @@ jobs:
         run: |
           npm ci --only=production
           # Install additional dependencies for discovery script
-          npm install --no-save axios cheerio
+          npm install --no-save axios cheerio dotenv nodemailer
           
       - name: 🔍 Run AI Provider Discovery
         env:
+          # GitHub and workflow configuration
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NOTIFICATION_EMAIL: ${{ inputs.email_override || secrets.NOTIFICATION_EMAIL || 'admin@example.com' }}
           DRY_RUN: ${{ inputs.dry_run }}
+          
+          # Email configuration - CRITICAL FOR PRODUCTION
+          ENABLE_REAL_EMAIL_SENDING: 'true'
+          DISCOVERY_EMAIL_RECIPIENT: ${{ inputs.email_override || secrets.DISCOVERY_EMAIL_RECIPIENT || 'admin@aistatusdashboard.com' }}
+          
+          # SMTP Configuration - Required for email sending
+          SMTP_HOST: ${{ secrets.SMTP_HOST || 'smtp.gmail.com' }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT || '587' }}
+          SMTP_SECURE: ${{ secrets.SMTP_SECURE || 'false' }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          DEFAULT_FROM: ${{ secrets.DEFAULT_FROM || secrets.SMTP_USER }}
+          DEFAULT_REPLY_TO: ${{ secrets.DEFAULT_REPLY_TO || secrets.SMTP_USER }}
+          
+          # Optional webhook notifications
+          DISCOVERY_NOTIFICATION_WEBHOOK: ${{ secrets.DISCOVERY_NOTIFICATION_WEBHOOK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          
+          # Site configuration
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL || 'https://aistatusdashboard.com' }}
         run: |
           echo "🚀 Starting AI Provider Discovery..."
           echo "📅 Scheduled run at $(date)"
           echo "🔧 Configuration:"
-          echo "  - Email: $NOTIFICATION_EMAIL"
+          echo "  - Email: $DISCOVERY_EMAIL_RECIPIENT"
           echo "  - Dry run: $DRY_RUN"
+          echo "  - SMTP Host: $SMTP_HOST"
+          echo "  - SMTP User: $(echo $SMTP_USER | sed 's/./*/g')"
+          echo "  - Email Sending: $ENABLE_REAL_EMAIL_SENDING"
           echo ""
           
-          # Make script executable
-          chmod +x scripts/discover-ai-providers.js
+          # Validate required environment variables
+          if [ "$ENABLE_REAL_EMAIL_SENDING" = "true" ]; then
+            if [ -z "$SMTP_USER" ] || [ -z "$SMTP_PASSWORD" ]; then
+              echo "❌ SMTP credentials not configured!"
+              echo "Please set SMTP_USER and SMTP_PASSWORD secrets in GitHub repository settings."
+              exit 1
+            fi
+            echo "✅ SMTP credentials configured"
+          fi
           
-          # Run discovery script
+          # Create logs directory if it doesn't exist
+          mkdir -p logs
+          
+          # Run discovery script with proper environment
           node scripts/discover-ai-providers.js
           
       - name: 📊 Upload Discovery Results

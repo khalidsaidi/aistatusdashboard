@@ -4,6 +4,15 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
+// Load environment variables if not in GitHub Actions
+if (!process.env.GITHUB_ACTIONS) {
+  try {
+    require('dotenv').config({ path: path.join(__dirname, '..', '.env.local') });
+  } catch (error) {
+    // dotenv not available, continue without it
+  }
+}
+
 // Load configuration
 function loadConfig() {
   const configPath = path.join(__dirname, '..', 'config', 'discovery-sources.json');
@@ -17,8 +26,8 @@ function loadConfig() {
     
     return config;
   } catch (error) {
-    console.error('❌ Failed to load configuration:', error.message);
-    console.log('📝 Using default configuration...');
+    
+    
     
     // Fallback configuration
     return {
@@ -67,8 +76,8 @@ class AIProviderDiscovery {
   }
 
   async run() {
-    console.log('🔍 Starting AI Provider Discovery...');
-    console.log(`📅 ${new Date().toISOString()}`);
+    
+    
     
     try {
       await this.discoverFromAllSources();
@@ -76,17 +85,17 @@ class AIProviderDiscovery {
       await this.sendNotifications();
       await this.updateResults();
     } catch (error) {
-      console.error('❌ Discovery failed:', error);
+      
       await this.sendErrorNotification(error);
     }
   }
 
   async discoverFromAllSources() {
-    console.log('\n📡 Fetching from multiple sources...');
+    
     
     // Filter enabled sources only
     const enabledSources = CONFIG.sources.filter(source => source.enabled !== false);
-    console.log(`🔍 Checking ${enabledSources.length} enabled sources...`);
+    
     
     const promises = enabledSources.map(source => this.fetchFromSource(source));
     const results = await Promise.allSettled(promises);
@@ -96,17 +105,17 @@ class AIProviderDiscovery {
     results.forEach((result, index) => {
       const source = enabledSources[index];
       if (result.status === 'fulfilled') {
-        console.log(`✅ ${source.name}: ${result.value.length} providers found`);
+        
         this.discoveredProviders.push(...result.value);
       } else {
-        console.log(`❌ ${source.name}: ${result.reason.message}`);
+        
         this.errors.push(`${source.name}: ${result.reason.message}`);
       }
     });
   }
 
   async fetchFromSource(source) {
-    console.log(`  🔍 Searching ${source.name}...`);
+    
     
     switch (source.type) {
       case 'github':
@@ -167,7 +176,7 @@ class AIProviderDiscovery {
           }
         });
       } catch (error) {
-        console.log(`    ⚠️  Could not fetch README for ${repo.full_name}`);
+        
       }
     }
     
@@ -308,7 +317,7 @@ class AIProviderDiscovery {
   }
 
   async analyzeResults() {
-    console.log('\n🔍 Analyzing discovered providers...');
+    
     
     // Use discovered providers from sources
     const allDiscovered = this.discoveredProviders || [];
@@ -326,27 +335,27 @@ class AIProviderDiscovery {
     // Limit results
     const maxResults = CONFIG.storage?.maxResultsPerRun || 50;
     if (this.newProviders.length > maxResults) {
-      console.log(`⚠️  Limiting results to top ${maxResults} providers`);
+      
       this.newProviders = this.newProviders.slice(0, maxResults);
     }
     
-    console.log(`📊 Analysis complete:`);
-    console.log(`   • Total discovered: ${allDiscovered.length}`);
-    console.log(`   • New providers: ${this.newProviders.length}`);
-    console.log(`   • High confidence (>70%): ${this.newProviders.filter(p => p.confidence > 0.7).length}`);
-    console.log(`   • Errors: ${this.errors.length}`);
+    
+    
+    
+    
+    
   }
 
   async sendNotifications() {
     if (this.newProviders.length === 0 && this.errors.length === 0) {
-      console.log('📧 No new providers found, no notification needed');
+      
       return;
     }
     
     const subject = `🤖 AI Provider Discovery Report - ${this.newProviders.length} new providers found`;
     const body = this.generateEmailBody();
     
-    console.log('📧 Sending notification email...');
+    
     await this.sendEmail(subject, body);
   }
 
@@ -388,24 +397,183 @@ class AIProviderDiscovery {
   }
 
   async sendEmail(subject, body) {
-    // For GitHub Actions, we'll use a webhook or email service
-    // This is a placeholder - actual implementation would depend on chosen service
+    // Send REAL emails using configured email service
     
+    if (process.env.ENABLE_REAL_EMAIL_SENDING !== 'true') {
+      
+      
+      
+      return;
+    }
+
     if (process.env.GITHUB_ACTIONS) {
-      // In GitHub Actions, we'll create an issue instead of email
+      // In GitHub Actions, send real email AND create an issue
+      await this.sendRealEmail(subject, body);
       await this.createGitHubIssue(subject, body);
     } else {
-      // Local development - just log
-      console.log(`📧 Email would be sent:`);
-      console.log(`To: ${CONFIG.notification.email.to}`);
-      console.log(`Subject: ${subject}`);
-      console.log(`Body:\n${body}`);
+      // Local development - send real email
+      await this.sendRealEmail(subject, body);
+    }
+  }
+
+  async sendRealEmail(subject, body) {
+    try {
+      // Check if email credentials are configured
+      if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
+        
+        return;
+      }
+
+      const nodemailer = require('nodemailer');
+      
+      // Create transporter with real SMTP configuration
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: parseInt(process.env.SMTP_PORT || '587'),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASSWORD
+        }
+      });
+
+      // Verify SMTP connection
+      await transporter.verify();
+
+      const recipientEmail = process.env.DISCOVERY_EMAIL_RECIPIENT || CONFIG.notification.email.to;
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://aistatusdashboard.com';
+
+      // Create HTML email content
+      const htmlBody = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>AI Provider Discovery Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+            .header { background: #007bff; color: white; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+            .new-providers { background: #d4edda; border: 1px solid #c3e6cb; border-radius: 5px; padding: 15px; margin: 20px 0; }
+            .provider { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 3px; padding: 10px; margin: 10px 0; }
+            .errors { background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px; padding: 15px; margin: 20px 0; }
+            .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666; }
+            pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>🤖 AI Provider Discovery Report</h1>
+              <p>Automated discovery scan completed at ${new Date().toLocaleString()}</p>
+            </div>
+
+            ${this.newProviders.length > 0 ? `
+            <div class="new-providers">
+              <h2>🎉 New Providers Discovered (${this.newProviders.length})</h2>
+              ${this.newProviders.map(provider => `
+                <div class="provider">
+                  <h3>${provider.name}</h3>
+                  <p><strong>URL:</strong> <a href="${provider.url}">${provider.url}</a></p>
+                  <p><strong>Status Page:</strong> <a href="${provider.statusPageUrl}">${provider.statusPageUrl}</a></p>
+                  <p><strong>Detection Method:</strong> ${provider.detectionMethod}</p>
+                  <p><strong>Confidence:</strong> ${provider.confidence}</p>
+                </div>
+              `).join('')}
+            </div>
+            ` : '<p>✅ No new providers discovered in this scan.</p>'}
+
+            ${this.errors.length > 0 ? `
+            <div class="errors">
+              <h2>⚠️ Discovery Errors (${this.errors.length})</h2>
+              ${this.errors.map(error => `
+                <div class="provider">
+                  <p><strong>URL:</strong> ${error.url}</p>
+                  <p><strong>Error:</strong> ${error.error}</p>
+                </div>
+              `).join('')}
+            </div>
+            ` : ''}
+
+            <div class="footer">
+              <p>This report was generated by the AI Status Dashboard provider discovery system.</p>
+              <p>Visit the <a href="${siteUrl}">AI Status Dashboard</a> to view current status.</p>
+              <p>To configure this notification, update the DISCOVERY_EMAIL_RECIPIENT environment variable.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const mailOptions = {
+        from: process.env.DEFAULT_FROM || process.env.SMTP_USER,
+        to: recipientEmail,
+        subject: subject,
+        text: body,
+        html: htmlBody
+      };
+
+      const result = await transporter.sendMail(mailOptions);
+      
+      
+      
+      
+      
+
+      // Also send to webhook if configured
+      await this.sendWebhookNotification(subject, body);
+
+    } catch (error) {
+      
+      
+      
+      
+    }
+  }
+
+  async sendWebhookNotification(subject, body) {
+    try {
+      const webhookUrl = process.env.DISCOVERY_NOTIFICATION_WEBHOOK;
+      if (!webhookUrl) {
+        return; // No webhook configured
+      }
+
+      const payload = {
+        text: `${subject}\n\n${body}`,
+        username: 'AI Status Dashboard',
+        icon_emoji: ':robot_face:',
+        attachments: [
+          {
+            color: this.newProviders.length > 0 ? 'good' : 'warning',
+            title: subject,
+            text: body,
+            footer: 'AI Status Dashboard Provider Discovery',
+            ts: Math.floor(Date.now() / 1000)
+          }
+        ]
+      };
+
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        
+      } else {
+        
+      }
+    } catch (error) {
+      
     }
   }
 
   async createGitHubIssue(title, body) {
     if (!process.env.GITHUB_TOKEN) {
-      console.log('⚠️  No GitHub token available, cannot create issue');
+      
       return;
     }
     
@@ -428,9 +596,9 @@ class AIProviderDiscovery {
     
     try {
       await this.makeHttpRequest(options, JSON.stringify(issueData));
-      console.log('✅ GitHub issue created successfully');
+      
     } catch (error) {
-      console.error('❌ Failed to create GitHub issue:', error.message);
+      
     }
   }
 
@@ -474,9 +642,9 @@ class AIProviderDiscovery {
       // Save updated results
       fs.writeFileSync(resultsPath, JSON.stringify(allResults, null, 2));
       
-      console.log(`💾 Results saved to ${resultsPath}`);
+      
     } catch (error) {
-      console.error('❌ Failed to save results:', error.message);
+      
     }
   }
 
@@ -534,7 +702,10 @@ class AIProviderDiscovery {
 // Run if called directly
 if (require.main === module) {
   const discovery = new AIProviderDiscovery();
-  discovery.run().catch(console.error);
+  discovery.run().catch(error => {
+    console.error('❌ Discovery failed:', error.message);
+    process.exit(1);
+  });
 }
 
 module.exports = AIProviderDiscovery;

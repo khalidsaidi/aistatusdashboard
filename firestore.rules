@@ -2,17 +2,46 @@ rules_version='2'
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Public read access to status data
+    match /status_history/{document} {
+      allow read: if true;
+      allow write: if false; // Only server can write
+    }
+    
+    match /current_status/{document} {
+      allow read: if true;
+      allow write: if false; // Only server can write
+    }
+    
+    match /incidents/{document} {
+      allow read: if true;
+      allow write: if false; // Only server can write
+    }
+    
+    // Comments require moderation
+    match /comments/{document} {
+      allow read: if resource.data.approved == true;
+      allow create: if request.auth != null 
+        && request.resource.data.keys().hasAll(['author', 'content', 'createdAt'])
+        && request.resource.data.author.size() <= 50
+        && request.resource.data.content.size() <= 500;
+      allow update, delete: if false; // Only admins via functions
+    }
+    
+    // Email subscriptions - users can manage their own
+    match /email_subscriptions/{document} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Webhook subscriptions - authenticated users only
+    match /webhook_subscriptions/{document} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    
+    // Everything else is denied
     match /{document=**} {
-      // This rule allows anyone with your database reference to view, edit,
-      // and delete all data in your database. It is useful for getting
-      // started, but it is configured to expire after 30 days because it
-      // leaves your app open to attackers. At that time, all client
-      // requests to your database will be denied.
-      //
-      // Make sure to write security rules for your app before that time, or
-      // else all client requests to your database will be denied until you
-      // update your rules.
-      allow read, write: if request.time < timestamp.date(2025, 8, 4);
+      allow read, write: if false;
     }
   }
 }

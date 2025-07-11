@@ -1,8 +1,25 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    // Status data and logos - public read only
+    match /status/{allPaths=**} {
+      allow read: if true;
+      allow write: if false; // Only server functions can write
+    }
+    
+    match /logos/{allPaths=**} {
+      allow read: if true;
+      allow write: if false; // Only server functions can write
+    }
+    
+    // User uploads - authenticated users can manage their own files
+    match /users/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Everything else denied
     match /{allPaths=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
     }
   }
 } 

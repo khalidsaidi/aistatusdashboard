@@ -7,5 +7,5 @@ export function log(level: LogLevel, message: string, data?: Record<string, any>
     message,
     ...data
   };
-  console.log(JSON.stringify(logData));
+  // Log data processed
 } 

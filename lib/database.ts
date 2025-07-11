@@ -258,20 +258,29 @@ export async function getAverageResponseTime(
   const since = new Date(Date.now() - hours * 60 * 60 * 1000);
   
   try {
+    // Use only the composite index we have: providerId + checkedAt
     const snapshot = await db.collection('status_history')
       .where('providerId', '==', providerId)
       .where('checkedAt', '>=', Timestamp.fromDate(since))
-      .where('status', '!=', 'unknown')
       .get();
     
     if (snapshot.empty) {
       return 0;
     }
     
-    const responseTimes = snapshot.docs.map(doc => doc.data().responseTime);
-    const sum = responseTimes.reduce((acc, time) => acc + time, 0);
+    // Filter out 'unknown' status in application code to avoid multiple inequality filters
+    const validResponseTimes = snapshot.docs
+      .map(doc => doc.data())
+      .filter(data => data.status !== 'unknown')
+      .map(data => data.responseTime);
     
-    return Math.round(sum / responseTimes.length);
+    if (validResponseTimes.length === 0) {
+      return 0;
+    }
+    
+    const sum = validResponseTimes.reduce((acc, time) => acc + time, 0);
+    
+    return Math.round(sum / validResponseTimes.length);
   } catch (error) {
     log('error', 'Failed to get average response time', {
       provider: providerId,

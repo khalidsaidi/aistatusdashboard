@@ -1,7 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { getPerformance } from 'firebase/performance';
-import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,9 +14,6 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-
-// Initialize Storage
-const storage = getStorage(app);
 
 // Initialize Analytics (only in browser)
 let analytics: any = null;
@@ -35,7 +31,7 @@ if (typeof window !== 'undefined') {
   performance = getPerformance(app);
 }
 
-export { app, analytics, performance, storage };
+export { app, analytics, performance };
 
 // Performance monitoring utilities
 export const trackCustomMetric = (name: string, value: number) => {

@@ -6,8 +6,8 @@ const { getFirestore } = require('firebase-admin/firestore');
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔄 Migrating SQLite data to Firestore');
-console.log('====================================');
+
+
 
 // Load environment variables
 require('dotenv').config({ path: '.env.local' });
@@ -16,8 +16,8 @@ require('dotenv').config({ path: '.env.local' });
 const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
 if (!process.env.FIREBASE_PROJECT_ID || !privateKey || !process.env.FIREBASE_CLIENT_EMAIL) {
-  console.error('❌ Missing Firebase Admin SDK configuration');
-  console.error('Make sure .env.local is properly configured');
+  
+  
   process.exit(1);
 }
 
@@ -36,7 +36,7 @@ const db = getFirestore();
 const dbPath = path.join(process.cwd(), 'status.db');
 
 if (!fs.existsSync(dbPath)) {
-  console.log('📝 No SQLite database found - creating sample data in Firestore');
+  
   createSampleData();
   return;
 }
@@ -44,12 +44,12 @@ if (!fs.existsSync(dbPath)) {
 const sqliteDb = new sqlite3.Database(dbPath);
 
 async function migrateStatusResults() {
-  console.log('📊 Migrating status results...');
+  
   
   return new Promise((resolve, reject) => {
     sqliteDb.all('SELECT * FROM status_results ORDER BY checked_at DESC LIMIT 1000', async (err, rows) => {
       if (err) {
-        console.error('❌ Error reading status results:', err);
+        
         reject(err);
         return;
       }
@@ -72,9 +72,9 @@ async function migrateStatusResults() {
 
       if (count > 0) {
         await batch.commit();
-        console.log(`✅ Migrated ${count} status results`);
+        
       } else {
-        console.log('📝 No status results to migrate');
+        
       }
       
       resolve();
@@ -83,13 +83,13 @@ async function migrateStatusResults() {
 }
 
 async function migrateComments() {
-  console.log('💬 Migrating comments...');
+  
   
   return new Promise((resolve, reject) => {
     sqliteDb.all('SELECT * FROM comments ORDER BY created_at DESC', async (err, rows) => {
       if (err) {
         // Comments table might not exist
-        console.log('📝 No comments table found - skipping');
+        
         resolve();
         return;
       }
@@ -116,9 +116,9 @@ async function migrateComments() {
 
       if (count > 0) {
         await batch.commit();
-        console.log(`✅ Migrated ${count} comments`);
+        
       } else {
-        console.log('📝 No comments to migrate');
+        
       }
       
       resolve();
@@ -127,7 +127,7 @@ async function migrateComments() {
 }
 
 async function createSampleData() {
-  console.log('📝 Creating sample data in Firestore...');
+  
   
   const providers = [
     'openai', 'anthropic', 'huggingface', 'google-ai', 
@@ -175,7 +175,7 @@ async function createSampleData() {
   }
   
   await batch.commit();
-  console.log('✅ Sample data created successfully');
+  
 }
 
 async function runMigration() {
@@ -183,14 +183,14 @@ async function runMigration() {
     await migrateStatusResults();
     await migrateComments();
     
-    console.log('\n🎉 Migration completed successfully!');
-    console.log('\nNext steps:');
-    console.log('1. Test the app with Firestore data');
-    console.log('2. Deploy to Firebase Hosting');
-    console.log('3. Update API endpoints to use Firestore');
+    
+    
+    
+    
+    
     
   } catch (error) {
-    console.error('❌ Migration failed:', error);
+    
     process.exit(1);
   } finally {
     if (sqliteDb) {

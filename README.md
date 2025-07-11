@@ -45,27 +45,29 @@ Experience the dashboard in action with real-time status monitoring of 15 AI pro
 
 ## 🏗️ Architecture
 
-```mermaid
-graph TB
-    A[Next.js Frontend] --> B[API Routes]
-    B --> C[Status Fetcher]
-    B --> D[Cache Layer]
-    B --> E[Rate Limiter]
-    
-    C --> F[Provider APIs]
-    D --> G[In-Memory Cache]
-    B --> H[SQLite Database]
-    
-    B --> I[Notification System]
-    I --> J[Email Notifications]
-    I --> K[Webhook System]
-    I --> L[Incident Tracking]
-    
-    style A fill:#e1f5fe
-    style B fill:#f3e5f5
-    style H fill:#e8f5e8
-    style I fill:#fff3e0
+### Horizontal Scaling System
 ```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   API Gateway   │    │  Scaling Manager │    │  Worker Queues  │
+│                 │───▶│                 │───▶│                 │
+│ - Rate Limiting │    │ - Auto-scaling  │    │ - Bull/Redis    │
+│ - Load Balance  │    │ - Health Checks │    │ - Job Processing│
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                │
+                                ▼
+                       ┌─────────────────┐
+                       │ Enterprise Cache │
+                       │                 │
+                       │ - Redis Cluster │
+                       │ - Cache Warming │
+                       │ - Invalidation  │
+                       └─────────────────┘
+```
+
+### Processing Methods
+1. **Horizontal Scaling** (1000+ providers): Worker queues with auto-scaling
+2. **Enterprise Batch** (50-1000 providers): Controlled batch processing  
+3. **Public API** (<50 providers): Ultra-resilient direct fetching
 
 ## 🔧 Technical Stack
 
@@ -128,6 +130,18 @@ cd aistatusdashboard
 
 # Install dependencies
 npm install
+
+# Set up environment variables
+cp .env.example .env.local
+
+# Configure Redis (optional - falls back to in-memory)
+export REDIS_URL="redis://localhost:6379"
+
+# Configure scaling
+export USE_HORIZONTAL_SCALING=true
+export MIN_WORKERS=2
+export MAX_WORKERS=20
+export SCALING_THRESHOLD=100
 
 # Start development server
 npm run dev

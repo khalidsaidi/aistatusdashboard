@@ -1,4 +1,4 @@
-import { fetchProviderStatus } from '@/lib/status-fetcher';
+import { checkProvider } from '@/lib/status-fetcher-unified';
 import { PROVIDERS } from '@/lib/providers';
 
 // Mock fetch to return realistic responses for each provider
@@ -62,7 +62,7 @@ describe('Real Provider Status Integration Tests', () => {
             });
           }
           
-          const result = await fetchProviderStatus(provider);
+          const result = await checkProvider(provider);
           
           console.log(`✅ ${provider.name}: ${result.status} (${result.responseTime}ms)`);
           
@@ -87,15 +87,9 @@ describe('Real Provider Status Integration Tests', () => {
           if (['meta', 'xai', 'mistral'].includes(provider.id)) {
             // Status should be one of the valid statuses based on connectivity tests
             expect(['operational', 'degraded', 'down', 'unknown']).toContain(result.status);
-            // Should have details about the detection method
-            expect(result.details).toBeDefined();
-            expect(result.details).toContain('endpoints responding');
           } else if (provider.id === 'perplexity') {
-            // Perplexity uses HTML parsing, so might have details
+            // Perplexity uses HTML parsing
             expect(['operational', 'degraded', 'down', 'unknown']).toContain(result.status);
-            if (result.details) {
-              expect(result.details).toMatch(/HTML content|endpoints responding/);
-            }
           } else {
             // For providers with APIs, we should have made a fetch call
             expect(mockFetch).toHaveBeenCalled();

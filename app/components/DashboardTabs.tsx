@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StatusResult } from '@/lib/types';
-import { NotificationSubscription } from '@/components/NotificationSubscription';
+import NotificationPanel from './NotificationPanel';
 import APIDemo from './APIDemo';
 import CommentSection from './CommentSection';
 import ClientTimestamp from './ClientTimestamp';
+import AnalyticsDashboard from './AnalyticsDashboard';
 import React from 'react';
 import Image from 'next/image';
 
@@ -28,7 +29,7 @@ class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    console.error('Dashboard Error:', error, errorInfo);
+    // Dashboard error handled by error boundary
   }
 
   render() {
@@ -57,7 +58,18 @@ class ErrorBoundary extends React.Component<
 
 export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
   // Initialize ALL hooks first - React requires hooks to be called in the same order
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'notifications' | 'api' | 'comments'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'notifications' | 'api' | 'comments' | 'analytics'>('dashboard');
+  
+  // Handle URL parameters for tab switching
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabParam = urlParams.get('tab');
+      if (tabParam && ['dashboard', 'notifications', 'api', 'comments', 'analytics'].includes(tabParam)) {
+        setActiveTab(tabParam as 'dashboard' | 'notifications' | 'api' | 'comments' | 'analytics');
+      }
+    }
+  }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'operational' | 'degraded' | 'down' | 'unknown'>('all');
   const [sortBy, setSortBy] = useState<'name' | 'status' | 'responseTime' | 'lastChecked'>('name');
@@ -72,16 +84,18 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
       // Focus search on '/' key (both regular slash and numpad slash)
       if ((e.key === '/' || e.code === 'NumpadDivide') && !e.ctrlKey && !e.metaKey && !e.altKey) {
         e.preventDefault();
-        // Check if search input exists and is visible, regardless of activeTab
-        if (searchInputRef.current && searchInputRef.current.offsetParent !== null) {
+        // Only focus if we're on dashboard tab and search input exists
+        if (activeTab === 'dashboard' && searchInputRef.current) {
           searchInputRef.current.focus();
         }
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown, true);
-    return () => document.removeEventListener('keydown', handleKeyDown, true);
-  }, []);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('keydown', handleKeyDown, true);
+      return () => document.removeEventListener('keydown', handleKeyDown, true);
+    }
+  }, [activeTab]);
 
   // Calculate stats safely
   const safeStatuses = statuses.filter(s => s && typeof s === 'object' && s.status);
@@ -215,6 +229,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
 
   const tabs = [
     { id: 'dashboard', label: '📊 Status Dashboard', count: filteredAndSortedStatuses.length },
+    { id: 'analytics', label: '📈 Analytics & Costs', count: null },
     { id: 'notifications', label: '🔔 Notifications', count: null },
     { id: 'api', label: '🚀 API & Badges', count: null },
     { id: 'comments', label: '💬 Comments', count: null }
@@ -272,6 +287,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
                 className="w-6 h-6"
                 width={24}
                 height={24}
+                unoptimized
                 onError={(e) => {
                   // Fallback to PNG if SVG fails
                   const target = e.target as HTMLImageElement;
@@ -693,7 +709,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
                 <p className="text-gray-500 dark:text-gray-400">Unable to load notifications</p>
               </div>
             }>
-              <NotificationSubscription />
+              <NotificationPanel />
             </ErrorBoundary>
           )}
 
@@ -704,6 +720,16 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
               </div>
             }>
               <APIDemo />
+            </ErrorBoundary>
+          )}
+
+          {activeTab === 'analytics' && (
+            <ErrorBoundary fallback={
+              <div className="text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400">Unable to load analytics dashboard</p>
+              </div>
+            }>
+              <AnalyticsDashboard />
             </ErrorBoundary>
           )}
 

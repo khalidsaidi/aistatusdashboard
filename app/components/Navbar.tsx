@@ -42,13 +42,13 @@ export default function Navbar() {
             >
               Dashboard
             </Link>
-            <a 
-              href="/api/status" 
+            <Link 
+              href="/?tab=api" 
               className="hover:opacity-80 transition-opacity py-2 px-3 min-h-[44px] min-w-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
               aria-label="API Documentation"
             >
               API
-            </a>
+            </Link>
             <a 
               href="/rss.xml" 
               className="hover:opacity-80 transition-opacity py-2 px-3 min-h-[44px] min-w-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
@@ -103,13 +103,13 @@ export default function Navbar() {
               >
                 📊 Dashboard
               </Link>
-              <a 
-                href="/api/status" 
+              <Link 
+                href="/?tab=api" 
                 className="block py-3 px-4 rounded-md hover:bg-slate-600 dark:hover:bg-gray-700 transition-colors text-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-400"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 🚀 API
-              </a>
+              </Link>
               <a 
                 href="/rss.xml" 
                 className="block py-3 px-4 rounded-md hover:bg-slate-600 dark:hover:bg-gray-700 transition-colors text-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-400"
