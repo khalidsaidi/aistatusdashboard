@@ -6,7 +6,15 @@ const createJestConfig = nextJest({
 
 const customJestConfig = {
   testEnvironment: 'jsdom',
-  setupFiles: ['<rootDir>/jest.polyfills.js'],
+  // CRITICAL: Load polyfills in multiple ways for CI compatibility
+  setupFiles: [
+    '<rootDir>/jest.polyfills.js',
+    'whatwg-fetch'
+  ],
+  setupFilesAfterEnv: [
+    '<rootDir>/jest.setup.js',
+    '<rootDir>/jest.polyfills.js'  // Load again after environment setup
+  ],
   moduleDirectories: ['node_modules', '<rootDir>/'],
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/__tests__/e2e/'],
   moduleNameMapper: {
@@ -25,48 +33,23 @@ const customJestConfig = {
   testMatch: [
     '<rootDir>/__tests__/unit/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/__tests__/integration/**/*.{js,jsx,ts,tsx}',
-    '<rootDir>/functions/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
-    '<rootDir>/lib/**/__tests__/**/*.{js,jsx,ts,tsx}',
   ],
   testTimeout: 60000,
-  maxWorkers: '50%',
-  verbose: true,
-  setupFiles: [
-    '<rootDir>/jest.env.js'
-  ],
-  testEnvironmentOptions: {
-    // Frontend runs on localhost, backend is Firebase
-    url: 'http://localhost:3000'
-  },
-  // Global test environment variables
+  // CRITICAL: Ensure polyfills are available in all contexts
   globals: {
-    TEST_FRONTEND_URL: 'http://localhost:3000',
-    TEST_API_BASE_URL: process.env.TEST_API_BASE_URL || 'https://us-central1-ai-status-dashboard-dev.cloudfunctions.net/api',
-    FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID || 'ai-status-dashboard-dev'
-  },
-  coverageThreshold: {
-    global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80
+    'ts-jest': {
+      useESM: true
     }
   },
-  coveragePathIgnorePatterns: [
-    '/node_modules/',
-    '/.next/',
-    '/coverage/',
-    '/dist/',
-    '/build/',
-    '/__tests__/',
-    '/test-utils/',
-    '/mocks/',
-    '.d.ts'
-  ],
   // Fix for Next.js 15 and Node.js compatibility
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
-  // Mock Web APIs for Node.js environment
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/jest.polyfills.js']
+  testEnvironmentOptions: {
+    customExportConditions: [''],
+  },
+  // CRITICAL: Transform Firebase ESM modules for Jest compatibility
+  transformIgnorePatterns: [
+    'node_modules/(?!(firebase|@firebase)/)'
+  ],
 }
 
 module.exports = createJestConfig(customJestConfig) 

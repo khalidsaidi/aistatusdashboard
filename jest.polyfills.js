@@ -9,6 +9,25 @@ if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
   console.log('🔧 Loading Jest polyfills for CI/CD environment...');
 }
 
+// CRITICAL: Polyfill Request/Response BEFORE any other modules load
+(function() {
+  'use strict';
+  
+  // Aggressive polyfill setup for CI environments
+  if (typeof globalThis === 'undefined') {
+    // Fallback for older Node.js versions
+    (function() {
+      if (typeof global !== 'undefined') {
+        global.globalThis = global;
+      } else if (typeof window !== 'undefined') {
+        window.globalThis = window;
+      } else if (typeof self !== 'undefined') {
+        self.globalThis = self;
+      }
+    })();
+  }
+})();
+
 // CRITICAL FIX: Comprehensive Request polyfill for CI environment
 const RequestPolyfill = class Request {
   constructor(input, init = {}) {
