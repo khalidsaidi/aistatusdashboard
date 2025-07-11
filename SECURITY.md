@@ -1,76 +1,91 @@
-# Security Policy
+# 🔒 Security Guidelines
 
-## Supported Versions
+## Secret Management
 
-We release patches for security vulnerabilities for the following versions:
+### ❌ Never Commit These Files
+- `*.env` (except `.env.example`)
+- `service-account*.json`
+- `*firebase-adminsdk*.json`
+- `*.key`, `*.pem`, `*.crt`
+- `*.token`, `*.api-key`
+- Files in `secrets/` or `credentials/` directories
 
-| Version | Supported          |
-| ------- | ------------------ |
-| Latest  | :white_check_mark: |
+### ✅ Safe to Commit
+- `.env.example` files with placeholder values
+- Configuration templates with `your-value-here` placeholders
+- Public Firebase configuration (project IDs, etc.)
 
-## Reporting a Vulnerability
+### 🛡️ Environment File Setup
 
-We take the security of AI Status Dashboard seriously. If you believe you have found a security vulnerability, please report it to us as described below.
+1. **Copy example files:**
+   ```bash
+   cp .env.example .env.local
+   cp environments/production.env.example environments/production.env
+   ```
 
-### Please do NOT:
-- Create a public GitHub issue for security vulnerabilities
-- Disclose the vulnerability publicly until we've had a chance to address it
+2. **Replace placeholder values:**
+   ```bash
+   # Replace 'your-api-key-here' with actual values
+   FIREBASE_API_KEY=your-actual-api-key
+   ```
 
-### Please DO:
-1. **Email us** at [legal@aistatusdashboard.com](mailto:legal@aistatusdashboard.com)
-2. **Use the subject line**: "Security Vulnerability Report"
-3. **Include the following information**:
-   - Type of issue (e.g., buffer overflow, SQL injection, cross-site scripting, etc.)
-   - Full paths of source file(s) related to the manifestation of the issue
-   - The location of the affected source code (tag/branch/commit or direct URL)
-   - Any special configuration required to reproduce the issue
-   - Step-by-step instructions to reproduce the issue
-   - Proof-of-concept or exploit code (if possible)
-   - Impact of the issue, including how an attacker might exploit the issue
+3. **Verify .gitignore coverage:**
+   ```bash
+   git status  # Should not show your .env files
+   ```
 
-### What to expect:
-- **Acknowledgment**: We will acknowledge receipt of your vulnerability report within 24 hours
-- **Initial Assessment**: We will provide an initial assessment within 72 hours
-- **Updates**: We will keep you informed of our progress throughout the process
-- **Resolution**: We aim to resolve critical vulnerabilities within 90 days
-- **Credit**: We will credit you in our security advisory (unless you prefer to remain anonymous)
+### 🚨 If You Accidentally Commit Secrets
 
-## Security Measures
+1. **Immediately rotate the exposed credentials**
+2. **Remove from git history:**
+   ```bash
+   git filter-branch --force --index-filter \
+   "git rm --cached --ignore-unmatch path/to/secret-file" \
+   --prune-empty --tag-name-filter cat -- --all
+   ```
+3. **Force push (⚠️ dangerous):**
+   ```bash
+   git push origin --force --all
+   ```
 
-### Current Security Practices
-- **No secrets in code**: All sensitive data handled via environment variables
-- **Input validation**: User inputs are sanitized and validated
-- **Rate limiting**: API endpoints protected against abuse
-- **HTTPS enforcement**: All production traffic encrypted
-- **Dependency scanning**: Automated vulnerability scanning via Dependabot
-- **Code review**: All changes reviewed before merging
+### 🔍 GitHub Security Scanning
 
-### Scope
-This security policy applies to:
-- The main AI Status Dashboard application
-- All API endpoints and backend services
-- Build and deployment processes
-- Third-party integrations and dependencies
+Our repository uses:
+- **GitHub Secret Scanning** - Automatically detects exposed secrets
+- **TruffleHog** - Scans for secrets in CI/CD
+- **CodeQL** - Static analysis for security vulnerabilities
 
-### Out of Scope
-- Issues in third-party services we monitor (report to those providers directly)
-- Social engineering attacks
-- Physical security issues
-- Issues requiring physical access to our infrastructure
+### 📧 Security Alerts
 
-## Security Updates
+When GitHub detects secrets:
+1. **Email alerts** are sent immediately
+2. **CI/CD pipeline fails** and blocks deployment
+3. **Security tab** shows detailed findings
+4. **Fix immediately** by rotating credentials and removing from git
 
-Security updates will be:
-- Released as soon as possible after verification
-- Announced in our GitHub releases
-- Documented in our changelog
-- Communicated to users via appropriate channels
+### 🛠️ Local Development
 
-## Questions
+Use environment variables or local files:
+```bash
+# Local development
+export FIREBASE_API_KEY="your-dev-key"
+npm run dev
 
-If you have questions about this security policy, please contact us at [legal@aistatusdashboard.com](mailto:legal@aistatusdashboard.com).
+# Or use .env.local file
+echo "FIREBASE_API_KEY=your-dev-key" >> .env.local
+```
 
----
+### 🏭 Production Deployment
 
-**Last Updated:** January 2025  
-**Repository:** https://github.com/khalidsaidi/aistatusdashboard 
+All production secrets are managed via:
+- **GitHub Secrets** for CI/CD
+- **Firebase Environment Config** for Cloud Functions
+- **Vercel/Hosting Environment Variables** for frontend
+
+Never hardcode production credentials in source code.
+
+## Reporting Security Issues
+
+Email security issues to: `security@aistatusdashboard.com`
+
+Do not create public GitHub issues for security vulnerabilities. 
