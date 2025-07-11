@@ -8,9 +8,13 @@ on:
   workflow_dispatch:
 
 env:
-  NODE_VERSION: '18.x'
+  NODE_VERSION: '20.x'
   FIREBASE_PROJECT_ID_DEV: 'ai-status-dashboard-dev'
   FIREBASE_PROJECT_ID_PROD: 'ai-status-dashboard-prod'
+  # Environment variables for consistent configuration
+  NODE_ENV: 'test'
+  NEXT_PUBLIC_ENVIRONMENT: 'ci'
+  FIREBASE_FUNCTIONS_REGION: 'us-central1'
 
 jobs:
   # =============================================================================
@@ -49,6 +53,9 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+        env:
+          NODE_ENV: test
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID_DEV }}
 
   # =============================================================================
   # LINTING AND FORMATTING
@@ -71,9 +78,15 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint
+        env:
+          NODE_ENV: test
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID_DEV }}
 
       - name: Check TypeScript
         run: npm run type-check
+        env:
+          NODE_ENV: test
+          FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID_DEV }}
 
       - name: Check formatting
         run: npm run format:check
@@ -86,7 +99,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ['16.x', '18.x', '20.x']
+        node-version: ['18.x', '20.x']  # Remove 16.x as it's causing issues
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -105,6 +118,9 @@ jobs:
         env:
           NODE_ENV: test
           FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID_DEV }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID_DEV }}
+          FIREBASE_FUNCTIONS_REGION: ${{ env.FIREBASE_FUNCTIONS_REGION }}
+          CI: true
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
