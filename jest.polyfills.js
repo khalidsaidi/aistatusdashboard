@@ -1,7 +1,13 @@
 /**
  * Jest Polyfills for Next.js 15 and Node.js Compatibility
  * Provides Web API mocks for testing environment
+ * CRITICAL: This must be loaded BEFORE any Next.js modules
  */
+
+// CRITICAL FIX: Ensure polyfills are loaded immediately
+if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+  console.log('🔧 Loading Jest polyfills for CI/CD environment...');
+}
 
 // CRITICAL FIX: Comprehensive Request polyfill for CI environment
 const RequestPolyfill = class Request {
@@ -196,4 +202,29 @@ if (typeof global.crypto === 'undefined') {
       return arr;
     }
   };
+}
+
+// CRITICAL FIX: Force polyfills into all possible global contexts
+const forcePolyfills = () => {
+  const contexts = [global, globalThis];
+  if (typeof window !== 'undefined') contexts.push(window);
+  if (typeof self !== 'undefined') contexts.push(self);
+
+  contexts.forEach(ctx => {
+    if (ctx && typeof ctx.Request === 'undefined') {
+      ctx.Request = RequestPolyfill;
+    }
+    if (ctx && typeof ctx.Response === 'undefined') {
+      ctx.Response = ResponsePolyfill;
+    }
+  });
+};
+
+// Apply immediately and on module load
+forcePolyfills();
+
+// Apply again after a short delay for CI environments
+if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
+  setTimeout(forcePolyfills, 0);
+  console.log('✅ Jest polyfills loaded for CI/CD environment');
 } 
