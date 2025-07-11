@@ -353,7 +353,7 @@ export function sanitizeForQuery(input: string): string {
  * - Used for runtime validation of API responses
  */
 export const ProviderStatusSchema = z.enum(['operational', 'degraded', 'down', 'unknown'], {
-  errorMap: () => ({ message: 'Status must be one of: operational, degraded, down, unknown' })
+  message: 'Status must be one of: operational, degraded, down, unknown'
 });
 
 /**
@@ -408,7 +408,7 @@ export const ProviderCategorySchema = z.enum([
   'Hardware_AI', 
   'Search_AI'
 ], {
-  errorMap: () => ({ message: 'Category must be one of: LLM, ML_Platform, Cloud_AI, Hardware_AI, Search_AI' })
+  message: 'Category must be one of: LLM, ML_Platform, Cloud_AI, Hardware_AI, Search_AI'
 });
 
 /**
@@ -425,7 +425,7 @@ export const StatusApiFormatSchema = z.enum([
   'html_parsing',
   'rss_feed'
 ], {
-  errorMap: () => ({ message: 'Format must be one of the supported API formats' })
+  message: 'Format must be one of the supported API formats'
 });
 
 /**
@@ -748,7 +748,7 @@ export const UnifiedProviderSchema = z.object({
   id: z.string().min(1, 'Provider ID must be non-empty string'),
   name: z.string().min(1, 'Provider name must be non-empty string'),
   category: z.enum(['LLM', 'ML_Platform', 'Cloud_AI', 'Hardware_AI', 'Search_AI'], {
-    errorMap: () => ({ message: 'Category must be one of: LLM, ML_Platform, Cloud_AI, Hardware_AI, Search_AI' })
+    message: 'Category must be one of: LLM, ML_Platform, Cloud_AI, Hardware_AI, Search_AI'
   }),
   statusUrl: z.string().url('Status URL must be valid URL'),
   statusPageUrl: z.string().url('Status page URL must be valid URL'),

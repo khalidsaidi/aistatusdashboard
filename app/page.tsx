@@ -81,7 +81,7 @@ function getFallbackStatuses(): any[] {
 // Main dashboard page component
 export default async function DashboardPage() {
   // PERFORMANCE: Skip heavy operations for HEAD requests
-  const headersList = headers();
+  const headersList = await headers();
   const isHeadRequest = headersList.get('x-request-method') === 'HEAD';
   
   if (isHeadRequest) {

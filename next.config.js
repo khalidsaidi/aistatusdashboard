@@ -18,8 +18,8 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
     optimizeServerReact: true,
-    serverComponentsExternalPackages: ['firebase-admin']
   },
+  serverExternalPackages: ['firebase-admin'],
   
   // Webpack configuration for better error handling
   webpack: (config, { dev, isServer }) => {
