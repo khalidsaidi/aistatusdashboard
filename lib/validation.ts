@@ -752,9 +752,7 @@ export const UnifiedProviderSchema = z.object({
   }),
   statusUrl: z.string().url('Status URL must be valid URL'),
   statusPageUrl: z.string().url('Status page URL must be valid URL'),
-  format: z.enum(['statuspage_v2', 'statuspage_v2_or_html', 'google_cloud', 'connectivity_check', 'html_parsing', 'rss_feed'], {
-    errorMap: () => ({ message: 'Format must be a valid API format type' })
-  }),
+  format: z.enum(['statuspage_v2', 'statuspage_v2_or_html', 'google_cloud', 'connectivity_check', 'html_parsing', 'rss_feed']),
   timeout: z.number().int().min(1, 'Timeout must be positive integer'),
   fallbackUrls: z.array(z.string().url('Fallback URL must be valid URL')).optional(),
   enabled: z.boolean(),
@@ -790,7 +788,7 @@ export const BatchRequestItemSchema = z.object({
 export const StandardErrorSchema = z.object({
   code: z.string().min(1, 'Error code must be non-empty string'),
   message: z.string().min(1, 'Error message must be descriptive'),
-  details: z.record(z.unknown()).optional(),
+  details: z.record(z.string(), z.unknown()).optional(),
   timestamp: z.string().datetime('Timestamp must be valid ISO 8601 datetime'),
   requestId: z.string().optional()
 });

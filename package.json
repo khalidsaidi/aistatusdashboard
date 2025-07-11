@@ -27,6 +27,7 @@
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
     "bottleneck": "^2.19.5",
+    "critters": "^0.0.25",
     "exponential-backoff": "^3.1.2",
     "firebase": "^10.1.0",
     "firebase-admin": "^13.4.0",
