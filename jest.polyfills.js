@@ -15,6 +15,11 @@ if (typeof global.Request === 'undefined') {
   };
 }
 
+// Ensure Request is available globally
+if (typeof globalThis.Request === 'undefined') {
+  globalThis.Request = global.Request;
+}
+
 if (typeof global.Response === 'undefined') {
   global.Response = class Response {
     constructor(body, init = {}) {
@@ -33,6 +38,11 @@ if (typeof global.Response === 'undefined') {
       return this.body;
     }
   };
+}
+
+// Ensure Response is available globally
+if (typeof globalThis.Response === 'undefined') {
+  globalThis.Response = global.Response;
 }
 
 // Mock Headers if not available
