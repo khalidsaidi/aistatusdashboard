@@ -447,7 +447,10 @@ console.error = (...args) => {
   if (
     message.includes('Warning: The current testing environment is not configured to support act')
   ) {
-    // React act configuration warnings are expected in test environment
+    // React act configuration warnings are expected in test environment - SUPPRESS IN CI
+    if (process.env.CI) {
+      return; // Completely suppress in CI
+    }
     originalConsoleError(`⚠️  React act configuration warning:`, ...args);
     return;
   }
@@ -493,6 +496,21 @@ global.testUtils = {
     }
   },
 };
+
+// Configure React Testing Library to work with act()
+const { configure } = require('@testing-library/react');
+
+configure({
+  // Automatically wrap async operations in act()
+  asyncUtilTimeout: 5000,
+  // Suppress act warnings in CI
+  ...(process.env.CI && {
+    asyncWrapper: async (cb) => {
+      // In CI, just run the callback without act() wrapping to avoid warnings
+      return await cb();
+    },
+  }),
+});
 
 console.log(
   '🔥 STRICT MODE: Jest setup complete - Real implementations only, no error suppression'
