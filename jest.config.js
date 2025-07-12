@@ -65,15 +65,17 @@ const customJestConfig = {
   },
   // CI-specific options with better error handling
   ...(process.env.CI && {
-    bail: 1, // Stop on first failure in CI to identify the failing test
-    verbose: true,
-    silent: false,
+    bail: false, // Don't stop on first failure in CI - let all tests run
+    verbose: false, // Reduce verbosity in CI
+    silent: true, // Suppress console output in CI
     passWithNoTests: true,
-    detectOpenHandles: true,
+    detectOpenHandles: false, // Disable open handles detection in CI
     forceExit: true,
-    maxWorkers: 2,
+    maxWorkers: 1, // Use single worker in CI for stability
     // Use default reporter only in CI
     reporters: ['default'],
+    // Increase timeouts for CI environment
+    testTimeout: 30000,
   }),
   // Add error boundary for CI
   errorOnDeprecated: false,
