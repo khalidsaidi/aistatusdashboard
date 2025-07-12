@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('API Status error:', error);
-    
+
     // In CI, return a fallback response instead of failing
     if (process.env.CI === 'true' || process.env.NODE_ENV === 'test') {
       return NextResponse.json(
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
           timestamp: new Date().toISOString(),
           source: 'ci-fallback',
         },
-        { 
+        {
           status: 200,
           headers: {
             'Access-Control-Allow-Origin': '*',
@@ -121,7 +121,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      console.error(`Firebase Functions POST response error: ${response.status} ${response.statusText}`);
+      console.error(
+        `Firebase Functions POST response error: ${response.status} ${response.statusText}`
+      );
       throw new Error(`Firebase Functions returned ${response.status}`);
     }
 
@@ -137,7 +139,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('API Status POST error:', error);
-    
+
     // In CI, return a fallback response instead of failing
     if (process.env.CI === 'true' || process.env.NODE_ENV === 'test') {
       return NextResponse.json(
@@ -147,7 +149,7 @@ export async function POST(request: NextRequest) {
           timestamp: new Date().toISOString(),
           source: 'ci-fallback',
         },
-        { 
+        {
           status: 200,
           headers: {
             'Access-Control-Allow-Origin': '*',
