@@ -2,6 +2,11 @@
  * @jest-environment node
  */
 
+/**
+ * Status Monitor Tests - Updated for CI formatting fix
+ * Triggering new CI run to debug formatting issues
+ */
+
 // Real status monitor tests
 describe('Status Monitor - Real Implementation', () => {
   describe('Function Module Loading', () => {
@@ -157,10 +162,10 @@ describe('Status Monitor - Real Implementation', () => {
   describe('Error Handling and Resilience', () => {
     it('should handle network errors during status checks', async () => {
       // Test network error simulation without actual network calls
-      const simulateNetworkError = async (): Promise<Response> => {
+      const simulateNetworkError = async () => {
         throw new Error('Network error: ENOTFOUND invalid-url-that-does-not-exist.com');
       };
-      
+
       try {
         await simulateNetworkError();
         // Should not reach this point

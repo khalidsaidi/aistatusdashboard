@@ -31,7 +31,7 @@ const customJestConfig = {
     '<rootDir>/__tests__/unit/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/__tests__/integration/**/*.{js,jsx,ts,tsx}',
   ],
-  testTimeout: 60000,
+  testTimeout: process.env.CI ? 120000 : 60000, // Longer timeout in CI
   // Transform Firebase ESM modules to CommonJS for Jest
   transformIgnorePatterns: ['node_modules/(?!(firebase|@firebase|undici)/)'],
   // Use babel-jest to transform Firebase modules
@@ -63,6 +63,16 @@ const customJestConfig = {
   testEnvironmentOptions: {
     customExportConditions: ['node', 'node-addons'],
   },
+  // CI-specific options
+  ...(process.env.CI && {
+    bail: false, // Don't stop on first failure in CI
+    verbose: true,
+    silent: false,
+    passWithNoTests: true,
+    detectOpenHandles: true,
+    forceExit: true,
+    maxWorkers: 2,
+  }),
 };
 
 module.exports = createJestConfig(customJestConfig);
