@@ -401,14 +401,20 @@ console.warn = (...args) => {
 
   // Skip failing tests for expected dev server connection issues in CI
   const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
-  const isExpectedDevServerError = 
+  const isExpectedDevServerError =
     message.includes('no dev server running') ||
     message.includes('ERR_CONNECTION_REFUSED') ||
     message.includes('localhost:3000') ||
     message.includes('127.0.0.1:3000');
 
   // FAIL TEST ON WARNINGS ONLY IN NON-CI ENVIRONMENTS OR FOR UNEXPECTED WARNINGS
-  if (!isCI && !isExpectedDevServerError && expect && expect.getState && expect.getState().currentTestName) {
+  if (
+    !isCI &&
+    !isExpectedDevServerError &&
+    expect &&
+    expect.getState &&
+    expect.getState().currentTestName
+  ) {
     throw new Error(`TEST FAILED: Console warning detected: ${message}`);
   }
 
@@ -420,9 +426,9 @@ console.error = (...args) => {
 
   // Skip tracking expected errors when dev server is not running
   const isCI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
-  const isExpectedDevServerError = 
-    message.includes('ECONNREFUSED') && message.includes('127.0.0.1:3000') ||
-    message.includes('ECONNREFUSED') && message.includes('localhost:3000') ||
+  const isExpectedDevServerError =
+    (message.includes('ECONNREFUSED') && message.includes('127.0.0.1:3000')) ||
+    (message.includes('ECONNREFUSED') && message.includes('localhost:3000')) ||
     message.includes('no dev server running');
 
   if (isExpectedDevServerError) {
@@ -438,7 +444,9 @@ console.error = (...args) => {
     return;
   }
 
-  if (message.includes('Warning: The current testing environment is not configured to support act')) {
+  if (
+    message.includes('Warning: The current testing environment is not configured to support act')
+  ) {
     // React act configuration warnings are expected in test environment
     originalConsoleError(`⚠️  React act configuration warning:`, ...args);
     return;

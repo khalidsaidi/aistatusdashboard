@@ -16,14 +16,14 @@ const TIMEOUT = 10000; // 10 seconds
 function makeRequest(url, options = {}) {
   return new Promise((resolve, reject) => {
     const client = url.startsWith('https:') ? https : http;
-    
+
     const request = client.get(url, (res) => {
       let data = '';
-      
+
       res.on('data', (chunk) => {
         data += chunk;
       });
-      
+
       res.on('end', () => {
         resolve({
           statusCode: res.statusCode,
@@ -32,12 +32,12 @@ function makeRequest(url, options = {}) {
         });
       });
     });
-    
+
     request.setTimeout(TIMEOUT, () => {
       request.destroy();
       reject(new Error(`Request timeout after ${TIMEOUT}ms`));
     });
-    
+
     request.on('error', (error) => {
       reject(error);
     });
@@ -50,23 +50,22 @@ function makeRequest(url, options = {}) {
 async function testEndpoint(name, url, expectedStatus = 200, validator = null) {
   console.log(`🧪 Testing: ${name}`);
   console.log(`   URL: ${url}`);
-  
+
   try {
     const response = await makeRequest(url);
-    
+
     // Check status code
     if (response.statusCode !== expectedStatus) {
       throw new Error(`Expected status ${expectedStatus}, got ${response.statusCode}`);
     }
-    
+
     // Run custom validator if provided
     if (validator) {
       validator(response);
     }
-    
+
     console.log(`   ✅ PASS - Status: ${response.statusCode}`);
     return { name, url, success: true, statusCode: response.statusCode };
-    
   } catch (error) {
     console.log(`   ❌ FAIL - ${error.message}`);
     return { name, url, success: false, error: error.message };
@@ -108,14 +107,14 @@ function validateHTML(response) {
 async function main() {
   console.log('💨 Starting Smoke Tests...');
   console.log('===========================');
-  
+
   const baseUrl = process.env.TEST_URL || 'http://localhost:3000';
   const apiUrl = process.env.TEST_API_BASE_URL || `${baseUrl}/api`;
-  
+
   console.log(`📍 Base URL: ${baseUrl}`);
   console.log(`📍 API URL: ${apiUrl}`);
   console.log('');
-  
+
   const tests = [
     // Frontend tests
     {
@@ -129,7 +128,7 @@ async function main() {
       url: `${baseUrl}/favicon.ico`,
       expectedStatus: 200,
     },
-    
+
     // API tests
     {
       name: 'API Health Check',
@@ -155,7 +154,7 @@ async function main() {
         console.log(`   📊 Status data structure valid`);
       },
     },
-    
+
     // Static assets
     {
       name: 'Next.js Build Manifest',
@@ -163,41 +162,36 @@ async function main() {
       expectedStatus: 200,
     },
   ];
-  
+
   const results = [];
   let passedTests = 0;
-  
+
   for (const test of tests) {
-    const result = await testEndpoint(
-      test.name,
-      test.url,
-      test.expectedStatus,
-      test.validator
-    );
-    
+    const result = await testEndpoint(test.name, test.url, test.expectedStatus, test.validator);
+
     results.push(result);
     if (result.success) {
       passedTests++;
     }
-    
+
     console.log(''); // Add spacing between tests
   }
-  
+
   // Summary
   console.log('📊 Smoke Test Summary:');
   console.log('======================');
-  
-  results.forEach(result => {
+
+  results.forEach((result) => {
     const status = result.success ? '✅ PASS' : '❌ FAIL';
     console.log(`${status} ${result.name}`);
     if (result.error) {
       console.log(`     Error: ${result.error}`);
     }
   });
-  
+
   const successRate = (passedTests / tests.length) * 100;
   console.log(`\n📈 Success Rate: ${passedTests}/${tests.length} (${successRate.toFixed(1)}%)`);
-  
+
   if (passedTests === tests.length) {
     console.log('\n🎉 All smoke tests passed!');
     console.log('🚀 Application is ready for production!');
@@ -228,4 +222,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { testEndpoint, validateJSON, validateHTML, makeRequest }; 
+module.exports = { testEndpoint, validateJSON, validateHTML, makeRequest };

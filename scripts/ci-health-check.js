@@ -18,14 +18,14 @@ const RETRY_DELAY = 2000; // 2 seconds
 function makeRequest(url, timeout = HEALTH_CHECK_TIMEOUT) {
   return new Promise((resolve, reject) => {
     const client = url.startsWith('https:') ? https : http;
-    
+
     const request = client.get(url, (res) => {
       let data = '';
-      
+
       res.on('data', (chunk) => {
         data += chunk;
       });
-      
+
       res.on('end', () => {
         resolve({
           statusCode: res.statusCode,
@@ -34,12 +34,12 @@ function makeRequest(url, timeout = HEALTH_CHECK_TIMEOUT) {
         });
       });
     });
-    
+
     request.setTimeout(timeout, () => {
       request.destroy();
       reject(new Error(`Request timeout after ${timeout}ms`));
     });
-    
+
     request.on('error', (error) => {
       reject(error);
     });
@@ -51,13 +51,13 @@ function makeRequest(url, timeout = HEALTH_CHECK_TIMEOUT) {
  */
 async function checkHealth(url, retries = MAX_RETRIES) {
   console.log(`🔍 Checking health of: ${url}`);
-  
+
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       console.log(`  Attempt ${attempt}/${retries}...`);
-      
+
       const response = await makeRequest(url);
-      
+
       if (response.statusCode >= 200 && response.statusCode < 400) {
         console.log(`  ✅ Success! Status: ${response.statusCode}`);
         return {
@@ -73,14 +73,14 @@ async function checkHealth(url, retries = MAX_RETRIES) {
       }
     } catch (error) {
       console.log(`  ❌ Error: ${error.message}`);
-      
+
       if (attempt === retries) {
         throw error;
       }
-      
+
       if (attempt < retries) {
         console.log(`  ⏳ Retrying in ${RETRY_DELAY}ms...`);
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
       }
     }
   }
@@ -92,19 +92,19 @@ async function checkHealth(url, retries = MAX_RETRIES) {
 async function main() {
   console.log('🏥 Starting CI Health Check...');
   console.log('================================');
-  
+
   const baseUrl = process.env.TEST_FRONTEND_URL || 'http://localhost:3000';
   const apiUrl = process.env.TEST_API_BASE_URL || `${baseUrl}/api`;
-  
+
   const endpoints = [
     { name: 'Frontend Root', url: baseUrl },
     { name: 'API Health', url: `${apiUrl}/health` },
     { name: 'API Status', url: `${apiUrl}/status` },
   ];
-  
+
   let allPassed = true;
   const results = [];
-  
+
   for (const endpoint of endpoints) {
     try {
       console.log(`\n📍 Testing: ${endpoint.name}`);
@@ -113,26 +113,26 @@ async function main() {
       console.log(`✅ ${endpoint.name}: PASSED`);
     } catch (error) {
       console.log(`❌ ${endpoint.name}: FAILED - ${error.message}`);
-      results.push({ 
-        ...endpoint, 
-        success: false, 
-        error: error.message 
+      results.push({
+        ...endpoint,
+        success: false,
+        error: error.message,
       });
       allPassed = false;
     }
   }
-  
+
   console.log('\n📊 Health Check Summary:');
   console.log('========================');
-  
-  results.forEach(result => {
+
+  results.forEach((result) => {
     const status = result.success ? '✅ PASS' : '❌ FAIL';
     console.log(`${status} ${result.name}: ${result.url}`);
     if (result.error) {
       console.log(`     Error: ${result.error}`);
     }
   });
-  
+
   if (allPassed) {
     console.log('\n🎉 All health checks passed!');
     process.exit(0);
