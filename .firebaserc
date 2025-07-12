@@ -3,7 +3,7 @@
     "default": "ai-status-dashboard-dev",
     "development": "ai-status-dashboard-dev",
     "staging": "ai-status-dashboard-dev",
-    "production": "ai-status-dashboard-prod"
+    "production": "ai-status-dashboard"
   },
   "targets": {
     "ai-status-dashboard-dev": {
@@ -12,7 +12,7 @@
         "staging": ["ai-status-dashboard-dev"]
       }
     },
-    "ai-status-dashboard-prod": {
+    "ai-status-dashboard": {
       "hosting": {
         "production": ["ai-status-dashboard"]
       }
