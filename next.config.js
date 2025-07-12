@@ -29,6 +29,31 @@ const nextConfig = {
       config.devtool = 'eval-source-map';
     }
 
+    // Completely exclude Firebase Functions directory from Next.js build
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      // Prevent Next.js from trying to resolve Firebase Functions imports
+      'firebase-functions': false,
+      'firebase-functions/v2': false,
+      'firebase-functions/v2/https': false,
+    };
+
+    // Exclude Firebase Functions directory from all module resolution
+    config.module.rules.push({
+      test: /\.(ts|tsx|js|jsx)$/,
+      exclude: [
+        /node_modules/,
+        /functions/, // Exclude Firebase Functions directory
+        /functions\/src/, // Exclude Firebase Functions source
+      ],
+    });
+
+    // Ignore Firebase Functions packages during build
+    config.externals = config.externals || [];
+    if (isServer) {
+      config.externals.push('firebase-functions', 'firebase-functions/v2');
+    }
+
     // Handle potential build errors gracefully
     config.stats = {
       errorDetails: true,
