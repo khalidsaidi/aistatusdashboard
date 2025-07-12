@@ -6,9 +6,14 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+# Add debug environment variables at the top
 env:
   NODE_VERSION: '18'
   PLAYWRIGHT_BROWSERS_PATH: 0
+  # Enable comprehensive debugging
+  DEBUG: 'pw:*'
+  ACTIONS_STEP_DEBUG: true
+  ACTIONS_RUNNER_DEBUG: true
 
 jobs:
   # Fast feedback for PRs
@@ -18,6 +23,21 @@ jobs:
     timeout-minutes: 15
     
     steps:
+    - name: 🐛 Debug Environment
+      run: |
+        echo "=== ENVIRONMENT DEBUG ==="
+        echo "Runner OS: $RUNNER_OS"
+        echo "Runner Arch: $RUNNER_ARCH" 
+        echo "Node Version: $(node --version)"
+        echo "NPM Version: $(npm --version)"
+        echo "Available disk space:"
+        df -h
+        echo "Memory info:"
+        free -h
+        echo "CPU info:"
+        nproc
+        echo "========================="
+    
     - name: Checkout code
       uses: actions/checkout@v4
       
@@ -27,17 +47,116 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
         
+    - name: 🐛 Debug Dependencies Before Install
+      run: |
+        echo "=== PRE-INSTALL DEBUG ==="
+        echo "Package.json exists: $(test -f package.json && echo 'YES' || echo 'NO')"
+        echo "Package-lock.json exists: $(test -f package-lock.json && echo 'YES' || echo 'NO')"
+        if [ -f package.json ]; then
+          echo "Package.json size: $(wc -c < package.json) bytes"
+          echo "Dependencies count: $(cat package.json | grep -c '\".*\":')"
+        fi
+        echo "=========================="
+        
     - name: Install dependencies
-      run: npm ci
+      run: |
+        echo "🔧 Installing dependencies with verbose logging..."
+        npm ci --verbose
       
+    - name: 🐛 Debug Dependencies After Install  
+      run: |
+        echo "=== POST-INSTALL DEBUG ==="
+        echo "Node modules exists: $(test -d node_modules && echo 'YES' || echo 'NO')"
+        if [ -d node_modules ]; then
+          echo "Node modules size: $(du -sh node_modules)"
+          echo "Top-level packages: $(ls node_modules | wc -l)"
+        fi
+        echo "=========================="
+        
     - name: Run linting
-      run: npm run lint
+      run: |
+        echo "🔍 Running linting with debug info..."
+        npm run lint || {
+          echo "❌ Linting failed. Debug info:"
+          echo "ESLint config exists: $(test -f .eslintrc.js && echo 'YES' || echo 'NO')"
+          echo "ESLint installed: $(npm list eslint 2>/dev/null || echo 'NOT FOUND')"
+          exit 1
+        }
       
     - name: Run type checking
-      run: npm run type-check
+      run: |
+        echo "🔍 Running type checking with debug info..."
+        npm run type-check || {
+          echo "❌ Type checking failed. Debug info:"
+          echo "TypeScript config exists: $(test -f tsconfig.json && echo 'YES' || echo 'NO')"
+          echo "TypeScript installed: $(npm list typescript 2>/dev/null || echo 'NOT FOUND')"
+          exit 1
+        }
       
     - name: Run unit tests
-      run: npm run test:unit
+      run: |
+        echo "🧪 Running unit tests with debug info..."
+        npm run test:unit || {
+          echo "❌ Unit tests failed. Debug info:"
+          echo "Jest config exists: $(test -f jest.config.js && echo 'YES' || echo 'NO')"
+          echo "Jest installed: $(npm list jest 2>/dev/null || echo 'NOT FOUND')"
+          exit 1
+        }
+
+    - name: 🐛 Collect Debug Artifacts on Failure
+      if: failure()
+      run: |
+        echo "=== FAILURE DEBUG COLLECTION ==="
+        mkdir -p debug-artifacts
+        
+        # Collect system info
+        echo "System info:" > debug-artifacts/system-info.txt
+        uname -a >> debug-artifacts/system-info.txt
+        df -h >> debug-artifacts/system-info.txt
+        free -h >> debug-artifacts/system-info.txt
+        
+        # Collect npm debug info
+        echo "NPM debug info:" > debug-artifacts/npm-debug.txt
+        npm config list >> debug-artifacts/npm-debug.txt 2>&1 || true
+        npm list --depth=0 >> debug-artifacts/npm-debug.txt 2>&1 || true
+        
+        # Collect log files
+        find . -name "*.log" -type f -exec cp {} debug-artifacts/ \; 2>/dev/null || true
+        
+        echo "Debug artifacts collected in debug-artifacts/"
+        ls -la debug-artifacts/
+        
+    - name: 🔍 Interactive Debug Session (on failure)
+      if: failure() && contains(github.event.head_commit.message, '[debug]')
+      run: |
+        echo "=== INTERACTIVE DEBUG SESSION ==="
+        echo "This is a simulated debug session. In a real scenario, you would:"
+        echo "1. Use 'tmate' action for SSH access"
+        echo "2. Use 'debugger' action for interactive debugging"
+        echo "3. Add breakpoints with custom scripts"
+        
+        echo "Current environment state:"
+        pwd
+        ls -la
+        echo "Environment variables:"
+        env | grep -E "(NODE|NPM|CI|GITHUB)" | sort
+        
+        echo "To enable real SSH debugging, add '[debug]' to your commit message"
+        echo "and uncomment the tmate action below"
+        
+        # Uncomment for real SSH debugging:
+        # - name: Setup tmate session
+        #   if: failure() && contains(github.event.head_commit.message, '[debug]')
+        #   uses: mxschmitt/action-tmate@v3
+        #   timeout-minutes: 30
+        
+    - name: Upload Debug Artifacts
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: pr-debug-artifacts
+        path: debug-artifacts/
+        retention-days: 7
       
     - name: Build application
       run: npm run build
@@ -81,27 +200,119 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
+    - name: 🐛 Debug Environment (Develop Tests)
+      run: |
+        echo "=== DEVELOP-TESTS ENVIRONMENT DEBUG ==="
+        echo "Runner OS: $RUNNER_OS"
+        echo "Test Category: ${{ matrix.test-category }}"
+        echo "Available browsers before install:"
+        which google-chrome || echo "Chrome not found"
+        which firefox || echo "Firefox not found"
+        which msedge || echo "Edge not found"
+        echo "System packages:"
+        dpkg -l | grep -E "(webkit|gtk|flite)" | head -10 || echo "No relevant packages found"
+        echo "================================="
+
     - name: Install Playwright browsers and dependencies
       run: |
-        # Install Playwright browsers with system dependencies
-        npx playwright install --with-deps
+        echo "🎭 Installing Playwright browsers with comprehensive logging..."
         
+        # Install with detailed output
+        npx playwright install --with-deps --verbose || {
+          echo "❌ Playwright install failed. Debug info:"
+          echo "Playwright version: $(npm list @playwright/test 2>/dev/null || echo 'NOT FOUND')"
+          echo "Available space:"
+          df -h
+          echo "Network connectivity:"
+          ping -c 1 google.com || echo "No internet connectivity"
+          exit 1
+        }
+        
+        echo "🌐 Installing additional WebKit dependencies..."
         # Install additional WebKit dependencies that might be missing
-        sudo apt-get update || true
+        sudo apt-get update || {
+          echo "⚠️ apt-get update failed, continuing..."
+        }
+        
         sudo apt-get install -y \
           libgtk-4-1 \
           libevent-2.1-7 \
           libgstcodecparsers-1.0-0 \
           libflite1 \
-          || echo "Some optional packages failed to install, continuing..."
+          || echo "⚠️ Some optional packages failed to install, continuing..."
+          
+        echo "✅ Browser installation completed. Verification:"
+        npx playwright --version
+        echo "Installed browsers:"
+        ls ~/.cache/ms-playwright/ 2>/dev/null || echo "No playwright cache found"
+      
+    - name: 🐛 Debug Build Environment
+      run: |
+        echo "=== BUILD ENVIRONMENT DEBUG ==="
+        echo "Next.js version: $(npm list next 2>/dev/null || echo 'NOT FOUND')"
+        echo "React version: $(npm list react 2>/dev/null || echo 'NOT FOUND')"
+        echo "TypeScript version: $(npm list typescript 2>/dev/null || echo 'NOT FOUND')"
+        echo "Build script exists: $(grep -q '\"build\"' package.json && echo 'YES' || echo 'NO')"
+        echo "Environment variables:"
+        env | grep -E "(NODE|NPM|NEXT)" | head -10
+        echo "=============================="
       
     - name: Build application
-      run: npm run build
+      run: |
+        echo "🏗️ Building application with detailed logging..."
+        npm run build || {
+          echo "❌ Build failed. Debug info:"
+          echo "Next.js config exists: $(test -f next.config.js && echo 'YES' || echo 'NO')"
+          echo "TypeScript config exists: $(test -f tsconfig.json && echo 'YES' || echo 'NO')"
+          echo "Source files exist:"
+          find . -name "*.tsx" -o -name "*.ts" | head -5
+          echo "Build logs:"
+          cat .next/build.log 2>/dev/null || echo "No build log found"
+          exit 1
+        }
       
     - name: Run test category
       run: npm run test:e2e:${{ matrix.test-category }}
       env:
         CI: true
+        
+    - name: 🐛 Collect Debug Artifacts on Failure (Develop Tests)
+      if: failure()
+      run: |
+        echo "=== DEVELOP-TESTS FAILURE DEBUG ==="
+        mkdir -p debug-artifacts-develop
+        
+        # Collect system info
+        echo "System info:" > debug-artifacts-develop/system-info.txt
+        uname -a >> debug-artifacts-develop/system-info.txt
+        df -h >> debug-artifacts-develop/system-info.txt
+        free -h >> debug-artifacts-develop/system-info.txt
+        
+        # Collect browser info
+        echo "Browser info:" > debug-artifacts-develop/browser-info.txt
+        npx playwright --version >> debug-artifacts-develop/browser-info.txt 2>&1 || echo "Playwright not available" >> debug-artifacts-develop/browser-info.txt
+        ls ~/.cache/ms-playwright/ >> debug-artifacts-develop/browser-info.txt 2>&1 || echo "No playwright cache" >> debug-artifacts-develop/browser-info.txt
+        
+        # Collect build artifacts
+        if [ -d .next ]; then
+          echo "Next.js build info:" > debug-artifacts-develop/build-info.txt
+          ls -la .next/ >> debug-artifacts-develop/build-info.txt 2>&1
+          cat .next/build-manifest.json >> debug-artifacts-develop/build-info.txt 2>&1 || echo "No build manifest" >> debug-artifacts-develop/build-info.txt
+        fi
+        
+        # Collect test logs
+        find . -name "*.log" -type f -exec cp {} debug-artifacts-develop/ \; 2>/dev/null || true
+        
+        echo "Debug artifacts collected:"
+        ls -la debug-artifacts-develop/
+        
+    - name: Upload Debug Artifacts (Develop Tests)
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: develop-${{ matrix.test-category }}-debug-artifacts
+        path: debug-artifacts-develop/
+        retention-days: 7
         
     - name: Upload test results
       if: always()
@@ -202,8 +413,42 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
+    - name: 🐛 Debug Security Environment
+      run: |
+        echo "=== SECURITY SCAN DEBUG ==="
+        echo "NPM version: $(npm --version)"
+        echo "Node version: $(node --version)"
+        echo "Package-lock exists: $(test -f package-lock.json && echo 'YES' || echo 'NO')"
+        echo "Dependencies count: $(npm list --depth=0 2>/dev/null | wc -l)"
+        echo "=========================="
+      
     - name: Run security audit
-      run: npm audit --audit-level=moderate
+      run: |
+        echo "🔒 Running security audit with detailed output..."
+        
+        # First, try a basic audit to see what we're dealing with
+        echo "📊 Audit summary:"
+        npm audit --audit-level=low --json > audit-results.json 2>&1 || {
+          echo "⚠️ Audit command failed, checking results..."
+        }
+        
+        # Show audit results
+        if [ -f audit-results.json ]; then
+          echo "Audit file size: $(wc -c < audit-results.json) bytes"
+          echo "Vulnerabilities found:"
+          cat audit-results.json | grep -E "(high|critical|moderate)" | head -10 || echo "No vulnerabilities in first 10 lines"
+        fi
+        
+        # Now run the actual audit with moderate level
+        echo "🔍 Running moderate-level security audit..."
+        npm audit --audit-level=moderate || {
+          echo "❌ Security audit failed with moderate-level vulnerabilities"
+          echo "📋 Full audit output:"
+          npm audit || echo "Full audit also failed"
+          echo "🔧 Attempting to show fixable issues:"
+          npm audit fix --dry-run || echo "No fix suggestions available"
+          exit 1
+        }
       
     - name: Run dependency check
       run: npx audit-ci --moderate
@@ -217,6 +462,39 @@ jobs:
         VALIDATE_JAVASCRIPT_ES: true
         VALIDATE_CSS: true
         VALIDATE_HTML: true
+        
+    - name: 🐛 Collect Security Debug Artifacts on Failure
+      if: failure()
+      run: |
+        echo "=== SECURITY SCAN FAILURE DEBUG ==="
+        mkdir -p debug-artifacts-security
+        
+        # Collect audit results
+        if [ -f audit-results.json ]; then
+          cp audit-results.json debug-artifacts-security/
+        fi
+        
+        # Collect dependency information
+        echo "Dependency tree:" > debug-artifacts-security/dependencies.txt
+        npm list --depth=0 >> debug-artifacts-security/dependencies.txt 2>&1 || true
+        
+        # Collect package info
+        cp package.json debug-artifacts-security/ 2>/dev/null || true
+        cp package-lock.json debug-artifacts-security/ 2>/dev/null || true
+        
+        # Collect security scan logs
+        find . -name "*security*" -o -name "*audit*" -type f -exec cp {} debug-artifacts-security/ \; 2>/dev/null || true
+        
+        echo "Security debug artifacts collected:"
+        ls -la debug-artifacts-security/
+        
+    - name: Upload Security Debug Artifacts
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: security-debug-artifacts
+        path: debug-artifacts-security/
+        retention-days: 7
 
   # Deployment (only on main branch success)
   deploy:
