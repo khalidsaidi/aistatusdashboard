@@ -17,7 +17,11 @@ async function isServerAvailable(): Promise<boolean> {
   try {
     // Create a timeout promise
     const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Timeout')), 2000);
+      const timeout = setTimeout(() => reject(new Error('Timeout')), 2000);
+      // In test environment, unref the timeout to prevent hanging
+      if (process.env.NODE_ENV === 'test') {
+        timeout.unref();
+      }
     });
 
     const fetchPromise = fetch(`${API_BASE}/api/health`);
@@ -255,7 +259,13 @@ describe('Health API Integration', () => {
           measurements.push(Date.now() - startTime);
 
           // Small delay between requests
-          await new Promise((resolve) => setTimeout(resolve, 100));
+          await new Promise((resolve) => {
+            const timeout = setTimeout(resolve, 100);
+            // In test environment, unref the timeout to prevent hanging
+            if (process.env.NODE_ENV === 'test') {
+              timeout.unref();
+            }
+          });
         }
 
         // Response times shouldn't vary too much

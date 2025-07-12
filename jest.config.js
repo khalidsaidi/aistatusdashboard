@@ -70,15 +70,32 @@ const customJestConfig = {
     silent: true, // Suppress console output in CI
     passWithNoTests: true,
     detectOpenHandles: false, // Disable open handles detection in CI
-    forceExit: true,
+    forceExit: true, // Force exit to prevent hanging
     maxWorkers: 1, // Use single worker in CI for stability
     // Use default reporter only in CI
     reporters: ['default'],
     // Increase timeouts for CI environment
     testTimeout: 30000,
+    // Improved worker cleanup
+    workerIdleMemoryLimit: '512MB',
+    clearMocks: true,
+    resetMocks: true,
+    restoreMocks: true,
   }),
   // Add error boundary for CI
   errorOnDeprecated: false,
+  // Improved cleanup and teardown
+  clearMocks: true,
+  resetMocks: true,
+  restoreMocks: true,
+  // Force exit after tests complete to prevent hanging
+  forceExit: process.env.CI ? true : false,
+  // Better worker management
+  maxWorkers: process.env.CI ? 1 : '50%',
+  // Improved memory management
+  logHeapUsage: process.env.CI ? false : true,
+  // Add teardown handling
+  globalTeardown: process.env.CI ? '<rootDir>/jest.teardown.js' : undefined,
 };
 
 module.exports = createJestConfig(customJestConfig);

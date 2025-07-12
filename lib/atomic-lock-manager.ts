@@ -235,6 +235,11 @@ export class AtomicLockManager {
     this.cleanupInterval = setInterval(() => {
       this.cleanup();
     }, this.cleanupIntervalMs);
+
+    // In test environment, unref the interval to prevent hanging
+    if (process.env.NODE_ENV === 'test') {
+      this.cleanupInterval.unref();
+    }
   }
 
   /**

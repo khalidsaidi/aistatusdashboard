@@ -318,6 +318,11 @@ export class PerformanceBottleneckDetector {
     this.monitoringInterval = setInterval(() => {
       this.monitorRunningOperations();
     }, 5000); // Check every 5 seconds
+
+    // In test environment, unref the interval to prevent hanging
+    if (process.env.NODE_ENV === 'test') {
+      this.monitoringInterval.unref();
+    }
   }
 
   /**
