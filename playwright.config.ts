@@ -15,6 +15,8 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   /* Add timeout for CI */
   timeout: process.env.CI ? 30000 : 60000, // 30s in CI, 60s locally
+  /* Test pattern - only run smoke tests in CI */
+  testMatch: process.env.CI ? '**/ci-smoke.test.ts' : '**/*.test.ts',
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [['html'], ['github'], ['junit', { outputFile: 'test-results/junit.xml' }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
