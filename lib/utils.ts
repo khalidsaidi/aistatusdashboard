@@ -8,7 +8,7 @@ export function getApiUrl(endpoint: string): string {
 
     // In CI environment, always use Firebase Functions even on localhost
     const isCI = process.env.CI === 'true' || process.env.NODE_ENV === 'test';
-    
+
     if (isLocalhost && !isCI) {
       // Use local API routes that will proxy to Firebase Functions (only in real dev)
       return `/api/${endpoint}`;
