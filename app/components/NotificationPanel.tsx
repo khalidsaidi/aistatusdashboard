@@ -229,7 +229,12 @@ export default function NotificationPanel() {
 
   const deleteWebhook = async (id: string) => {
     // Skip confirmation in test environment
-    if (typeof window !== 'undefined' && window.confirm && !window.confirm('Are you sure you want to delete this webhook?')) return;
+    if (
+      typeof window !== 'undefined' &&
+      window.confirm &&
+      !window.confirm('Are you sure you want to delete this webhook?')
+    )
+      return;
 
     try {
       const response = await fetch(getApiUrl(`/api/webhooks/${id}`), {
@@ -250,7 +255,12 @@ export default function NotificationPanel() {
 
   const unsubscribeEmail = async (id: string) => {
     // Skip confirmation in test environment
-    if (typeof window !== 'undefined' && window.confirm && !window.confirm('Are you sure you want to unsubscribe?')) return;
+    if (
+      typeof window !== 'undefined' &&
+      window.confirm &&
+      !window.confirm('Are you sure you want to unsubscribe?')
+    )
+      return;
 
     try {
       const response = await fetch(getApiUrl(`/api/subscriptions/${id}`), {

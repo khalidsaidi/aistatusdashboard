@@ -24,13 +24,15 @@ if (process.env.NODE_ENV !== 'test' && typeof window !== 'undefined') {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
     // Initialize Analytics (only in browser)
-    isSupported().then((supported) => {
-      if (supported) {
-        analytics = getAnalytics(app);
-      }
-    }).catch((error) => {
-      console.warn('Firebase Analytics initialization failed:', error);
-    });
+    isSupported()
+      .then((supported) => {
+        if (supported) {
+          analytics = getAnalytics(app);
+        }
+      })
+      .catch((error) => {
+        console.warn('Firebase Analytics initialization failed:', error);
+      });
 
     // Initialize Performance Monitoring
     performance = getPerformance(app);

@@ -47,7 +47,7 @@ describe('Button Accessibility and Styling', () => {
       await act(async () => {
         render(React.createElement(DashboardTabs, { statuses: testStatuses }));
         // Wait for async operations to complete
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       });
 
       // Tab buttons should meet minimum size requirements
