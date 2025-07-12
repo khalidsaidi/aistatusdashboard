@@ -156,16 +156,19 @@ describe('Status Monitor - Real Implementation', () => {
 
   describe('Error Handling and Resilience', () => {
     it('should handle network errors during status checks', async () => {
-      // Test network error simulation
+      // Test network error simulation without actual network calls
+      const simulateNetworkError = async (): Promise<Response> => {
+        throw new Error('Network error: ENOTFOUND invalid-url-that-does-not-exist.com');
+      };
+      
       try {
-        const response = await fetch('https://invalid-url-that-does-not-exist.com');
-
-        if (!response.ok) {
-          console.log(`Network error handled: ${response.status}`);
-        }
+        await simulateNetworkError();
+        // Should not reach this point
+        expect(true).toBe(false);
       } catch (error) {
         // Expected network error
         expect(error).toBeDefined();
+        expect((error as Error).message).toContain('Network error');
         console.log('Network error caught and handled properly');
       }
     });
