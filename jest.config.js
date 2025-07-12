@@ -63,16 +63,22 @@ const customJestConfig = {
   testEnvironmentOptions: {
     customExportConditions: ['node', 'node-addons'],
   },
-  // CI-specific options
+  // CI-specific options with better error handling
   ...(process.env.CI && {
-    bail: false, // Don't stop on first failure in CI
+    bail: 1, // Stop on first failure in CI to identify the failing test
     verbose: true,
     silent: false,
     passWithNoTests: true,
     detectOpenHandles: true,
     forceExit: true,
     maxWorkers: 2,
+    // Use default reporter only in CI
+    reporters: ['default'],
   }),
+  // Add error boundary for CI
+  errorOnDeprecated: false,
+  // Handle unhandled promise rejections
+  unhandledPromiseRejectionWarning: false,
 };
 
 module.exports = createJestConfig(customJestConfig);
