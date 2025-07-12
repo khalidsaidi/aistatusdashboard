@@ -24,4 +24,4 @@ module.exports = async () => {
   }, 1000);
 
   console.log('✅ Jest Global Teardown: Cleanup completed');
-}; 
+};

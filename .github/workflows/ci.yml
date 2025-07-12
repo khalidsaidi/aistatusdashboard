@@ -117,7 +117,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ['18.x', '20.x']
+        node-version: ['20.x']  # Only Node 20.x since packages require Node 20+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -155,7 +155,7 @@ jobs:
         uses: codecov/codecov-action@v5
         if: matrix.node-version == '20.x'
         with:
-          file: ./coverage/lcov.info
+          files: ./coverage/lcov.info
           fail_ci_if_error: false
 
   # =============================================================================
@@ -305,9 +305,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [performance]
     if: github.ref == 'refs/heads/develop' # Only deploy to staging from develop branch
-    environment:
-      name: staging
-      url: https://${{ env.FIREBASE_PROJECT_ID_DEV }}.web.app
 
     steps:
       - name: Checkout code
@@ -362,9 +359,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [deploy-staging]
     if: github.ref == 'refs/heads/main' # Only deploy to production from main branch
-    environment:
-      name: production
-      url: https://${{ env.FIREBASE_PROJECT_ID_PROD }}.web.app
 
     steps:
       - name: Checkout code

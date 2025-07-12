@@ -406,13 +406,13 @@ global.testWarnings = [];
 
 console.warn = (...args) => {
   const message = args.join(' ');
-  
+
   // In CI, just log warnings without failing tests
   if (process.env.CI) {
     originalConsoleWarn(`⚠️ CI Warning:`, ...args);
     return;
   }
-  
+
   global.testWarnings.push(message);
 
   // Skip failing tests for expected dev server connection issues in CI
