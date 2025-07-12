@@ -1,4 +1,5 @@
-import { render, screen, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import { act } from 'react';
 import { describe, it, expect } from '@jest/globals';
 import '@testing-library/jest-dom';
 import React from 'react';

@@ -1,4 +1,5 @@
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { act } from 'react';
 import userEvent from '@testing-library/user-event';
 import DashboardTabs from '@/app/components/DashboardTabs';
 import React from 'react';
