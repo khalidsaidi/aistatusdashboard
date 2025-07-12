@@ -77,8 +77,6 @@ const customJestConfig = {
   }),
   // Add error boundary for CI
   errorOnDeprecated: false,
-  // Handle unhandled promise rejections
-  unhandledPromiseRejectionWarning: false,
 };
 
 module.exports = createJestConfig(customJestConfig);
