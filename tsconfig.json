@@ -40,9 +40,18 @@
   "exclude": [
     "node_modules",
     "functions",
-    "functions/**",
-    "**/functions/**",
-    "functions/src/**",
-    "functions/lib/**"
+    "functions/**/*",
+    "**/functions/**/*",
+    "functions/src/**/*",
+    "functions/lib/**/*",
+    "./functions/**/*",
+    "functions/src/pushNotifications.ts",
+    "functions/src/*.ts",
+    ".next",
+    "out",
+    "**/*.test.*",
+    "**/*.spec.*",
+    "__tests__/**/*",
+    "coverage/**/*"
   ]
 }
