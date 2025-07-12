@@ -346,9 +346,12 @@ function validateConfiguration(config: SecureConfig): void {
 
   for (const pattern of sensitivePatterns) {
     if (pattern.test(configStr)) {
-      console.warn(
-        `⚠️  Configuration contains pattern that should be in environment variables: ${pattern}`
-      );
+      // Only warn in non-test environments about hardcoded values
+      if (config.environment !== 'test') {
+        console.warn(
+          `⚠️  Configuration contains pattern that should be in environment variables: ${pattern}`
+        );
+      }
       // Don't throw in non-production to allow development
       if (config.environment === 'production') {
         throw new Error(

@@ -16,22 +16,22 @@ async function safeUserInteraction(callback: () => Promise<void>) {
   });
 }
 
-// Helper function to render component and wait for async operations
-async function renderAndWaitForAsyncOps(ui: React.ReactElement) {
+// Helper function to render and wait for async operations
+const renderAndWaitForAsyncOps = async (ui: React.ReactElement) => {
   const user = userEvent.setup();
   let result: any;
 
   await act(async () => {
     result = render(ui);
     // Wait for all async operations to complete
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 100));
   });
 
   return {
     user,
     ...result,
   };
-}
+};
 
 const testStatuses = [
   {

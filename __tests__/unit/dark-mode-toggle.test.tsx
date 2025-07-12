@@ -40,15 +40,19 @@ describe('Dark Mode Toggle Component', () => {
     }
   });
 
-  it('should render the toggle button', () => {
-    render(<DarkModeToggle />);
+  it('should render the toggle button', async () => {
+    await act(async () => {
+      render(<DarkModeToggle />);
+    });
 
     const toggleButton = screen.getByRole('button', { name: /toggle dark mode/i });
     expect(toggleButton).toBeInTheDocument();
   });
 
-  it('should display moon emoji initially (light mode)', () => {
-    render(<DarkModeToggle />);
+  it('should display moon emoji initially (light mode)', async () => {
+    await act(async () => {
+      render(<DarkModeToggle />);
+    });
 
     const toggleButton = screen.getByRole('button', { name: /toggle dark mode/i });
     expect(toggleButton).toHaveTextContent('🌙');
@@ -126,11 +130,13 @@ describe('Dark Mode Toggle Component', () => {
     });
   });
 
-  it('should restore dark mode from localStorage on mount', () => {
+  it('should restore dark mode from localStorage on mount', async () => {
     // Set dark mode in localStorage before rendering
     localStorage.setItem('darkMode', 'true');
 
-    render(<DarkModeToggle />);
+    await act(async () => {
+      render(<DarkModeToggle />);
+    });
 
     const toggleButton = screen.getByRole('button', { name: /toggle dark mode/i });
 
@@ -185,8 +191,10 @@ describe('Dark Mode Toggle Component', () => {
     expect(document.documentElement).toHaveClass('dark');
   });
 
-  it('should have proper accessibility attributes', () => {
-    render(<DarkModeToggle />);
+  it('should have proper accessibility attributes', async () => {
+    await act(async () => {
+      render(<DarkModeToggle />);
+    });
 
     const toggleButton = screen.getByRole('button', { name: /toggle dark mode/i });
 
@@ -219,7 +227,7 @@ describe('Dark Mode Toggle Component', () => {
     localStorage.setItem = originalSetItem;
   });
 
-  it('should handle missing localStorage gracefully', () => {
+  it('should handle missing localStorage gracefully', async () => {
     // Mock localStorage to be undefined
     const originalLocalStorage = window.localStorage;
 
@@ -231,9 +239,11 @@ describe('Dark Mode Toggle Component', () => {
     });
 
     // Should not crash when localStorage is undefined
-    expect(() => {
-      render(<DarkModeToggle />);
-    }).not.toThrow();
+    await act(async () => {
+      expect(() => {
+        render(<DarkModeToggle />);
+      }).not.toThrow();
+    });
 
     // Restore original localStorage
     Object.defineProperty(window, 'localStorage', {

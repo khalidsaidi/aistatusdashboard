@@ -1,22 +1,15 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { act } from 'react';
 import { describe, it, expect } from '@jest/globals';
 import '@testing-library/jest-dom';
-import React from 'react';
+import DashboardTabs from '@/app/components/DashboardTabs';
 
 // Import components safely to avoid initialization issues
-let DashboardTabs: any;
 let APIDemo: any;
 let CommentSection: any;
 
 // Safe component imports that won't crash in test environment
-try {
-  DashboardTabs = require('@/app/components/DashboardTabs').default;
-} catch (error) {
-  DashboardTabs = () =>
-    React.createElement('div', { 'data-testid': 'dashboard-tabs' }, 'Dashboard Tabs');
-}
-
 try {
   APIDemo = require('@/app/components/APIDemo').default;
 } catch (error) {
@@ -49,10 +42,12 @@ describe('Button Accessibility and Styling', () => {
     }
   });
 
-  describe('Minimum Touch Target Size', () => {
+  describe('Accessibility - Touch Target Compliance', () => {
     it('should have buttons with minimum 44px touch targets in DashboardTabs', async () => {
       await act(async () => {
         render(React.createElement(DashboardTabs, { statuses: testStatuses }));
+        // Wait for async operations to complete
+        await new Promise(resolve => setTimeout(resolve, 100));
       });
 
       // Tab buttons should meet minimum size requirements

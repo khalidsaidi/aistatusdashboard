@@ -60,10 +60,10 @@ describe('NotificationPanel - Real Implementation', () => {
       await act(async () => {
         render(<NotificationPanel />);
         // Wait for async operations to complete
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 200));
       });
 
-      expect(screen.getByText('📧 Email Alerts')).toBeInTheDocument();
+      expect(screen.getByText(/notifications & alerts/i)).toBeInTheDocument();
     });
 
     it('should display all notification tabs', async () => {
