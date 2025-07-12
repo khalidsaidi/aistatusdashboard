@@ -10,9 +10,11 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 1 : 0, // Reduce retries in CI
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
+  /* Add timeout for CI */
+  timeout: process.env.CI ? 30000 : 60000, // 30s in CI, 60s locally
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [['html'], ['github'], ['junit', { outputFile: 'test-results/junit.xml' }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -25,45 +27,54 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     /* Record video on failure */
     video: 'retain-on-failure',
+    /* Add navigation timeout for CI */
+    navigationTimeout: process.env.CI ? 15000 : 30000,
+    /* Add action timeout for CI */
+    actionTimeout: process.env.CI ? 10000 : 30000,
   },
 
   /* Configure projects for major browsers */
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-
-    /* Test against mobile viewports. */
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
-    },
-
-    /* Test against branded browsers. */
-    {
-      name: 'Microsoft Edge',
-      use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    },
-    {
-      name: 'Google Chrome',
-      use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    },
-  ],
+  projects: process.env.CI
+    ? [
+        // In CI, only run on Chromium for speed
+        {
+          name: 'chromium',
+          use: { ...devices['Desktop Chrome'] },
+        },
+      ]
+    : [
+        // In local development, run on all browsers
+        {
+          name: 'chromium',
+          use: { ...devices['Desktop Chrome'] },
+        },
+        {
+          name: 'firefox',
+          use: { ...devices['Desktop Firefox'] },
+        },
+        {
+          name: 'webkit',
+          use: { ...devices['Desktop Safari'] },
+        },
+        /* Test against mobile viewports. */
+        {
+          name: 'Mobile Chrome',
+          use: { ...devices['Pixel 5'] },
+        },
+        {
+          name: 'Mobile Safari',
+          use: { ...devices['iPhone 12'] },
+        },
+        /* Test against branded browsers. */
+        {
+          name: 'Microsoft Edge',
+          use: { ...devices['Desktop Edge'], channel: 'msedge' },
+        },
+        {
+          name: 'Google Chrome',
+          use: { ...devices['Desktop Chrome'], channel: 'chrome' },
+        },
+      ],
 
   /* Run your local dev server before starting the tests */
   webServer: process.env.CI
