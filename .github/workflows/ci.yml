@@ -146,6 +146,11 @@ jobs:
           CI: true
           FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID_DEV }}
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ env.FIREBASE_PROJECT_ID_DEV }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY_DEV }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ env.FIREBASE_PROJECT_ID_DEV }}.firebaseapp.com
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ env.FIREBASE_PROJECT_ID_DEV }}.appspot.com
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID_DEV }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID_DEV }}
           FIREBASE_FUNCTIONS_REGION: ${{ env.FIREBASE_FUNCTIONS_REGION }}
           NODE_OPTIONS: '--max-old-space-size=4096'
           # Prevent Jest from failing on expected dev server connection issues
