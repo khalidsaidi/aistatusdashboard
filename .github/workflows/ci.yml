@@ -152,7 +152,7 @@ jobs:
           SKIP_DEV_SERVER_TESTS: true
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         if: matrix.node-version == '20.x'
         with:
           file: ./coverage/lcov.info
@@ -247,7 +247,7 @@ jobs:
           TEST_API_BASE_URL: https://us-central1-${{ env.FIREBASE_PROJECT_ID_DEV }}.cloudfunctions.net/api
 
       - name: Upload E2E test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: e2e-test-results
