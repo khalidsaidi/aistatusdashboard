@@ -260,6 +260,7 @@ export function NotificationSubscription({}: NotificationSubscriptionProps) {
                   alt={provider.name}
                   width={32}
                   height={32}
+                  loading="lazy"
                   className="w-8 h-8"
                 />
                 <span className="text-sm font-medium text-gray-900 dark:text-white">

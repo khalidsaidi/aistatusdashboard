@@ -54,7 +54,7 @@ export default function DarkModeToggle() {
     return (
       <button
         type="button"
-        className="p-2 rounded-md bg-gray-200 dark:bg-gray-700"
+        className="p-3 rounded-md bg-gray-200 dark:bg-gray-700 min-h-[44px] min-w-[44px]"
         aria-label="Toggle dark mode"
       >
         <span className="w-5 h-5 block">🌙</span>
@@ -66,7 +66,7 @@ export default function DarkModeToggle() {
     <button
       type="button"
       onClick={toggleDarkMode}
-      className="p-2 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+      className="p-3 rounded-md bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors min-h-[44px] min-w-[44px]"
       aria-label="Toggle dark mode"
     >
       <span className="w-5 h-5 block">{isDark ? '☀️' : '🌙'}</span>

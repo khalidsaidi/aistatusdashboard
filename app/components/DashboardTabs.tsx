@@ -144,9 +144,9 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
     if (downCount > 0)
       return { status: 'issues', color: 'text-red-600 dark:text-red-400', icon: '🔴' };
     if (degradedCount > 0)
-      return { status: 'degraded', color: 'text-yellow-600 dark:text-yellow-400', icon: '🟡' };
+              return { status: 'degraded', color: 'text-yellow-700 dark:text-yellow-400', icon: '🟡' };
     if (operationalCount === safeStatuses.length && safeStatuses.length > 0) {
-      return { status: 'operational', color: 'text-green-600 dark:text-green-400', icon: '🟢' };
+              return { status: 'operational', color: 'text-green-700 dark:text-green-400', icon: '🟢' };
     }
     return { status: 'unknown', color: 'text-gray-600 dark:text-gray-400', icon: '⚪' };
   }, [operationalCount, degradedCount, downCount, safeStatuses.length]);
@@ -300,9 +300,9 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
 
     const statusColor =
       status.status === 'operational'
-        ? 'text-green-600 dark:text-green-400'
+        ? 'text-green-700 dark:text-green-400'
         : status.status === 'degraded'
-          ? 'text-yellow-600 dark:text-yellow-400'
+          ? 'text-yellow-700 dark:text-yellow-400'
           : status.status === 'down'
             ? 'text-red-600 dark:text-red-400'
             : 'text-gray-600 dark:text-gray-400';
@@ -319,9 +319,9 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
 
     const uptimeColor =
       uptimePercentage >= 99
-        ? 'text-green-600 dark:text-green-400'
+        ? 'text-green-700 dark:text-green-400'
         : uptimePercentage >= 95
-          ? 'text-yellow-600 dark:text-yellow-400'
+          ? 'text-yellow-700 dark:text-yellow-400'
           : 'text-red-600 dark:text-red-400';
 
     return (
@@ -340,6 +340,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
                 className="w-6 h-6"
                 width={24}
                 height={24}
+                loading="lazy"
                 unoptimized
                 onError={(e) => {
                   // Fallback to PNG if SVG fails
@@ -359,7 +360,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
             </div>
           </div>
           <div className="text-right">
-            <div className={`text-2xl ${statusColor} flex items-center gap-2`}>
+            <div className={`text-2xl ${statusColor} flex items-center gap-2`} data-testid="provider-status">
               {statusIcon}
               <span className="text-sm font-medium capitalize">{status.status}</span>
             </div>
@@ -407,7 +408,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
             href={status.statusPageUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium transition-colors"
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             data-testid="official-status-link"
           >
             View Official Status →
@@ -476,13 +477,13 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6">
           <div className="flex flex-wrap gap-6 text-sm">
             <div className="flex items-center gap-2">
-              <span className="text-green-600 dark:text-green-400">✅</span>
+              <span className="text-green-700 dark:text-green-400">✅</span>
               <span className="text-gray-700 dark:text-gray-300">
                 {operationalCount} Operational
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-yellow-600 dark:text-yellow-400">⚠️</span>
+              <span className="text-yellow-700 dark:text-yellow-400">⚠️</span>
               <span className="text-gray-700 dark:text-gray-300">{degradedCount} Degraded</span>
             </div>
             <div className="flex items-center gap-2">
@@ -719,6 +720,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
+              data-testid={tab.id === 'notifications' ? 'notifications-button' : undefined}
               className={`px-8 py-4 font-medium text-sm border-b-2 transition-colors flex items-center gap-2 min-h-[48px] min-w-[48px] ${
                 activeTab === tab.id
                   ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
@@ -791,7 +793,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                       System Health
                     </h3>
-                    <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+                    <p className="text-3xl font-bold text-green-700 dark:text-green-400">
                       {healthPercentage}%
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Overall Uptime</p>
@@ -870,7 +872,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
               }
             >
               <CommentSection
-                title="💬 AI Status Dashboard Community"
+                title="Dashboard Comments & Feedback"
                 className="max-w-4xl mx-auto"
               />
             </ErrorBoundary>

@@ -31,7 +31,7 @@ export default function Footer() {
             If you are a rights holder and want your trademark removed, please{' '}
             <a
               href="mailto:legal@yourdomain.com?subject=Trademark%20Removal%20Request"
-              className="text-blue-600 dark:text-blue-400 hover:underline py-1 px-2 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-blue-700 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300 py-1 px-2 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               contact us
             </a>{' '}
@@ -47,14 +47,14 @@ export default function Footer() {
           <p className="text-xs text-gray-500 dark:text-gray-500">
             <a
               href="/api/health"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               System Health
             </a>
             {' • '}
             <a
               href="/api/status"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               JSON API
             </a>
@@ -63,13 +63,13 @@ export default function Footer() {
 
         {/* Technical Info */}
         <div className="text-center">
-          <p className="text-xs text-gray-400 dark:text-gray-600">
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
             Built with Next.js • Respects robots.txt and rate limits •{' '}
             <a
               href="https://github.com/khalidsaidi/aistatusdashboard"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1"
+              className="text-blue-700 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               title="View source code on GitHub"
             >
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -78,7 +78,7 @@ export default function Footer() {
               Open Source
             </a>
           </p>
-          <p className="text-xs text-gray-400 dark:text-gray-600 mt-1">
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
             Status checks are performed using official APIs and public status pages
           </p>
         </div>

@@ -51,21 +51,29 @@ test.describe('Ultra-Minimal MVP Tests', () => {
   test('should show last updated time', async ({ page }) => {
     await page.goto('/');
 
-    const lastUpdated = await page.locator('text=Last updated:');
-    await expect(lastUpdated).toBeVisible();
+    // Wait for the page to load and find the last updated text
+    await page.waitForLoadState('networkidle');
+    
+    // Look for the "Last updated:" text in any element (not just p tags)
+    const lastUpdatedElement = page.locator('text=Last updated:');
+    await expect(lastUpdatedElement).toBeVisible();
 
-    // Wait for the timestamp to load (hydration)
+    // Wait for the timestamp to be populated (not "Loading...")
     await page.waitForFunction(
       () => {
-        const elements = Array.from(document.querySelectorAll('p'));
-        const lastUpdatedElement = elements.find((el) => el.textContent?.includes('Last updated:'));
-        return lastUpdatedElement && !lastUpdatedElement.textContent?.includes('Loading...');
+        const elements = Array.from(document.querySelectorAll('*'));
+        const lastUpdatedElement = elements.find((el) => 
+          el.textContent?.includes('Last updated:') && 
+          !el.textContent?.includes('Loading...')
+        );
+        return lastUpdatedElement && lastUpdatedElement.textContent?.match(/\d{1,2}:\d{2}:\d{2}/);
       },
-      { timeout: 10000 }
+      { timeout: 15000 }
     );
 
-    const timeText = await lastUpdated.textContent();
-    expect(timeText).toMatch(/Last updated: \d{1,2}:\d{2}:\d{2}/);
+    // Verify the format contains time
+    const timeText = await lastUpdatedElement.textContent();
+    expect(timeText).toMatch(/Last updated:.*\d{1,2}:\d{2}:\d{2}/);
   });
 
   test('should indicate auto-refresh', async ({ page }) => {

@@ -18,11 +18,11 @@ const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-HPNE6D
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: {
-    default: 'AI Status Dashboard',
+    default: 'AI Status Dashboard - Real-time AI Provider Monitoring',
     template: '%s | AI Status Dashboard',
   },
   description:
-    'Real-time status monitoring dashboard for AI provider APIs including OpenAI, Anthropic, Google AI, and more. Monitor service availability, response times, and incidents.',
+    'Real-time status monitoring dashboard for AI provider APIs including OpenAI, Anthropic, Google AI, and more. Monitor service availability.',
   keywords: [
     'AI status',
     'API monitoring',
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI Status Dashboard',
+    title: 'AI Status Dashboard - Real-time AI Provider Monitoring',
     description: 'Real-time monitoring of AI provider APIs',
     images: ['/og-image.png'],
     creator: '@aistatusdash',
@@ -188,7 +188,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <link rel="manifest" href="/manifest.json" />
         <meta name="application-name" content="AI Status Dashboard" />
         <meta name="apple-mobile-web-app-title" content="AI Status Dashboard" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
