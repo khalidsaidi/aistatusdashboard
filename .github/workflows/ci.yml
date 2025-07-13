@@ -772,8 +772,42 @@ jobs:
         path: debug-artifacts-security/
         retention-days: 7
 
-  # Deployment (only on main branch success)
-  deploy:
+  # Deploy to development environment (develop branch)
+  deploy-dev:
+    if: github.ref == 'refs/heads/develop' && success()
+    needs: [develop-tests, security-scan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build for development
+      run: npm run build
+      env:
+        NODE_ENV: development
+        
+    - name: Deploy to development environment
+      run: |
+        echo "🚀 Deploying to development environment..."
+        # Set Firebase project to dev
+        npx firebase use dev
+        # Deploy to dev environment
+        npx firebase deploy --only hosting,functions
+        echo "✅ Deployed to ai-status-dashboard-dev"
+
+  # Deploy to production environment (main branch)
+  deploy-prod:
     if: github.ref == 'refs/heads/main' && success()
     needs: [production-tests, security-scan]
     runs-on: ubuntu-latest
@@ -797,16 +831,19 @@ jobs:
       env:
         NODE_ENV: production
         
-    - name: Deploy to production
+    - name: Deploy to production environment
       run: |
-        echo "Deploying to production..."
-        # Add your deployment commands here
-        # npm run deploy
+        echo "🚀 Deploying to production environment..."
+        # Set Firebase project to prod
+        npx firebase use prod
+        # Deploy to production environment
+        npx firebase deploy --only hosting,functions
+        echo "✅ Deployed to ai-status-dashboard-prod"
 
   # Development workflow completion
   develop-success:
     if: github.ref == 'refs/heads/develop' && success()
-    needs: [develop-tests, security-scan]
+    needs: [develop-tests, security-scan, deploy-dev]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     
