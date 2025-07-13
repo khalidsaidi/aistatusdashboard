@@ -795,7 +795,8 @@ jobs:
     - name: Build for development
       run: npm run build
       env:
-        NODE_ENV: development
+        NODE_ENV: production
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID: ai-status-dashboard-dev
         
     - name: Deploy to development environment
       run: |
@@ -830,6 +831,7 @@ jobs:
       run: npm run build
       env:
         NODE_ENV: production
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID: ai-status-dashboard-prod
         
     - name: Deploy to production environment
       run: |
