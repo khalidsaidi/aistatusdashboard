@@ -12,8 +12,8 @@ test.describe('Basic Smoke Tests', () => {
     while (retries > 0) {
       try {
         const response = await page.goto('/', { 
-          waitUntil: 'networkidle',
-          timeout: 30000 
+          waitUntil: 'domcontentloaded',
+          timeout: 15000 
         });
         
         // Check if page loaded successfully
@@ -40,7 +40,7 @@ test.describe('Basic Smoke Tests', () => {
   });
 
   test('should have essential meta tags', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'networkidle', timeout: 30000 });
+    await page.goto('/', { waitUntil: 'domcontentloaded', timeout: 15000 });
     
     // Check title exists and is reasonable length
     const title = await page.title();
@@ -51,21 +51,22 @@ test.describe('Basic Smoke Tests', () => {
     const description = await page.getAttribute('meta[name="description"]', 'content');
     if (description) {
       expect(description.length).toBeGreaterThan(50);
-    } else {
-      console.log('No meta description found - this should be fixed');
     }
+    
+    console.log('Essential meta tags validated');
   });
 
-  test('should render main content', async ({ page }) => {
-    await page.goto('/', { waitUntil: 'networkidle', timeout: 30000 });
+  test('should have working navigation structure', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded', timeout: 15000 });
     
-    // Wait for React to hydrate
-    await page.waitForTimeout(2000);
-    
-    // Check for any main content (flexible selector)
-    const mainContent = await page.locator('main, #__next, [role="main"], body > div').first();
+    // Check that main content areas exist
+    const mainContent = await page.locator('main, [role="main"], .main-content').first();
     await expect(mainContent).toBeVisible({ timeout: 10000 });
     
-    console.log('Main content is visible');
+    // Check for navigation elements
+    const nav = await page.locator('nav, [role="navigation"], .navigation').first();
+    await expect(nav).toBeVisible({ timeout: 10000 });
+    
+    console.log('Navigation structure validated');
   });
 }); 

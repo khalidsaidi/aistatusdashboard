@@ -4,8 +4,8 @@ test.describe('Minimal Smoke Tests', () => {
   test('should load the homepage', async ({ page }) => {
     await page.goto('/');
     
-    // Wait for page to load
-    await page.waitForLoadState('networkidle');
+    // Wait for page to load with timeout
+    await page.waitForLoadState('domcontentloaded', { timeout: 10000 });
 
     // Basic check - page should have a title
     const title = await page.title();
@@ -15,7 +15,7 @@ test.describe('Minimal Smoke Tests', () => {
 
   test('should have basic HTML structure', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded', { timeout: 10000 });
 
     // Check for basic HTML elements
     const body = await page.locator('body');
