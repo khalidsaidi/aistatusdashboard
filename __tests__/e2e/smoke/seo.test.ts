@@ -4,8 +4,8 @@ test.describe('SEO Tests', () => {
   test('should have proper meta tags', async ({ page }) => {
     await page.goto('/');
     
-    // Wait for page to load completely
-    await page.waitForLoadState('networkidle');
+    // Wait for page to load completely with timeout
+    await page.waitForLoadState('domcontentloaded', { timeout: 10000 });
 
     // Check title with better error reporting
     const title = await page.title();
@@ -35,7 +35,7 @@ test.describe('SEO Tests', () => {
 
   test('should have Open Graph tags', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded', { timeout: 10000 });
 
     const ogTags = {
       'og:title': await page.getAttribute('meta[property="og:title"]', 'content'),
@@ -56,7 +56,7 @@ test.describe('SEO Tests', () => {
 
   test('should have Twitter Card tags', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded', { timeout: 10000 });
 
     const twitterTags = {
       'twitter:card': await page.getAttribute('meta[name="twitter:card"]', 'content'),
@@ -75,7 +75,7 @@ test.describe('SEO Tests', () => {
 
   test('should have structured data', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded', { timeout: 10000 });
 
     const jsonLd = await page.evaluate(() => {
       const script = document.querySelector('script[type="application/ld+json"]');
@@ -94,7 +94,7 @@ test.describe('SEO Tests', () => {
 
   test('should have canonical URL', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded', { timeout: 10000 });
 
     const canonical = await page.getAttribute('link[rel="canonical"]', 'href');
     console.log('Canonical URL:', canonical);
@@ -111,7 +111,7 @@ test.describe('SEO Tests', () => {
 
   test('should have proper heading structure', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded', { timeout: 10000 });
 
     // Should have exactly one h1
     const h1Count = await page.$$eval('h1', (elements) => elements.length);
@@ -129,7 +129,7 @@ test.describe('SEO Tests', () => {
 
   test('should have sitemap (CI-friendly)', async ({ page }) => {
     try {
-      const response = await page.goto('/sitemap.xml');
+      const response = await page.goto('/sitemap.xml', { timeout: 5000 });
       
       if (response?.status() === 200) {
         const contentType = response?.headers()['content-type'];
@@ -148,7 +148,7 @@ test.describe('SEO Tests', () => {
 
   test('should have robots.txt (CI-friendly)', async ({ page }) => {
     try {
-      const response = await page.goto('/robots.txt');
+      const response = await page.goto('/robots.txt', { timeout: 5000 });
       
       if (response?.status() === 200) {
         const text = await response?.text();
