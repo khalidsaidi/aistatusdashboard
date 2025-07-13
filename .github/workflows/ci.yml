@@ -821,8 +821,8 @@ jobs:
     - name: Deploy to development environment
       run: |
         echo "🚀 Deploying to development environment..."
-        # Set Firebase project to dev
-        npx firebase use dev
+        # Set Firebase project to ai-status-dashboard-dev
+        npx firebase use ai-status-dashboard-dev
         # Deploy to dev environment
         npx firebase deploy --only hosting,functions --token "${{ secrets.FIREBASE_TOKEN }}"
         echo "✅ Deployed to ai-status-dashboard-dev"
@@ -864,11 +864,11 @@ jobs:
     - name: Deploy to production environment
       run: |
         echo "🚀 Deploying to production environment..."
-        # Set Firebase project to prod
-        npx firebase use prod
+        # Set Firebase project to ai-status-dashboard
+        npx firebase use ai-status-dashboard
         # Deploy to production environment
         npx firebase deploy --only hosting,functions --token "${{ secrets.FIREBASE_TOKEN }}"
-        echo "✅ Deployed to ai-status-dashboard-prod"
+        echo "✅ Deployed to ai-status-dashboard"
       env:
         GOOGLE_APPLICATION_CREDENTIALS: firebase-service-account.json
 
