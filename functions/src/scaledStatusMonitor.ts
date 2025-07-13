@@ -175,11 +175,11 @@ async function checkProviderStatus(provider: any) {
 
     // SECURITY FIX: Rate limiting per provider to prevent resource exhaustion
     // const rateLimitKey = `provider_rate_limit:${provider.id}`;
-    const rateLimitWindow = 60000; // 1 minute
+    // const rateLimitWindow = 60000; // 1 minute
     // const maxRequestsPerWindow = 10;
 
     // Use constant-time comparison to prevent timing attacks
-    const currentTime = Date.now();
+    // const currentTime = Date.now();
     // const windowStart = Math.floor(currentTime / rateLimitWindow) * rateLimitWindow;
 
     // CRITICAL FIX: Non-blocking timeout with proper resource cleanup
