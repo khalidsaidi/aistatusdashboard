@@ -792,6 +792,12 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
+    - name: Install functions dependencies
+      run: |
+        cd functions
+        npm ci
+        cd ..
+      
     - name: Build for development
       run: npm run build
       env:
@@ -848,6 +854,12 @@ jobs:
         
     - name: Install dependencies
       run: npm ci
+      
+    - name: Install functions dependencies
+      run: |
+        cd functions
+        npm ci
+        cd ..
       
     - name: Build for production
       run: npm run build
