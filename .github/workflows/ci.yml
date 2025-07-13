@@ -798,14 +798,21 @@ jobs:
         NODE_ENV: production
         NEXT_PUBLIC_FIREBASE_PROJECT_ID: ai-status-dashboard-dev
         
+    - name: Authenticate with Firebase
+      run: |
+        echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}" > firebase-service-account.json
+        export GOOGLE_APPLICATION_CREDENTIALS=firebase-service-account.json
+        
     - name: Deploy to development environment
       run: |
         echo "🚀 Deploying to development environment..."
         # Set Firebase project to dev
         npx firebase use dev
         # Deploy to dev environment
-        npx firebase deploy --only hosting,functions
+        npx firebase deploy --only hosting,functions --token "${{ secrets.FIREBASE_TOKEN }}"
         echo "✅ Deployed to ai-status-dashboard-dev"
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: firebase-service-account.json
 
   # Deploy to production environment (main branch)
   deploy-prod:
@@ -833,14 +840,21 @@ jobs:
         NODE_ENV: production
         NEXT_PUBLIC_FIREBASE_PROJECT_ID: ai-status-dashboard-prod
         
+    - name: Authenticate with Firebase
+      run: |
+        echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}" > firebase-service-account.json
+        export GOOGLE_APPLICATION_CREDENTIALS=firebase-service-account.json
+        
     - name: Deploy to production environment
       run: |
         echo "🚀 Deploying to production environment..."
         # Set Firebase project to prod
         npx firebase use prod
         # Deploy to production environment
-        npx firebase deploy --only hosting,functions
+        npx firebase deploy --only hosting,functions --token "${{ secrets.FIREBASE_TOKEN }}"
         echo "✅ Deployed to ai-status-dashboard-prod"
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: firebase-service-account.json
 
   # Development workflow completion
   develop-success:
