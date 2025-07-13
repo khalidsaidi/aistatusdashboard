@@ -16,9 +16,9 @@ env:
   ACTIONS_RUNNER_DEBUG: true
 
 jobs:
-  # Fast feedback for PRs only
+  # Fast feedback for PRs and main branch pushes
   pr-checks:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     
@@ -186,41 +186,22 @@ jobs:
           sleep 2
         done
         
-        # Verify server is running
-        if ! curl -f http://localhost:3000 > /dev/null 2>&1; then
-          echo "❌ Server failed to start after 60 seconds"
+        # Verify server is running with better health check
+        echo "🔍 Checking server health..."
+        if curl -f -s --max-time 5 http://localhost:3000 > /dev/null 2>&1; then
+          echo "✅ Server is ready and responding"
+        else
+          echo "❌ Server health check failed"
           echo "🔍 Debugging server startup..."
           echo "Server process status:"
-          ps aux | grep -E "(node|next)" | head -5 || echo "No Node processes found"
+          ps aux | grep -E "(node|next)" | head -10
           echo "Port 3000 status:"
           netstat -tlnp | grep :3000 || echo "Port 3000 not in use"
-          echo "Server logs:"
-          cat server.log 2>/dev/null | tail -20 || echo "No server logs found"
-          
-          # Try alternative approach
-          echo "🔄 Trying alternative server startup..."
-          pkill -f "next" 2>/dev/null || true
-          sleep 2
-          
-          PORT=3000 npm run dev > server-alt.log 2>&1 &
-          ALT_PID=$!
-          echo $ALT_PID > server.pid
-          
-          for i in {1..15}; do
-            if curl -f http://localhost:3000 > /dev/null 2>&1; then
-              echo "✅ Alternative server startup successful"
-              break
-            fi
-            echo "⏳ Alternative attempt... ($i/15)"
-            sleep 2
-          done
-          
-          if ! curl -f http://localhost:3000 > /dev/null 2>&1; then
-            echo "❌ All server startup attempts failed"
-            echo "Alternative server logs:"
-            cat server-alt.log 2>/dev/null | tail -10 || echo "No alternative logs"
-            exit 1
-          fi
+          echo "Server logs (last 30 lines):"
+          cat server.log 2>/dev/null | tail -30 || echo "No server logs found"
+          echo "Testing direct connection:"
+          curl -v --max-time 10 http://localhost:3000 || echo "Direct connection failed"
+          exit 1
         fi
       
     - name: Run critical E2E tests
