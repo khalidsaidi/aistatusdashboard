@@ -16,9 +16,9 @@ env:
   ACTIONS_RUNNER_DEBUG: true
 
 jobs:
-  # Fast feedback for PRs and development
+  # Fast feedback for PRs only
   pr-checks:
-    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/develop'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     
@@ -164,10 +164,78 @@ jobs:
     - name: Install Playwright browsers
       run: npx playwright install --with-deps chromium
       
+    - name: Start development server
+      run: |
+        echo "🚀 Starting development server for E2E tests..."
+        
+        # Use development server for reliability
+        echo "🚀 Starting Next.js development server..."
+        npm run dev > server.log 2>&1 &
+        SERVER_PID=$!
+        echo $SERVER_PID > server.pid
+        echo "📝 Server PID: $SERVER_PID"
+        
+        # Wait for server to be ready
+        echo "⏳ Waiting for server to start..."
+        for i in {1..30}; do
+          if curl -f http://localhost:3000 > /dev/null 2>&1; then
+            echo "✅ Server is ready"
+            break
+          fi
+          echo "⏳ Waiting... ($i/30)"
+          sleep 2
+        done
+        
+        # Verify server is running
+        if ! curl -f http://localhost:3000 > /dev/null 2>&1; then
+          echo "❌ Server failed to start after 60 seconds"
+          echo "🔍 Debugging server startup..."
+          echo "Server process status:"
+          ps aux | grep -E "(node|next)" | head -5 || echo "No Node processes found"
+          echo "Port 3000 status:"
+          netstat -tlnp | grep :3000 || echo "Port 3000 not in use"
+          echo "Server logs:"
+          cat server.log 2>/dev/null | tail -20 || echo "No server logs found"
+          
+          # Try alternative approach
+          echo "🔄 Trying alternative server startup..."
+          pkill -f "next" 2>/dev/null || true
+          sleep 2
+          
+          PORT=3000 npm run dev > server-alt.log 2>&1 &
+          ALT_PID=$!
+          echo $ALT_PID > server.pid
+          
+          for i in {1..15}; do
+            if curl -f http://localhost:3000 > /dev/null 2>&1; then
+              echo "✅ Alternative server startup successful"
+              break
+            fi
+            echo "⏳ Alternative attempt... ($i/15)"
+            sleep 2
+          done
+          
+          if ! curl -f http://localhost:3000 > /dev/null 2>&1; then
+            echo "❌ All server startup attempts failed"
+            echo "Alternative server logs:"
+            cat server-alt.log 2>/dev/null | tail -10 || echo "No alternative logs"
+            exit 1
+          fi
+        fi
+      
     - name: Run critical E2E tests
       run: npm run test:e2e:critical
       env:
         CI: true
+        
+    - name: Stop development server
+      if: always()
+      run: |
+        if [ -f server.pid ]; then
+          echo "🛑 Stopping development server..."
+          kill $(cat server.pid) 2>/dev/null || true
+          rm server.pid
+        fi
         
     - name: Upload test results
       if: failure()
