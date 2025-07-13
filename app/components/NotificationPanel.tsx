@@ -572,7 +572,7 @@ export default function NotificationPanel() {
                       🚫 Notifications Blocked
                     </h4>
                     <p className="text-sm text-red-800 dark:text-red-300">
-                      You've blocked notifications for this site. Please enable them in your browser settings to receive push notifications.
+                      You&apos;ve blocked notifications for this site. Please enable them in your browser settings to receive push notifications.
                     </p>
                   </div>
                 ) : notificationPermission === 'granted' && pushEnabled ? (
