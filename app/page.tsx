@@ -3,7 +3,6 @@ import { checkAllProviders } from '@/lib/status-fetcher-unified';
 import { log } from '@/lib/logger';
 import DashboardTabs from './components/DashboardTabs';
 import ClientWrapper from './components/ClientWrapper';
-import { headers } from 'next/headers';
 
 // Simple in-memory cache for server-side rendering
 const statusCache = new Map<string, { data: any[]; timestamp: number }>();
@@ -81,22 +80,6 @@ function getFallbackStatuses(): any[] {
 
 // Main dashboard page component
 export default async function DashboardPage() {
-  // PERFORMANCE: Skip heavy operations for HEAD requests
-  const headersList = await headers();
-  const isHeadRequest = headersList.get('x-request-method') === 'HEAD';
-
-  if (isHeadRequest) {
-    const fallbackStatuses = getFallbackStatuses();
-    return (
-      <main className="flex-1 bg-gray-50 dark:bg-gray-900">
-        <div className="px-4 sm:px-6 py-8">
-          <ClientWrapper>
-            <DashboardTabs statuses={fallbackStatuses} />
-          </ClientWrapper>
-        </div>
-      </main>
-    );
-  }
 
   let statuses;
   let error: string | null = null;

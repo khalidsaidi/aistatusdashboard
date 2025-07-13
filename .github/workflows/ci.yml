@@ -863,7 +863,7 @@ jobs:
         cd ..
       
     - name: Build for production
-      run: npm run build
+      run: npm run build:static
       env:
         NODE_ENV: production
         NEXT_EXPORT: true

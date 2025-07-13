@@ -8,6 +8,8 @@ const nextConfig = {
         images: {
           unoptimized: true,
         },
+        // Skip API routes during static export since we use Firebase Functions
+        skipTrailingSlashRedirect: true,
       }
     : {}),
 

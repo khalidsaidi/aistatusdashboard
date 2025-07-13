@@ -1,185 +1,163 @@
-'use strict';
-var __createBinding =
-  (this && this.__createBinding) ||
-  (Object.create
-    ? function (o, m, k, k2) {
-        if (k2 === undefined) k2 = k;
-        var desc = Object.getOwnPropertyDescriptor(m, k);
-        if (!desc || ('get' in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-          desc = {
-            enumerable: true,
-            get: function () {
-              return m[k];
-            },
-          };
-        }
-        Object.defineProperty(o, k2, desc);
-      }
-    : function (o, m, k, k2) {
-        if (k2 === undefined) k2 = k;
-        o[k2] = m[k];
-      });
-var __setModuleDefault =
-  (this && this.__setModuleDefault) ||
-  (Object.create
-    ? function (o, v) {
-        Object.defineProperty(o, 'default', { enumerable: true, value: v });
-      }
-    : function (o, v) {
-        o['default'] = v;
-      });
-var __importStar =
-  (this && this.__importStar) ||
-  function (mod) {
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null)
-      for (var k in mod)
-        if (k !== 'default' && Object.prototype.hasOwnProperty.call(mod, k))
-          __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
-  };
-Object.defineProperty(exports, '__esModule', { value: true });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.emailService = exports.EmailService = void 0;
-const nodemailer = __importStar(require('nodemailer'));
-const v2_1 = require('firebase-functions/v2');
+const nodemailer = __importStar(require("nodemailer"));
+const v2_1 = require("firebase-functions/v2");
 class EmailService {
-  constructor() {
-    this.transporter = null;
-    this.initialized = false;
-    // Don't initialize immediately to avoid startup failures
-    // Initialize lazily when first used
-  }
-  getEnvironment() {
-    return process.env.NODE_ENV === 'production' ? 'production' : 'development';
-  }
-  formatSubjectWithEnvironment(subject) {
-    const environment = this.getEnvironment();
-    if (environment === 'production') {
-      return subject; // No prefix for production
+    constructor() {
+        this.transporter = null;
+        this.initialized = false;
+        // Don't initialize immediately to avoid startup failures
+        // Initialize lazily when first used
     }
-    return `[DEV] ${subject}`;
-  }
-  initializeTransporter() {
-    if (this.initialized) return;
-    try {
-      // Use environment variables for Firebase Functions v2
-      const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
-      const smtpPort = process.env.SMTP_PORT || '587';
-      const smtpUser = process.env.SMTP_USER || 'status@aistatusdashboard.com';
-      const smtpPass = process.env.SMTP_PASS || 'your-app-password';
-      const environment = this.getEnvironment();
-      // Skip initialization if using placeholder credentials
-      if (
-        !smtpUser ||
-        !smtpPass ||
-        smtpPass.includes('placeholder') ||
-        smtpUser.includes('placeholder') ||
-        smtpPass === 'your-app-password'
-      ) {
-        v2_1.logger.warn('SMTP using placeholder credentials - email service disabled', {
-          environment,
-        });
-        this.initialized = true;
-        return;
-      }
-      this.transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: parseInt(smtpPort),
-        secure: smtpPort === '465',
-        auth: {
-          user: smtpUser,
-          pass: smtpPass,
-        },
-      });
-      // Only verify if we have real credentials - don't block startup
-      if (this.transporter) {
-        this.transporter.verify((error, success) => {
-          if (error) {
-            v2_1.logger.error('SMTP configuration error (non-blocking)', {
-              error: error.message,
-              environment,
+    getEnvironment() {
+        return process.env.NODE_ENV === 'production' ? 'production' : 'development';
+    }
+    formatSubjectWithEnvironment(subject) {
+        const environment = this.getEnvironment();
+        if (environment === 'production') {
+            return subject; // No prefix for production
+        }
+        return `[DEV] ${subject}`;
+    }
+    initializeTransporter() {
+        if (this.initialized)
+            return;
+        try {
+            // Use environment variables for Firebase Functions v2
+            const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+            const smtpPort = process.env.SMTP_PORT || '587';
+            const smtpUser = process.env.SMTP_USER || 'status@aistatusdashboard.com';
+            const smtpPass = process.env.SMTP_PASS || 'your-app-password';
+            const environment = this.getEnvironment();
+            // Skip initialization if using placeholder credentials
+            if (!smtpUser ||
+                !smtpPass ||
+                smtpPass.includes('placeholder') ||
+                smtpUser.includes('placeholder') ||
+                smtpPass === 'your-app-password') {
+                v2_1.logger.warn('SMTP using placeholder credentials - email service disabled', {
+                    environment,
+                });
+                this.initialized = true;
+                return;
+            }
+            this.transporter = nodemailer.createTransport({
+                host: smtpHost,
+                port: parseInt(smtpPort),
+                secure: smtpPort === '465',
+                auth: {
+                    user: smtpUser,
+                    pass: smtpPass,
+                },
             });
-            // Don't throw - just log the error
-          } else {
-            v2_1.logger.info('SMTP server is ready to send emails', {
-              environment,
-              host: smtpHost,
-              user: smtpUser,
+            // Only verify if we have real credentials - don't block startup
+            if (this.transporter) {
+                this.transporter.verify((error, success) => {
+                    if (error) {
+                        v2_1.logger.error('SMTP configuration error (non-blocking)', {
+                            error: error.message,
+                            environment,
+                        });
+                        // Don't throw - just log the error
+                    }
+                    else {
+                        v2_1.logger.info('SMTP server is ready to send emails', {
+                            environment,
+                            host: smtpHost,
+                            user: smtpUser,
+                        });
+                    }
+                });
+            }
+            this.initialized = true;
+        }
+        catch (error) {
+            v2_1.logger.error('Failed to initialize email transporter (non-blocking)', {
+                error: error instanceof Error ? error.message : 'Unknown error',
             });
-          }
-        });
-      }
-      this.initialized = true;
-    } catch (error) {
-      v2_1.logger.error('Failed to initialize email transporter (non-blocking)', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-      this.initialized = true; // Mark as initialized even if failed to prevent retry loops
+            this.initialized = true; // Mark as initialized even if failed to prevent retry loops
+        }
     }
-  }
-  async sendEmail(options) {
-    try {
-      // Initialize on first use
-      this.initializeTransporter();
-      const enableRealMonitoring = process.env.APP_ENABLE_REAL_MONITORING || 'true';
-      const environment = this.getEnvironment();
-      const smtpFrom =
-        process.env.SMTP_FROM || 'AI Status Dashboard <status@aistatusdashboard.com>';
-      // Check if email sending is enabled
-      if (enableRealMonitoring !== 'true') {
-        v2_1.logger.warn(
-          'Real email sending is disabled in config. Set APP_ENABLE_REAL_MONITORING=true to send actual emails.',
-          {
-            to: options.to,
-            subject: options.subject,
-            environment,
-          }
-        );
-        return false;
-      }
-      // Check if transporter is available
-      if (!this.transporter) {
-        v2_1.logger.error('Email service not available. Please configure real SMTP credentials.');
-        return false;
-      }
-      // Format subject with environment prefix
-      const formattedSubject = this.formatSubjectWithEnvironment(options.subject);
-      const mailOptions = {
-        from: smtpFrom,
-        to: options.to,
-        subject: formattedSubject,
-        text: options.text,
-        html: options.html,
-      };
-      const result = await this.transporter.sendMail(mailOptions);
-      v2_1.logger.info('REAL email sent successfully', {
-        messageId: result.messageId,
-        to: options.to,
-        subject: formattedSubject,
-        from: mailOptions.from,
-        environment,
-      });
-      return true;
-    } catch (error) {
-      v2_1.logger.error('Failed to send REAL email', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        to: options.to,
-        subject: options.subject,
-      });
-      return false;
+    async sendEmail(options) {
+        try {
+            // Initialize on first use
+            this.initializeTransporter();
+            const enableRealMonitoring = process.env.APP_ENABLE_REAL_MONITORING || 'true';
+            const environment = this.getEnvironment();
+            const smtpFrom = process.env.SMTP_FROM || 'AI Status Dashboard <status@aistatusdashboard.com>';
+            // Check if email sending is enabled
+            if (enableRealMonitoring !== 'true') {
+                v2_1.logger.warn('Real email sending is disabled in config. Set APP_ENABLE_REAL_MONITORING=true to send actual emails.', {
+                    to: options.to,
+                    subject: options.subject,
+                    environment,
+                });
+                return false;
+            }
+            // Check if transporter is available
+            if (!this.transporter) {
+                v2_1.logger.error('Email service not available. Please configure real SMTP credentials.');
+                return false;
+            }
+            // Format subject with environment prefix
+            const formattedSubject = this.formatSubjectWithEnvironment(options.subject);
+            const mailOptions = {
+                from: smtpFrom,
+                to: options.to,
+                subject: formattedSubject,
+                text: options.text,
+                html: options.html,
+            };
+            const result = await this.transporter.sendMail(mailOptions);
+            v2_1.logger.info('REAL email sent successfully', {
+                messageId: result.messageId,
+                to: options.to,
+                subject: formattedSubject,
+                from: mailOptions.from,
+                environment,
+            });
+            return true;
+        }
+        catch (error) {
+            v2_1.logger.error('Failed to send REAL email', {
+                error: error instanceof Error ? error.message : 'Unknown error',
+                to: options.to,
+                subject: options.subject,
+            });
+            return false;
+        }
     }
-  }
-  async sendStatusAlert(email, providerName, status) {
-    const subject = `🚨 AI Status Alert: ${providerName} is ${status}`;
-    const environment = this.getEnvironment();
-    const siteUrl =
-      process.env.APP_BASE_URL ||
-      (environment === 'production' ? 'https://aistatusdashboard.com' : 'http://localhost:3000');
-    const environmentBadge =
-      environment === 'production' ? '' : `<span class="env-badge">DEV</span>`;
-    const html = `
+    async sendStatusAlert(email, providerName, status) {
+        const subject = `🚨 AI Status Alert: ${providerName} is ${status}`;
+        const environment = this.getEnvironment();
+        const siteUrl = process.env.APP_BASE_URL ||
+            (environment === 'production' ? 'https://aistatusdashboard.com' : 'http://localhost:3000');
+        const environmentBadge = environment === 'production' ? '' : `<span class="env-badge">DEV</span>`;
+        const html = `
       <!DOCTYPE html>
       <html>
       <head>
@@ -217,22 +195,20 @@ class EmailService {
       </body>
       </html>
     `;
-    return this.sendEmail({
-      to: email,
-      subject,
-      html,
-      text: `${providerName} status has changed to: ${status}. Check ${siteUrl} for details. (Environment: ${environment})`,
-    });
-  }
-  async sendIncidentAlert(email, incident) {
-    const subject = `🚨 AI Status Incident: ${incident.title}`;
-    const environment = this.getEnvironment();
-    const siteUrl =
-      process.env.APP_BASE_URL ||
-      (environment === 'production' ? 'https://aistatusdashboard.com' : 'http://localhost:3000');
-    const environmentBadge =
-      environment === 'production' ? '' : `<span class="env-badge">DEV</span>`;
-    const html = `
+        return this.sendEmail({
+            to: email,
+            subject,
+            html,
+            text: `${providerName} status has changed to: ${status}. Check ${siteUrl} for details. (Environment: ${environment})`,
+        });
+    }
+    async sendIncidentAlert(email, incident) {
+        const subject = `🚨 AI Status Incident: ${incident.title}`;
+        const environment = this.getEnvironment();
+        const siteUrl = process.env.APP_BASE_URL ||
+            (environment === 'production' ? 'https://aistatusdashboard.com' : 'http://localhost:3000');
+        const environmentBadge = environment === 'production' ? '' : `<span class="env-badge">DEV</span>`;
+        const html = `
       <!DOCTYPE html>
       <html>
       <head>
@@ -275,13 +251,13 @@ class EmailService {
       </body>
       </html>
     `;
-    return this.sendEmail({
-      to: email,
-      subject,
-      html,
-      text: `${incident.title} - Status: ${incident.status}. Impact: ${incident.impact}. ${incident.body}. Check ${siteUrl} for updates. (Environment: ${environment})`,
-    });
-  }
+        return this.sendEmail({
+            to: email,
+            subject,
+            html,
+            text: `${incident.title} - Status: ${incident.status}. Impact: ${incident.impact}. ${incident.body}. Check ${siteUrl} for updates. (Environment: ${environment})`,
+        });
+    }
 }
 exports.EmailService = EmailService;
 exports.emailService = new EmailService();
