@@ -16,9 +16,9 @@ env:
   ACTIONS_RUNNER_DEBUG: true
 
 jobs:
-  # Fast feedback for PRs
+  # Fast feedback for PRs and development
   pr-checks:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     
@@ -753,3 +753,22 @@ jobs:
         echo "Deploying to production..."
         # Add your deployment commands here
         # npm run deploy
+
+  # Development workflow completion
+  develop-success:
+    if: github.ref == 'refs/heads/develop' && success()
+    needs: [develop-tests, security-scan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    
+    steps:
+    - name: ✅ Development Workflow Complete
+      run: |
+        echo "🎉 All development tests passed successfully!"
+        echo "✅ Smoke tests: PASSED"
+        echo "✅ UI tests: PASSED" 
+        echo "✅ Integration tests: PASSED"
+        echo "✅ Security scan: PASSED"
+        echo ""
+        echo "🚀 Development branch is ready!"
+        echo "📧 This job ensures you get success notifications for develop pushes"
