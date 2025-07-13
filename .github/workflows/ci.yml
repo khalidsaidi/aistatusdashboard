@@ -801,7 +801,21 @@ jobs:
     - name: Authenticate with Firebase
       run: |
         echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}' > firebase-service-account.json
+        echo "First 50 chars of service account:"
         cat firebase-service-account.json | head -c 50
+        echo ""
+        echo "Validating JSON format:"
+        if jq empty firebase-service-account.json 2>/dev/null; then
+          echo "✅ Valid JSON"
+        else
+          echo "❌ Invalid JSON - trying base64 decode..."
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}' | base64 -d > firebase-service-account.json
+          if jq empty firebase-service-account.json 2>/dev/null; then
+            echo "✅ Valid JSON after base64 decode"
+          else
+            echo "❌ Still invalid JSON"
+          fi
+        fi
         export GOOGLE_APPLICATION_CREDENTIALS=firebase-service-account.json
         
     - name: Deploy to development environment
