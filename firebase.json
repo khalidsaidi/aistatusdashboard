@@ -19,7 +19,7 @@
         "function": "api"
       },
       {
-        "source": "**",
+        "source": "!/**/*.@(js|css|svg|png|jpg|jpeg|gif|ico|json|xml|txt|pdf)",
         "destination": "/index.html"
       }
     ],
