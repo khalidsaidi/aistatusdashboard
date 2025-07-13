@@ -335,15 +335,9 @@ jobs:
       run: |
         echo "🚀 Starting development server for E2E tests..."
         
-        # Verify build exists
-        if [ ! -d ".next" ]; then
-          echo "❌ No build found, running build first..."
-          npm run build
-        fi
-        
-        # Start server in background with logging
-        echo "🚀 Starting Next.js server..."
-        npm run start > server.log 2>&1 &
+        # Use development server instead of production for more reliability
+        echo "🚀 Starting Next.js development server..."
+        npm run dev > server.log 2>&1 &
         SERVER_PID=$!
         echo $SERVER_PID > server.pid
         echo "📝 Server PID: $SERVER_PID"
@@ -361,10 +355,48 @@ jobs:
         
         # Verify server is running
         if ! curl -f http://localhost:3000 > /dev/null 2>&1; then
-          echo "❌ Server failed to start"
+          echo "❌ Server failed to start after 60 seconds"
+          echo "🔍 Debugging server startup..."
+          echo "Server process status:"
+          ps aux | grep -E "(node|next)" | head -5 || echo "No Node processes found"
+          echo "Port 3000 status:"
+          netstat -tlnp | grep :3000 || echo "Port 3000 not in use"
           echo "Server logs:"
-          cat server.log 2>/dev/null || echo "No server logs found"
-          exit 1
+          cat server.log 2>/dev/null | tail -20 || echo "No server logs found"
+          echo "Build status:"
+          ls -la .next/ 2>/dev/null | head -5 || echo "No .next directory"
+          
+          # Try alternative approaches
+          echo "🔄 Trying alternative server startup..."
+          
+          # Kill any existing processes
+          pkill -f "next" 2>/dev/null || true
+          sleep 2
+          
+          # Try starting with explicit port
+          echo "🚀 Attempting server start with explicit port..."
+          PORT=3000 npm run dev > server-alt.log 2>&1 &
+          ALT_PID=$!
+          echo $ALT_PID > server-alt.pid
+          
+          # Wait again
+          for i in {1..15}; do
+            if curl -f http://localhost:3000 > /dev/null 2>&1; then
+              echo "✅ Alternative server startup successful"
+              echo $ALT_PID > server.pid  # Update main PID file
+              break
+            fi
+            echo "⏳ Alternative attempt... ($i/15)"
+            sleep 2
+          done
+          
+          # Final check
+          if ! curl -f http://localhost:3000 > /dev/null 2>&1; then
+            echo "❌ All server startup attempts failed"
+            echo "Alternative server logs:"
+            cat server-alt.log 2>/dev/null | tail -10 || echo "No alternative logs"
+            exit 1
+          fi
         fi
       
     - name: Run test category
