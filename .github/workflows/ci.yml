@@ -800,7 +800,8 @@ jobs:
         
     - name: Authenticate with Firebase
       run: |
-        echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}" > firebase-service-account.json
+        echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEV }}' > firebase-service-account.json
+        cat firebase-service-account.json | head -c 50
         export GOOGLE_APPLICATION_CREDENTIALS=firebase-service-account.json
         
     - name: Deploy to development environment
@@ -842,7 +843,8 @@ jobs:
         
     - name: Authenticate with Firebase
       run: |
-        echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}" > firebase-service-account.json
+        echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}' > firebase-service-account.json
+        cat firebase-service-account.json | head -c 50
         export GOOGLE_APPLICATION_CREDENTIALS=firebase-service-account.json
         
     - name: Deploy to production environment
