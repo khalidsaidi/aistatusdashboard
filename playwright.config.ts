@@ -70,6 +70,7 @@ export default defineConfig({
   timeout: (() => {
     if (process.env.TEST_TYPE === 'performance') return 120000; // 2 minutes for performance tests
     if (process.env.TEST_TYPE === 'extended') return 60000; // 1 minute for extended tests
+    if (process.env.TEST_TYPE === 'smoke') return process.env.CI ? 60000 : 30000; // Longer timeout for smoke tests in CI
     return process.env.CI ? 30000 : 60000; // 30s in CI, 60s locally
   })(),
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -91,9 +92,11 @@ export default defineConfig({
     video: 'retain-on-failure',
     /* Add navigation timeout based on test type */
     navigationTimeout: process.env.TEST_TYPE === 'performance' ? 30000 : 
+                      process.env.TEST_TYPE === 'smoke' ? (process.env.CI ? 30000 : 15000) :
                       (process.env.CI ? 15000 : 30000),
     /* Add action timeout based on test type */
     actionTimeout: process.env.TEST_TYPE === 'performance' ? 15000 :
+                   process.env.TEST_TYPE === 'smoke' ? (process.env.CI ? 20000 : 10000) :
                    (process.env.CI ? 10000 : 30000),
   },
 

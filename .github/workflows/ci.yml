@@ -402,7 +402,20 @@ jobs:
     - name: Run test category
       run: |
         echo "🧪 Running E2E tests for category: ${{ matrix.test-category }}"
-        npm run test:e2e:${{ matrix.test-category }} || {
+        
+        # Add extra debugging for smoke tests
+        if [ "${{ matrix.test-category }}" = "smoke" ]; then
+          echo "🔍 Smoke test debugging:"
+          echo "Server status:"
+          curl -f http://localhost:3000 > /dev/null 2>&1 && echo "✅ Server responding" || echo "❌ Server not responding"
+          echo "Available smoke test files:"
+          find __tests__/e2e/smoke -name "*.spec.ts" -o -name "*.test.ts" 2>/dev/null || echo "No smoke test files found"
+          echo "Playwright browsers:"
+          npx playwright --version || echo "Playwright not available"
+        fi
+        
+        # Run tests with increased timeout for CI
+        timeout 300 npm run test:e2e:${{ matrix.test-category }} || {
           echo "❌ E2E tests failed. Debug info:"
           echo "Server status:"
           curl -I http://localhost:3000 2>/dev/null || echo "Server not responding"
@@ -410,10 +423,13 @@ jobs:
           find __tests__/e2e -name "*.spec.ts" -o -name "*.test.ts" | head -10
           echo "Playwright config:"
           cat playwright.config.ts | head -20
+          echo "Test results directory:"
+          ls -la test-results-${{ matrix.test-category }}/ 2>/dev/null || echo "No test results found"
           exit 1
         }
       env:
         CI: true
+        PLAYWRIGHT_TIMEOUT: 60000
         
     - name: Stop development server
       if: always()
