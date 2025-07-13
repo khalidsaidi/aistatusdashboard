@@ -802,6 +802,7 @@ jobs:
       run: npm run build
       env:
         NODE_ENV: production
+        NEXT_EXPORT: true
         NEXT_PUBLIC_FIREBASE_PROJECT_ID: ai-status-dashboard-dev
         
     - name: Authenticate with Firebase
@@ -865,6 +866,7 @@ jobs:
       run: npm run build
       env:
         NODE_ENV: production
+        NEXT_EXPORT: true
         NEXT_PUBLIC_FIREBASE_PROJECT_ID: ai-status-dashboard-prod
         
     - name: Authenticate with Firebase
