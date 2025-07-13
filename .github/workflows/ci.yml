@@ -804,6 +804,12 @@ jobs:
         NODE_ENV: production
         NEXT_EXPORT: true
         NEXT_PUBLIC_FIREBASE_PROJECT_ID: ai-status-dashboard-dev
+        NEXT_PUBLIC_FIREBASE_API_KEY: AIzaSyB-PApl2fcKWYSjnORl9rn-4NMVGnjVF1Q
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ai-status-dashboard-dev.firebaseapp.com
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ai-status-dashboard-dev.firebasestorage.app
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: "413124782229"
+        NEXT_PUBLIC_FIREBASE_APP_ID: 1:413124782229:web:81c009a0e73157e21e139c
+        NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: G-C7VKHPDHQM
         
     - name: Authenticate with Firebase
       run: |
@@ -863,11 +869,17 @@ jobs:
         cd ..
       
     - name: Build for production
-      run: npm run build:static
+      run: npm run build
       env:
         NODE_ENV: production
         NEXT_EXPORT: true
         NEXT_PUBLIC_FIREBASE_PROJECT_ID: ai-status-dashboard-prod
+        NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY_PROD }}
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ai-status-dashboard.firebaseapp.com
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ai-status-dashboard.firebasestorage.app
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID_PROD }}
+        NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID_PROD }}
+        NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID_PROD }}
         
     - name: Authenticate with Firebase
       run: |
