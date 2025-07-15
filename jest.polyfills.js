@@ -141,15 +141,11 @@
       ctx.Response = ResponsePolyfill;
       ctx.Headers = HeadersPolyfill;
 
-      // Mock fetch
-      ctx.fetch =
-        ctx.fetch ||
-        (async (url, options = {}) => {
-          return new ResponsePolyfill(JSON.stringify({ mock: true }), {
-            status: 200,
-            headers: { 'content-type': 'application/json' },
-          });
-        });
+      // Real fetch - use whatwg-fetch
+      if (!ctx.fetch) {
+        require('whatwg-fetch');
+        ctx.fetch = globalThis.fetch;
+      }
 
       // Mock URL
       if (!ctx.URL && typeof require !== 'undefined') {

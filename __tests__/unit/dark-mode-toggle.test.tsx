@@ -203,11 +203,11 @@ describe('Dark Mode Toggle Component', () => {
   });
 
   it('should handle localStorage errors gracefully', async () => {
-    // Mock localStorage to throw an error
+    // Test with real localStorage unavailable scenario
     const originalSetItem = localStorage.setItem;
-    localStorage.setItem = jest.fn(() => {
+    localStorage.setItem = () => {
       throw new Error('localStorage error');
-    });
+    };
 
     const { user } = renderWithUser(<DarkModeToggle />);
 

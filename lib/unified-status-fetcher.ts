@@ -37,17 +37,11 @@ export interface StatusResult {
   };
 }
 
-// Mock implementations for dependencies that don't exist yet
-class ThreadSafeRateLimiter {
-  async checkRateLimit(key: string, limit: number, windowMs: number) {
-    return {
-      allowed: true,
-      remaining: limit - 1,
-      resetTime: Date.now() + windowMs,
-      retryAfter: undefined,
-    };
-  }
-}
+// Real implementation - import the actual rate limiter
+import { rateLimiter } from './rate-limiter';
+
+// Use the real rate limiter instead of mock
+const ThreadSafeRateLimiter = rateLimiter;
 
 class GlobalLockManager {
   async withLock<T>(lockKey: string, fn: () => Promise<T>): Promise<T> {
@@ -95,7 +89,7 @@ interface FetcherMetrics {
 }
 
 export class UnifiedStatusFetcher {
-  private rateLimiter: ThreadSafeRateLimiter;
+  private rateLimiter: typeof rateLimiter;
   private lockManager: GlobalLockManager;
   private quotaOptimizer: FirebaseQuotaOptimizer;
   private cache = new Map<string, { result: StatusResult; timestamp: number; ttl: number }>();
@@ -109,7 +103,7 @@ export class UnifiedStatusFetcher {
   };
 
   constructor(private config: FetcherConfig) {
-    this.rateLimiter = new ThreadSafeRateLimiter();
+    this.rateLimiter = rateLimiter;
     this.lockManager = new GlobalLockManager();
     this.quotaOptimizer = new FirebaseQuotaOptimizer();
 
@@ -255,11 +249,12 @@ export class UnifiedStatusFetcher {
       if (!rateLimitResult.allowed) {
         log('warn', 'Rate limit exceeded for provider', {
           providerId: provider.id,
-          retryAfter: rateLimitResult.retryAfter,
+          resetTime: rateLimitResult.resetTime,
         });
 
         // Wait and retry
-        await new Promise((resolve) => setTimeout(resolve, rateLimitResult.retryAfter || 1000));
+        const waitTime = Math.max(0, rateLimitResult.resetTime - Date.now());
+        await new Promise((resolve) => setTimeout(resolve, waitTime || 1000));
       }
 
       // Fetch with enterprise-grade error handling

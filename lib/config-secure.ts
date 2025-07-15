@@ -163,8 +163,8 @@ function getApiBaseUrl(environment: Environment, firebaseProjectId: string): str
       return `https://${region}-${firebaseProjectId}.cloudfunctions.net/api`;
 
     case 'test':
-      // Tests use local API endpoints
-      return '/api';
+      // Tests use Firebase dev backend - never localhost
+      return `https://${region}-${firebaseProjectId}.cloudfunctions.net/api`;
 
     case 'staging':
     case 'production':

@@ -139,8 +139,10 @@ export class FirebaseWorkerQueue extends EventEmitter {
 
   private ensureFirebaseInitialized(): void {
     // Check if Jest environment is being torn down
-    if (process.env.NODE_ENV === 'test' && (global as any).jestTearingDown) {
-      // Jest is tearing down, don't initialize Firebase
+    if (process.env.NODE_ENV === 'test' && 
+        ((global as any).jestTearingDown || 
+         (global as any).process?.env?.JEST_WORKER_ID === undefined)) {
+      // Jest is tearing down or environment is not available, don't initialize Firebase
       return;
     }
 

@@ -41,13 +41,16 @@ if (process.env.NODE_ENV !== 'test' && typeof window !== 'undefined') {
     // Continue without Firebase in case of initialization errors
   }
 } else if (process.env.NODE_ENV === 'test') {
-  // Provide mock objects for test environment
-  app = {
-    name: 'mock-app',
-    options: firebaseConfig,
-  };
-  analytics = null;
-  performance = null;
+  // In test environment, use real Firebase with test project
+  try {
+    app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+    analytics = null; // Analytics not needed in tests
+    performance = null; // Performance monitoring not needed in tests
+    console.log('✅ Real Firebase initialized for tests with project:', firebaseConfig.projectId);
+  } catch (error) {
+    console.error('❌ Failed to initialize real Firebase for tests:', error);
+    throw new Error('Firebase initialization required for tests - no mocks allowed');
+  }
 }
 
 export { app, analytics, performance };

@@ -1,22 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Only use export mode in production builds
-  ...(process.env.NODE_ENV === 'production' && process.env.NEXT_EXPORT === 'true'
-    ? {
-        output: 'export',
-        trailingSlash: true,
-        images: {
-          unoptimized: true,
-        },
-        // Skip API routes during static export since we use Firebase Functions
-        skipTrailingSlashRedirect: true,
-      }
-    : {}),
-
-  // Environment-specific configuration
-  assetPrefix:
-    process.env.NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_ASSET_PREFIX || '' : '',
-
   // Build optimization
   experimental: {
     optimizeCss: true,
@@ -24,12 +7,20 @@ const nextConfig = {
   },
   serverExternalPackages: ['firebase-admin'],
 
-  // Webpack configuration for better error handling
+  // Turbopack configuration (now stable)
+  turbopack: {
+    resolveAlias: {
+      // Redirect Firebase Functions imports to empty modules
+      'firebase-functions': require.resolve('./lib/empty-module.js'),
+      'firebase-functions/v2': require.resolve('./lib/empty-module.js'),
+      'firebase-functions/v2/https': require.resolve('./lib/empty-module.js'),
+    },
+  },
+
+  // Webpack configuration for fallback compatibility
   webpack: (config, { dev, isServer }) => {
-    // Add source maps in development
-    if (dev) {
-      config.devtool = 'eval-source-map';
-    }
+    // Don't override Next.js devtool - let it use defaults
+    // The custom devtool setting was causing font serving issues
 
     // Completely exclude Firebase Functions directory from Next.js build
     config.resolve.alias = {

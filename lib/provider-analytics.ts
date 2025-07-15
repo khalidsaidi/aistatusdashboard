@@ -236,18 +236,49 @@ export class ProviderAnalyticsManager {
     if (!this.db) return [];
 
     try {
-      // In a real implementation, you'd use Firestore queries
-      // For now, we'll simulate with stored data
+      // Real Firestore implementation - get all provider analytics
       const providers: ProviderAnalytics[] = [];
 
-      // This would be replaced with actual Firestore query
-      const mockProviders = ['openai', 'anthropic', 'google-ai', 'huggingface', 'cohere'];
+      if (!this.db) {
+        throw new Error('Database not initialized - cannot get top providers');
+      }
 
-      for (const providerId of mockProviders) {
-        const analytics = await this.getProviderAnalytics(providerId);
-        if (analytics) {
-          providers.push(analytics);
-        }
+      try {
+        // Query all provider analytics from Firestore using proper v9 syntax
+        const { collection, query, orderBy, limit: limitQuery, getDocs } = await import('firebase/firestore');
+        const analyticsRef = collection(this.db, 'providerAnalytics');
+        const q = query(analyticsRef, orderBy('popularityScore', 'desc'), limitQuery(limit));
+        const snapshot = await getDocs(q);
+        
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          providers.push({
+            providerId: doc.id,
+            providerName: data.providerName || doc.id,
+            totalInteractions: data.totalInteractions || 0,
+            uniqueUsers: data.uniqueUsers || 0,
+            popularityScore: data.popularityScore || 0,
+            tier: data.tier || 'low',
+            lastInteraction: data.lastInteraction?.toDate() || new Date(),
+            interactionsByType: data.interactionsByType || {
+              views: 0,
+              clicks: 0,
+              subscriptions: 0,
+              shares: 0,
+              bookmarks: 0
+            },
+            costMetrics: data.costMetrics || {
+              monthlyChecks: 0,
+              estimatedMonthlyCost: 0,
+              costPerInteraction: 0
+            }
+          });
+        });
+      } catch (error) {
+        log('error', 'Failed to query provider analytics from Firestore', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+        throw error;
       }
 
       return providers.sort((a, b) => b.popularityScore - a.popularityScore).slice(0, limit);

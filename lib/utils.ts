@@ -1,29 +1,16 @@
 import { trackApiCall } from './firebase';
+import { APP_CONFIG } from '../config/app.config';
 
 export function getApiUrl(endpoint: string): string {
-  // For client-side requests, detect if we're running locally (but not in CI)
-  if (typeof window !== 'undefined') {
-    const isLocalhost =
-      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-    // In CI environment, always use Firebase Functions even on localhost
-    const isCI = process.env.CI === 'true' || process.env.NODE_ENV === 'test';
-
-    if (isLocalhost && !isCI) {
-      // Use local API routes that will proxy to Firebase Functions (only in real dev)
-      return `/api/${endpoint}`;
-    }
-  }
-
-  // For server-side, CI, or production, use Firebase Functions directly
+  // Always use Firebase Functions directly since we removed proxy routes
   const baseUrl =
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
-    `https://us-central1-${process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'demo-project'}.cloudfunctions.net`;
+    APP_CONFIG.environment.apiBaseUrl ||
+    `https://${APP_CONFIG.firebase.functions.region}-${process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'ai-status-dashboard-dev'}.cloudfunctions.net`;
 
   // Handle different endpoint types
-  if (['status', 'health', 'comments', 'notifications', 'incidents'].includes(endpoint)) {
+  if (['status', 'health', 'comments', 'notifications', 'incidents'].includes(endpoint.replace('api/', ''))) {
     // These endpoints are part of the main api function
-    return `${baseUrl}/api/${endpoint}`;
+    return `${baseUrl}/api/${endpoint.replace('api/', '')}`;
   } else {
     // For notification endpoints, use direct function URLs
     return `${baseUrl}/${endpoint}`;

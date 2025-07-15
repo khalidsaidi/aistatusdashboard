@@ -803,6 +803,7 @@ jobs:
       env:
         NODE_ENV: production
         NEXT_EXPORT: true
+        NEXT_PUBLIC_ENVIRONMENT: development
         NEXT_PUBLIC_FIREBASE_PROJECT_ID: ai-status-dashboard-dev
         NEXT_PUBLIC_FIREBASE_API_KEY: AIzaSyB-PApl2fcKWYSjnORl9rn-4NMVGnjVF1Q
         NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ai-status-dashboard-dev.firebaseapp.com
@@ -873,6 +874,7 @@ jobs:
       env:
         NODE_ENV: production
         NEXT_EXPORT: true
+        NEXT_PUBLIC_ENVIRONMENT: production
         NEXT_PUBLIC_FIREBASE_PROJECT_ID: ai-status-dashboard-prod
         NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY_PROD }}
         NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ai-status-dashboard.firebaseapp.com

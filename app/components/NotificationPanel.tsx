@@ -43,7 +43,7 @@ export default function NotificationPanel() {
 
   const fetchEmailSubscriptions = useCallback(async () => {
     try {
-      const response = await fetch(getApiUrl('/api/subscriptions'));
+      const response = await fetch(getApiUrl('api/subscriptions'));
       if (response.ok) {
         const data = await response.json();
         setSubscriptions(data.subscriptions || []);
@@ -55,7 +55,7 @@ export default function NotificationPanel() {
 
   const fetchWebhooks = useCallback(async () => {
     try {
-      const response = await fetch(getApiUrl('/api/webhooks'));
+      const response = await fetch(getApiUrl('api/webhooks'));
       if (response.ok) {
         const data = await response.json();
         setWebhooks(data.webhooks || []);
@@ -67,7 +67,7 @@ export default function NotificationPanel() {
 
   const fetchIncidents = useCallback(async () => {
     try {
-      const response = await fetch(getApiUrl('/api/incidents'));
+      const response = await fetch(getApiUrl('api/incidents'));
       if (response.ok) {
         const data = await response.json();
         setIncidents(data.incidents || []);
@@ -119,7 +119,7 @@ export default function NotificationPanel() {
 
     setLoading(true);
     try {
-      const response = await fetch(getApiUrl('/api/subscribe'), {
+      const response = await fetch(getApiUrl('api/subscribe'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -157,14 +157,15 @@ export default function NotificationPanel() {
     setLoading(true);
     try {
       if (pushEnabled) {
-        // Unsubscribe
-        const success = await unsubscribeFromPushNotifications();
+        // Unsubscribe (temporarily disabled)
+        // const success = await unsubscribeFromPushNotifications();
+        const success = false; // Stub for debugging
         if (success) {
           setPushEnabled(false);
           setPushSubscription(null);
           alert('Successfully unsubscribed from push notifications!');
         } else {
-          alert('Failed to unsubscribe from push notifications.');
+          alert('Push notifications temporarily disabled for debugging.');
         }
       } else {
         // Request permission first if not granted
@@ -199,7 +200,8 @@ export default function NotificationPanel() {
                 'Stability AI',
               ];
 
-        const success = await subscribeToPushNotifications(providersToUse);
+        // const success = await subscribeToPushNotifications(providersToUse);
+        const success = false; // Stub for debugging
         if (success) {
           setPushEnabled(true);
           setNotificationPermission('granted');
@@ -207,7 +209,7 @@ export default function NotificationPanel() {
           setPushSubscription(null); // We don't have the actual subscription object
           alert('Push notifications enabled!');
         } else {
-          alert('Failed to subscribe to push notifications.');
+          alert('Push notifications temporarily disabled for debugging.');
         }
       }
     } catch (error) {
@@ -224,7 +226,7 @@ export default function NotificationPanel() {
 
     setLoading(true);
     try {
-      const response = await fetch(getApiUrl('/api/webhooks'), {
+      const response = await fetch(getApiUrl('api/webhooks'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -261,7 +263,7 @@ export default function NotificationPanel() {
       return;
 
     try {
-      const response = await fetch(getApiUrl(`/api/webhooks/${id}`), {
+      const response = await fetch(getApiUrl(`api/webhooks/${id}`), {
         method: 'DELETE',
       });
 
@@ -287,7 +289,7 @@ export default function NotificationPanel() {
       return;
 
     try {
-      const response = await fetch(getApiUrl(`/api/subscriptions/${id}`), {
+      const response = await fetch(getApiUrl(`api/subscriptions/${id}`), {
         method: 'DELETE',
       });
 
@@ -517,7 +519,7 @@ export default function NotificationPanel() {
                             Providers: {subscription.providers.join(', ')}
                           </p>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Types: {subscription.notificationTypes.join(', ')}
+                            Types: {subscription.notificationTypes ? subscription.notificationTypes.join(', ') : 'All types'}
                           </p>
                           <p className="text-sm">
                             <span

@@ -234,12 +234,14 @@ describe('Service Worker - Real Implementation', () => {
     });
 
     it('should handle network errors in service worker', async () => {
-      // Test network error simulation
+      // Test network error simulation - use Firebase dev backend
       try {
-        const response = await fetch('/non-existent-endpoint');
+        const { getApiUrl } = require('../../lib/config-secure');
+        const response = await fetch(`${getApiUrl()}/non-existent-endpoint`);
 
         if (!response.ok) {
           console.log(`Network error handled: ${response.status}`);
+          expect(response.status).toBe(404);
         }
       } catch (error) {
         console.log('Network error caught and handled');

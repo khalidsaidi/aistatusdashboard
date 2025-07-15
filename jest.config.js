@@ -30,6 +30,9 @@ const customJestConfig = {
   testMatch: [
     '<rootDir>/__tests__/unit/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/__tests__/integration/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/__tests__/api/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/__tests__/frontend/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/__tests__/*.{js,jsx,ts,tsx}',
   ],
   testTimeout: process.env.CI ? 120000 : 60000, // Longer timeout in CI
   // Transform Firebase ESM modules to CommonJS for Jest

@@ -201,9 +201,9 @@ export default defineConfig({
   webServer: process.env.CI
     ? undefined
     : {
-        command: 'npm run dev',
+        command: 'pkill -f "npm run dev" || true && npm run dev',
         url: 'http://localhost:3000',
-        reuseExistingServer: !process.env.CI,
+        reuseExistingServer: true, // Use existing server if available
         timeout: 120 * 1000, // 2 minutes
       },
 });

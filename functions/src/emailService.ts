@@ -1,5 +1,6 @@
 import * as nodemailer from 'nodemailer';
 import { logger } from 'firebase-functions/v2';
+import { APP_CONFIG } from '../../config/app.config';
 
 interface EmailOptions {
   to: string;
@@ -35,35 +36,22 @@ export class EmailService {
     if (this.initialized) return;
 
     try {
-      // Use environment variables for Firebase Functions v2
-      const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
-      const smtpPort = process.env.SMTP_PORT || '587';
-      const smtpUser = process.env.SMTP_USER || 'status@aistatusdashboard.com';
-      const smtpPass = process.env.SMTP_PASS || 'your-app-password';
+      // Use centralized configuration
+      const { smtp } = APP_CONFIG.email;
       const environment = this.getEnvironment();
 
-      // Skip initialization if using placeholder credentials
-      if (
-        !smtpUser ||
-        !smtpPass ||
-        smtpPass.includes('placeholder') ||
-        smtpUser.includes('placeholder') ||
-        smtpPass === 'your-app-password'
-      ) {
-        logger.warn('SMTP using placeholder credentials - email service disabled', {
-          environment,
-        });
-        this.initialized = true;
-        return;
+      // Validate required credentials
+      if (!smtp.user || !smtp.password) {
+        throw new Error(`Missing required SMTP credentials: ${!smtp.user ? 'SMTP_USER' : ''} ${!smtp.password ? 'SMTP_PASSWORD' : ''}`);
       }
 
       this.transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: parseInt(smtpPort),
-        secure: smtpPort === '465',
+        host: smtp.host,
+        port: smtp.port,
+        secure: smtp.secure,
         auth: {
-          user: smtpUser,
-          pass: smtpPass,
+          user: smtp.user,
+          pass: smtp.password,
         },
       });
 
@@ -79,8 +67,8 @@ export class EmailService {
           } else {
             logger.info('SMTP server is ready to send emails', {
               environment,
-              host: smtpHost,
-              user: smtpUser,
+              host: smtp.host,
+              user: smtp.user,
             });
           }
         });

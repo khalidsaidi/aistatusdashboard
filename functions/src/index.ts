@@ -6,6 +6,7 @@ import express from 'express';
 import cors from 'cors';
 import { emailService } from './emailService';
 import fetch from 'node-fetch';
+import { APP_CONFIG } from '../../config/app.config';
 
 // Initialize Firebase Admin SDK
 admin.initializeApp();
@@ -26,93 +27,7 @@ interface Provider {
   statusPageUrl: string;
 }
 
-const PROVIDERS: Provider[] = [
-  {
-    id: 'openai',
-    name: 'OpenAI',
-    url: 'https://status.openai.com/api/v2/status.json',
-    statusPageUrl: 'https://status.openai.com',
-  },
-  {
-    id: 'anthropic',
-    name: 'Anthropic',
-    url: 'https://status.anthropic.com/api/v2/summary.json',
-    statusPageUrl: 'https://status.anthropic.com',
-  },
-  {
-    id: 'huggingface',
-    name: 'HuggingFace',
-    url: 'https://status.huggingface.co/api/v2/summary.json',
-    statusPageUrl: 'https://status.huggingface.co',
-  },
-  {
-    id: 'google-ai',
-    name: 'Google AI',
-    url: 'https://status.cloud.google.com/incidents.json',
-    statusPageUrl: 'https://status.cloud.google.com',
-  },
-  {
-    id: 'cohere',
-    name: 'Cohere',
-    url: 'https://status.cohere.com/api/v2/status.json',
-    statusPageUrl: 'https://status.cohere.com',
-  },
-  {
-    id: 'replicate',
-    name: 'Replicate',
-    url: 'https://www.replicatestatus.com/api/v2/status.json',
-    statusPageUrl: 'https://www.replicatestatus.com',
-  },
-  {
-    id: 'groq',
-    name: 'Groq',
-    url: 'https://groqstatus.com/api/v2/status.json',
-    statusPageUrl: 'https://groqstatus.com',
-  },
-  {
-    id: 'deepseek',
-    name: 'DeepSeek',
-    url: 'https://status.deepseek.com/api/v2/status.json',
-    statusPageUrl: 'https://status.deepseek.com',
-  },
-  // Additional AI Providers - using alternative detection methods
-  {
-    id: 'meta',
-    name: 'Meta AI',
-    url: 'https://ai.meta.com',
-    statusPageUrl: 'https://ai.meta.com',
-  },
-  {
-    id: 'xai',
-    name: 'xAI',
-    url: 'https://x.ai',
-    statusPageUrl: 'https://x.ai',
-  },
-  {
-    id: 'perplexity',
-    name: 'Perplexity AI',
-    url: 'https://status.perplexity.ai',
-    statusPageUrl: 'https://status.perplexity.ai',
-  },
-  {
-    id: 'mistral',
-    name: 'Mistral AI',
-    url: 'https://mistral.ai',
-    statusPageUrl: 'https://mistral.ai',
-  },
-  {
-    id: 'aws',
-    name: 'AWS AI Services',
-    url: 'https://status.aws.amazon.com/rss/all.rss',
-    statusPageUrl: 'https://status.aws.amazon.com',
-  },
-  {
-    id: 'azure',
-    name: 'Azure AI Services',
-    url: 'https://azurestatuscdn.azureedge.net/en-us/status/feed',
-    statusPageUrl: 'https://status.azure.com',
-  },
-];
+const PROVIDERS: readonly Provider[] = APP_CONFIG.providers;
 
 // Rate limiting storage
 interface RateLimit {
@@ -122,7 +37,7 @@ interface RateLimit {
 
 const rateLimits = new Map<string, RateLimit>();
 
-function checkRateLimit(clientId: string, maxRequests = 60, windowMs = 60000): boolean {
+function checkRateLimit(clientId: string, maxRequests = APP_CONFIG.rateLimit.maxRequests, windowMs = APP_CONFIG.rateLimit.windowMs): boolean {
   const now = Date.now();
   const clientLimit = rateLimits.get(clientId);
 

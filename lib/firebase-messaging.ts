@@ -18,9 +18,20 @@ const vapidKey = process.env.NEXT_PUBLIC_FCM_VAPID_KEY;
 let app: any = null;
 let messaging: Messaging | null = null;
 
+// Validate Firebase configuration
+const validateFirebaseConfig = () => {
+  const requiredFields = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
+  const missing = requiredFields.filter(field => !firebaseConfig[field as keyof typeof firebaseConfig]);
+  
+  if (missing.length > 0) {
+    throw new Error(`Missing Firebase configuration: ${missing.join(', ')}`);
+  }
+};
+
 // Skip Firebase initialization in test/Node.js environments
 if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
   try {
+    validateFirebaseConfig();
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
     // Initialize messaging only on client side with proper browser detection
@@ -28,8 +39,8 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'test') {
       messaging = getMessaging(app);
     }
   } catch (error) {
-    // Firebase messaging not available in this environment (expected in test/server environments)
-    messaging = null;
+    console.error('Firebase initialization failed:', error);
+    throw error;
   }
 }
 
@@ -62,18 +73,8 @@ export async function requestNotificationPermission(): Promise<string | null> {
     return null;
   }
 
-  if (
-    !vapidKey ||
-    vapidKey === 'your-dev-vapid-public-key' ||
-    vapidKey === 'your-prod-vapid-public-key'
-  ) {
-    const env = process.env.NODE_ENV || 'development';
-    console.error(
-      `VAPID key not configured for ${env} environment. Please set NEXT_PUBLIC_FCM_VAPID_KEY in your .env.${env === 'production' ? 'production' : 'local'} file.`
-    );
-    throw new Error(
-      `VAPID key not configured for ${env} environment. Please check your environment variables.`
-    );
+  if (!vapidKey) {
+    throw new Error('VAPID key not configured. Push notifications require a valid VAPID key.');
   }
 
   try {
