@@ -60,7 +60,7 @@
     "babel-jest": "^30.0.4",
     "eslint": "^8.46.0",
     "eslint-config-next": "^13.4.19",
-    "firebase-tools": "^13.0.0",
+    "firebase-tools": "^14.19.1",
     "husky": "^8.0.3",
     "jest": "^29.6.2",
     "jest-environment-jsdom": "^29.6.2",
