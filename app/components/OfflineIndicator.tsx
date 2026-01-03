@@ -69,7 +69,7 @@ export default function OfflineIndicator({ className = '' }: OfflineIndicatorPro
               You&apos;re offline
             </h3>
             <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-              Showing cached data. Some features may be limited.
+              Some features may be limited until you&apos;re back online.
               {lastOnline && (
                 <span className="block mt-1">Last online: {lastOnline.toLocaleTimeString()}</span>
               )}

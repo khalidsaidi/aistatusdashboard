@@ -94,6 +94,15 @@ jobs:
           # Create logs directory if it doesn't exist
           mkdir -p logs
 
+          # If the discovery script isn't present in this repo state, skip gracefully.
+          if [ ! -f "scripts/discover-ai-providers.js" ]; then
+            echo "⚠️ scripts/discover-ai-providers.js is missing; skipping discovery job."
+            cat > logs/discovery-results.json <<'EOF'
+          {"skipped":true,"reason":"scripts/discover-ai-providers.js missing","summary":{"sourcesChecked":0,"totalDiscovered":0,"highConfidence":0,"errorsCount":0}}
+          EOF
+            exit 0
+          fi
+
           # Run discovery script with proper environment
           node scripts/discover-ai-providers.js
 

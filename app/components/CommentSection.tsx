@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { UserComment } from '../../lib/types';
-import { getApiUrl } from '../../lib/utils';
+import { useState, useEffect, useCallback, useRef } from 'react';
+// import { UserComment } from '../../lib/types';
+import type { Comment as UserComment } from '@/lib/types';
+// import { getApiUrl } from '../../lib/utils';
 
 interface CommentSectionProps {
   providerId?: string;
@@ -16,6 +17,8 @@ export default function CommentSection({
   className = '',
 }: CommentSectionProps) {
   const [comments, setComments] = useState<UserComment[]>([]);
+  const [localPending, setLocalPending] = useState<UserComment[]>([]);
+  const localPendingRef = useRef<UserComment[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
@@ -31,6 +34,27 @@ export default function CommentSection({
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
 
+  useEffect(() => {
+    localPendingRef.current = localPending;
+  }, [localPending]);
+
+  const mergeComments = useCallback((primary: UserComment[], secondary: UserComment[]) => {
+    const merged = new Map<string, UserComment>();
+    primary.forEach((comment) => {
+      if (!merged.has(comment.id)) {
+        merged.set(comment.id, comment);
+      }
+    });
+    secondary.forEach((comment) => {
+      if (!merged.has(comment.id)) {
+        merged.set(comment.id, comment);
+      }
+    });
+    return Array.from(merged.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }, []);
+
   const fetchComments = useCallback(
     async (loadMore = false) => {
       setLoading(true);
@@ -42,25 +66,30 @@ export default function CommentSection({
           ...(providerId && { providerId }),
         });
 
-        const response = await fetch(`${getApiUrl('comments')}?${params}`);
+        const response = await fetch(`/api/comments?${params}`);
         const data = await response.json();
 
         if (response.ok) {
+          const pending = localPendingRef.current;
           // Ensure data is an array
-          const commentsData = Array.isArray(data)
+          const commentsData: UserComment[] = Array.isArray(data)
             ? data
             : data.comments && Array.isArray(data.comments)
               ? data.comments
               : [];
 
           if (loadMore) {
-            setComments((prev) => [...prev, ...commentsData]);
+            setComments((prev) => mergeComments(prev, commentsData));
           } else {
-            setComments(commentsData);
+            setComments(mergeComments(pending, commentsData));
             setOffset(0);
           }
 
           setHasMore(commentsData.length === limit);
+          if (pending.length > 0) {
+            const serverIds = new Set(commentsData.map((comment: UserComment) => comment.id));
+            setLocalPending((prev) => prev.filter((comment) => !serverIds.has(comment.id)));
+          }
           if (loadMore) {
             setOffset((prev) => prev + limit);
           }
@@ -75,7 +104,7 @@ export default function CommentSection({
         setLoading(false);
       }
     },
-    [providerId, offset]
+    [providerId, offset, mergeComments]
   );
 
   useEffect(() => {
@@ -88,13 +117,14 @@ export default function CommentSection({
     setMessage('');
 
     try {
-      const response = await fetch(getApiUrl('comments'), {
+      const response = await fetch('/api/comments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           author,
           content: commentMessage,
           provider: providerId,
+          type: commentType,
         }),
       });
 
@@ -107,7 +137,23 @@ export default function CommentSection({
         setCommentMessage('');
         setCommentType('general');
 
-        // Refresh comments to show new comment (if approved)
+        const newComment: UserComment = {
+          id: data.id || `local-${Date.now()}`,
+          author,
+          content: commentMessage,
+          provider: providerId || null,
+          createdAt: new Date().toISOString(),
+          approved: false,
+          likes: 0,
+          type: commentType,
+          status: 'pending',
+        };
+        const mergedPending = mergeComments([newComment], localPendingRef.current);
+        localPendingRef.current = mergedPending;
+        setLocalPending(mergedPending);
+        setComments((prev) => mergeComments([newComment], prev));
+
+        // Refresh comments to sync with server (pending comments stay visible)
         await fetchComments();
       } else {
         setMessage(`❌ Error: ${data.error}`);
@@ -124,7 +170,7 @@ export default function CommentSection({
 
   const handleCommentAction = async (commentId: string, action: string) => {
     try {
-      const response = await fetch(`${getApiUrl('comments')}/${commentId}`, {
+      const response = await fetch(`/api/comments/${commentId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action }),
@@ -345,13 +391,12 @@ export default function CommentSection({
       {/* Message Display */}
       {message && (
         <div
-          className={`p-3 rounded-md ${
-            message.includes('✅') || message.includes('👍')
-              ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200'
-              : message.includes('🚨')
-                ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200'
-                : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200'
-          }`}
+          className={`p-3 rounded-md ${message.includes('✅') || message.includes('👍')
+            ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200'
+            : message.includes('🚨')
+              ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200'
+              : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200'
+            }`}
         >
           {message}
         </div>

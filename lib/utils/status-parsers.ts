@@ -1,5 +1,5 @@
 import { ProviderStatus } from '../types';
-import { validateStatusResult } from '../validation';
+// import { validateStatusResult } from '../validation';
 
 /**
  * Status Parsing Utilities
@@ -46,6 +46,123 @@ export function parseStatusPageResponse(data: any): ProviderStatus {
 }
 
 /**
+ * Parse Instatus summary API response
+ *
+ * AI CONSTRAINTS:
+ * - MUST handle minimal summary payloads
+ * - MUST map common status strings to ProviderStatus
+ */
+export function parseInstatusSummaryResponse(data: any): ProviderStatus {
+  try {
+    if (!data || typeof data !== 'object') {
+      return 'unknown';
+    }
+
+    const rawStatus =
+      typeof data.page?.status === 'string'
+        ? data.page.status
+        : typeof data.status === 'string'
+          ? data.status
+          : typeof data.status?.indicator === 'string'
+            ? data.status.indicator
+            : undefined;
+
+    if (!rawStatus) {
+      return 'unknown';
+    }
+
+    const normalized = rawStatus.trim().toLowerCase();
+
+    if (['up', 'operational', 'ok', 'online'].includes(normalized)) {
+      return 'operational';
+    }
+
+    if (
+      normalized.includes('down') ||
+      normalized.includes('outage') ||
+      normalized.includes('major') ||
+      normalized.includes('critical')
+    ) {
+      return 'down';
+    }
+
+    if (
+      normalized.includes('issue') ||
+      normalized.includes('degrad') ||
+      normalized.includes('partial') ||
+      normalized.includes('maint')
+    ) {
+      return 'degraded';
+    }
+
+    return 'unknown';
+  } catch (error) {
+    return 'unknown';
+  }
+}
+
+/**
+ * Parse Meta status JSON response
+ *
+ * AI CONSTRAINTS:
+ * - MUST handle array of orgs with services
+ * - MUST detect non-operational service statuses
+ */
+export function parseMetaStatusResponse(data: any): ProviderStatus {
+  try {
+    if (!Array.isArray(data)) {
+      return 'unknown';
+    }
+
+    let hasServices = false;
+    let hasIssues = false;
+
+    for (const org of data) {
+      const services = Array.isArray(org?.services) ? org.services : [];
+      for (const service of services) {
+        if (typeof service?.status !== 'string') {
+          continue;
+        }
+
+        hasServices = true;
+        const normalized = service.status.trim().toLowerCase();
+
+        if (normalized.includes('no known issues') || normalized.includes('no issues')) {
+          continue;
+        }
+
+        if (
+          normalized.includes('outage') ||
+          normalized.includes('down') ||
+          normalized.includes('critical') ||
+          normalized.includes('major')
+        ) {
+          return 'down';
+        }
+
+        if (
+          normalized.includes('disruption') ||
+          normalized.includes('issue') ||
+          normalized.includes('incident') ||
+          normalized.includes('degrad') ||
+          normalized.includes('partial')
+        ) {
+          hasIssues = true;
+        }
+      }
+    }
+
+    if (!hasServices) {
+      return 'unknown';
+    }
+
+    return hasIssues ? 'degraded' : 'operational';
+  } catch (error) {
+    return 'unknown';
+  }
+}
+
+/**
  * Parse Google Cloud status API response
  *
  * AI CONSTRAINTS:
@@ -85,10 +202,71 @@ export function parseGoogleCloudResponse(data: any): ProviderStatus {
  */
 export function parseRssFeedResponse(data: any): ProviderStatus {
   try {
-    if (typeof data === 'string' && data.length > 0) {
-      return 'operational';
+    if (typeof data !== 'string') {
+      return 'unknown';
     }
-    return 'unknown';
+
+    const items = data.match(/<item[\s\S]*?<\/item>/gi) || [];
+    if (items.length === 0) {
+      return data.length > 0 ? 'operational' : 'unknown';
+    }
+
+    const resolvedKeywords = [
+      'resolved',
+      'completed',
+      'closed',
+      'mitigated',
+      'restored',
+      'recovered',
+    ];
+    const degradedKeywords = [
+      'degraded',
+      'partial',
+      'performance',
+      'latency',
+      'issue',
+      'incident',
+      'investigating',
+      'identified',
+      'monitoring',
+      'impact',
+    ];
+    const downKeywords = [
+      'outage',
+      'down',
+      'unavailable',
+      'service disruption',
+      'critical',
+      'major',
+    ];
+
+    let hasDegraded = false;
+
+    for (const item of items) {
+      const titleMatch = item.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+      const descriptionMatch = item.match(/<description[^>]*>([\s\S]*?)<\/description>/i);
+      const contentMatch = item.match(/<content:encoded[^>]*>([\s\S]*?)<\/content:encoded>/i);
+
+      const rawText = [titleMatch?.[1], descriptionMatch?.[1], contentMatch?.[1]]
+        .filter(Boolean)
+        .join(' ');
+
+      const text = rawText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').toLowerCase();
+
+      const isResolved = resolvedKeywords.some((keyword) => text.includes(keyword));
+      const isDown = downKeywords.some((keyword) => text.includes(keyword));
+      const isDegraded = degradedKeywords.some((keyword) => text.includes(keyword));
+
+      if (isDown && !isResolved) {
+        return 'down';
+      }
+
+      if (isDegraded && !isResolved) {
+        hasDegraded = true;
+      }
+    }
+
+    return hasDegraded ? 'degraded' : 'operational';
   } catch (error) {
     return 'unknown';
   }
@@ -109,23 +287,52 @@ export function parseHtmlResponse(data: any): ProviderStatus {
     }
 
     const html = data.toLowerCase();
+    const cleaned = html
+      .replace(/<script[\s\S]*?<\/script>/g, ' ')
+      .replace(/<style[\s\S]*?<\/style>/g, ' ');
+    const text = cleaned.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
 
-    // Look for status indicators in HTML
-    const hasIncidents =
-      html.includes('incident') ||
-      html.includes('outage') ||
-      html.includes('down') ||
-      html.includes('degraded') ||
-      html.includes('issues');
+    const downKeywords = [
+      'major outage',
+      'service outage',
+      'outage',
+      'down',
+      'unavailable',
+    ];
+    const degradedKeywords = [
+      'degraded',
+      'partial outage',
+      'service disruption',
+      'performance issues',
+      'elevated errors',
+      'elevated latency',
+      'investigating',
+      'identified',
+      'monitoring',
+      'major incident',
+      'minor incident',
+      'partial disruption',
+    ];
+    const operationalKeywords = [
+      'all systems operational',
+      'all services operational',
+      'no known issues',
+      'no incidents',
+      'all systems go',
+      'operational',
+    ];
 
-    const isOperational =
-      html.includes('operational') || html.includes('all systems') || html.includes('no issues');
+    if (downKeywords.some((keyword) => text.includes(keyword))) {
+      return 'down';
+    }
 
-    if (hasIncidents && !isOperational) {
+    if (degradedKeywords.some((keyword) => text.includes(keyword))) {
       return 'degraded';
     }
 
-    return isOperational || !hasIncidents ? 'operational' : 'unknown';
+    return operationalKeywords.some((keyword) => text.includes(keyword))
+      ? 'operational'
+      : 'unknown';
   } catch (error) {
     return 'unknown';
   }

@@ -32,18 +32,23 @@ export default function ClientTimestamp({
   // Always call formatDate function to avoid conditional logic after hooks
   const targetDate = date || currentTime;
 
-  const formatDate = () => {
+  const formatDate = (useUtc: boolean) => {
+    const locale = useUtc ? 'en-US' : undefined;
+    const options = useUtc ? { timeZone: 'UTC' } : undefined;
+
     switch (format) {
       case 'date':
-        return targetDate.toLocaleDateString();
+        return targetDate.toLocaleDateString(locale, options);
       case 'time':
-        return targetDate.toLocaleTimeString();
+        return targetDate.toLocaleTimeString(locale, options);
       case 'datetime':
       default:
-        return targetDate.toLocaleString();
+        return targetDate.toLocaleString(locale, options);
     }
   };
 
+  const fallback = date ? formatDate(true) : 'Loading...';
+
   // Use conditional rendering instead of early return
-  return <span className={className}>{mounted ? formatDate() : 'Loading...'}</span>;
+  return <span className={className}>{mounted ? formatDate(false) : fallback}</span>;
 }

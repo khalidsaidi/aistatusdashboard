@@ -57,15 +57,14 @@ export default defineConfig({
   testDir: './__tests__/e2e',
   testMatch: getTestFilter(),
   /* Run tests in files in parallel */
-  fullyParallel: true,
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 1 : 0,
-  /* Opt out of parallel tests on CI for stability, but allow more workers for speed */
-  workers: process.env.CI ? 
-    (process.env.TEST_TYPE === 'critical' ? 2 : 1) : // More workers for critical tests
-    undefined,
+  // These E2E tests mutate shared Firestore collections (clear/seed),
+  // so they must not run concurrently to remain deterministic.
+  workers: 1,
   /* Add timeout based on test type */
   timeout: (() => {
     if (process.env.TEST_TYPE === 'performance') return 120000; // 2 minutes for performance tests
@@ -75,7 +74,7 @@ export default defineConfig({
   })(),
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
-    ['html', { outputFolder: `test-results-${process.env.TEST_TYPE || 'all'}/html` }],
+    ['html', { outputFolder: `test-results-${process.env.TEST_TYPE || 'all'}/html`, open: 'never' }],
     ['github'],
     ['junit', { outputFile: `test-results-${process.env.TEST_TYPE || 'all'}/junit.xml` }],
     ['json', { outputFile: `test-results-${process.env.TEST_TYPE || 'all'}/results.json` }]
@@ -83,7 +82,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.TEST_FRONTEND_URL || 'http://localhost:3000',
+    baseURL: process.env.TEST_FRONTEND_URL || 'http://localhost:3001',
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
     /* Take screenshot on failure */
@@ -201,8 +200,8 @@ export default defineConfig({
   webServer: process.env.CI
     ? undefined
     : {
-        command: 'pkill -f "npm run dev" || true && npm run dev',
-        url: 'http://localhost:3000',
+        command: 'node scripts/start-dev.js',
+        url: 'http://localhost:3001',
         reuseExistingServer: true, // Use existing server if available
         timeout: 120 * 1000, // 2 minutes
       },

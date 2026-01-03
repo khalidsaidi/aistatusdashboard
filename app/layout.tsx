@@ -8,15 +8,15 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { Suspense } from 'react';
 import { Providers } from './providers';
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';
 import GlobalErrorHandler from './components/GlobalErrorHandler';
+import OfflineIndicator from './components/OfflineIndicator';
 
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-HPNE6D3YQW';
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-ZV3PS0MPQ7';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'AI Status Dashboard - Real-time AI Provider Monitoring',
     template: '%s | AI Status Dashboard',
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com',
+    url: SITE_URL,
     siteName: 'AI Status Dashboard',
     title: 'AI Status Dashboard - Real-time AI Provider Monitoring',
     description:
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     creator: '@aistatusdash',
   },
   alternates: {
-    canonical: process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com',
+    canonical: SITE_URL,
   },
   verification: {
     google: process.env.GOOGLE_SITE_VERIFICATION,
@@ -102,54 +102,31 @@ export const metadata: Metadata = {
   },
 };
 
-// Client-side Firebase initialization component
-function FirebaseInit() {
-  if (typeof window === 'undefined') return null;
-
-  // Import Firebase modules only on client side
-  import('../lib/firebase').then(({ trackPageLoad }) => {
-    trackPageLoad('app_layout');
-  });
-
-  // Import crashlytics for error tracking
-  import('../lib/crashlytics').then(({ logError, setBreadcrumb }) => {
-    setBreadcrumb('App initialized', 'navigation');
-
-    // Set up global error handler
-    window.addEventListener('error', (event) => {
-      logError(event.error, 'global_error_handler');
-    });
-
-    window.addEventListener('unhandledrejection', (event) => {
-      logError(new Error(event.reason), 'unhandled_promise_rejection');
-    });
-  });
-
+// Client-side initialization
+function ClientInit() {
   return null;
 }
 
 // Google Analytics component
 function GoogleAnalytics() {
-  if (typeof window === 'undefined') return null;
+  if (!GA_MEASUREMENT_ID) return null;
 
   return (
     <>
-      <script
-        async
+      <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-      ></script>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GA_MEASUREMENT_ID}', {
-              page_path: window.location.pathname,
-            });
-          `,
-        }}
+        strategy="afterInteractive"
       />
+      <Script id="ga-init" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${GA_MEASUREMENT_ID}', {
+            page_path: window.location.pathname,
+          });
+        `}
+      </Script>
     </>
   );
 }
@@ -160,7 +137,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     '@type': 'WebApplication',
     name: 'AI Status Dashboard',
     description: 'Real-time status monitoring dashboard for AI provider APIs',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://yourdomain.com',
+    url: SITE_URL,
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Any',
     offers: {
@@ -206,12 +183,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <GoogleAnalytics />
         </Suspense>
       </head>
-      <body className={geistSans.className}>
+      <body className={`${geistSans.className} ${geistMono.variable} antialiased min-h-screen bg-background font-sans`}>
         <ErrorBoundary>
           <Providers>
             <GlobalErrorHandler />
             <Suspense fallback={null}>
-              <FirebaseInit />
+              <ClientInit />
             </Suspense>
             <a
               href="#main"
@@ -220,6 +197,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               Skip to main content
             </a>
             <Navbar />
+            <OfflineIndicator />
             <div id="main" className="flex-1">
               {children}
             </div>
@@ -241,15 +219,34 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script id="sw-registration" strategy="afterInteractive">
           {`
             if ('serviceWorker' in navigator) {
-              window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
-                  .then(function(registration) {
-                    console.log('SW registered: ', registration);
-                  })
-                  .catch(function(registrationError) {
-                    console.log('SW registration failed: ', registrationError);
-                  });
-              });
+              const registerServiceWorker = async function() {
+                try {
+                  const hostname = window.location.hostname;
+                  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+                  const allowLocalSw = ${process.env.NEXT_PUBLIC_ENABLE_SW_ON_LOCALHOST === 'true' ? 'true' : 'false'};
+
+                  // Service workers often cause confusing caching issues during local dev.
+                  // If one is installed on localhost, unregister it to keep the dev experience reliable.
+                  if (isLocalhost && !allowLocalSw) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(registrations.map((r) => r.unregister()));
+                    return;
+                  }
+
+                  const registration = await navigator.serviceWorker.register('/sw.js');
+                  console.log('SW registered:', registration);
+                } catch (registrationError) {
+                  console.log('SW registration failed:', registrationError);
+                }
+              };
+
+              // afterInteractive scripts can run after the window load event in fast navigations.
+              // Register immediately if the document is already loaded.
+              if (document.readyState === 'complete') {
+                registerServiceWorker();
+              } else {
+                window.addEventListener('load', registerServiceWorker);
+              }
             }
           `}
         </Script>
@@ -268,10 +265,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Script>
         */}
 
-        <Suspense fallback={null}>
-          <Analytics />
-          <SpeedInsights />
-        </Suspense>
       </body>
     </html>
   );

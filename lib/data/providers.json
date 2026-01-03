@@ -1,0 +1,166 @@
+{
+    "providers": [
+        {
+            "id": "openai",
+            "name": "OpenAI",
+            "category": "LLM",
+            "statusUrl": "https://status.openai.com/api/v2/status.json",
+            "statusPageUrl": "https://status.openai.com",
+            "format": "statuspage",
+            "enabled": true
+        },
+        {
+            "id": "anthropic",
+            "name": "Anthropic",
+            "category": "LLM",
+            "statusUrl": "https://status.anthropic.com/api/v2/status.json",
+            "statusPageUrl": "https://status.anthropic.com",
+            "format": "statuspage",
+            "enabled": true
+        },
+        {
+            "id": "google-ai",
+            "name": "Google Gemini / AI Studio",
+            "category": "LLM",
+            "statusUrl": "https://status.cloud.google.com/incidents.json",
+            "statusPageUrl": "https://status.cloud.google.com",
+            "format": "google-cloud",
+            "enabled": true
+        },
+        {
+            "id": "mistral",
+            "name": "Mistral AI",
+            "category": "LLM",
+            "statusUrl": "https://status.mistral.ai",
+            "statusPageUrl": "https://status.mistral.ai",
+            "format": "html",
+            "enabled": true
+        },
+        {
+            "id": "cohere",
+            "name": "Cohere",
+            "category": "LLM",
+            "statusUrl": "https://status.cohere.com/api/v2/status.json",
+            "statusPageUrl": "https://status.cohere.com",
+            "format": "statuspage",
+            "enabled": true
+        },
+        {
+            "id": "meta",
+            "name": "Meta AI (Meta Status)",
+            "category": "LLM",
+            "statusUrl": "https://metastatus.com/data/orgs.json",
+            "statusPageUrl": "https://metastatus.com",
+            "format": "meta",
+            "enabled": true
+        },
+        {
+            "id": "perplexity",
+            "name": "Perplexity",
+            "category": "Search",
+            "statusUrl": "https://perplexity.instatus.com/summary.json",
+            "statusPageUrl": "https://status.perplexity.com",
+            "format": "instatus",
+            "enabled": true
+        },
+        {
+            "id": "groq",
+            "name": "Groq",
+            "category": "LLM",
+            "statusUrl": "https://groqstatus.com/api/v2/status.json",
+            "statusPageUrl": "https://groqstatus.com",
+            "format": "statuspage",
+            "enabled": true
+        },
+        {
+            "id": "deepseek",
+            "name": "DeepSeek",
+            "category": "LLM",
+            "statusUrl": "https://status.deepseek.com/api/v2/status.json",
+            "statusPageUrl": "https://status.deepseek.com",
+            "format": "statuspage",
+            "enabled": true
+        },
+        {
+            "id": "ai21",
+            "name": "AI21 Labs",
+            "category": "LLM",
+            "statusUrl": "https://status.ai21.com/api/v2/status.json",
+            "statusPageUrl": "https://status.ai21.com",
+            "format": "statuspage",
+            "enabled": true
+        },
+        {
+            "id": "stability",
+            "name": "Stability AI",
+            "category": "LLM",
+            "statusUrl": "https://status.stability.ai/api/v2/status.json",
+            "statusPageUrl": "https://status.stability.ai",
+            "format": "statuspage",
+            "enabled": true
+        },
+        {
+            "id": "cerebras",
+            "name": "Cerebras",
+            "category": "LLM",
+            "statusUrl": "https://status.cerebras.ai/api/v2/status.json",
+            "statusPageUrl": "https://status.cerebras.ai",
+            "format": "statuspage",
+            "enabled": true
+        },
+        {
+            "id": "runway",
+            "name": "Runway",
+            "category": "LLM",
+            "statusUrl": "https://status.runwayml.com/api/v2/status.json",
+            "statusPageUrl": "https://status.runwayml.com",
+            "format": "statuspage",
+            "enabled": true
+        },
+        {
+            "id": "huggingface",
+            "name": "Hugging Face",
+            "category": "Ecosystem",
+            "statusUrl": "https://status.huggingface.co",
+            "statusPageUrl": "https://status.huggingface.co",
+            "format": "html",
+            "enabled": true
+        },
+        {
+            "id": "replicate",
+            "name": "Replicate",
+            "category": "Deployment",
+            "statusUrl": "https://status.replicate.com/api/v2/status.json",
+            "statusPageUrl": "https://status.replicate.com",
+            "format": "statuspage",
+            "enabled": true
+        },
+        {
+            "id": "xai",
+            "name": "xAI (Grok)",
+            "category": "LLM",
+            "statusUrl": "https://xai.instatus.com/summary.json",
+            "statusPageUrl": "https://xai.instatus.com",
+            "format": "instatus",
+            "enabled": true
+        },
+        {
+            "id": "aws",
+            "name": "AWS Bedrock",
+            "category": "Cloud",
+            "statusUrl": "https://status.aws.amazon.com/rss/all.rss",
+            "statusPageUrl": "https://status.aws.amazon.com",
+            "format": "rss",
+            "enabled": true
+        },
+        {
+            "id": "azure",
+            "name": "Azure OpenAI",
+            "category": "Cloud",
+            "statusUrl": "https://azure.status.microsoft/en-us/status/feed/",
+            "statusPageUrl": "https://azure.status.microsoft/en-us/status/",
+            "format": "rss",
+            "enabled": true
+        }
+    ]
+}

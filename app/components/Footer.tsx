@@ -1,4 +1,10 @@
 export default function Footer() {
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || process.env.CONTACT_EMAIL;
+  const contactHref = contactEmail
+    ? `mailto:${contactEmail}?subject=Trademark%20Removal%20Request`
+    : 'https://github.com/khalidsaidi/aistatusdashboard/issues/new?labels=trademark&title=Trademark%20Removal%20Request';
+  const contactLabel = contactEmail ? 'contact us' : 'open an issue';
+
   return (
     <footer
       role="contentinfo"
@@ -30,10 +36,12 @@ export default function Footer() {
           <p className="text-xs text-gray-500 dark:text-gray-500">
             If you are a rights holder and want your trademark removed, please{' '}
             <a
-              href="mailto:legal@yourdomain.com?subject=Trademark%20Removal%20Request"
+              href={contactHref}
               className="text-blue-700 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300 py-1 px-2 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              target={contactEmail ? undefined : '_blank'}
+              rel={contactEmail ? undefined : 'noopener noreferrer'}
             >
-              contact us
+              {contactLabel}
             </a>{' '}
             and we&apos;ll comply within 24 hours.
           </p>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
@@ -211,33 +211,50 @@ const ToastContext = createContext<ToastContextType | null>(null);
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const showToast = (toast: Omit<Toast, 'id'>) => {
+  const showToast = useCallback((toast: Omit<Toast, 'id'>) => {
     const id = Math.random().toString(36).substr(2, 9);
     setToasts((prev) => [...prev, { ...toast, id }]);
-  };
+  }, []);
 
-  const showSuccess = (title: string, message?: string) => {
-    showToast({ type: 'success', title, message });
-  };
+  const showSuccess = useCallback(
+    (title: string, message?: string) => {
+      showToast({ type: 'success', title, message });
+    },
+    [showToast]
+  );
 
-  const showError = (title: string, message?: string) => {
-    showToast({ type: 'error', title, message });
-  };
+  const showError = useCallback(
+    (title: string, message?: string) => {
+      showToast({ type: 'error', title, message });
+    },
+    [showToast]
+  );
 
-  const showWarning = (title: string, message?: string) => {
-    showToast({ type: 'warning', title, message });
-  };
+  const showWarning = useCallback(
+    (title: string, message?: string) => {
+      showToast({ type: 'warning', title, message });
+    },
+    [showToast]
+  );
 
-  const showInfo = (title: string, message?: string) => {
-    showToast({ type: 'info', title, message });
-  };
+  const showInfo = useCallback(
+    (title: string, message?: string) => {
+      showToast({ type: 'info', title, message });
+    },
+    [showToast]
+  );
 
-  const closeToast = (id: string) => {
+  const closeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
-  };
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({ showToast, showSuccess, showError, showWarning, showInfo }),
+    [showToast, showSuccess, showError, showWarning, showInfo]
+  );
 
   return (
-    <ToastContext.Provider value={{ showToast, showSuccess, showError, showWarning, showInfo }}>
+    <ToastContext.Provider value={contextValue}>
       {children}
       <ToastContainer toasts={toasts} onClose={closeToast} />
     </ToastContext.Provider>

@@ -7,12 +7,18 @@ import APIDemo from './APIDemo';
 import CommentSection from './CommentSection';
 import ClientTimestamp from './ClientTimestamp';
 import AnalyticsDashboard from './AnalyticsDashboard';
+import ExportShare from './ExportShare';
 import React from 'react';
 import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { trackEvent } from '@/lib/utils/analytics-client';
 
 interface DashboardTabsProps {
   statuses?: StatusResult[];
 }
+
+const VALID_TABS = ['dashboard', 'notifications', 'api', 'comments', 'analytics'] as const;
+type DashboardTabId = typeof VALID_TABS[number];
 
 // Error boundary component
 class ErrorBoundary extends React.Component<
@@ -62,22 +68,43 @@ class ErrorBoundary extends React.Component<
 export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
   // Initialize ALL hooks first - React requires hooks to be called in the same order
   const [activeTab, setActiveTab] = useState<
-    'dashboard' | 'notifications' | 'api' | 'comments' | 'analytics'
+    DashboardTabId
   >('dashboard');
 
-  // Handle URL parameters for tab switching
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Sync tab selection from the URL (supports navbar links + back/forward)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const tabParam = urlParams.get('tab');
-      if (
-        tabParam &&
-        ['dashboard', 'notifications', 'api', 'comments', 'analytics'].includes(tabParam)
-      ) {
-        setActiveTab(tabParam as 'dashboard' | 'notifications' | 'api' | 'comments' | 'analytics');
-      }
+    const tabParam = searchParams.get('tab');
+    if (tabParam && (VALID_TABS as readonly string[]).includes(tabParam)) {
+      setActiveTab(tabParam as DashboardTabId);
+    } else {
+      setActiveTab('dashboard');
     }
+  }, [searchParams]);
+
+  useEffect(() => {
+    trackEvent('page_view', { metadata: { path: window.location.pathname } });
   }, []);
+
+  useEffect(() => {
+    trackEvent('tab_view', { metadata: { tab: activeTab } });
+  }, [activeTab]);
+
+  const setTab = (tab: DashboardTabId) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (tab === 'dashboard') {
+      params.delete('tab');
+    } else {
+      params.set('tab', tab);
+    }
+
+    const query = params.toString();
+    router.replace(query ? `/?${query}` : '/', { scroll: false });
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<
     'all' | 'operational' | 'degraded' | 'down' | 'unknown'
@@ -137,7 +164,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
       .map((t) => new Date(t).getTime())
       .sort((a, b) => b - a); // Sort descending to get most recent
 
-    return timestamps.length > 0 ? new Date(timestamps[0]) : new Date();
+    return timestamps.length > 0 ? new Date(timestamps[0]) : null;
   }, [safeStatuses]);
 
   const systemStatus = React.useMemo(() => {
@@ -261,7 +288,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
 
   const tabs = [
     { id: 'dashboard', label: '📊 Status Dashboard', count: filteredAndSortedStatuses.length },
-    { id: 'analytics', label: '📈 Analytics & Costs', count: null },
+    { id: 'analytics', label: '📈 Analytics & Engagement', count: null },
     { id: 'notifications', label: '🔔 Notifications', count: null },
     { id: 'api', label: '🚀 API & Badges', count: null },
     { id: 'comments', label: '💬 Comments', count: null },
@@ -381,7 +408,11 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
           <div>
             <p className="text-gray-600 dark:text-gray-400">Last Checked</p>
             <p className="font-medium text-gray-900 dark:text-white">
-              {status.lastChecked ? new Date(status.lastChecked).toLocaleTimeString() : 'N/A'}
+              {status.lastChecked ? (
+                <ClientTimestamp format="time" date={new Date(status.lastChecked)} />
+              ) : (
+                'N/A'
+              )}
             </p>
           </div>
         </div>
@@ -408,6 +439,12 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
             href={status.statusPageUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() =>
+              trackEvent('provider_click', {
+                providerId: status.id,
+                metadata: { providerName: status.name },
+              })
+            }
             className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             data-testid="official-status-link"
           >
@@ -446,7 +483,9 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
                 </div>
                 <div className="text-gray-600 dark:text-gray-400">
                   Last updated:{' '}
-                  <span className="font-medium">{lastUpdated.toLocaleTimeString()}</span>
+                  <span className="font-medium">
+                    {lastUpdated ? <ClientTimestamp format="time" date={lastUpdated} /> : 'N/A'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -719,7 +758,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setTab(tab.id as any)}
               data-testid={tab.id === 'notifications' ? 'notifications-button' : undefined}
               className={`px-8 py-4 font-medium text-sm border-b-2 transition-colors flex items-center gap-2 min-h-[48px] min-w-[48px] ${
                 activeTab === tab.id
@@ -821,6 +860,8 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
                     </p>
                   </div>
                 </div>
+
+                <ExportShare statuses={filteredAndSortedStatuses} className="mt-8" />
               </div>
             </ErrorBoundary>
           )}

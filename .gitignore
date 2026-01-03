@@ -1,356 +1,43 @@
-# Dependencies
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# dependencies
+/node_modules
 /.pnp
 .pnp.js
 
-# Production builds
-dist/
-dist-ssr/
-/build
-.next/
-out/
-*.local
-
-# Angular specific
-.angular/
-.ng-build/
-tmp/
-out-tsc/
-bazel-out/
-
-# Environment files
-.env
-.env.*
-!.env.example
-
-# Testing
+# testing
 /coverage
-*.lcov
-.nyc_output/
-test-results/
-junit.xml
-cypress/videos/
-cypress/screenshots/
-cypress/downloads/
 
-# Playwright test results and reports
-playwright-report/
-test-results/
-playwright/.cache/
-playwright-results/
-test-results-*/
-*test-results*
+# next.js
+/.next/
+/out/
 
-# Jest and other test artifacts
-coverage/
-.coverage/
-junit.xml
-test-report.xml
-test-output.xml
+# production
+/build
 
-# Test logs and debugging
-*.test.log
-test-debug.log
-debug-test-*.log
-
-# Performance test results
-lighthouse-results/
-performance-results/
-
-# IDE
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-.idea/
-*.swp
-*.swo
-*~
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# OS
+# misc
 .DS_Store
-Thumbs.db
-*.log
+*.pem
 
-# Database
-*.sqlite
-*.sqlite3
-*.db
-!migrations/*.sql
-data/
-
-# Monitoring and logs
-logs/
-*.log
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-lerna-debug.log*
-.pnpm-debug.log*
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Optional stylelint cache
-.stylelintcache
-
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variable files
+# local env files
+.env*.local
 .env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+.env.external.smtp.local
 
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
+# local secrets / sensitive artifacts
+.ai/creds/
 
-# yarn v2
-.yarn/cache
-.yarn/unplugged
-.yarn/build-state.yml
-.yarn/install-state.gz
-.pnp.*
-
-# Certificates
-*.pem
-*.key
-*.crt
-
-# Backup files
-*.backup
-*.bak
-
-# Temporary files
-temp/
-tmp/
-*.tmp
-*.temp
-
-# Production secrets (never commit these)
-secrets/
-credentials/
-*.credentials.json 
-# Firebase service account keys
-dev-servicekey.json
-prod-servicekey.json
-
-# Local environment files that may contain real credentials
-.env.test
-.env.test.local
-
-# Extension config files that may contain credentials
-# (Keep example/template versions in repo, ignore local copies with real values)
-extension-config.local.env
-extensions/*.local.env
-
-# Vercel
+# vercel
 .vercel
 
-# TypeScript
+# typescript
 *.tsbuildinfo
-tsconfig.tsbuildinfo
 next-env.d.ts
 
-# Firebase
+# firebase
 .firebase/
-firebase-debug.log
-ui-debug.log
-.firebaserc
-
-# Service account keys (keep them private)
-*firebase*adminsdk*.json
-serviceAccountKey.json
-config/firebase/*.json
-
-# Test configuration files with credentials
-config/test.env
-config/production.env
-config/development.env
-config/*.env
-!config/*.env.example
-
-# Test results and logs (contain environment-specific data)
-logs/
-test-results*.json
-local-dev-backend-test-results.json
-test-results-dev-environment.json
-test-results-real-services.json
-
-# Discovery results (may contain sensitive data)
-logs/discovery-results.json
-
-# Build artifacts that shouldn't be in source
-tsconfig.tsbuildinfo
-*.tsbuildinfo
-
-# Build artifacts that shouldn't be in source
-
-# Debug logs
-pglite-debug.log
-*.debug.log
-
-# Environment-specific configuration files (contain credentials)
-extension-config.env
-firebase-ext-config.json
-extensions/*.env
-
-# Test utilities (contain hardcoded URLs and may expose endpoints)  
-test-apis.html
-
-# Development deployment scripts (may contain sensitive commands)
-deploy-dev.sh
-
-# Windows security metadata files
-*:Zone.Identifier
-*:mshield
-
-# Windows security metadata files (already covered above)
-
-# Logo assets (downloaded at build time to avoid trademark issues)
-public/logos/
-logos/
-
-# SWC cache (Next.js compiler cache)
-.swc/
-
-# Firebase cache and hosting files
-.firebase/
-firebase-debug.log
-ui-debug.log
-hosting.*.cache
-
-# Test artifacts and last run data
-.last-run.json
-test-results/.last-run.json
-
-# Script-generated files and logs
-scripts/logs/
-scripts/*.log
-scripts/discovery-results.json
-
-# Environment setup files (contain sensitive placeholders)
-.env.local
-.env.production
-.env.development
-
-# Firebase extensions environment files
-extensions/*.env
-firestore-send-email.env
-
-# Editor and IDE files
-.vscode/settings.json
-.vscode/launch.json
-.vscode/tasks.json
-.vscode/*.json
-!.vscode/extensions.json
-*.code-workspace
-
-# OS-specific files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-desktop.ini
-
-# Package manager files
-.pnpm-store/
-.yarn/
-yarn.lock
-pnpm-lock.yaml
-
-# Build and deployment artifacts
-*.tgz
-*.tar.gz
-dist/
-build/
-.vercel/
-.netlify/
-
-# Runtime and process files
-*.pid
-*.seed
-*.pid.lock
-.npm/
-.eslintcache
-.stylelintcache
-
-# Backup and temporary files
-*.backup
-*.bak
-*.swp
-*.swo
-*~
-.tmp/
-temp/
-
-# Security and credentials (additional patterns)
-*.key
-*.pem
-*.crt
-*.p12
-*.pfx
-secrets.json
-credentials.json
-
-# Additional secret files that should NEVER be committed
-service-account*.json
-*service-account*.json
-firebase-adminsdk*.json
-*firebase-adminsdk*.json
-.env.production
-.env.staging
-.env.secrets
-config/secrets.*
-config/production.*
-config/staging.*
-
-# API keys and tokens
-*.token
-*.api-key
-.firebase-token
-.github-token
-.slack-webhook
-
-# Test environment files with real credentials
-jest.env.local.js
-test.env.local
-*.test.env.local
+*-debug.log
+serviceAccountKey.json.env.production.local

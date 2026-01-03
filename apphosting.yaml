@@ -1,0 +1,53 @@
+env:
+  - variable: NEXT_PUBLIC_SITE_URL
+    value: "https://aistatusdashboard.com"
+  - variable: NEXT_PUBLIC_GA_MEASUREMENT_ID
+    value: "G-ZV3PS0MPQ7"
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: "AIzaSyCgJ68MuGknSH4bZPh4tNkr2wePTA9QvGw"
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: "ai-status-dashboard.firebaseapp.com"
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: "ai-status-dashboard"
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: "ai-status-dashboard.firebasestorage.app"
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "401066429430"
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: "1:401066429430:web:88df5e30e599ab6c3e15d7"
+  - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    value: "G-ZV3PS0MPQ7"
+  - variable: FIREBASE_PROJECT_ID
+    value: "ai-status-dashboard"
+  - variable: APP_ENABLE_EMAIL
+    value: "true"
+  - variable: SMTP_HOST
+    value: "email-smtp.us-east-1.amazonaws.com"
+  - variable: SMTP_PORT
+    value: "587"
+  - variable: SMTP_SECURE
+    value: "false"
+  - variable: SMTP_FROM
+    value: "AI Status Dashboard <hello@aistatusdashboard.com>"
+  - variable: APP_ENABLE_DEBUG_ENDPOINTS
+    value: "false"
+  - variable: APP_ALLOW_OPEN_CRON
+    value: "false"
+  - variable: APP_ALLOW_PUBLIC_WEBHOOKS
+    value: "true"
+  - variable: CRON_SECRET
+    secret: "CRON_SECRET"
+  - variable: APP_CRON_SECRET
+    secret: "CRON_SECRET"
+  - variable: WEBHOOK_SECRET
+    secret: "WEBHOOK_SECRET"
+  - variable: APP_WEBHOOK_SECRET
+    secret: "WEBHOOK_SECRET"
+  - variable: APP_DEBUG_SECRET
+    secret: "APP_DEBUG_SECRET"
+  - variable: SMTP_USER
+    secret: "SMTP_USER"
+  - variable: SMTP_PASSWORD
+    secret: "SMTP_PASSWORD"
+  - variable: FIREBASE_SERVICE_ACCOUNT_KEY
+    secret: "FIREBASE_SERVICE_ACCOUNT_KEY"

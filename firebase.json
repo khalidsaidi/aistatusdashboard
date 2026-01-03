@@ -3,23 +3,53 @@
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
-  "functions": [
-    {
-      "source": "functions",
-      "codebase": "default",
-      "ignore": ["node_modules", ".git", "firebase-debug.log", "firebase-debug.*.log"]
-    }
-  ],
   "hosting": {
-    "public": "out",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-    "rewrites": [
-      {
-        "source": "/api/**",
-        "function": "api"
-      }
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/.github/**",
+      "**/.husky/**",
+      "**/.firebase/**",
+      "**/.next/**",
+      "**/.swc/**",
+      ".env.local",
+      ".env.development.local",
+      ".env.external.smtp.local",
+      ".env.test",
+      ".env.test.local",
+      ".env.example",
+      ".ai/**",
+      "test-results/**",
+      "test-results-all/**",
+      "screenshots/**",
+      "__tests__/**",
+      "**/*.log",
+      "**/*.tsbuildinfo"
     ],
+    "frameworksBackend": {
+      "region": "us-central1"
+    },
     "headers": [
+      {
+        "source": "/",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
+      {
+        "source": "**/*.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
+      },
       {
         "source": "**/*.@(js|css)",
         "headers": [
@@ -37,7 +67,40 @@
             "value": "max-age=31536000"
           }
         ]
+      },
+      {
+        "source": "/sw.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache"
+          }
+        ]
       }
+    ]
+  },
+  "apphosting": {
+    "backendId": "aistatusdashboard",
+    "rootDir": ".",
+    "alwaysDeployFromSource": true,
+    "ignore": [
+      "node_modules",
+      ".git",
+      ".github",
+      ".husky",
+      ".firebase",
+      ".next",
+      ".swc",
+      ".ai",
+      "test-results",
+      "test-results-all",
+      "screenshots",
+      "__tests__",
+      "*.log",
+      "*.tsbuildinfo",
+      ".env*",
+      "apphosting.emulator.yaml",
+      "apphosting.local.yaml"
     ]
   },
   "storage": {

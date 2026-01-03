@@ -1,97 +1,51 @@
-// Firebase messaging service worker for push notifications
-importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
+// PWA Service Worker (offline-safe, update-safe)
+// IMPORTANT: Do NOT cache HTML (/) with cache-first. That causes stale pages that reference
+// old hashed Next.js chunks, which breaks hydration (e.g. tabs stop working).
 
-// Initialize Firebase
-firebase.initializeApp({
-  apiKey: 'your-api-key',
-  authDomain: 'ai-status-dashboard-dev.firebaseapp.com',
-  projectId: 'ai-status-dashboard-dev',
-  storageBucket: 'ai-status-dashboard-dev.appspot.com',
-  messagingSenderId: 'your-sender-id',
-  appId: 'your-app-id',
-});
-
-// Initialize Firebase Messaging
-const messaging = firebase.messaging();
-
-// Handle background messages
-messaging.onBackgroundMessage((payload) => {
-  console.log('Received background message:', payload);
-
-  const notificationTitle = payload.notification?.title || 'AI Status Alert';
-  const notificationOptions = {
-    body: payload.notification?.body || 'AI service status changed',
-    icon: '/icon-192x192.png',
-    badge: '/badge-72x72.png',
-    data: payload.data,
-    actions: [
-      {
-        action: 'view',
-        title: 'View Dashboard',
-        icon: '/icon-view.png',
-      },
-      {
-        action: 'dismiss',
-        title: 'Dismiss',
-        icon: '/icon-dismiss.png',
-      },
-    ],
-    requireInteraction: true,
-    tag: 'ai-status-notification',
-  };
-
-  self.registration.showNotification(notificationTitle, notificationOptions);
-});
-
-// Handle notification clicks
-self.addEventListener('notificationclick', (event) => {
-  console.log('Notification clicked:', event);
-
-  event.notification.close();
-
-  if (event.action === 'view') {
-    // Open dashboard
-    event.waitUntil(clients.openWindow(self.location.origin));
-  } else if (event.action === 'dismiss') {
-    // Just close the notification
-    return;
-  } else {
-    // Default action - open dashboard
-    event.waitUntil(clients.openWindow(self.location.origin));
-  }
-});
-
-// Handle push events (fallback)
-self.addEventListener('push', (event) => {
-  if (event.data) {
-    const data = event.data.json();
-    const title = data.title || 'AI Status Alert';
-    const options = {
-      body: data.body || 'AI service status changed',
-      icon: '/icon-192x192.png',
-      badge: '/badge-72x72.png',
-      data: data.data,
-      tag: 'ai-status-notification',
-    };
-
-    event.waitUntil(self.registration.showNotification(title, options));
-  }
-});
-
-// Cache management for offline functionality
-const CACHE_NAME = 'ai-status-dashboard-v1';
-const urlsToCache = ['/', '/manifest.json', '/icon-192x192.png', '/icon-512x512.png'];
+const CACHE_NAME = 'ai-status-dashboard-v2';
+const PRECACHE_URLS = ['/manifest.json', '/icon-192x192.png', '/icon-512x512.png'];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache)));
+  self.skipWaiting();
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS)));
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Return cached version or fetch from network
-      return response || fetch(event.request);
-    })
-  );
+  const request = event.request;
+  if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  // Always go to network for navigation requests to avoid stale HTML breaking the app.
+  if (request.mode === 'navigate') {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // Cache-first only for our small precache list; everything else is network-first.
+  if (PRECACHE_URLS.includes(url.pathname)) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        if (cached) return cached;
+        return fetch(request).then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          return response;
+        });
+      })
+    );
+    return;
+  }
+
+  event.respondWith(fetch(request).catch(() => caches.match(request)));
 });

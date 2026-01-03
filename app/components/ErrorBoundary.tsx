@@ -1,6 +1,7 @@
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { getEnv } from '@/lib/utils/env';
 
 interface Props {
   children: ReactNode;
@@ -76,7 +77,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </button>
           </div>
 
-          {process.env.NODE_ENV === 'development' && this.state.error && (
+          {getEnv('NODE_ENV') === 'development' && this.state.error && (
             <details className="mt-4 p-4 bg-gray-100 rounded text-left">
               <summary className="cursor-pointer font-semibold">
                 Error Details (Development)

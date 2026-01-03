@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { StatusResult } from '@/lib/types';
+import { trackEvent } from '@/lib/utils/analytics-client';
 
 interface ExportShareProps {
   statuses: StatusResult[];
@@ -85,6 +86,7 @@ export default function ExportShare({ statuses, className = '' }: ExportSharePro
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      trackEvent('export', { metadata: { format } });
     } catch (error) {
       // Export error handled - show user feedback instead
       alert('Failed to export data. Please try again.');
@@ -107,10 +109,12 @@ export default function ExportShare({ statuses, className = '' }: ExportSharePro
     try {
       if (navigator.share && navigator.canShare(shareData)) {
         await navigator.share(shareData);
+        trackEvent('share', { metadata: { method: 'native' } });
       } else {
         // Fallback: copy to clipboard
         await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
         alert('Status copied to clipboard!');
+        trackEvent('share', { metadata: { method: 'clipboard' } });
       }
     } catch (error) {
       // Share error handled - show user feedback instead
@@ -118,6 +122,7 @@ export default function ExportShare({ statuses, className = '' }: ExportSharePro
       try {
         await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
         alert('Status copied to clipboard!');
+        trackEvent('share', { metadata: { method: 'clipboard' } });
       } catch (clipboardError) {
         // Clipboard fallback failed - silent handling
         alert('Unable to share. Please copy the URL manually.');
@@ -126,10 +131,11 @@ export default function ExportShare({ statuses, className = '' }: ExportSharePro
   };
 
   const copyApiUrl = async () => {
-    const apiUrl = 'https://us-central1-ai-status-dashboard-dev.cloudfunctions.net/api/status';
+    const apiUrl = typeof window !== 'undefined' ? `${window.location.origin}/api/status` : '/api/status';
     try {
       await navigator.clipboard.writeText(apiUrl);
       alert('API URL copied to clipboard!');
+      trackEvent('copy_api_url');
     } catch (error) {
       // Copy operation failed - show user feedback
       alert('Unable to copy. Please copy manually: ' + apiUrl);
@@ -139,6 +145,7 @@ export default function ExportShare({ statuses, className = '' }: ExportSharePro
   return (
     <div
       className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 ${className}`}
+      data-testid="export-share"
     >
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📤 Export Data</h3>
 

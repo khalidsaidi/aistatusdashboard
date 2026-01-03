@@ -1,169 +1,124 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useToast } from './Toast';
 
 export default function GlobalErrorHandler() {
   const { showError, showWarning } = useToast();
 
+  const toastApiRef = useRef({ showError, showWarning });
+  toastApiRef.current = { showError, showWarning };
+
   useEffect(() => {
-    let fontErrorShown = false; // Prevent duplicate font error toasts
+    let fontErrorShown = false;
 
-    // Catch unhandled promise rejections
-    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      console.error('Unhandled promise rejection:', event.reason);
+    const originalConsoleError = console.error;
+    const originalOnError = window.onerror;
+    const originalOnUnhandledRejection = window.onunhandledrejection;
+    const originalFetch = window.fetch;
 
-      // Check if it's a font loading error
-      if (event.reason?.message?.includes('font') || event.reason?.toString().includes('.woff')) {
-        if (!fontErrorShown) {
-          showWarning(
-            'Font Loading Error',
-            'Some fonts failed to load, but the site will continue to work with fallback fonts.'
-          );
-          fontErrorShown = true;
-        }
+    const seenToastKeys = new Set<string>();
+    let toastCount = 0;
+    let lastToastAt = 0;
+    const TOAST_THROTTLE_MS = 1500;
+    const MAX_TOASTS_PER_SESSION = 6;
+
+    const shouldIgnoreMessage = (message: string) => {
+      if (!message) return true;
+      return false;
+    };
+
+    const showToastOnce = (key: string, type: 'error' | 'warning', title: string, message: string) => {
+      if (shouldIgnoreMessage(message)) return;
+      if (toastCount >= MAX_TOASTS_PER_SESSION) return;
+      if (seenToastKeys.has(key)) return;
+
+      const now = Date.now();
+      if (now - lastToastAt < TOAST_THROTTLE_MS) return;
+
+      seenToastKeys.add(key);
+      toastCount += 1;
+      lastToastAt = now;
+
+      if (type === 'warning') {
+        toastApiRef.current.showWarning(title, message);
       } else {
-        // Show user-friendly error message for other rejections
-        showError(
-          'Network Error',
-          'Something went wrong. Please check your connection and try again.'
-        );
+        toastApiRef.current.showError(title, message);
       }
-
-      // Prevent default browser error handling
-      event.preventDefault();
     };
 
-    // Catch JavaScript errors
-    const handleError = (event: ErrorEvent) => {
-      console.error('JavaScript error:', event.error);
-
-      // Show user-friendly error message
-      showError('Application Error', 'An unexpected error occurred. Please refresh the page.');
+    const safeToString = (value: unknown) => {
+      if (value instanceof Error) return value.message;
+      if (typeof value === 'string') return value;
+      try {
+        return JSON.stringify(value);
+      } catch {
+        return String(value);
+      }
     };
 
-    // Catch resource loading errors (fonts, images, scripts, etc.)
-    const handleResourceError = (event: Event) => {
-      const target = event.target as HTMLElement;
+    console.error = (...args) => {
+      originalConsoleError.apply(console, args);
 
-      if (target) {
-        // Check for font loading errors
-        if (target.tagName === 'LINK' && (target as HTMLLinkElement).href?.includes('.woff')) {
-          console.warn('Font loading error:', (target as HTMLLinkElement).href);
+      try {
+        const message = args.map(safeToString).join(' ');
+
+        if (message.includes('font') || message.includes('.woff')) {
           if (!fontErrorShown) {
-            showWarning(
+            toastApiRef.current.showWarning(
               'Font Loading Error',
               'Some fonts failed to load, but the site will continue to work with fallback fonts.'
             );
             fontErrorShown = true;
           }
+          return;
         }
-        // Check for image loading errors
-        else if (target.tagName === 'IMG') {
-          console.warn('Image loading error:', (target as HTMLImageElement).src);
-          showWarning('Image Loading Error', 'An image failed to load.');
-        }
-        // Check for script loading errors
-        else if (target.tagName === 'SCRIPT') {
-          console.error('Script loading error:', (target as HTMLScriptElement).src);
-          showError(
-            'Script Loading Error',
-            'A required script failed to load. Please refresh the page.'
-          );
-        }
-        // Generic resource error
-        else {
-          console.warn('Resource loading error:', target);
-        }
+
+        showToastOnce(`console.error:${message}`, 'error', 'Application Error', message.slice(0, 200));
+      } catch {
+        // Never throw from a console patch.
       }
     };
 
-    // Monitor Performance Observer for failed resource loads
-    if ('PerformanceObserver' in window) {
-      const observer = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
-          // Check for font loading failures
-          if (entry.name.includes('.woff')) {
-            const resourceEntry = entry as PerformanceResourceTiming;
-            if (resourceEntry.transferSize === 0) {
-              console.warn('Font failed to load via Performance Observer:', entry.name);
-              if (!fontErrorShown) {
-                showWarning(
-                  'Font Loading Error',
-                  'Some fonts failed to load, but the site will continue to work with fallback fonts.'
-                );
-                fontErrorShown = true;
-              }
-            }
-          }
-        });
-      });
-
+    window.onerror = function (message, source, lineno, colno, error) {
       try {
-        observer.observe({ entryTypes: ['resource'] });
-      } catch (e) {
-        console.warn('Performance Observer not supported for resource monitoring');
-      }
-    }
+        const details =
+          (message ? message.toString() : 'Unknown error') +
+          (source ? `\n${source}:${lineno ?? 0}:${colno ?? 0}` : '') +
+          (error && (error as Error).stack ? `\n${(error as Error).stack}` : '');
 
-    // Monitor console errors for font loading issues
-    const originalConsoleError = console.error;
-    console.error = (...args) => {
-      const message = args.join(' ');
-
-      // Check for font-related errors in console
-      if (
-        (message.includes('.woff') || (message.includes('font') && message.includes('404'))) &&
-        !fontErrorShown
-      ) {
-        showWarning(
-          'Font Loading Error',
-          'Some fonts failed to load, but the site will continue to work with fallback fonts.'
-        );
-        fontErrorShown = true;
+        showToastOnce('window.onerror', 'error', 'Application Error', details.slice(0, 400));
+      } catch {
+        // ignore
       }
 
-      // Call original console.error
-      originalConsoleError.apply(console, args);
+      if (typeof originalOnError === 'function') {
+        return originalOnError(message, source, lineno, colno, error);
+      }
+      return false;
     };
 
-    // Monitor console warnings for font loading issues
-    const originalConsoleWarn = console.warn;
-    console.warn = (...args) => {
-      const message = args.join(' ');
-
-      // Check for font-related warnings in console
-      if ((message.includes('.woff') || message.includes('font')) && !fontErrorShown) {
-        showWarning(
-          'Font Loading Error',
-          'Some fonts failed to load, but the site will continue to work with fallback fonts.'
-        );
-        fontErrorShown = true;
-      }
-
-      // Call original console.warn
-      originalConsoleWarn.apply(console, args);
-    };
-
-    // Catch React errors (in addition to ErrorBoundary)
-    const handleReactError = (event: any) => {
-      if (event.detail?.error) {
-        console.error('React error:', event.detail.error);
-
-        showError('Component Error', 'A component failed to load. Please try refreshing the page.');
-      }
-    };
-
-    // Network error handler for fetch failures
-    const originalFetch = window.fetch;
-    window.fetch = async (...args) => {
+    window.onunhandledrejection = function (event) {
       try {
-        const response = await originalFetch(...args);
+        const reason = (event as PromiseRejectionEvent).reason;
+        const details = reason instanceof Error ? reason.message : reason ? String(reason) : 'Unknown reason';
+        showToastOnce('window.onunhandledrejection', 'error', 'Unhandled Promise Rejection', details.slice(0, 300));
+      } catch {
+        // ignore
+      }
 
-        // Show toast for HTTP errors
+      if (typeof originalOnUnhandledRejection === 'function') {
+        return originalOnUnhandledRejection.call(window, event);
+      }
+      return false;
+    };
+
+    window.fetch = async function (...args) {
+      try {
+        const response = await originalFetch.apply(window, args);
+
         if (!response.ok) {
-          // Get URL from fetch arguments
-          let url = '';
+          let url = 'Unknown URL';
           if (typeof args[0] === 'string') {
             url = args[0];
           } else if (args[0] instanceof Request) {
@@ -172,70 +127,58 @@ export default function GlobalErrorHandler() {
             url = args[0].toString();
           }
 
-          // Handle font loading errors specifically
-          if (url.includes('.woff') && !fontErrorShown) {
-            showWarning(
-              'Font Loading Error',
-              'Some fonts failed to load, but the site will continue to work with fallback fonts.'
-            );
-            fontErrorShown = true;
-          }
-          // Skip showing toasts for other static assets
-          else if (!url.includes('.css') && !url.includes('.js')) {
+          if (!shouldIgnoreMessage(url)) {
+            const truncatedUrl = url.slice(0, 120);
+
             if (response.status >= 500) {
-              showError('Server Error', `Service temporarily unavailable (${response.status})`);
+              showToastOnce(
+                `fetch:${response.status}:${truncatedUrl}`,
+                'error',
+                'Server Error',
+                `Server error (${response.status}): ${truncatedUrl}`
+              );
             } else if (response.status === 404) {
-              showWarning('Not Found', 'The requested resource was not found');
-            } else if (response.status === 401 || response.status === 403) {
-              showWarning('Access Denied', "You don't have permission to access this resource");
+              showToastOnce(
+                `fetch:${response.status}:${truncatedUrl}`,
+                'warning',
+                'Resource Not Found',
+                `The requested resource was not found: ${truncatedUrl}`
+              );
             }
           }
         }
 
         return response;
       } catch (error) {
-        // Network connectivity issues
-        showError(
-          'Connection Error',
-          'Unable to connect to the server. Please check your internet connection.'
-        );
+        let url = 'Unknown URL';
+        if (typeof args[0] === 'string') {
+          url = args[0];
+        } else if (args[0] instanceof Request) {
+          url = args[0].url;
+        } else if (args[0] instanceof URL) {
+          url = args[0].toString();
+        }
+
+        if (!shouldIgnoreMessage(url)) {
+          showToastOnce(
+            `fetch:network:${url}`,
+            'error',
+            'Network Error',
+            `Failed to connect to: ${url.slice(0, 120)}. Please check your internet connection.`
+          );
+        }
+
         throw error;
       }
     };
 
-    // Monitor document for font loading using CSS Font Loading API
-    if ('fonts' in document) {
-      document.fonts.addEventListener('loadingerror', (event: any) => {
-        console.warn('Font loading error via CSS Font Loading API:', event);
-        if (!fontErrorShown) {
-          showWarning(
-            'Font Loading Error',
-            'Some fonts failed to load, but the site will continue to work with fallback fonts.'
-          );
-          fontErrorShown = true;
-        }
-      });
-    }
-
-    // Add event listeners
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
-    window.addEventListener('error', handleError);
-    window.addEventListener('error', handleResourceError, true); // Use capture phase for resource errors
-    window.addEventListener('reactError', handleReactError);
-
-    // Cleanup
     return () => {
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('error', handleResourceError, true);
-      window.removeEventListener('reactError', handleReactError);
-
-      // Restore original fetch and console methods
-      window.fetch = originalFetch;
       console.error = originalConsoleError;
-      console.warn = originalConsoleWarn;
+      window.onerror = originalOnError;
+      window.onunhandledrejection = originalOnUnhandledRejection;
+      window.fetch = originalFetch;
     };
-  }, [showError, showWarning]);
+  }, []);
 
-  return null; // This component doesn't render anything
+  return null;
 }
