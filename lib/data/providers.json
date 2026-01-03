@@ -3,6 +3,16 @@
         {
             "id": "openai",
             "name": "OpenAI",
+            "displayName": "ChatGPT (OpenAI)",
+            "aliases": [
+                "openai",
+                "chatgpt",
+                "gpt",
+                "gpt-4",
+                "gpt-4o",
+                "gpt-3.5",
+                "openai api"
+            ],
             "category": "LLM",
             "statusUrl": "https://status.openai.com/api/v2/status.json",
             "statusPageUrl": "https://status.openai.com",
@@ -12,6 +22,17 @@
         {
             "id": "anthropic",
             "name": "Anthropic",
+            "displayName": "Claude (Anthropic)",
+            "aliases": [
+                "anthropic",
+                "claude",
+                "claude 2",
+                "claude 3",
+                "claude 3.5",
+                "claude 3 opus",
+                "claude 3 sonnet",
+                "claude 3 haiku"
+            ],
             "category": "LLM",
             "statusUrl": "https://status.anthropic.com/api/v2/status.json",
             "statusPageUrl": "https://status.anthropic.com",
@@ -21,6 +42,15 @@
         {
             "id": "google-ai",
             "name": "Google Gemini / AI Studio",
+            "displayName": "Gemini (Google)",
+            "aliases": [
+                "gemini",
+                "google gemini",
+                "ai studio",
+                "google ai studio",
+                "google ai",
+                "bard"
+            ],
             "category": "LLM",
             "statusUrl": "https://status.cloud.google.com/incidents.json",
             "statusPageUrl": "https://status.cloud.google.com",
@@ -30,6 +60,11 @@
         {
             "id": "mistral",
             "name": "Mistral AI",
+            "displayName": "Mistral AI",
+            "aliases": [
+                "mistral",
+                "mistral ai"
+            ],
             "category": "LLM",
             "statusUrl": "https://status.mistral.ai",
             "statusPageUrl": "https://status.mistral.ai",
@@ -39,6 +74,11 @@
         {
             "id": "cohere",
             "name": "Cohere",
+            "displayName": "Cohere",
+            "aliases": [
+                "cohere",
+                "cohere api"
+            ],
             "category": "LLM",
             "statusUrl": "https://status.cohere.com/api/v2/status.json",
             "statusPageUrl": "https://status.cohere.com",
@@ -48,6 +88,14 @@
         {
             "id": "meta",
             "name": "Meta AI (Meta Status)",
+            "displayName": "Meta AI",
+            "aliases": [
+                "meta",
+                "meta ai",
+                "llama",
+                "llama 2",
+                "llama 3"
+            ],
             "category": "LLM",
             "statusUrl": "https://metastatus.com/data/orgs.json",
             "statusPageUrl": "https://metastatus.com",
@@ -57,6 +105,11 @@
         {
             "id": "perplexity",
             "name": "Perplexity",
+            "displayName": "Perplexity",
+            "aliases": [
+                "perplexity",
+                "perplexity ai"
+            ],
             "category": "Search",
             "statusUrl": "https://perplexity.instatus.com/summary.json",
             "statusPageUrl": "https://status.perplexity.com",
@@ -66,6 +119,12 @@
         {
             "id": "groq",
             "name": "Groq",
+            "displayName": "Groq",
+            "aliases": [
+                "groq",
+                "groq cloud",
+                "groqcloud"
+            ],
             "category": "LLM",
             "statusUrl": "https://groqstatus.com/api/v2/status.json",
             "statusPageUrl": "https://groqstatus.com",
@@ -75,6 +134,11 @@
         {
             "id": "deepseek",
             "name": "DeepSeek",
+            "displayName": "DeepSeek",
+            "aliases": [
+                "deepseek",
+                "deep seek"
+            ],
             "category": "LLM",
             "statusUrl": "https://status.deepseek.com/api/v2/status.json",
             "statusPageUrl": "https://status.deepseek.com",
@@ -84,6 +148,15 @@
         {
             "id": "ai21",
             "name": "AI21 Labs",
+            "displayName": "AI21 Labs",
+            "aliases": [
+                "ai21",
+                "ai21 labs",
+                "jamba",
+                "jurassic",
+                "jurassic-2",
+                "j2"
+            ],
             "category": "LLM",
             "statusUrl": "https://status.ai21.com/api/v2/status.json",
             "statusPageUrl": "https://status.ai21.com",
@@ -93,6 +166,13 @@
         {
             "id": "stability",
             "name": "Stability AI",
+            "displayName": "Stability AI",
+            "aliases": [
+                "stability",
+                "stability ai",
+                "stable diffusion",
+                "sdxl"
+            ],
             "category": "LLM",
             "statusUrl": "https://status.stability.ai/api/v2/status.json",
             "statusPageUrl": "https://status.stability.ai",
@@ -102,6 +182,11 @@
         {
             "id": "cerebras",
             "name": "Cerebras",
+            "displayName": "Cerebras",
+            "aliases": [
+                "cerebras",
+                "cerebras inference"
+            ],
             "category": "LLM",
             "statusUrl": "https://status.cerebras.ai/api/v2/status.json",
             "statusPageUrl": "https://status.cerebras.ai",
@@ -111,6 +196,12 @@
         {
             "id": "runway",
             "name": "Runway",
+            "displayName": "Runway",
+            "aliases": [
+                "runway",
+                "runwayml",
+                "runway ml"
+            ],
             "category": "LLM",
             "statusUrl": "https://status.runwayml.com/api/v2/status.json",
             "statusPageUrl": "https://status.runwayml.com",
@@ -120,6 +211,13 @@
         {
             "id": "huggingface",
             "name": "Hugging Face",
+            "displayName": "Hugging Face",
+            "aliases": [
+                "hugging face",
+                "huggingface",
+                "hf",
+                "hugging face hub"
+            ],
             "category": "Ecosystem",
             "statusUrl": "https://status.huggingface.co",
             "statusPageUrl": "https://status.huggingface.co",
@@ -129,6 +227,11 @@
         {
             "id": "replicate",
             "name": "Replicate",
+            "displayName": "Replicate",
+            "aliases": [
+                "replicate",
+                "replicate api"
+            ],
             "category": "Deployment",
             "statusUrl": "https://status.replicate.com/api/v2/status.json",
             "statusPageUrl": "https://status.replicate.com",
@@ -138,6 +241,13 @@
         {
             "id": "xai",
             "name": "xAI (Grok)",
+            "displayName": "Grok (xAI)",
+            "aliases": [
+                "xai",
+                "x ai",
+                "grok",
+                "grok ai"
+            ],
             "category": "LLM",
             "statusUrl": "https://xai.instatus.com/summary.json",
             "statusPageUrl": "https://xai.instatus.com",
@@ -147,6 +257,12 @@
         {
             "id": "aws",
             "name": "AWS Bedrock",
+            "displayName": "Amazon Bedrock (AWS)",
+            "aliases": [
+                "bedrock",
+                "amazon bedrock",
+                "aws bedrock"
+            ],
             "category": "Cloud",
             "statusUrl": "https://status.aws.amazon.com/rss/all.rss",
             "statusPageUrl": "https://status.aws.amazon.com",
@@ -156,6 +272,12 @@
         {
             "id": "azure",
             "name": "Azure OpenAI",
+            "displayName": "Azure OpenAI",
+            "aliases": [
+                "azure openai",
+                "microsoft openai",
+                "azure ai"
+            ],
             "category": "Cloud",
             "statusUrl": "https://azure.status.microsoft/en-us/status/feed/",
             "statusPageUrl": "https://azure.status.microsoft/en-us/status/",

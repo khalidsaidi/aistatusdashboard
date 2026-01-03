@@ -150,24 +150,27 @@ export default function NotificationPanel() {
               />
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {providers.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() =>
-                    setSelectedProviders((prev) =>
-                      prev.includes(p.id) ? prev.filter((x) => x !== p.id) : [...prev, p.id]
-                    )
-                  }
-                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-all border ${
-                    selectedProviders.includes(p.id)
-                    ? 'bg-blue-600 border-blue-600 text-white'
-                    : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400'
+              {providers.map((p) => {
+                const label = p.displayName || p.name;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() =>
+                      setSelectedProviders((prev) =>
+                        prev.includes(p.id) ? prev.filter((x) => x !== p.id) : [...prev, p.id]
+                      )
+                    }
+                    className={`px-3 py-2 rounded-lg text-xs font-medium transition-all border ${
+                      selectedProviders.includes(p.id)
+                        ? 'bg-blue-600 border-blue-600 text-white'
+                        : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400'
                     }`}
-                >
-                  {p.name}
-                </button>
-              ))}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
             <button
               disabled={loading}

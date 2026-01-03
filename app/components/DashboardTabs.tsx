@@ -181,13 +181,22 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
   // Filter and sort statuses
   const filteredAndSortedStatuses = React.useMemo(() => {
     const safeStatuses = statuses.filter((s) => s && typeof s === 'object' && s.status);
+    const normalizedQuery = searchQuery.trim().toLowerCase();
 
-    // Apply search filter
-    let filtered = safeStatuses.filter(
-      (status) =>
-        status.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        status.id.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // Apply search filter (name + aliases)
+    let filtered = safeStatuses.filter((status) => {
+      if (!normalizedQuery) return true;
+      const haystack = [
+        status.name,
+        status.displayName,
+        status.id,
+        ...(status.aliases || []),
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      return haystack.includes(normalizedQuery);
+    });
 
     // Apply status filter
     if (statusFilter !== 'all') {
@@ -243,8 +252,8 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
 
       switch (sortBy) {
         case 'name':
-          aValue = a.name.toLowerCase();
-          bValue = b.name.toLowerCase();
+          aValue = (a.displayName || a.name).toLowerCase();
+          bValue = (b.displayName || b.name).toLowerCase();
           break;
         case 'status':
           // Sort by status priority: operational > degraded > down > unknown
@@ -306,6 +315,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
         </div>
       );
     }
+    const displayName = status.displayName || status.name;
 
     const statusIcon =
       status.status === 'operational'
@@ -363,7 +373,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
             <div className="w-8 h-8 flex items-center justify-center">
               <Image
                 src={`/logos/${status.id}.svg`}
-                alt={`${status.name} logo`}
+                alt={`${displayName} logo`}
                 className="w-6 h-6"
                 width={24}
                 height={24}
@@ -382,7 +392,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
               />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white">{status.name}</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white">{displayName}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">AI Provider</p>
             </div>
           </div>
@@ -442,7 +452,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
             onClick={() =>
               trackEvent('provider_click', {
                 providerId: status.id,
-                metadata: { providerName: status.name },
+                metadata: { providerName: displayName },
               })
             }
             className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"

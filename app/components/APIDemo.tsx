@@ -20,8 +20,12 @@ export default function APIDemo() {
     }
   }, [response]);
 
-  const providers = useMemo(() => providerService.getProviders().map((p) => p.id), []);
+  const providers = useMemo(() => providerService.getProviders(), []);
   const providerCount = providers.length;
+  const selectedProviderLabel =
+    providers.find((p) => p.id === selectedProvider)?.displayName ||
+    providers.find((p) => p.id === selectedProvider)?.name ||
+    selectedProvider;
 
   // Base URL for API
   const API_BASE = '/api';
@@ -51,7 +55,7 @@ export default function APIDemo() {
         id: 'single-provider',
         title: 'Get Single Provider',
         endpoint: `${API_BASE}/status?provider=${selectedProvider}`,
-        description: `Get detailed status for ${selectedProvider} with response time`,
+        description: `Get detailed status for ${selectedProviderLabel} with response time`,
       },
       {
         id: 'webhook-registration',
@@ -154,8 +158,8 @@ export default function APIDemo() {
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           >
             {providers.map((provider) => (
-              <option key={provider} value={provider}>
-                {provider.charAt(0).toUpperCase() + provider.slice(1).replace('-', ' ')}
+              <option key={provider.id} value={provider.id}>
+                {provider.displayName || provider.name}
               </option>
             ))}
           </select>

@@ -97,7 +97,7 @@ export class AnalyticsService {
             const docs = await this.loadEventsSince(since);
 
             const providers = providerService.getProviders();
-            const byId = new Map(providers.map(p => [p.id, p.name] as const));
+            const byId = new Map(providers.map((p) => [p.id, p.displayName || p.name] as const));
 
             // Always return a stable set of providers (even when analytics is empty/unavailable)
             const stats: Record<string, ProviderAnalytics> = {};
@@ -172,7 +172,7 @@ export class AnalyticsService {
             const limit = typeof options.limit === 'number' ? options.limit : 10;
             return providerService.getProviders().slice(0, limit).map((p) => ({
                 providerId: p.id,
-                providerName: p.name,
+                providerName: p.displayName || p.name,
                 totalInteractions: 0,
                 interactionsByType: { clicks: 0, subscriptions: 0 },
                 tier: 'low',

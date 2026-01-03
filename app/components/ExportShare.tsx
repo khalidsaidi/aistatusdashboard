@@ -30,7 +30,7 @@ export default function ExportShare({ statuses, className = '' }: ExportSharePro
               timestamp: new Date().toISOString(),
               providers: statuses.map((s) => ({
                 id: s.id,
-                name: s.name,
+                name: s.displayName || s.name,
                 status: s.status,
                 responseTime: s.responseTime,
                 lastChecked: s.lastChecked,
@@ -47,7 +47,7 @@ export default function ExportShare({ statuses, className = '' }: ExportSharePro
           const headers = ['ID', 'Name', 'Status', 'Response Time (ms)', 'Last Checked'];
           const rows = statuses.map((s) => [
             s.id,
-            s.name,
+            s.displayName || s.name,
             s.status,
             s.responseTime?.toString() || 'N/A',
             s.lastChecked || 'N/A',
@@ -65,7 +65,7 @@ export default function ExportShare({ statuses, className = '' }: ExportSharePro
           content += statuses
             .map(
               (s) =>
-                `${s.name} (${s.id})\n` +
+                `${s.displayName || s.name} (${s.id})\n` +
                 `Status: ${s.status}\n` +
                 `Response Time: ${s.responseTime ? `${s.responseTime}ms` : 'N/A'}\n` +
                 `Last Checked: ${s.lastChecked || 'N/A'}\n\n`

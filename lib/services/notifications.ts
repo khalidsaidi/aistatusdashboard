@@ -65,7 +65,7 @@ export class NotificationService {
                     to: sub.email,
                     template: 'status_change',
                     data: {
-                        providerName: current.name,
+                        providerName: current.displayName || current.name,
                         providerId: current.id,
                         previousStatus: previous.status,
                         currentStatus: current.status,

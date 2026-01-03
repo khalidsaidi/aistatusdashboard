@@ -3,6 +3,7 @@ export type ProviderStatus = 'operational' | 'degraded' | 'down' | 'unknown';
 export interface Provider {
     id: string;
     name: string;
+    displayName?: string;
     category: string;
     statusUrl: string;
     statusPageUrl: string;
@@ -11,17 +12,20 @@ export interface Provider {
     enabled?: boolean;
     priority?: number;
     fallbackUrls?: string[];
+    aliases?: string[];
 }
 
 export interface StatusResult {
     id: string;
     name: string;
+    displayName?: string;
     status: ProviderStatus;
     responseTime: number;
     lastChecked: string;
     error?: string;
     statusPageUrl?: string;
     details?: string;
+    aliases?: string[];
 }
 
 export interface StatusHistoryRecord extends StatusResult {

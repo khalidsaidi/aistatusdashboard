@@ -41,6 +41,8 @@ export class StatusService {
                 const result: StatusResult = {
                     id: provider.id,
                     name: provider.name,
+                    displayName: provider.displayName || provider.name,
+                    aliases: provider.aliases,
                     status,
                     responseTime,
                     lastChecked: new Date().toISOString(),
@@ -61,6 +63,8 @@ export class StatusService {
         return {
             id: provider.id,
             name: provider.name,
+            displayName: provider.displayName || provider.name,
+            aliases: provider.aliases,
             status: 'unknown',
             responseTime: Date.now() - startTime,
             lastChecked: new Date().toISOString(),
@@ -80,6 +84,8 @@ export class StatusService {
             return {
                 id: p.id,
                 name: p.name,
+                displayName: p.displayName || p.name,
+                aliases: p.aliases,
                 status: 'unknown',
                 responseTime: 0,
                 lastChecked: new Date().toISOString(),
