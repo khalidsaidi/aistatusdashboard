@@ -53,19 +53,23 @@ class SourceRegistryService {
 
   async getLatestPayload(sourceId: string): Promise<{ body: string | null; headers: Record<string, string> } | null> {
     const db = getDb();
-    const snapshot = await db
-      .collection('source_payloads')
-      .where('sourceId', '==', sourceId)
-      .orderBy('fetchedAt', 'desc')
-      .limit(1)
-      .get();
+    try {
+      const snapshot = await db
+        .collection('source_payloads')
+        .where('sourceId', '==', sourceId)
+        .orderBy('fetchedAt', 'desc')
+        .limit(1)
+        .get();
 
-    if (snapshot.empty) return null;
-    const data = snapshot.docs[0]?.data() || {};
-    return {
-      body: typeof data.body === 'string' ? data.body : null,
-      headers: typeof data.headers === 'object' && data.headers ? data.headers : {},
-    };
+      if (snapshot.empty) return null;
+      const data = snapshot.docs[0]?.data() || {};
+      return {
+        body: typeof data.body === 'string' ? data.body : null,
+        headers: typeof data.headers === 'object' && data.headers ? data.headers : {},
+      };
+    } catch {
+      return null;
+    }
   }
 }
 

@@ -101,6 +101,36 @@ async function fetchWithCache(
         }
       }
 
+      if (!body) {
+        try {
+          const fallback = await fetch(url, { headers: DEFAULT_HEADERS, cache: 'no-store' });
+          const fallbackBody = await fallback.text();
+          let fallbackJson: any = null;
+          if (
+            fallbackBody.trim() &&
+            (
+              (fallback.headers.get('content-type') || '').includes('application/json') ||
+              fallbackBody.trim().startsWith('{') ||
+              fallbackBody.trim().startsWith('[')
+            )
+          ) {
+            try {
+              fallbackJson = JSON.parse(fallbackBody);
+            } catch {
+              fallbackJson = null;
+            }
+          }
+          return {
+            ok: fallback.ok,
+            statusCode: fallback.status,
+            body: fallbackBody,
+            json: fallbackJson,
+          };
+        } catch {
+          return { ok: true, statusCode: 304 };
+        }
+      }
+
       await sourceRegistryService.upsertEntry({
         sourceId,
         providerId: providerId || meta?.providerId || '',
