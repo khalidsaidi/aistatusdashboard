@@ -102,6 +102,11 @@ async function main() {
   const strict = !args.includes('--allow-mismatch');
   const refresh = args.includes('--refresh');
 
+  const envFile = envArg || (refresh ? path.resolve(process.cwd(), '.env.production.local') : null);
+  if (envFile) {
+    loadEnvFile(envFile);
+  }
+
   const baseUrl =
     baseArg ||
     process.env.STATUS_CHECK_BASE_URL ||
@@ -109,8 +114,6 @@ async function main() {
     'http://localhost:3000';
 
   if (refresh) {
-    const envFile = envArg || path.resolve(process.cwd(), '.env.production.local');
-    loadEnvFile(envFile);
     const secret = process.env.APP_CRON_SECRET || process.env.CRON_SECRET;
     if (!secret) {
       throw new Error('Missing APP_CRON_SECRET/CRON_SECRET for refresh step.');

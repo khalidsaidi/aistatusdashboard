@@ -40,7 +40,14 @@ export class StatusService {
                 clearTimeout(timeoutId);
                 const responseTime = Date.now() - startTime;
 
-                const { status, details } = await this.parseStatus(provider, response);
+                let { status, details } = await this.parseStatus(provider, response);
+                if (status === 'unknown') {
+                    const note = response.ok
+                        ? 'Unverified: status page did not provide a clear signal'
+                        : `Unverified: status endpoint returned HTTP ${response.status}`;
+                    details = details ? `${details} | ${note}` : note;
+                    status = 'operational';
+                }
                 const result: StatusResult = {
                     id: provider.id,
                     name: provider.name,
@@ -68,10 +75,11 @@ export class StatusService {
             name: provider.name,
             displayName: provider.displayName || provider.name,
             aliases: provider.aliases,
-            status: 'unknown',
+            status: 'operational',
             responseTime: Date.now() - startTime,
             lastChecked: new Date().toISOString(),
             error: lastError,
+            details: 'Unverified: status endpoint unreachable',
             statusPageUrl: provider.statusPageUrl,
         };
     }
@@ -141,7 +149,7 @@ export class StatusService {
                         // ignore html fallback failures
                     }
                 }
-                return { status: this.statusFromHttp(response) };
+                return { status: 'unknown' };
             }
 
             if (format === 'google-cloud') {
@@ -152,7 +160,7 @@ export class StatusService {
                     keywords: provider.id === 'google-ai' ? GOOGLE_AI_KEYWORDS : undefined,
                 });
                 return {
-                    status: status === 'unknown' ? this.statusFromHttp(response) : status,
+                    status,
                 };
             }
 
@@ -166,7 +174,7 @@ export class StatusService {
                             : undefined;
 
                 return {
-                    status: status === 'unknown' ? this.statusFromHttp(response) : status,
+                    status,
                     details: rawStatus ? `status:${rawStatus}` : undefined,
                 };
             }
@@ -179,7 +187,7 @@ export class StatusService {
                     : null;
                 const status = parseMetaStatusResponse(metaOrg ? [metaOrg] : data);
                 return {
-                    status: status === 'unknown' ? this.statusFromHttp(response) : status,
+                    status,
                 };
             }
 
@@ -190,7 +198,7 @@ export class StatusService {
                         ? data.data.attributes.aggregate_state
                         : undefined;
                 return {
-                    status: status === 'unknown' ? this.statusFromHttp(response) : status,
+                    status,
                     details: aggregate ? `aggregate:${aggregate}` : undefined,
                 };
             }
@@ -201,7 +209,7 @@ export class StatusService {
                 typeof data?.status?.description === 'string' ? data.status.description : undefined;
 
             return {
-                status: status === 'unknown' ? this.statusFromHttp(response) : status,
+                status,
                 details:
                     typeof indicator === 'string'
                         ? `indicator:${indicator}${description ? ` (${description})` : ''}`
@@ -213,9 +221,9 @@ export class StatusService {
             try {
                 const text = await response.clone().text();
                 const parsed = parseRssFeedResponse(text);
-                return { status: parsed === 'unknown' ? this.statusFromHttp(response) : parsed };
+                return { status: parsed };
             } catch {
-                return { status: this.statusFromHttp(response) };
+                return { status: 'unknown' };
             }
         }
 
@@ -223,9 +231,9 @@ export class StatusService {
             try {
                 const text = await response.clone().text();
                 const parsed = parseHtmlResponse(text);
-                return { status: parsed === 'unknown' ? this.statusFromHttp(response) : parsed };
+                return { status: parsed };
             } catch {
-                return { status: this.statusFromHttp(response) };
+                return { status: 'unknown' };
             }
         }
 
@@ -245,7 +253,7 @@ export class StatusService {
                     typeof data?.status?.description === 'string' ? data.status.description : undefined;
 
                 return {
-                    status: status === 'unknown' ? this.statusFromHttp(response) : status,
+                    status,
                     details:
                         typeof indicator === 'string'
                             ? `indicator:${indicator}${description ? ` (${description})` : ''}`
@@ -257,23 +265,17 @@ export class StatusService {
                 if (parsed !== 'unknown') {
                     return { status: parsed };
                 }
-                return { status: this.statusFromHttp(response) };
+                return { status: 'unknown' };
             }
         }
 
         try {
             const text = await response.clone().text();
             const parsed = parseHtmlResponse(text);
-            return { status: parsed === 'unknown' ? this.statusFromHttp(response) : parsed };
+            return { status: parsed };
         } catch {
-            return { status: this.statusFromHttp(response) };
+            return { status: 'unknown' };
         }
-    }
-
-    private statusFromHttp(response: Response): ProviderStatus {
-        if (response.ok) return 'operational';
-        if (response.status >= 500) return 'down';
-        return 'degraded';
     }
 
     private getCached(id: string): StatusResult | null {

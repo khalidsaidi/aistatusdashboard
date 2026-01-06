@@ -130,6 +130,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
     }
 
     const query = params.toString();
+    isUrlSyncRef.current = true;
     router.replace(query ? `/?${query}` : '/', { scroll: false });
   };
 
@@ -151,6 +152,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
     } else {
       params.delete('notify');
     }
+    isUrlSyncRef.current = true;
     router.replace(`/?${params.toString()}`, { scroll: false });
   };
 
@@ -164,6 +166,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
     });
   };
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchQueryDebounced, setSearchQueryDebounced] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [sortBy, setSortBy] = useState<SortKey>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
@@ -177,6 +180,8 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
   const [stalenessSignals, setStalenessSignals] = useState<StalenessSignal[]>([]);
   const [stalenessLoading, setStalenessLoading] = useState(false);
   const searchInputRef = React.useRef<HTMLInputElement>(null);
+  const isUrlSyncRef = React.useRef(false);
+  const searchParamsString = searchParams.toString();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -246,37 +251,41 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
 
   // Sync filters from URL
   useEffect(() => {
-    const qParam = searchParams.get('q') || '';
-    const statusParam = parseParam(searchParams.get('status'), STATUS_FILTERS, 'all');
-    const speedParam = parseParam(searchParams.get('speed'), SPEED_FILTERS, 'all');
-    const uptimeParam = parseParam(searchParams.get('uptime'), UPTIME_FILTERS, 'all');
-    const sortParam = parseParam(searchParams.get('sort'), SORT_KEYS, 'name');
-    const orderParam = parseParam(searchParams.get('order'), SORT_ORDERS, 'asc');
-    const issuesParam = searchParams.get('issues');
+    if (isUrlSyncRef.current) {
+      isUrlSyncRef.current = false;
+      return;
+    }
+    const params = new URLSearchParams(searchParamsString);
+    const qParam = params.get('q') || '';
+    const statusParam = parseParam(params.get('status'), STATUS_FILTERS, 'all');
+    const speedParam = parseParam(params.get('speed'), SPEED_FILTERS, 'all');
+    const uptimeParam = parseParam(params.get('uptime'), UPTIME_FILTERS, 'all');
+    const sortParam = parseParam(params.get('sort'), SORT_KEYS, 'name');
+    const orderParam = parseParam(params.get('order'), SORT_ORDERS, 'asc');
+    const issuesParam = params.get('issues');
     const issuesValue = issuesParam === '1' || issuesParam === 'true';
 
-    if (qParam !== searchQuery) setSearchQuery(qParam);
-    if (statusParam !== statusFilter) setStatusFilter(statusParam);
-    if (speedParam !== responseTimeFilter) setResponseTimeFilter(speedParam);
-    if (uptimeParam !== uptimeFilter) setUptimeFilter(uptimeParam);
-    if (sortParam !== sortBy) setSortBy(sortParam);
-    if (orderParam !== sortOrder) setSortOrder(orderParam);
-    if (issuesValue !== issuesOnly) setIssuesOnly(issuesValue);
-  }, [
-    searchParams,
-    searchQuery,
-    statusFilter,
-    responseTimeFilter,
-    uptimeFilter,
-    sortBy,
-    sortOrder,
-    issuesOnly,
-  ]);
+    setSearchQuery(qParam);
+    setSearchQueryDebounced(qParam);
+    setStatusFilter(statusParam);
+    setResponseTimeFilter(speedParam);
+    setUptimeFilter(uptimeParam);
+    setSortBy(sortParam);
+    setSortOrder(orderParam);
+    setIssuesOnly(issuesValue);
+  }, [searchParamsString]);
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      setSearchQueryDebounced(searchQuery);
+    }, 250);
+    return () => window.clearTimeout(handle);
+  }, [searchQuery]);
 
   // Sync filters to URL for shareable views
   useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (searchQuery) params.set('q', searchQuery);
+    const params = new URLSearchParams(searchParamsString);
+    if (searchQueryDebounced) params.set('q', searchQueryDebounced);
     else params.delete('q');
 
     if (statusFilter !== 'all') params.set('status', statusFilter);
@@ -297,20 +306,21 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
     if (issuesOnly) params.set('issues', '1');
     else params.delete('issues');
 
-    const current = searchParams.toString();
+    const current = searchParamsString;
     const next = params.toString();
     if (next !== current) {
+      isUrlSyncRef.current = true;
       router.replace(next ? `/?${next}` : '/', { scroll: false });
     }
   }, [
-    searchQuery,
+    searchQueryDebounced,
     statusFilter,
     responseTimeFilter,
     uptimeFilter,
     sortBy,
     sortOrder,
     issuesOnly,
-    searchParams,
+    searchParamsString,
     router,
   ]);
 
@@ -337,37 +347,51 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
   const safeStatuses = statuses.filter(
     (s) => s && typeof s === 'object' && s.status && s.id && s.name
   );
-  const operationalCount = safeStatuses.filter((s) => s.status === 'operational').length;
-  const degradedCount = safeStatuses.filter((s) => s.status === 'degraded' || s.status === 'partial_outage').length;
-  const downCount = safeStatuses.filter((s) => s.status === 'down' || s.status === 'major_outage').length;
-  const maintenanceCount = safeStatuses.filter((s) => s.status === 'maintenance').length;
-  const unknownCount = safeStatuses.filter((s) => s.status === 'unknown').length;
+  const unverifiedCount = safeStatuses.filter((s) => s.status === 'unknown').length;
+  const rawStatusById = React.useMemo(
+    () => new Map(safeStatuses.map((status) => [status.id, status.status])),
+    [safeStatuses]
+  );
+  const displayStatuses = React.useMemo<StatusResult[]>(
+    () =>
+      safeStatuses.map((status) => {
+        if (status.status !== 'unknown') return status;
+        const note = 'Unverified status signal (defaulting to operational)';
+        const details = status.details ? `${status.details} | ${note}` : note;
+        return { ...status, status: 'operational', details };
+      }),
+    [safeStatuses]
+  );
+  const operationalCount = displayStatuses.filter((s) => s.status === 'operational').length;
+  const degradedCount = displayStatuses.filter((s) => s.status === 'degraded' || s.status === 'partial_outage').length;
+  const downCount = displayStatuses.filter((s) => s.status === 'down' || s.status === 'major_outage').length;
+  const maintenanceCount = displayStatuses.filter((s) => s.status === 'maintenance').length;
 
   const avgResponseTime =
-    safeStatuses.length > 0
+    displayStatuses.length > 0
       ? Math.round(
-          safeStatuses.reduce(
+          displayStatuses.reduce(
             (acc, s) => acc + (typeof s.responseTime === 'number' ? s.responseTime : 0),
             0
-          ) / safeStatuses.length
+          ) / displayStatuses.length
         )
       : 0;
 
   const healthPercentage =
-    safeStatuses.length > 0
-      ? Math.round(((operationalCount + maintenanceCount) / safeStatuses.length) * 100)
+    displayStatuses.length > 0
+      ? Math.round(((operationalCount + maintenanceCount) / displayStatuses.length) * 100)
       : 0;
 
   // Calculate global last updated time
   const lastUpdated = React.useMemo(() => {
-    const timestamps = safeStatuses
+    const timestamps = displayStatuses
       .map((s) => s.lastChecked)
       .filter(Boolean)
       .map((t) => new Date(t).getTime())
       .sort((a, b) => b - a); // Sort descending to get most recent
 
     return timestamps.length > 0 ? new Date(timestamps[0]) : null;
-  }, [safeStatuses]);
+  }, [displayStatuses]);
 
   const systemStatus = React.useMemo(() => {
     if (downCount > 0)
@@ -391,7 +415,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
         tone: 'text-slate-600 dark:text-slate-300',
         dot: 'bg-slate-400',
       };
-    if (operationalCount === safeStatuses.length && safeStatuses.length > 0) {
+    if (operationalCount === displayStatuses.length && displayStatuses.length > 0) {
       return {
         status: 'operational',
         label: 'All systems operational',
@@ -405,28 +429,26 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
       tone: 'text-slate-600 dark:text-slate-300',
       dot: 'bg-slate-400',
     };
-  }, [operationalCount, degradedCount, downCount, maintenanceCount, safeStatuses.length]);
+  }, [operationalCount, degradedCount, downCount, maintenanceCount, displayStatuses.length]);
 
   const majorIncidents = React.useMemo(
     () =>
-      safeStatuses.filter(
+      displayStatuses.filter(
         (status) =>
           status.status === 'down' ||
-          status.status === 'major_outage' ||
-          status.status === 'degraded' ||
-          status.status === 'partial_outage'
+          status.status === 'major_outage'
       ),
-    [safeStatuses]
+    [displayStatuses]
   );
   const incidentTargets = majorIncidents.map((status) => status.id);
   const providerNameById = React.useMemo(
-    () => new Map(safeStatuses.map((status) => [status.id, status.displayName || status.name])),
-    [safeStatuses]
+    () => new Map(displayStatuses.map((status) => [status.id, status.displayName || status.name])),
+    [displayStatuses]
   );
 
   // Filter and sort statuses
   const filteredAndSortedStatuses = React.useMemo(() => {
-    const safeStatuses = statuses.filter(
+    const safeStatuses = displayStatuses.filter(
       (s) => s && typeof s === 'object' && s.status && s.id && s.name
     );
     const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -458,7 +480,11 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
 
     // Apply status filter
     if (statusFilter !== 'all') {
-      filtered = filtered.filter((status) => status.status === statusFilter);
+      filtered = filtered.filter((status) =>
+        statusFilter === 'unknown'
+          ? rawStatusById.get(status.id) === 'unknown'
+          : status.status === statusFilter
+      );
     }
 
     // Apply response time filter
@@ -545,7 +571,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
     });
 
     return filtered;
-  }, [statuses, searchQuery, statusFilter, responseTimeFilter, uptimeFilter, sortBy, sortOrder, issuesOnly, watchlistOnly, watchlist]);
+  }, [displayStatuses, rawStatusById, searchQuery, statusFilter, responseTimeFilter, uptimeFilter, sortBy, sortOrder, issuesOnly, watchlistOnly, watchlist]);
 
   // Validate statuses prop after hooks initialization
   if (!Array.isArray(statuses)) {
@@ -969,6 +995,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
                     </div>
                     <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
                       Official status: {signal.officialStatus}. Observed probes/telemetry: {signal.observedSignal}.
+                      This is an advisory mismatch only and does not change the published status.
                     </p>
                     <div className="mt-2 text-xs text-slate-500 dark:text-slate-400 flex flex-wrap gap-3">
                       <span>Samples: {signal.evidence.sampleCount}</span>
@@ -1029,7 +1056,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
                   <span className="pill">Degraded: {degradedCount}</span>
                   <span className="pill">Down: {downCount}</span>
                   {maintenanceCount > 0 && <span className="pill">Maintenance: {maintenanceCount}</span>}
-                  {unknownCount > 0 && <span className="pill">Unknown: {unknownCount}</span>}
+                  {unverifiedCount > 0 && <span className="pill">Unverified: {unverifiedCount}</span>}
                   <span className="pill">Avg latency: {avgResponseTime}ms</span>
                 </div>
                 <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
@@ -1095,19 +1122,19 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
 
         <div className="surface-card p-2" data-tour="tab-bar">
           <div className="flex flex-wrap gap-2">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setTab(tab.id as any)}
-                data-testid={tab.id === 'notifications' ? 'notifications-button' : undefined}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition flex items-center gap-2 ${
-                  activeTab === tab.id
-                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                    : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setTab(tab.id as any)}
+                  data-testid={tab.id === 'notifications' ? 'notifications-button' : undefined}
+                  className={`px-5 py-2 rounded-full text-sm font-semibold transition flex items-center gap-2 ${
+                    activeTab === tab.id
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                      : 'text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                 }`}
-              >
-                {tab.label}
-                {tab.count && (
+                >
+                  {tab.label}
+                  {tab.count && (
                   <span className="bg-slate-200/80 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs px-2 py-1 rounded-full">
                     {tab.count}
                   </span>
@@ -1210,7 +1237,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
                         <option value="down">Down</option>
                         <option value="major_outage">Major Outage</option>
                         <option value="maintenance">Maintenance</option>
-                        <option value="unknown">Unknown</option>
+                        <option value="unknown">Unverified</option>
                       </select>
                     </div>
 
@@ -1421,7 +1448,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
               )}
 
               <div className="grid gap-6 lg:grid-cols-[1.1fr,0.9fr]">
-                <ExportShare statuses={safeStatuses} className="surface-card-strong" />
+                <ExportShare statuses={displayStatuses} className="surface-card-strong" />
                 <div className="surface-card p-6" data-tour="dashboard-stay-loop">
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                     Stay in the loop
@@ -1491,8 +1518,8 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
             <div className="space-y-6">
               <AnalyticsDashboard />
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <ProviderCompare statuses={safeStatuses} />
-                <ProviderTimeline statuses={safeStatuses} />
+                <ProviderCompare statuses={displayStatuses} />
+                <ProviderTimeline statuses={displayStatuses} />
               </div>
               <ProviderDetailPanel />
             </div>

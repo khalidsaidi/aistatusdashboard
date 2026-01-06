@@ -128,7 +128,13 @@ export function parseMetaStatusResponse(data: any): ProviderStatus {
         hasServices = true;
         const normalized = service.status.trim().toLowerCase();
 
-        if (normalized.includes('no known issues') || normalized.includes('no issues')) {
+        if (
+          normalized.includes('resolved') ||
+          normalized.includes('no known issues') ||
+          normalized.includes('no issues') ||
+          normalized.includes('operational') ||
+          normalized.includes('low disruption')
+        ) {
           continue;
         }
 
@@ -148,6 +154,9 @@ export function parseMetaStatusResponse(data: any): ProviderStatus {
           normalized.includes('degrad') ||
           normalized.includes('partial')
         ) {
+          if (normalized.includes('low') || normalized.includes('minor') || normalized.includes('resolved')) {
+            continue;
+          }
           hasIssues = true;
         }
       }
@@ -362,8 +371,6 @@ export function parseHtmlResponse(data: any): ProviderStatus {
       'investigating',
       'identified',
       'monitoring',
-      'major incident',
-      'minor incident',
       'partial disruption',
     ];
     const operationalKeywords = [

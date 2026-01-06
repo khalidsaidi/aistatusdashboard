@@ -37,7 +37,15 @@ function loadEnvFromFiles(files) {
     });
 }
 
-loadEnvFromFiles(['.env.production.local', '.env.local']);
+const preferredEnv = (process.env.VERIFY_DB_ENV || process.env.FIREBASE_ENV || 'local').toLowerCase();
+const envFiles =
+    preferredEnv === 'production'
+        ? ['.env.production.local', '.env.local']
+        : ['.env.local', '.env.production.local'];
+loadEnvFromFiles(envFiles);
+if (preferredEnv !== 'production' && process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+    delete process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+}
 
 // Load env for Firebase
 const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;

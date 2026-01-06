@@ -2,12 +2,25 @@ import { providerService } from '@/lib/services/providers';
 import { statusService } from '@/lib/services/status';
 import { intelligenceService } from '@/lib/services/intelligence';
 import { log } from '@/lib/utils/logger';
+import sourcesConfig from '@/lib/data/sources.json';
 import DashboardTabs from './components/DashboardTabs';
 import ClientWrapper from './components/ClientWrapper';
 import { Suspense } from 'react';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
+
+const sourcePolls = new Map<string, number>();
+(sourcesConfig as { sources?: Array<{ providerId?: string; pollIntervalSeconds?: number }> }).sources?.forEach(
+  (source) => {
+    if (!source.providerId || typeof source.pollIntervalSeconds !== 'number') return;
+    const current = sourcePolls.get(source.providerId);
+    sourcePolls.set(
+      source.providerId,
+      typeof current === 'number' ? Math.min(current, source.pollIntervalSeconds) : source.pollIntervalSeconds
+    );
+  }
+);
 
 // Fallback component
 function ErrorFallback({ error }: { error: string }) {
@@ -58,14 +71,22 @@ export default async function DashboardPage() {
         (summary.activeIncidentCount || 0) > 0 ||
         (summary.activeMaintenanceCount || 0) > 0 ||
         (summary.degradedComponentCount || 0) > 0;
-      const mergedStatus = summary.status && summary.status !== 'unknown' && hasEvidence
-        ? summary.status
-        : status.status;
+      const pollSeconds = sourcePolls.get(status.id) ?? 120;
+      const updatedAt = summary.lastUpdated ? Date.parse(summary.lastUpdated) : NaN;
+      const isFresh =
+        Number.isFinite(updatedAt) &&
+        Date.now() - updatedAt <= pollSeconds * 2 * 1000 + 60000;
+      const useSummary =
+        !!summary.status &&
+        summary.status !== 'unknown' &&
+        hasEvidence &&
+        isFresh;
+      const mergedStatus = useSummary ? summary.status : status.status;
       return {
         ...status,
         status: mergedStatus,
-        details: summary.description || status.details,
-        lastChecked: summary.lastUpdated || status.lastChecked,
+        details: useSummary ? summary.description || status.details : status.details,
+        lastChecked: useSummary ? summary.lastUpdated || status.lastChecked : status.lastChecked,
       };
     });
 

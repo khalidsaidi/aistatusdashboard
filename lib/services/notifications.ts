@@ -29,10 +29,30 @@ export class NotificationService {
         current: ProviderStatus,
         previous: ProviderStatus
     ): 'incident' | 'recovery' | 'degradation' | null {
-        if (current === 'operational' && previous !== 'operational') return 'recovery';
-        if (current === 'down' && previous === 'operational') return 'incident';
-        if (current === 'degraded' && previous === 'operational') return 'degradation';
-        return null;
+        const rank = (status: ProviderStatus) => {
+            switch (status) {
+                case 'operational':
+                    return 0;
+                case 'maintenance':
+                    return 1;
+                case 'degraded':
+                case 'partial_outage':
+                    return 2;
+                case 'down':
+                case 'major_outage':
+                    return 3;
+                default:
+                    return 1;
+            }
+        };
+
+        const currentRank = rank(current);
+        const previousRank = rank(previous);
+
+        if (currentRank === previousRank) return null;
+        if (currentRank < previousRank) return 'recovery';
+        if (current === 'down' || current === 'major_outage') return 'incident';
+        return 'degradation';
     }
 
     private async queueEmailNotifications(
