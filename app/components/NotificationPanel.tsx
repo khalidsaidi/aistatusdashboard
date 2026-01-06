@@ -5,6 +5,7 @@ import { providerService } from '@/lib/services/providers';
 import { getAnalyticsSessionId } from '@/lib/utils/analytics-client';
 import { useSearchParams } from 'next/navigation';
 import ClientTimestamp from './ClientTimestamp';
+import { useToast } from './ToastProvider';
 
 interface Incident {
   id: string;
@@ -38,6 +39,7 @@ export default function NotificationPanel() {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
+  const { showSuccess, showError } = useToast();
 
   const fetchIncidents = useCallback(async () => {
     try {
@@ -133,12 +135,13 @@ export default function NotificationPanel() {
 
       if (response.ok) {
         setEmail('');
-        alert('Check your email to confirm subscription!');
+        showSuccess('Subscription started', 'Check your inbox to confirm the alert subscription.');
       } else {
-        alert('Failed to subscribe.');
+        showError('Subscription failed', 'We could not register the email alert. Please try again.');
       }
     } catch (error) {
       console.error(error);
+      showError('Subscription error', 'We could not reach the alert service. Please retry.');
     } finally {
       setLoading(false);
     }
@@ -167,12 +170,13 @@ export default function NotificationPanel() {
 
       if (response.ok) {
         setWebhookUrl('');
-        alert('Webhook added successfully!');
+        showSuccess('Webhook registered', 'We will send updates to your webhook endpoint.');
       } else {
-        alert('Failed to add webhook.');
+        showError('Webhook failed', 'We could not register that webhook. Please try again.');
       }
     } catch (error) {
       console.error(error);
+      showError('Webhook error', 'We could not reach the webhook service. Please retry.');
     } finally {
       setLoading(false);
     }

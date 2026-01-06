@@ -34,6 +34,10 @@ export async function GET(request: NextRequest) {
       status: record.status,
       severity: record.status === 'down' || record.status === 'major_outage' ? 'critical' : 'warning',
       startTime: record.lastChecked,
+      endTime: undefined,
+      impactedComponents: [],
+      impactedRegions: [],
+      updates: [],
     }));
 
     const incidents = [...normalizedObserved, ...normalizedIntel]

@@ -194,20 +194,20 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 8264,
+                  "duration": 9364,
                   "errors": [],
                   "stdout": [
                     {
                       "text": "Test Script Process Project ID: undefined\n"
                     },
                     {
-                      "text": "✅ Subscription verified in DB for e2e-697542@example.com\n"
+                      "text": "✅ Subscription verified in DB for e2e-782770@example.com\n"
                     },
                     {
-                      "text": "✅ Webhook verified in DB for https://e2e-webhook-697542.com\n"
+                      "text": "✅ Webhook verified in DB for https://e2e-webhook-782770.com\n"
                     },
                     {
-                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 697542\"\n"
+                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 782770\"\n"
                     },
                     {
                       "text": "📡 Injected \"down\" status for Anthropic into DB\n"
@@ -234,7 +234,7 @@
                     }
                   ],
                   "retry": 0,
-                  "startTime": "2026-01-06T22:31:37.350Z",
+                  "startTime": "2026-01-06T23:06:22.592Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -263,20 +263,20 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 12268,
+                  "duration": 11110,
                   "errors": [],
                   "stdout": [
                     {
                       "text": "Test Script Process Project ID: undefined\n"
                     },
                     {
-                      "text": "✅ Subscription verified in DB for e2e-757234@example.com\n"
+                      "text": "✅ Subscription verified in DB for e2e-844865@example.com\n"
                     },
                     {
-                      "text": "✅ Webhook verified in DB for https://e2e-webhook-757234.com\n"
+                      "text": "✅ Webhook verified in DB for https://e2e-webhook-844865.com\n"
                     },
                     {
-                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 757234\"\n"
+                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 844865\"\n"
                     },
                     {
                       "text": "📡 Injected \"down\" status for Anthropic into DB\n"
@@ -303,7 +303,7 @@
                     }
                   ],
                   "retry": 0,
-                  "startTime": "2026-01-06T22:32:34.795Z",
+                  "startTime": "2026-01-06T23:07:22.351Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -332,20 +332,20 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 15618,
+                  "duration": 14662,
                   "errors": [],
                   "stdout": [
                     {
                       "text": "Test Script Process Project ID: undefined\n"
                     },
                     {
-                      "text": "✅ Subscription verified in DB for e2e-821022@example.com\n"
+                      "text": "✅ Subscription verified in DB for e2e-908564@example.com\n"
                     },
                     {
-                      "text": "✅ Webhook verified in DB for https://e2e-webhook-821022.com\n"
+                      "text": "✅ Webhook verified in DB for https://e2e-webhook-908564.com\n"
                     },
                     {
-                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 821022\"\n"
+                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 908564\"\n"
                     },
                     {
                       "text": "📡 Injected \"down\" status for Anthropic into DB\n"
@@ -372,7 +372,7 @@
                     }
                   ],
                   "retry": 0,
-                  "startTime": "2026-01-06T22:33:39.369Z",
+                  "startTime": "2026-01-06T23:08:26.698Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -401,20 +401,20 @@
                   "workerIndex": 3,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 10353,
+                  "duration": 11871,
                   "errors": [],
                   "stdout": [
                     {
                       "text": "Test Script Process Project ID: undefined\n"
                     },
                     {
-                      "text": "✅ Subscription verified in DB for e2e-948627@example.com\n"
+                      "text": "✅ Subscription verified in DB for e2e-036063@example.com\n"
                     },
                     {
-                      "text": "✅ Webhook verified in DB for https://e2e-webhook-948627.com\n"
+                      "text": "✅ Webhook verified in DB for https://e2e-webhook-036063.com\n"
                     },
                     {
-                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 948627\"\n"
+                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 036063\"\n"
                     },
                     {
                       "text": "📡 Injected \"down\" status for Anthropic into DB\n"
@@ -441,7 +441,7 @@
                     }
                   ],
                   "retry": 0,
-                  "startTime": "2026-01-06T22:35:48.431Z",
+                  "startTime": "2026-01-06T23:10:35.846Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -470,20 +470,20 @@
                   "workerIndex": 4,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 16304,
+                  "duration": 18183,
                   "errors": [],
                   "stdout": [
                     {
                       "text": "Test Script Process Project ID: undefined\n"
                     },
                     {
-                      "text": "✅ Subscription verified in DB for e2e-019106@example.com\n"
+                      "text": "✅ Subscription verified in DB for e2e-117590@example.com\n"
                     },
                     {
-                      "text": "✅ Webhook verified in DB for https://e2e-webhook-019106.com\n"
+                      "text": "✅ Webhook verified in DB for https://e2e-webhook-117590.com\n"
                     },
                     {
-                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 019106\"\n"
+                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 117590\"\n"
                     },
                     {
                       "text": "📡 Injected \"down\" status for Anthropic into DB\n"
@@ -510,7 +510,7 @@
                     }
                   ],
                   "retry": 0,
-                  "startTime": "2026-01-06T22:36:57.190Z",
+                  "startTime": "2026-01-06T23:11:55.891Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -539,20 +539,20 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 11239,
+                  "duration": 10911,
                   "errors": [],
                   "stdout": [
                     {
                       "text": "Test Script Process Project ID: undefined\n"
                     },
                     {
-                      "text": "✅ Subscription verified in DB for e2e-151429@example.com\n"
+                      "text": "✅ Subscription verified in DB for e2e-244378@example.com\n"
                     },
                     {
-                      "text": "✅ Webhook verified in DB for https://e2e-webhook-151429.com\n"
+                      "text": "✅ Webhook verified in DB for https://e2e-webhook-244378.com\n"
                     },
                     {
-                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 151429\"\n"
+                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 244378\"\n"
                     },
                     {
                       "text": "📡 Injected \"down\" status for Anthropic into DB\n"
@@ -579,7 +579,7 @@
                     }
                   ],
                   "retry": 0,
-                  "startTime": "2026-01-06T22:39:05.146Z",
+                  "startTime": "2026-01-06T23:14:03.761Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -608,20 +608,20 @@
                   "workerIndex": 6,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 11472,
+                  "duration": 10932,
                   "errors": [],
                   "stdout": [
                     {
                       "text": "Test Script Process Project ID: undefined\n"
                     },
                     {
-                      "text": "✅ Subscription verified in DB for e2e-216668@example.com\n"
+                      "text": "✅ Subscription verified in DB for e2e-307016@example.com\n"
                     },
                     {
-                      "text": "✅ Webhook verified in DB for https://e2e-webhook-216668.com\n"
+                      "text": "✅ Webhook verified in DB for https://e2e-webhook-307016.com\n"
                     },
                     {
-                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 216668\"\n"
+                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 307016\"\n"
                     },
                     {
                       "text": "📡 Injected \"down\" status for Anthropic into DB\n"
@@ -648,7 +648,7 @@
                     }
                   ],
                   "retry": 0,
-                  "startTime": "2026-01-06T22:40:14.745Z",
+                  "startTime": "2026-01-06T23:15:06.577Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -692,7 +692,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 20838,
+                      "duration": 22229,
                       "errors": [],
                       "stdout": [
                         {
@@ -705,7 +705,7 @@
                           "text": "⚙️ Status Orchestrator triggered\n"
                         },
                         {
-                          "text": "✅ Notification lifecycle verified: Notification queued for test-706776@example.com\n"
+                          "text": "✅ Notification lifecycle verified: Notification queued for test-793122@example.com\n"
                         }
                       ],
                       "stderr": [
@@ -741,7 +741,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:31:46.779Z",
+                      "startTime": "2026-01-06T23:06:33.124Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -770,7 +770,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3954,
+                      "duration": 3741,
                       "errors": [],
                       "stdout": [
                         {
@@ -792,7 +792,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:32:10.131Z",
+                      "startTime": "2026-01-06T23:06:58.827Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -821,19 +821,19 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4401,
+                      "duration": 4187,
                       "errors": [],
                       "stdout": [
                         {
                           "text": "✅ UI Search verified\n"
                         },
                         {
-                          "text": "✅ UI Filter verified: Found 17 operational providers\n"
+                          "text": "✅ UI Filter verified: Found 18 operational providers\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:32:14.105Z",
+                      "startTime": "2026-01-06T23:07:02.586Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -862,7 +862,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 264,
+                      "duration": 250,
                       "errors": [],
                       "stdout": [
                         {
@@ -871,7 +871,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:32:19.573Z",
+                      "startTime": "2026-01-06T23:07:06.787Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -900,7 +900,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4671,
+                      "duration": 5301,
                       "errors": [],
                       "stdout": [
                         {
@@ -913,7 +913,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:32:19.847Z",
+                      "startTime": "2026-01-06T23:07:07.053Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -942,7 +942,7 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 20918,
+                      "duration": 22124,
                       "errors": [],
                       "stdout": [
                         {
@@ -955,7 +955,7 @@
                           "text": "⚙️ Status Orchestrator triggered\n"
                         },
                         {
-                          "text": "✅ Notification lifecycle verified: Notification queued for test-768523@example.com\n"
+                          "text": "✅ Notification lifecycle verified: Notification queued for test-855040@example.com\n"
                         }
                       ],
                       "stderr": [
@@ -991,7 +991,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:32:48.526Z",
+                      "startTime": "2026-01-06T23:07:35.044Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1020,7 +1020,7 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4052,
+                      "duration": 5137,
                       "errors": [],
                       "stdout": [
                         {
@@ -1042,7 +1042,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:33:13.149Z",
+                      "startTime": "2026-01-06T23:08:00.808Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1071,19 +1071,19 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4522,
+                      "duration": 4537,
                       "errors": [],
                       "stdout": [
                         {
                           "text": "✅ UI Search verified\n"
                         },
                         {
-                          "text": "✅ UI Filter verified: Found 17 operational providers\n"
+                          "text": "✅ UI Filter verified: Found 18 operational providers\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:33:17.218Z",
+                      "startTime": "2026-01-06T23:08:05.970Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1112,7 +1112,7 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 417,
+                      "duration": 529,
                       "errors": [],
                       "stdout": [
                         {
@@ -1121,7 +1121,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:33:21.757Z",
+                      "startTime": "2026-01-06T23:08:10.522Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1150,7 +1150,7 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4681,
+                      "duration": 4619,
                       "errors": [],
                       "stdout": [
                         {
@@ -1163,7 +1163,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:33:22.191Z",
+                      "startTime": "2026-01-06T23:08:11.071Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1192,7 +1192,7 @@
                       "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 23252,
+                      "duration": 25721,
                       "errors": [],
                       "stdout": [
                         {
@@ -1205,7 +1205,7 @@
                           "text": "⚙️ Status Orchestrator triggered\n"
                         },
                         {
-                          "text": "✅ Notification lifecycle verified: Notification queued for test-835142@example.com\n"
+                          "text": "✅ Notification lifecycle verified: Notification queued for test-921507@example.com\n"
                         }
                       ],
                       "stderr": [
@@ -1241,7 +1241,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:33:55.148Z",
+                      "startTime": "2026-01-06T23:08:41.511Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1270,7 +1270,7 @@
                       "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 9733,
+                      "duration": 9584,
                       "errors": [],
                       "stdout": [
                         {
@@ -1292,7 +1292,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:34:22.655Z",
+                      "startTime": "2026-01-06T23:09:10.143Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1321,19 +1321,19 @@
                       "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 8421,
+                      "duration": 8568,
                       "errors": [],
                       "stdout": [
                         {
                           "text": "✅ UI Search verified\n"
                         },
                         {
-                          "text": "✅ UI Filter verified: Found 17 operational providers\n"
+                          "text": "✅ UI Filter verified: Found 18 operational providers\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:34:33.413Z",
+                      "startTime": "2026-01-06T23:09:19.747Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1362,7 +1362,7 @@
                       "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1348,
+                      "duration": 1225,
                       "errors": [],
                       "stdout": [
                         {
@@ -1371,7 +1371,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:34:41.854Z",
+                      "startTime": "2026-01-06T23:09:28.977Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1400,7 +1400,7 @@
                       "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 11130,
+                      "duration": 11625,
                       "errors": [],
                       "stdout": [
                         {
@@ -1413,7 +1413,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:34:43.215Z",
+                      "startTime": "2026-01-06T23:09:30.220Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1442,7 +1442,7 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 22239,
+                      "duration": 23676,
                       "errors": [],
                       "stdout": [
                         {
@@ -1455,7 +1455,7 @@
                           "text": "⚙️ Status Orchestrator triggered\n"
                         },
                         {
-                          "text": "✅ Notification lifecycle verified: Notification queued for test-958916@example.com\n"
+                          "text": "✅ Notification lifecycle verified: Notification queued for test-047847@example.com\n"
                         }
                       ],
                       "stderr": [
@@ -1491,7 +1491,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:35:58.919Z",
+                      "startTime": "2026-01-06T23:10:47.850Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1520,7 +1520,7 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4288,
+                      "duration": 6001,
                       "errors": [],
                       "stdout": [
                         {
@@ -1542,7 +1542,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:36:24.630Z",
+                      "startTime": "2026-01-06T23:11:14.925Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1571,7 +1571,7 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4775,
+                      "duration": 5063,
                       "errors": [],
                       "stdout": [
                         {
@@ -1583,7 +1583,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:36:28.937Z",
+                      "startTime": "2026-01-06T23:11:20.961Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1612,7 +1612,7 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 300,
+                      "duration": 429,
                       "errors": [],
                       "stdout": [
                         {
@@ -1621,7 +1621,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:36:33.723Z",
+                      "startTime": "2026-01-06T23:11:26.041Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1650,7 +1650,7 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4371,
+                      "duration": 6415,
                       "errors": [],
                       "stdout": [
                         {
@@ -1663,7 +1663,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:36:34.032Z",
+                      "startTime": "2026-01-06T23:11:26.485Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1692,7 +1692,7 @@
                       "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 22684,
+                      "duration": 22275,
                       "errors": [],
                       "stdout": [
                         {
@@ -1705,7 +1705,7 @@
                           "text": "⚙️ Status Orchestrator triggered\n"
                         },
                         {
-                          "text": "✅ Notification lifecycle verified: Notification queued for test-033661@example.com\n"
+                          "text": "✅ Notification lifecycle verified: Notification queued for test-134942@example.com\n"
                         }
                       ],
                       "stderr": [
@@ -1741,7 +1741,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:37:13.666Z",
+                      "startTime": "2026-01-06T23:12:14.947Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1770,7 +1770,7 @@
                       "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 9859,
+                      "duration": 9828,
                       "errors": [],
                       "stdout": [
                         {
@@ -1792,7 +1792,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:37:40.441Z",
+                      "startTime": "2026-01-06T23:12:40.016Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1821,7 +1821,7 @@
                       "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 10333,
+                      "duration": 8309,
                       "errors": [],
                       "stdout": [
                         {
@@ -1833,7 +1833,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:37:51.399Z",
+                      "startTime": "2026-01-06T23:12:50.571Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1862,7 +1862,7 @@
                       "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1172,
+                      "duration": 1308,
                       "errors": [],
                       "stdout": [
                         {
@@ -1871,7 +1871,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:38:01.754Z",
+                      "startTime": "2026-01-06T23:12:58.910Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1900,7 +1900,7 @@
                       "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 9464,
+                      "duration": 11395,
                       "errors": [],
                       "stdout": [
                         {
@@ -1913,7 +1913,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:38:02.944Z",
+                      "startTime": "2026-01-06T23:13:00.246Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1942,7 +1942,7 @@
                       "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 21824,
+                      "duration": 22976,
                       "errors": [],
                       "stdout": [
                         {
@@ -1955,7 +1955,7 @@
                           "text": "⚙️ Status Orchestrator triggered\n"
                         },
                         {
-                          "text": "✅ Notification lifecycle verified: Notification queued for test-162122@example.com\n"
+                          "text": "✅ Notification lifecycle verified: Notification queued for test-255020@example.com\n"
                         }
                       ],
                       "stderr": [
@@ -1991,7 +1991,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:39:22.126Z",
+                      "startTime": "2026-01-06T23:14:15.023Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2020,7 +2020,7 @@
                       "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3801,
+                      "duration": 3784,
                       "errors": [],
                       "stdout": [
                         {
@@ -2042,7 +2042,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:39:47.500Z",
+                      "startTime": "2026-01-06T23:14:41.202Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2071,7 +2071,7 @@
                       "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4948,
+                      "duration": 4600,
                       "errors": [],
                       "stdout": [
                         {
@@ -2083,7 +2083,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:39:51.318Z",
+                      "startTime": "2026-01-06T23:14:45.001Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2112,7 +2112,7 @@
                       "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 464,
+                      "duration": 355,
                       "errors": [],
                       "stdout": [
                         {
@@ -2121,7 +2121,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:39:56.279Z",
+                      "startTime": "2026-01-06T23:14:49.613Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2150,7 +2150,7 @@
                       "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5781,
+                      "duration": 5207,
                       "errors": [],
                       "stdout": [
                         {
@@ -2163,7 +2163,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:39:56.755Z",
+                      "startTime": "2026-01-06T23:14:49.980Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2192,7 +2192,7 @@
                       "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 21970,
+                      "duration": 20842,
                       "errors": [],
                       "stdout": [
                         {
@@ -2205,7 +2205,7 @@
                           "text": "⚙️ Status Orchestrator triggered\n"
                         },
                         {
-                          "text": "✅ Notification lifecycle verified: Notification queued for test-227514@example.com\n"
+                          "text": "✅ Notification lifecycle verified: Notification queued for test-317752@example.com\n"
                         }
                       ],
                       "stderr": [
@@ -2241,7 +2241,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:40:27.517Z",
+                      "startTime": "2026-01-06T23:15:17.756Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2270,7 +2270,7 @@
                       "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3949,
+                      "duration": 3870,
                       "errors": [],
                       "stdout": [
                         {
@@ -2292,7 +2292,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:40:52.992Z",
+                      "startTime": "2026-01-06T23:15:42.097Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2321,7 +2321,7 @@
                       "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4751,
+                      "duration": 4485,
                       "errors": [],
                       "stdout": [
                         {
@@ -2333,7 +2333,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:40:56.957Z",
+                      "startTime": "2026-01-06T23:15:45.979Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2362,7 +2362,7 @@
                       "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 361,
+                      "duration": 324,
                       "errors": [],
                       "stdout": [
                         {
@@ -2371,7 +2371,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:41:01.727Z",
+                      "startTime": "2026-01-06T23:15:50.477Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2400,7 +2400,7 @@
                       "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5392,
+                      "duration": 3962,
                       "errors": [],
                       "stdout": [
                         {
@@ -2413,7 +2413,7 @@
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2026-01-06T22:41:02.100Z",
+                      "startTime": "2026-01-06T23:15:50.811Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2452,7 +2452,7 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 9504,
+                  "duration": 9277,
                   "errors": [],
                   "stdout": [
                     {
@@ -2461,7 +2461,7 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-01-06T22:32:24.537Z",
+                  "startTime": "2026-01-06T23:07:12.371Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2490,7 +2490,7 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 10073,
+                  "duration": 8973,
                   "errors": [],
                   "stdout": [
                     {
@@ -2499,7 +2499,7 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-01-06T22:33:27.934Z",
+                  "startTime": "2026-01-06T23:08:15.709Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2528,7 +2528,7 @@
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 19238,
+                  "duration": 17067,
                   "errors": [],
                   "stdout": [
                     {
@@ -2537,7 +2537,7 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-01-06T22:34:54.368Z",
+                  "startTime": "2026-01-06T23:09:41.869Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2566,7 +2566,7 @@
                   "workerIndex": 3,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 16871,
+                  "duration": 21395,
                   "errors": [],
                   "stdout": [
                     {
@@ -2575,7 +2575,7 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-01-06T22:36:38.422Z",
+                  "startTime": "2026-01-06T23:11:32.925Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2604,7 +2604,7 @@
                   "workerIndex": 4,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 18116,
+                  "duration": 18160,
                   "errors": [],
                   "stdout": [
                     {
@@ -2613,7 +2613,7 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-01-06T22:38:12.430Z",
+                  "startTime": "2026-01-06T23:13:11.664Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2642,7 +2642,7 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 10195,
+                  "duration": 9730,
                   "errors": [],
                   "stdout": [
                     {
@@ -2651,7 +2651,7 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-01-06T22:40:03.672Z",
+                  "startTime": "2026-01-06T23:14:55.885Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2680,7 +2680,7 @@
                   "workerIndex": 6,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 10197,
+                  "duration": 9580,
                   "errors": [],
                   "stdout": [
                     {
@@ -2689,7 +2689,7 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-01-06T22:41:07.513Z",
+                  "startTime": "2026-01-06T23:15:54.789Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2707,8 +2707,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-01-06T22:31:35.124Z",
-    "duration": 564768.446,
+    "startTime": "2026-01-06T23:06:18.921Z",
+    "duration": 573309.932,
     "expected": 49,
     "skipped": 0,
     "unexpected": 0,
