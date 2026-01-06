@@ -39,3 +39,4 @@ Evidence: see `deployment-curl.txt`.
   - `APP_CRON_SECRET` or `CRON_SECRET` (to trigger `/api/cron/ingest?force=1`)
   - `FIREBASE_TOKEN` (firebase-tools deploy)
   - Optional `STATUS_CHECK_BASE_URL` (defaults to https://aistatusdashboard.com)
+- Deployment workflow now runs on `develop` and manual dispatch (in addition to `main`).
