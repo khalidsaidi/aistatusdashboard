@@ -57,6 +57,14 @@ function computeProviderStatus(
   if (severities.includes('degraded')) return 'degraded';
   if (severities.includes('maintenance')) return 'maintenance';
   if (severities.includes('operational')) return 'operational';
+  if (
+    activeIncidents.length === 0 &&
+    activeMaintenances.length === 0 &&
+    components.length === 0 &&
+    (incidents.length > 0 || maintenances.length > 0)
+  ) {
+    return 'operational';
+  }
   return 'unknown';
 }
 
