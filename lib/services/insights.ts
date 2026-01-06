@@ -913,6 +913,7 @@ export class InsightsService {
 
   async getStalenessSignals(options: { windowMinutes?: number } = {}): Promise<StalenessSignal[]> {
     const windowMinutes = options.windowMinutes || 30;
+    const minSamples = 3;
     const db = getDb();
     const snapshot = await db.collection('provider_status').get();
     const signals: StalenessSignal[] = [];
@@ -922,9 +923,16 @@ export class InsightsService {
       const providerId = data.providerId || doc.id;
       const officialStatus = typeof data.status === 'string' ? data.status : 'unknown';
 
-      const synthetic = await this.getSyntheticEvents({ providerId, windowMinutes });
+      const syntheticRaw = await this.getSyntheticEvents({ providerId, windowMinutes });
+      const synthetic = syntheticRaw.filter((event) => {
+        const code = String(event.errorCode || '').toLowerCase();
+        return !['http-401', 'http-403', 'http-404', 'invalid_key', 'unauthorized'].some((flag) =>
+          code.includes(flag)
+        );
+      });
       const crowd = await this.getTelemetryEvents({ providerId, windowMinutes, source: 'crowd' });
       const combined = [...synthetic, ...crowd];
+      if (combined.length < minSamples) continue;
       const summary = summarizeMetrics(combined);
       const observedSignal = scoreSignal(summary);
 
@@ -936,6 +944,15 @@ export class InsightsService {
         crowd.length ? 'crowd' : '',
       ].filter(Boolean));
 
+      const confidence =
+        combined.length >= 10 && crowd.length > 0 ? 'high' : combined.length >= 5 ? 'medium' : 'low';
+      const note =
+        crowd.length === 0
+          ? 'Signal based on synthetic probes only.'
+          : combined.length < 5
+            ? 'Low sample count; treat as an early warning.'
+            : undefined;
+
       signals.push({
         providerId,
         officialStatus,
@@ -943,6 +960,8 @@ export class InsightsService {
         summary: `Official status is ${officialStatus} but observed telemetry is ${observedSignal}.`,
         windowMinutes,
         evidence,
+        confidence,
+        note,
       });
     }
 

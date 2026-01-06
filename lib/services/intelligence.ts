@@ -17,6 +17,9 @@ export type ProviderStatusSummary = {
   componentCount?: number;
   incidentCount?: number;
   maintenanceCount?: number;
+  activeIncidentCount?: number;
+  activeMaintenanceCount?: number;
+  degradedComponentCount?: number;
 };
 
 class IntelligenceService {
@@ -35,6 +38,9 @@ class IntelligenceService {
           componentCount: data.componentCount || null,
           incidentCount: data.incidentCount || null,
           maintenanceCount: data.maintenanceCount || null,
+          activeIncidentCount: data.activeIncidentCount || 0,
+          activeMaintenanceCount: data.activeMaintenanceCount || 0,
+          degradedComponentCount: data.degradedComponentCount || 0,
         } as ProviderStatusSummary;
       });
     } catch (error) {

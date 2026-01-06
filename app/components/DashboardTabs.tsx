@@ -968,13 +968,15 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
                       </span>
                     </div>
                     <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
-                      Official status: {signal.officialStatus}. Observed telemetry: {signal.observedSignal}.
+                      Official status: {signal.officialStatus}. Observed probes/telemetry: {signal.observedSignal}.
                     </p>
                     <div className="mt-2 text-xs text-slate-500 dark:text-slate-400 flex flex-wrap gap-3">
                       <span>Samples: {signal.evidence.sampleCount}</span>
                       {signal.evidence.sources.length > 0 && (
                         <span>Sources: {signal.evidence.sources.join(', ')}</span>
                       )}
+                      {signal.confidence && <span>Confidence: {signal.confidence}</span>}
+                      {signal.note && <span>{signal.note}</span>}
                       {signal.evidence.snapshot && <span>{signal.evidence.snapshot}</span>}
                     </div>
                   </div>

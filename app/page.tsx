@@ -54,7 +54,13 @@ export default async function DashboardPage() {
     statuses = fallbackStatuses.map((status) => {
       const summary = summaryMap.get(status.id);
       if (!summary) return status;
-      const mergedStatus = summary.status || status.status;
+      const hasEvidence =
+        (summary.activeIncidentCount || 0) > 0 ||
+        (summary.activeMaintenanceCount || 0) > 0 ||
+        (summary.degradedComponentCount || 0) > 0;
+      const mergedStatus = summary.status && summary.status !== 'unknown' && hasEvidence
+        ? summary.status
+        : status.status;
       return {
         ...status,
         status: mergedStatus,

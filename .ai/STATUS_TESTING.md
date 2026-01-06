@@ -35,3 +35,6 @@ This calls `/api/cron/ingest?force=1` to bypass polling windows so every provide
 ```bash
 node scripts/status-accuracy-check.js --base https://aistatusdashboard.com --allow-mismatch
 ```
+
+## Staleness guardrails
+The script now flags stale provider summaries (older than 2x poll interval + 60s) as errors.

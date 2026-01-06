@@ -240,4 +240,6 @@ export interface StalenessSignal {
   summary: string;
   windowMinutes: number;
   evidence: EvidencePacket;
+  confidence?: 'low' | 'medium' | 'high';
+  note?: string;
 }

@@ -130,6 +130,13 @@ async function main() {
   const sourcesPath = path.resolve(__dirname, '../lib/data/sources.json');
   const sources = JSON.parse(fs.readFileSync(sourcesPath, 'utf8')).sources || [];
   const sourceProviders = new Set(sources.map((source) => source.providerId));
+  const providerPolls = sources.reduce((acc, source) => {
+    const current = acc[source.providerId];
+    const next = typeof source.pollIntervalSeconds === 'number' ? source.pollIntervalSeconds : null;
+    if (!next) return acc;
+    acc[source.providerId] = current ? Math.min(current, next) : next;
+    return acc;
+  }, {});
 
   const timestamp = getTimestamp();
   const outputDir = outputArg || path.resolve(process.cwd(), '.ai/status-accuracy', timestamp);
@@ -165,6 +172,19 @@ async function main() {
     try {
       const summaryEntry = intelList.find((item) => item.providerId === providerId);
       ingestedStatus = summaryEntry?.status || 'unknown';
+      const lastUpdated = summaryEntry?.lastUpdated;
+      if (!lastUpdated) {
+        errors.push('summary:missing-lastUpdated');
+      } else {
+        const updatedMs = Date.parse(lastUpdated);
+        if (Number.isFinite(updatedMs)) {
+          const pollSeconds = providerPolls[providerId] || 120;
+          const maxAgeMs = pollSeconds * 2 * 1000 + 60000;
+          if (Date.now() - updatedMs > maxAgeMs) {
+            errors.push(`summary:stale(${Math.round((Date.now() - updatedMs) / 1000)}s)`);
+          }
+        }
+      }
     } catch (error) {
       errors.push(`summary:${error.message}`);
     }

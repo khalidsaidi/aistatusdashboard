@@ -31,3 +31,6 @@
 - Added meta platform handling in ingestion and RSS empty-filter operational fallback.
 - Status accuracy script now supports --refresh and flags missing sources.
 - Added force-ingest option so accuracy checks can refresh every provider regardless of poll windows (`/api/cron/ingest?force=1`).
+- Staleness detector now filters auth/config probe failures and labels confidence + probe-only notes; requires minimum samples.
+- Provider summaries now store active evidence counts; dashboard prefers live status when no active evidence exists.
+- Accuracy script now flags stale provider summaries based on poll interval.

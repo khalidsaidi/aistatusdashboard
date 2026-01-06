@@ -69,6 +69,29 @@ function computeProviderStatus(
   return 'unknown';
 }
 
+function summarizeEvidence(
+  components: NormalizedComponent[],
+  incidents: NormalizedIncident[],
+  maintenances: NormalizedMaintenance[]
+) {
+  const activeIncidents = incidents.filter((incident) => {
+    if (incident.resolvedAt) return false;
+    return !['resolved', 'completed', 'cancelled'].includes(incident.status);
+  });
+  const activeMaintenances = maintenances.filter((maintenance) => {
+    if (maintenance.completedAt) return false;
+    return !['resolved', 'completed', 'cancelled'].includes(maintenance.status);
+  });
+  const degradedComponents = components.filter((component) =>
+    ['degraded', 'partial_outage', 'major_outage', 'down', 'maintenance'].includes(component.status)
+  );
+  return {
+    activeIncidentCount: activeIncidents.length,
+    activeMaintenanceCount: activeMaintenances.length,
+    degradedComponentCount: degradedComponents.length,
+  };
+}
+
 async function fetchWithCache(
   sourceId: string,
   url: string,
@@ -188,6 +211,7 @@ async function storeNormalized(summary: NormalizedProviderSummary) {
   const db = getDb();
   const providerStatusRef = db.collection('provider_status').doc(summary.providerId);
   const batch = db.batch();
+  const evidence = summarizeEvidence(summary.components, summary.incidents, summary.maintenances);
 
   batch.set(
     providerStatusRef,
@@ -200,6 +224,9 @@ async function storeNormalized(summary: NormalizedProviderSummary) {
       componentCount: summary.components.length,
       incidentCount: summary.incidents.length,
       maintenanceCount: summary.maintenances.length,
+      activeIncidentCount: evidence.activeIncidentCount,
+      activeMaintenanceCount: evidence.activeMaintenanceCount,
+      degradedComponentCount: evidence.degradedComponentCount,
       updatedAt: FieldValue.serverTimestamp(),
     },
     { merge: true }
@@ -514,7 +541,13 @@ export class SourceIngestionService {
     const response = await fetchWithCache(`${source.id}:meta`, url, source.providerId, 'meta');
     if (!response.ok || !response.json) return null;
 
-    const metaStatus = parseMetaStatusResponse(response.json);
+    const orgs = Array.isArray(response.json) ? response.json : [];
+    const metaOrg = orgs.find((org) =>
+      String(org?.name || '')
+        .toLowerCase()
+        .includes('meta')
+    );
+    const metaStatus = parseMetaStatusResponse(metaOrg ? [metaOrg] : orgs);
     const status =
       metaStatus === 'down'
         ? 'major_outage'
