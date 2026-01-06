@@ -30,3 +30,4 @@
 - Added ingestion sources for previously untracked providers (meta, perplexity, groq, deepseek, ai21, stability, cerebras, runway, replicate, xai).
 - Added meta platform handling in ingestion and RSS empty-filter operational fallback.
 - Status accuracy script now supports --refresh and flags missing sources.
+- Added force-ingest option so accuracy checks can refresh every provider regardless of poll windows (`/api/cron/ingest?force=1`).

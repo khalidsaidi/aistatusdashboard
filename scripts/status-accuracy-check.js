@@ -115,7 +115,7 @@ async function main() {
     if (!secret) {
       throw new Error('Missing APP_CRON_SECRET/CRON_SECRET for refresh step.');
     }
-    const refreshUrl = new URL('/api/cron/ingest', baseUrl).toString();
+    const refreshUrl = new URL('/api/cron/ingest?force=1', baseUrl).toString();
     const refreshResponse = await fetch(refreshUrl, {
       headers: { 'x-cron-secret': secret },
     });

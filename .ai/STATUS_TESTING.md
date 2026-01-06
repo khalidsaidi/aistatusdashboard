@@ -26,6 +26,8 @@ If you want the script to trigger ingestion first (recommended for production ru
 node scripts/status-accuracy-check.js --base https://aistatusdashboard.com --refresh --env .env.production.local
 ```
 
+This calls `/api/cron/ingest?force=1` to bypass polling windows so every provider is re-ingested before the check.
+
 ## Strictness
 - Default is strict: any mismatch exits non-zero.
 - To allow mismatches during investigation:

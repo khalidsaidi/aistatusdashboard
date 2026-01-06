@@ -36,7 +36,8 @@ export async function GET(request: NextRequest) {
   if (authResponse) return authResponse;
 
   try {
-    const stats = await sourceIngestionService.ingestAll();
+    const force = request.nextUrl.searchParams.get('force') === '1';
+    const stats = await sourceIngestionService.ingestAll({ force });
     return NextResponse.json({ success: true, ...stats, timestamp: new Date().toISOString() });
   } catch (error) {
     log('error', 'Source ingestion cron failed', { error });

@@ -290,12 +290,13 @@ export class SourceIngestionService {
     this.sources = (sourcesConfig as { sources: SourceDefinition[] }).sources || [];
   }
 
-  async ingestAll(): Promise<{ processed: number; skipped: number }> {
+  async ingestAll(options: { force?: boolean } = {}): Promise<{ processed: number; skipped: number }> {
     let processed = 0;
     let skipped = 0;
+    const force = options.force === true;
 
     for (const source of this.sources) {
-      const didRun = await this.ingestSource(source);
+      const didRun = await this.ingestSource(source, force);
       if (didRun) {
         processed += 1;
       } else {
@@ -306,10 +307,10 @@ export class SourceIngestionService {
     return { processed, skipped };
   }
 
-  async ingestSource(source: SourceDefinition): Promise<boolean> {
+  async ingestSource(source: SourceDefinition, force = false): Promise<boolean> {
     const now = new Date();
     const meta = await sourceRegistryService.getEntry(source.id);
-    if (meta?.nextFetchAt) {
+    if (!force && meta?.nextFetchAt) {
       const next = new Date(meta.nextFetchAt);
       if (next > now) return false;
     }
