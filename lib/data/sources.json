@@ -81,6 +81,87 @@
       "statusUrl": "https://status.huggingface.co/index.json",
       "platform": "betterstack",
       "pollIntervalSeconds": 120
+    },
+    {
+      "id": "meta-status",
+      "providerId": "meta",
+      "name": "Meta Status",
+      "baseUrl": "https://metastatus.com",
+      "statusUrl": "https://metastatus.com/data/orgs.json",
+      "platform": "meta",
+      "pollIntervalSeconds": 120
+    },
+    {
+      "id": "perplexity-instatus",
+      "providerId": "perplexity",
+      "name": "Perplexity Instatus",
+      "baseUrl": "https://perplexity.instatus.com",
+      "platform": "instatus",
+      "pollIntervalSeconds": 120
+    },
+    {
+      "id": "groq-statuspage",
+      "providerId": "groq",
+      "name": "Groq Statuspage",
+      "baseUrl": "https://groqstatus.com",
+      "platform": "statuspage",
+      "pollIntervalSeconds": 90
+    },
+    {
+      "id": "deepseek-statuspage",
+      "providerId": "deepseek",
+      "name": "DeepSeek Statuspage",
+      "baseUrl": "https://status.deepseek.com",
+      "platform": "statuspage",
+      "pollIntervalSeconds": 90
+    },
+    {
+      "id": "ai21-statuspage",
+      "providerId": "ai21",
+      "name": "AI21 Statuspage",
+      "baseUrl": "https://status.ai21.com",
+      "platform": "statuspage",
+      "pollIntervalSeconds": 90
+    },
+    {
+      "id": "stability-statuspage",
+      "providerId": "stability",
+      "name": "Stability AI Statuspage",
+      "baseUrl": "https://status.stability.ai",
+      "platform": "statuspage",
+      "pollIntervalSeconds": 90
+    },
+    {
+      "id": "cerebras-statuspage",
+      "providerId": "cerebras",
+      "name": "Cerebras Statuspage",
+      "baseUrl": "https://status.cerebras.ai",
+      "platform": "statuspage",
+      "pollIntervalSeconds": 90
+    },
+    {
+      "id": "runway-statuspage",
+      "providerId": "runway",
+      "name": "Runway Statuspage",
+      "baseUrl": "https://status.runwayml.com",
+      "platform": "statuspage",
+      "pollIntervalSeconds": 90
+    },
+    {
+      "id": "replicate-statuspage",
+      "providerId": "replicate",
+      "name": "Replicate Statuspage",
+      "baseUrl": "https://status.replicate.com",
+      "platform": "statuspage",
+      "pollIntervalSeconds": 90
+    },
+    {
+      "id": "xai-instatus",
+      "providerId": "xai",
+      "name": "xAI Instatus",
+      "baseUrl": "https://xai.instatus.com",
+      "platform": "instatus",
+      "pollIntervalSeconds": 120
     }
   ]
 }

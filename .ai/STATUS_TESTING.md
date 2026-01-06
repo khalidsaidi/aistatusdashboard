@@ -19,6 +19,13 @@ node scripts/status-accuracy-check.js --base https://aistatusdashboard.com
 
 Artifacts are stored in `.ai/status-accuracy/<timestamp>/report.json` and `summary.md`.
 
+## Fresh data before checking
+If you want the script to trigger ingestion first (recommended for production runs), use:
+
+```bash
+node scripts/status-accuracy-check.js --base https://aistatusdashboard.com --refresh --env .env.production.local
+```
+
 ## Strictness
 - Default is strict: any mismatch exits non-zero.
 - To allow mismatches during investigation:

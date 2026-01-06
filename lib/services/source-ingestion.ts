@@ -24,6 +24,7 @@ import {
   parseStatusIo,
   parseBetterstackIndex,
 } from '@/lib/utils/platform-parsers';
+import { parseMetaStatusResponse } from '@/lib/utils/status-parsers';
 import { sourceRegistryService } from '@/lib/services/source-registry';
 import { getGcpProductCatalog } from '@/lib/services/gcp-product-catalog';
 import { filterGoogleCloudIncidentsForAi, GOOGLE_AI_KEYWORDS } from '@/lib/utils/google-cloud';
@@ -310,6 +311,8 @@ export class SourceIngestionService {
         return this.fetchStatuspage(source, base);
       case 'instatus':
         return this.fetchInstatus(source, base);
+      case 'meta':
+        return this.fetchMeta(source, base);
       case 'google-cloud':
         return this.fetchGoogleCloud(source);
       case 'rss':
@@ -423,7 +426,9 @@ export class SourceIngestionService {
 
     const filter = source.metadata?.filter;
     const incidents = parseRssIncidents(source.providerId, source.id, response.body, filter);
-    const status = computeProviderStatus([], incidents, []);
+    const status = incidents.length === 0 && filter
+      ? 'operational'
+      : computeProviderStatus([], incidents, []);
 
     return {
       providerId: source.providerId,
@@ -433,6 +438,25 @@ export class SourceIngestionService {
       lastUpdated: new Date().toISOString(),
       components: [],
       incidents,
+      maintenances: [],
+    };
+  }
+
+  private async fetchMeta(source: SourceDefinition, base: string): Promise<NormalizedProviderSummary | null> {
+    const url = source.statusUrl || `${base.replace(/\/$/, '')}/data/orgs.json`;
+    const response = await fetchWithCache(`${source.id}:meta`, url, source.providerId, 'meta');
+    if (!response.ok || !response.json) return null;
+
+    const status = parseMetaStatusResponse(response.json);
+
+    return {
+      providerId: source.providerId,
+      sourceId: source.id,
+      status,
+      description: 'Meta status',
+      lastUpdated: new Date().toISOString(),
+      components: [],
+      incidents: [],
       maintenances: [],
     };
   }

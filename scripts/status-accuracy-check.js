@@ -3,6 +3,26 @@
 const fs = require('fs');
 const path = require('path');
 
+function loadEnvFile(filePath) {
+  if (!filePath) return;
+  if (!fs.existsSync(filePath)) return;
+  const content = fs.readFileSync(filePath, 'utf8');
+  content.split(/\r?\n/).forEach((raw) => {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) return;
+    const idx = line.indexOf('=');
+    if (idx === -1) return;
+    const key = line.slice(0, idx).trim();
+    let value = line.slice(idx + 1).trim();
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    if (process.env[key] === undefined) {
+      process.env[key] = value.replace(/\\n/g, '\n');
+    }
+  });
+}
+
 function readArgValue(args, name) {
   const idx = args.indexOf(name);
   if (idx === -1) return null;
@@ -78,7 +98,9 @@ async function main() {
   const args = process.argv.slice(2);
   const baseArg = readArgValue(args, '--base');
   const outputArg = readArgValue(args, '--output');
+  const envArg = readArgValue(args, '--env');
   const strict = !args.includes('--allow-mismatch');
+  const refresh = args.includes('--refresh');
 
   const baseUrl =
     baseArg ||
@@ -86,8 +108,28 @@ async function main() {
     process.env.NEXT_PUBLIC_SITE_URL ||
     'http://localhost:3000';
 
+  if (refresh) {
+    const envFile = envArg || path.resolve(process.cwd(), '.env.production.local');
+    loadEnvFile(envFile);
+    const secret = process.env.APP_CRON_SECRET || process.env.CRON_SECRET;
+    if (!secret) {
+      throw new Error('Missing APP_CRON_SECRET/CRON_SECRET for refresh step.');
+    }
+    const refreshUrl = new URL('/api/cron/ingest', baseUrl).toString();
+    const refreshResponse = await fetch(refreshUrl, {
+      headers: { 'x-cron-secret': secret },
+    });
+    if (!refreshResponse.ok) {
+      throw new Error(`Refresh failed: ${refreshResponse.status} ${refreshResponse.statusText}`);
+    }
+  }
+
   const providersPath = path.resolve(__dirname, '../lib/data/providers.json');
   const providers = JSON.parse(fs.readFileSync(providersPath, 'utf8')).providers || [];
+
+  const sourcesPath = path.resolve(__dirname, '../lib/data/sources.json');
+  const sources = JSON.parse(fs.readFileSync(sourcesPath, 'utf8')).sources || [];
+  const sourceProviders = new Set(sources.map((source) => source.providerId));
 
   const timestamp = getTimestamp();
   const outputDir = outputArg || path.resolve(process.cwd(), '.ai/status-accuracy', timestamp);
@@ -107,6 +149,10 @@ async function main() {
     let ingestedStatus = 'unknown';
     let evidence = { activeIncidents: 0, activeMaintenances: 0, degradedComponents: 0 };
     let errors = [];
+
+    if (!sourceProviders.has(providerId)) {
+      errors.push('source:missing');
+    }
 
     try {
       const live = await fetchJson(`${baseUrl}/api/status?provider=${encodeURIComponent(providerId)}`);
