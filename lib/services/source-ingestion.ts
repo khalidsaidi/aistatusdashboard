@@ -24,7 +24,7 @@ import {
   parseStatusIo,
   parseBetterstackIndex,
 } from '@/lib/utils/platform-parsers';
-import { parseMetaStatusResponse } from '@/lib/utils/status-parsers';
+import { parseHtmlResponse, parseMetaStatusResponse } from '@/lib/utils/status-parsers';
 import { sourceRegistryService } from '@/lib/services/source-registry';
 import { getGcpProductCatalog } from '@/lib/services/gcp-product-catalog';
 import { filterGoogleCloudIncidentsForAi, GOOGLE_AI_KEYWORDS } from '@/lib/utils/google-cloud';
@@ -104,11 +104,13 @@ async function fetchWithCache(
     const contentType = response.headers.get('content-type') || '';
     const body = await response.text();
     let json: any = null;
-    if (contentType.includes('application/json') && body.trim()) {
-      try {
-        json = JSON.parse(body);
-      } catch {
-        json = null;
+    if (body.trim()) {
+      if (contentType.includes('application/json') || body.trim().startsWith('{') || body.trim().startsWith('[')) {
+        try {
+          json = JSON.parse(body);
+        } catch {
+          json = null;
+        }
       }
     }
 
@@ -335,7 +337,29 @@ export class SourceIngestionService {
     const maintActiveUrl = `${base}/api/v2/scheduled-maintenances/active.json`;
 
     const summaryResponse = await fetchWithCache(`${source.id}:summary`, summaryUrl, source.providerId, 'statuspage');
-    if (!summaryResponse.ok || !summaryResponse.json) return null;
+    if (!summaryResponse.ok) return null;
+
+    if (!summaryResponse.json) {
+      const htmlStatus = parseHtmlResponse(summaryResponse.body || '');
+      const status =
+        htmlStatus === 'down'
+          ? 'major_outage'
+          : htmlStatus === 'degraded'
+            ? 'degraded'
+            : htmlStatus === 'operational'
+              ? 'operational'
+              : 'unknown';
+      return {
+        providerId: source.providerId,
+        sourceId: source.id,
+        status,
+        description: 'HTML status page',
+        lastUpdated: new Date().toISOString(),
+        components: [],
+        incidents: [],
+        maintenances: [],
+      };
+    }
 
     const components = parseStatuspageComponents(source.providerId, summaryResponse.json);
     const incidents = parseStatuspageIncidents(source.providerId, source.id, summaryResponse.json);
