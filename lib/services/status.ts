@@ -10,6 +10,8 @@ import {
     parseStatusPageResponse,
     parseBetterstackResponse,
 } from '@/lib/utils/status-parsers';
+import { getGcpProductCatalog } from '@/lib/services/gcp-product-catalog';
+import { GOOGLE_AI_KEYWORDS } from '@/lib/utils/google-cloud';
 
 export class StatusService {
     private cache = new Map<string, { result: StatusResult; expires: number }>();
@@ -126,7 +128,12 @@ export class StatusService {
             }
 
             if (format === 'google-cloud') {
-                const status = parseGoogleCloudResponse(data);
+                const catalog =
+                    provider.id === 'google-ai' ? await getGcpProductCatalog() : undefined;
+                const status = parseGoogleCloudResponse(data, {
+                    productCatalog: catalog,
+                    keywords: provider.id === 'google-ai' ? GOOGLE_AI_KEYWORDS : undefined,
+                });
                 return {
                     status: status === 'unknown' ? this.statusFromHttp(response) : status,
                 };
@@ -205,7 +212,10 @@ export class StatusService {
                 const data = await response.clone().json();
                 const status =
                     provider.id === 'google-ai'
-                        ? parseGoogleCloudResponse(data)
+                        ? parseGoogleCloudResponse(data, {
+                              productCatalog: await getGcpProductCatalog(),
+                              keywords: GOOGLE_AI_KEYWORDS,
+                          })
                         : parseStatusPageResponse(data);
 
                 const indicator = data?.status?.indicator;

@@ -26,6 +26,7 @@ import {
 } from '@/lib/utils/platform-parsers';
 import { sourceRegistryService } from '@/lib/services/source-registry';
 import { getGcpProductCatalog } from '@/lib/services/gcp-product-catalog';
+import { filterGoogleCloudIncidentsForAi, GOOGLE_AI_KEYWORDS } from '@/lib/utils/google-cloud';
 
 const DEFAULT_HEADERS = {
   'User-Agent': 'AI-Status-Dashboard/1.0',
@@ -377,14 +378,20 @@ export class SourceIngestionService {
     if (!response.ok || !response.json) return null;
 
     const catalog = await getGcpProductCatalog();
-    const incidents = parseGoogleCloudIncidents(source.providerId, source.id, response.json, catalog);
+    let incidents = parseGoogleCloudIncidents(source.providerId, source.id, response.json, catalog);
+    if (source.providerId === 'google-ai') {
+      incidents = filterGoogleCloudIncidentsForAi(incidents, GOOGLE_AI_KEYWORDS);
+    }
     const status = computeProviderStatus([], incidents, []);
 
     return {
       providerId: source.providerId,
       sourceId: source.id,
       status,
-      description: 'Google Cloud Service Health',
+      description:
+        source.providerId === 'google-ai'
+          ? 'Google Cloud Service Health (Vertex AI / Gemini only)'
+          : 'Google Cloud Service Health',
       lastUpdated: new Date().toISOString(),
       components: [],
       incidents,

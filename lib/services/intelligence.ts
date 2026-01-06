@@ -7,6 +7,7 @@ import type {
 } from '@/lib/types/ingestion';
 import { ProviderStatus } from '@/lib/types';
 import { log } from '@/lib/utils/logger';
+import { filterGoogleCloudIncidentsForAi, GOOGLE_AI_KEYWORDS } from '@/lib/utils/google-cloud';
 
 export type ProviderStatusSummary = {
   providerId: string;
@@ -94,8 +95,12 @@ class IntelligenceService {
     }
 
     const components = componentsSnap ? componentsSnap.docs.map((doc) => doc.data() as NormalizedComponent) : [];
-    const incidents = incidentsSnap.docs.map((doc) => doc.data() as NormalizedIncident);
+    let incidents = incidentsSnap.docs.map((doc) => doc.data() as NormalizedIncident);
     const maintenances = maintSnap.docs.map((doc) => doc.data() as NormalizedMaintenance);
+
+    if (providerId === 'google-ai') {
+      incidents = filterGoogleCloudIncidentsForAi(incidents, GOOGLE_AI_KEYWORDS);
+    }
 
     return { components, incidents, maintenances };
   }
@@ -117,7 +122,11 @@ class IntelligenceService {
     }
     try {
       const snapshot = await query.get();
-      return snapshot.docs.map((doc) => doc.data() as NormalizedIncident);
+      let incidents = snapshot.docs.map((doc) => doc.data() as NormalizedIncident);
+      if (options.providerId === 'google-ai') {
+        incidents = filterGoogleCloudIncidentsForAi(incidents, GOOGLE_AI_KEYWORDS);
+      }
+      return incidents;
     } catch (error) {
       log('warn', 'Incidents query failed, falling back to basic query', { error, options });
       let fallback: FirebaseFirestore.Query = db.collection('incidents');
@@ -130,7 +139,11 @@ class IntelligenceService {
         fallback = fallback.limit(50);
       }
       const snapshot = await fallback.get();
-      return snapshot.docs.map((doc) => doc.data() as NormalizedIncident);
+      let incidents = snapshot.docs.map((doc) => doc.data() as NormalizedIncident);
+      if (options.providerId === 'google-ai') {
+        incidents = filterGoogleCloudIncidentsForAi(incidents, GOOGLE_AI_KEYWORDS);
+      }
+      return incidents;
     }
   }
 

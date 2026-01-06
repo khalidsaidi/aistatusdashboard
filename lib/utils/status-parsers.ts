@@ -1,4 +1,5 @@
 import { ProviderStatus } from '../types';
+import { filterGoogleCloudRawIncidents } from './google-cloud';
 // import { validateStatusResult } from '../validation';
 
 /**
@@ -215,15 +216,22 @@ export function parseBetterstackResponse(data: any): ProviderStatus {
  * - MUST check for active incidents only
  * - MUST validate incident structure
  */
-export function parseGoogleCloudResponse(data: any): ProviderStatus {
+export function parseGoogleCloudResponse(
+  data: any,
+  options?: { productCatalog?: Map<string, string>; keywords?: string[] }
+): ProviderStatus {
   try {
     // Must be an array
     if (!Array.isArray(data)) {
       return 'unknown';
     }
 
+    const filtered = options?.keywords || options?.productCatalog
+      ? filterGoogleCloudRawIncidents(data, options?.productCatalog, options?.keywords)
+      : data;
+
     // Check for active incidents with significant impact
-    const hasActiveIncidents = data.some(
+    const hasActiveIncidents = filtered.some(
       (incident) =>
         incident &&
         !incident.end && // Incident is ongoing
