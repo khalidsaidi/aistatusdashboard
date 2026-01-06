@@ -37,10 +37,19 @@ function computeProviderStatus(
   incidents: NormalizedIncident[],
   maintenances: NormalizedMaintenance[]
 ) {
+  const activeIncidents = incidents.filter((incident) => {
+    if (incident.resolvedAt) return false;
+    return !['resolved', 'completed', 'cancelled'].includes(incident.status);
+  });
+  const activeMaintenances = maintenances.filter((maintenance) => {
+    if (maintenance.completedAt) return false;
+    return !['resolved', 'completed', 'cancelled'].includes(maintenance.status);
+  });
+
   const severities = [
     ...components.map((c) => c.status),
-    ...incidents.map((i) => i.severity),
-    ...maintenances.map((m) => m.severity),
+    ...activeIncidents.map((i) => i.severity),
+    ...activeMaintenances.map((m) => m.severity),
   ];
 
   if (severities.includes('major_outage')) return 'major_outage';

@@ -64,18 +64,32 @@ export function filterGoogleCloudIncidentsForAi(incidents: NormalizedIncident[],
   const list = buildKeywordList(keywords);
   if (!list.length) return incidents;
 
-  return incidents.filter((incident) => {
-    const pieces: string[] = [];
-    pieces.push(incident.title, incident.serviceName, incident.sourceStatus, incident.sourceSeverity);
+  return incidents
+    .map((incident) => {
+      const pieces: string[] = [];
+      pieces.push(incident.title, incident.serviceName, incident.sourceStatus, incident.sourceSeverity);
 
-    const impacted = Array.isArray(incident.impactedComponentNames)
-      ? incident.impactedComponentNames
-      : Array.isArray(incident.impactedComponents)
+      const impactedNames = Array.isArray(incident.impactedComponentNames)
+        ? incident.impactedComponentNames
+        : [];
+      const impactedIds = Array.isArray(incident.impactedComponents)
         ? incident.impactedComponents
         : [];
-    pieces.push(...impacted);
 
-    const text = normalizeText(pieces.join(' '));
-    return matchesKeywords(text, list);
-  });
+      const text = normalizeText(pieces.join(' '));
+      const textMatches = matchesKeywords(text, list);
+
+      const matchedNames = impactedNames.filter((name) => matchesKeywords(normalizeText(name), list));
+      const matchedIds = impactedIds.filter((id) => matchesKeywords(normalizeText(id), list));
+
+      const componentMatches = matchedNames.length > 0 || matchedIds.length > 0;
+      if (!textMatches && !componentMatches) return null;
+
+      return {
+        ...incident,
+        impactedComponentNames: matchedNames.length ? matchedNames : impactedNames,
+        impactedComponents: matchedIds.length ? matchedIds : impactedIds,
+      };
+    })
+    .filter(Boolean) as NormalizedIncident[];
 }
