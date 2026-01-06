@@ -26,3 +26,4 @@
 - App Hosting rollout failed due to TS error in `lib/utils/google-cloud.ts` (string | undefined). Fixed by coercing optional fields to string.
 - After first successful deploy, google-ai status moved to `unknown` because computeProviderStatus had no active incidents or components; updated logic to return `operational` when only historical incidents exist.
 - Deployed App Hosting after fixes; re-ran `/api/cron/ingest`. Google AI now shows `operational` with 0 active incidents (5 historical). Description reflects AI-only scope.
+- Added strict status accuracy test script and docs: `scripts/status-accuracy-check.js` + `.ai/STATUS_TESTING.md`.
