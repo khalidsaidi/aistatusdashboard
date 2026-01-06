@@ -163,6 +163,51 @@ export function parseMetaStatusResponse(data: any): ProviderStatus {
 }
 
 /**
+ * Parse Better Stack status page index.json response
+ *
+ * AI CONSTRAINTS:
+ * - MUST read aggregate_state when present
+ * - MUST map Better Stack states into ProviderStatus
+ */
+export function parseBetterstackResponse(data: any): ProviderStatus {
+  try {
+    if (!data || typeof data !== 'object') {
+      return 'unknown';
+    }
+
+    const rawStatus =
+      typeof data?.data?.attributes?.aggregate_state === 'string'
+        ? data.data.attributes.aggregate_state
+        : typeof data?.data?.attributes?.status === 'string'
+          ? data.data.attributes.status
+          : undefined;
+
+    if (!rawStatus) return 'unknown';
+    const normalized = rawStatus.trim().toLowerCase();
+
+    if (['operational', 'ok', 'up', 'healthy'].includes(normalized)) {
+      return 'operational';
+    }
+
+    if (normalized.includes('maintenance') || normalized.includes('maint')) {
+      return 'maintenance';
+    }
+
+    if (normalized.includes('downtime') || normalized.includes('outage') || normalized.includes('major')) {
+      return 'down';
+    }
+
+    if (normalized.includes('degrad') || normalized.includes('partial') || normalized.includes('incident')) {
+      return 'degraded';
+    }
+
+    return 'unknown';
+  } catch (error) {
+    return 'unknown';
+  }
+}
+
+/**
  * Parse Google Cloud status API response
  *
  * AI CONSTRAINTS:

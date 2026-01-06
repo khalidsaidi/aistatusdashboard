@@ -182,8 +182,25 @@ export class AnalyticsService {
     }
 
     async getOverview(windowDays = 7): Promise<AnalyticsOverview> {
-        const db = getDb();
         const since = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000);
+        try {
+            getDb();
+        } catch (error) {
+            log('error', 'Failed to initialize Firestore for analytics overview', { error });
+            return {
+                windowDays,
+                totalEvents: 0,
+                uniqueSessions: 0,
+                eventCounts: {
+                    pageViews: 0,
+                    providerClicks: 0,
+                    subscriptions: 0,
+                    comments: 0,
+                    exports: 0,
+                },
+                lastEventAt: null,
+            };
+        }
 
         let events: Array<{ id: string; data: any }> = [];
         try {

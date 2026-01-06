@@ -14,6 +14,13 @@ export const config = {
         windowMs: 60 * 1000, // 1 minute
         maxRequests: 100,
     },
+    insights: {
+        telemetryEnabled: process.env.TELEMETRY_ENABLED !== 'false',
+        telemetrySalt: process.env.TELEMETRY_SALT || '',
+        telemetrySecret: process.env.TELEMETRY_INGEST_SECRET || '',
+        probeEnabled: process.env.PROBE_ENABLED !== 'false',
+        probeSecret: process.env.SYNTHETIC_INGEST_SECRET || '',
+    },
     email: {
         enabled: (process.env.APP_ENABLE_EMAIL ?? process.env.APP_ENABLE_REAL_MONITORING) === 'true',
         from: process.env.SMTP_FROM || 'AI Status Dashboard <hello@aistatusdashboard.com>',

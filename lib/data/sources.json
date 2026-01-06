@@ -1,0 +1,86 @@
+{
+  "sources": [
+    {
+      "id": "openai-statuspage",
+      "providerId": "openai",
+      "name": "OpenAI Statuspage",
+      "baseUrl": "https://status.openai.com",
+      "platform": "statuspage",
+      "pollIntervalSeconds": 90
+    },
+    {
+      "id": "anthropic-statuspage",
+      "providerId": "anthropic",
+      "name": "Anthropic Statuspage",
+      "baseUrl": "https://status.anthropic.com",
+      "platform": "statuspage",
+      "pollIntervalSeconds": 90
+    },
+    {
+      "id": "cohere-statuspage",
+      "providerId": "cohere",
+      "name": "Cohere Statuspage",
+      "baseUrl": "https://status.cohere.com",
+      "platform": "statuspage",
+      "pollIntervalSeconds": 90
+    },
+    {
+      "id": "mistral-statuspage",
+      "providerId": "mistral",
+      "name": "Mistral Statuspage",
+      "baseUrl": "https://status.mistral.ai",
+      "platform": "statuspage",
+      "pollIntervalSeconds": 90
+    },
+    {
+      "id": "google-cloud",
+      "providerId": "google-ai",
+      "name": "Google Cloud Service Health",
+      "baseUrl": "https://status.cloud.google.com",
+      "statusUrl": "https://status.cloud.google.com/incidents.json",
+      "platform": "google-cloud",
+      "pollIntervalSeconds": 300
+    },
+    {
+      "id": "aws-bedrock",
+      "providerId": "aws",
+      "name": "AWS Health (Bedrock)",
+      "baseUrl": "https://status.aws.amazon.com",
+      "statusUrl": "https://status.aws.amazon.com/rss/all.rss",
+      "platform": "rss",
+      "pollIntervalSeconds": 300,
+      "metadata": {
+        "filter": "bedrock"
+      }
+    },
+    {
+      "id": "azure-openai",
+      "providerId": "azure",
+      "name": "Azure Status History",
+      "baseUrl": "https://azure.status.microsoft/en-us/status/",
+      "statusUrl": "https://azure.status.microsoft/en-us/status/feed/",
+      "platform": "rss",
+      "pollIntervalSeconds": 300,
+      "metadata": {
+        "filter": "openai"
+      }
+    },
+    {
+      "id": "cohere-statusio",
+      "providerId": "cohere",
+      "name": "Cohere Status.io",
+      "baseUrl": "https://status.cohere.io",
+      "platform": "statusio",
+      "pollIntervalSeconds": 300
+    },
+    {
+      "id": "huggingface-betterstack",
+      "providerId": "huggingface",
+      "name": "Hugging Face Better Stack",
+      "baseUrl": "https://status.huggingface.co",
+      "statusUrl": "https://status.huggingface.co/index.json",
+      "platform": "betterstack",
+      "pollIntervalSeconds": 120
+    }
+  ]
+}

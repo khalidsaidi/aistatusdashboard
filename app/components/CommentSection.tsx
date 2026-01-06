@@ -21,7 +21,10 @@ export default function CommentSection({
   const localPendingRef = useRef<UserComment[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState<{
+    text: string;
+    tone: 'success' | 'warning' | 'error' | 'info';
+  } | null>(null);
 
   // Form state
   const [author, setAuthor] = useState('');
@@ -37,6 +40,10 @@ export default function CommentSection({
   useEffect(() => {
     localPendingRef.current = localPending;
   }, [localPending]);
+
+  const showMessage = (text: string, tone: 'success' | 'warning' | 'error' | 'info') => {
+    setMessage({ text, tone });
+  };
 
   const mergeComments = useCallback((primary: UserComment[], secondary: UserComment[]) => {
     const merged = new Map<string, UserComment>();
@@ -94,11 +101,11 @@ export default function CommentSection({
             setOffset((prev) => prev + limit);
           }
         } else {
-          setMessage(`❌ Error: ${data.error}`);
+          showMessage(`Error: ${data.error}`, 'error');
           setComments([]); // Ensure comments is always an array
         }
       } catch (error) {
-        setMessage('❌ Failed to load comments');
+        showMessage('Failed to load comments.', 'error');
         setComments([]); // Ensure comments is always an array
       } finally {
         setLoading(false);
@@ -114,7 +121,7 @@ export default function CommentSection({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setMessage('');
+    setMessage(null);
 
     try {
       const response = await fetch('/api/comments', {
@@ -131,7 +138,7 @@ export default function CommentSection({
       const data = await response.json();
 
       if (response.ok) {
-        setMessage(`✅ Comment posted successfully`);
+        showMessage('Comment posted successfully.', 'success');
         setAuthor('');
         setEmail('');
         setCommentMessage('');
@@ -156,13 +163,13 @@ export default function CommentSection({
         // Refresh comments to sync with server (pending comments stay visible)
         await fetchComments();
       } else {
-        setMessage(`❌ Error: ${data.error}`);
+        showMessage(`Error: ${data.error}`, 'error');
         if (data.details) {
-          setMessage(`❌ ${data.details.join(', ')}`);
+          showMessage(data.details.join(', '), 'error');
         }
       }
     } catch (error) {
-      setMessage('❌ Failed to post comment. Please try again.');
+      showMessage('Failed to post comment. Please try again.', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -185,19 +192,19 @@ export default function CommentSection({
         );
 
         if (action === 'like') {
-          setMessage('👍 Thanks for your feedback!');
+          showMessage('Thanks for your feedback!', 'success');
         } else if (action === 'report') {
-          setMessage('🚨 Comment reported for review');
+          showMessage('Comment reported for review.', 'warning');
         }
 
         // Clear message after 3 seconds
-        const timer = setTimeout(() => setMessage(''), 3000);
+        const timer = setTimeout(() => setMessage(null), 3000);
         return () => clearTimeout(timer);
       } else {
-        setMessage(`❌ Error: ${data.error}`);
+        showMessage(`Error: ${data.error}`, 'error');
       }
     } catch (error) {
-      setMessage('❌ Action failed. Please try again.');
+      showMessage('Action failed. Please try again.', 'error');
     }
   };
 
@@ -223,73 +230,86 @@ export default function CommentSection({
     }
   };
 
-  const getTypeIcon = (type: string) => {
+  const getTypeLabel = (type: string | undefined) => {
     switch (type) {
       case 'feedback':
-        return '💬';
+        return 'Feedback';
       case 'issue':
-        return '🐛';
+        return 'Issue';
       case 'provider':
-        return '🔧';
+        return 'Provider';
       default:
-        return '💭';
+        return 'General';
     }
   };
 
   const CommentItem = ({ comment }: { comment: UserComment }) => (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
-      <div className="flex justify-between items-start mb-2">
-        <div className="flex items-center space-x-2">
-          <span className="font-medium text-gray-900 dark:text-white">{comment.author}</span>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            {getTypeIcon(comment.type || 'general')} {formatDate(comment.createdAt)}
+    <div
+      className="surface-card p-4"
+      data-comment-id={comment.id}
+      data-comment-text={comment.content || comment.message || ''}
+    >
+      <div className="flex justify-between items-start mb-2 gap-3">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-medium text-slate-900 dark:text-white">{comment.author}</span>
+            <span className="pill text-[0.65rem] uppercase tracking-[0.2em]">
+              {getTypeLabel(comment.type)}
+            </span>
+          </div>
+          <span className="text-xs text-slate-500 dark:text-slate-400">
+            {formatDate(comment.createdAt)}
           </span>
         </div>
 
         {(comment.status === 'pending' || comment.approved === false) && (
-          <span className="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">
+          <span className="text-xs bg-amber-100/70 dark:bg-amber-500/20 text-amber-800 dark:text-amber-200 px-2 py-1 rounded-full">
             Pending Review
           </span>
         )}
       </div>
 
-      <p className="text-gray-700 dark:text-gray-300 mb-3 whitespace-pre-wrap">
+      <p className="text-slate-700 dark:text-slate-300 mb-3 whitespace-pre-wrap">
         {comment.content || comment.message}
       </p>
 
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => handleCommentAction(comment.id, 'like')}
-            className="flex items-center space-x-1 text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors py-2 px-3 min-h-[44px] min-w-[44px] rounded"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors py-2 px-3 min-h-[36px] rounded-full border border-slate-200/70 dark:border-slate-700/70"
+            aria-label="Like"
           >
-            <span>👍</span>
-            <span>{comment.likes || 0}</span>
+            Like
+            <span className="text-xs text-slate-600 dark:text-slate-300">
+              {comment.likes || 0}
+            </span>
           </button>
 
           <button
             onClick={() => handleCommentAction(comment.id, 'report')}
-            className="text-sm text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors py-2 px-3 min-h-[44px] min-w-[44px] rounded flex items-center justify-center"
+            className="text-xs font-semibold text-slate-500 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-300 transition-colors py-2 px-3 min-h-[36px] rounded-full border border-slate-200/70 dark:border-slate-700/70"
+            aria-label="Report"
           >
-            🚨 Report
+            Report
           </button>
         </div>
       </div>
 
       {/* Replies */}
       {comment.replies && comment.replies.length > 0 && (
-        <div className="mt-4 pl-4 border-l-2 border-gray-200 dark:border-gray-600 space-y-3">
+        <div className="mt-4 pl-4 border-l-2 border-slate-200/70 dark:border-slate-700/70 space-y-3">
           {comment.replies.map((reply) => (
-            <div key={reply.id} className="bg-gray-50 dark:bg-gray-700 rounded p-3">
-              <div className="flex items-center space-x-2 mb-1">
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
+            <div key={reply.id} className="bg-slate-50/80 dark:bg-slate-800/70 rounded-xl p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm font-medium text-slate-900 dark:text-white">
                   {reply.author}
                 </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-slate-500 dark:text-slate-400">
                   {formatDate(reply.createdAt)}
                 </span>
               </div>
-              <p className="text-sm text-gray-700 dark:text-gray-300">{reply.message}</p>
+              <p className="text-sm text-slate-700 dark:text-slate-300">{reply.message}</p>
             </div>
           ))}
         </div>
@@ -298,29 +318,34 @@ export default function CommentSection({
   );
 
   return (
-    <div className={`space-y-6 ${className}`}>
-      <div className="flex justify-between items-center">
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-          {title} ({comments.length})
-        </h3>
+    <div className={`space-y-6 ${className}`} data-tour="comments-section">
+      <div className="flex flex-wrap justify-between items-center gap-3">
+        <div>
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+            Community
+          </p>
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-white mt-2">
+            {title} ({comments.length})
+          </h3>
+        </div>
 
         <button
           onClick={() => fetchComments()}
           disabled={loading}
-          className="text-sm text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50 disabled:cursor-not-allowed py-2 px-3 min-h-[44px] min-w-[44px] flex items-center justify-center"
+          className="cta-secondary disabled:opacity-50"
         >
-          {loading ? '🔄 Loading...' : '🔄 Refresh'}
+          {loading ? 'Refreshing...' : 'Refresh'}
         </button>
       </div>
 
       {/* Comment Form */}
       <form
         onSubmit={handleSubmit}
-        className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-4"
+        className="surface-card p-4 space-y-4"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
               Name *
             </label>
             <input
@@ -328,42 +353,42 @@ export default function CommentSection({
               value={author}
               onChange={(e) => setAuthor(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full px-3 py-2 border border-slate-200/70 dark:border-slate-700/70 rounded-full bg-white/80 dark:bg-slate-900/70 text-slate-900 dark:text-white"
               placeholder="Your name"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
               Email (optional)
             </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className="w-full px-3 py-2 border border-slate-200/70 dark:border-slate-700/70 rounded-full bg-white/80 dark:bg-slate-900/70 text-slate-900 dark:text-white"
               placeholder="your@email.com"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
             Comment Type
           </label>
           <select
             value={commentType}
             onChange={(e) => setCommentType(e.target.value as any)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full px-3 py-2 border border-slate-200/70 dark:border-slate-700/70 rounded-full bg-white/80 dark:bg-slate-900/70 text-slate-900 dark:text-white"
           >
-            <option value="general">💭 General Comment</option>
-            <option value="feedback">💬 Feedback</option>
-            <option value="issue">🐛 Report Issue</option>
+            <option value="general">General Comment</option>
+            <option value="feedback">Feedback</option>
+            <option value="issue">Report Issue</option>
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
             Message *
           </label>
           <textarea
@@ -371,10 +396,10 @@ export default function CommentSection({
             onChange={(e) => setCommentMessage(e.target.value)}
             required
             rows={4}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className="w-full px-3 py-2 border border-slate-200/70 dark:border-slate-700/70 rounded-xl bg-white/80 dark:bg-slate-900/70 text-slate-900 dark:text-white"
             placeholder="Share your thoughts..."
           />
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             {commentMessage.length}/1000 characters
           </div>
         </div>
@@ -382,7 +407,7 @@ export default function CommentSection({
         <button
           type="submit"
           disabled={submitting || !author.trim() || commentMessage.trim().length < 10}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-md transition-colors min-h-[44px]"
+          className="w-full cta-primary disabled:opacity-60"
         >
           {submitting ? 'Posting...' : 'Post Comment'}
         </button>
@@ -391,25 +416,28 @@ export default function CommentSection({
       {/* Message Display */}
       {message && (
         <div
-          className={`p-3 rounded-md ${message.includes('✅') || message.includes('👍')
-            ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200'
-            : message.includes('🚨')
-              ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200'
-              : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200'
-            }`}
+          className={`p-3 rounded-xl text-sm ${
+            message.tone === 'success'
+              ? 'bg-emerald-50/80 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-200'
+              : message.tone === 'warning'
+                ? 'bg-amber-50/80 dark:bg-amber-500/20 text-amber-800 dark:text-amber-200'
+                : message.tone === 'info'
+                  ? 'bg-slate-100/80 dark:bg-slate-800/70 text-slate-700 dark:text-slate-200'
+                  : 'bg-rose-50/80 dark:bg-rose-500/20 text-rose-800 dark:text-rose-200'
+          }`}
         >
-          {message}
+          {message.text}
         </div>
       )}
 
       {/* Comments List */}
       <div className="space-y-4">
         {loading && comments.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-8 text-slate-500 dark:text-slate-400">
             Loading comments...
           </div>
         ) : !Array.isArray(comments) || comments.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-8 text-slate-500 dark:text-slate-400">
             No comments yet. Be the first to share your thoughts!
           </div>
         ) : (
@@ -422,7 +450,7 @@ export default function CommentSection({
               <button
                 onClick={() => fetchComments(true)}
                 disabled={loading}
-                className="w-full py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[44px]"
+                className="w-full py-3 px-4 border border-slate-200/70 dark:border-slate-700/70 rounded-full text-slate-700 dark:text-slate-300 hover:bg-slate-50/80 dark:hover:bg-slate-800/70 disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-h-[44px]"
               >
                 {loading ? 'Loading...' : 'Load More Comments'}
               </button>

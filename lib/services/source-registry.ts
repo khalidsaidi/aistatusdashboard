@@ -1,0 +1,55 @@
+import { getDb } from '@/lib/db/firestore';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+import type { SourceRegistryEntry } from '@/lib/types/ingestion';
+
+const MAX_PAYLOAD_CHARS = 50000;
+
+class SourceRegistryService {
+  async getEntry(sourceId: string): Promise<SourceRegistryEntry | null> {
+    const db = getDb();
+    const doc = await db.collection('source_registry').doc(sourceId).get();
+    if (!doc.exists) return null;
+    const data = doc.data() || {};
+    return {
+      sourceId,
+      providerId: data.providerId,
+      platform: data.platform,
+      etag: data.etag || null,
+      lastModified: data.lastModified || null,
+      lastFetchedAt: data.lastFetchedAt?.toDate?.()?.toISOString?.() || data.lastFetchedAt || null,
+      lastStatusCode: data.lastStatusCode,
+      nextFetchAt: data.nextFetchAt?.toDate?.()?.toISOString?.() || data.nextFetchAt || null,
+    } as SourceRegistryEntry;
+  }
+
+  async upsertEntry(entry: SourceRegistryEntry) {
+    const db = getDb();
+    await db.collection('source_registry').doc(entry.sourceId).set(
+      {
+        providerId: entry.providerId,
+        platform: entry.platform,
+        etag: entry.etag || null,
+        lastModified: entry.lastModified || null,
+        lastStatusCode: entry.lastStatusCode || null,
+        lastFetchedAt: entry.lastFetchedAt ? Timestamp.fromDate(new Date(entry.lastFetchedAt)) : null,
+        nextFetchAt: entry.nextFetchAt ? Timestamp.fromDate(new Date(entry.nextFetchAt)) : null,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+  }
+
+  async recordPayload(sourceId: string, statusCode: number, body: string | undefined, headers: Record<string, string>) {
+    const db = getDb();
+    const safeBody = body && body.length > MAX_PAYLOAD_CHARS ? `${body.slice(0, MAX_PAYLOAD_CHARS)}\n...truncated` : body;
+    await db.collection('source_payloads').add({
+      sourceId,
+      statusCode,
+      body: safeBody || null,
+      headers,
+      fetchedAt: FieldValue.serverTimestamp(),
+    });
+  }
+}
+
+export const sourceRegistryService = new SourceRegistryService();

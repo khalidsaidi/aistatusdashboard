@@ -2,23 +2,23 @@
 
 ## P0 – Launch blockers (active)
 
-- None currently.
+- None.
 
 ## P1 – Functional gaps
 
-1) External event ingestion verification
-- AWS EventBridge + GCP Service Health pipelines created; still need a live event to confirm delivery.
+1) None currently.
 
 ## P2 – UX polish
 
-1) “Ask Status” + predictive panels are heuristics
-- Needs more telemetry volume to feel authoritative.
-
-2) Model/region details depend on catalog completeness
-- Validate models.json and endpoints/regions per provider.
+1) None currently.
 
 ## Recently resolved (for history)
 
+- SendGrid domain authentication validated; DNS CNAMEs confirmed.
+- External SMTP live check completed via Guerrilla Mail inbox (artifacts captured).
+- Model catalog entries added for all listed providers.
+- Seeded telemetry baseline via `/api/cron/probes` to populate early warning + forecast panels.
+- Controlled AWS + GCP ingestion checks confirmed end-to-end delivery.
 - Early warning panel, rate limit incidents, model detail view, and change radar admin UI added.
 - Provider detail panel wired to intel APIs for incidents + maintenance.
 - Gemini API key created + stored in Secret Manager; App Hosting env updated.

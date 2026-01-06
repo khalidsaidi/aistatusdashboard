@@ -137,6 +137,17 @@ export default function InsightsLab() {
   }, [radarSecret]);
 
   useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ pane?: PaneId }>).detail;
+      if (!detail?.pane) return;
+      const match = PANES.find((pane) => pane.id === detail.pane);
+      if (match) setActivePane(match.id);
+    };
+    window.addEventListener('ai-status:reliability-pane', handler as EventListener);
+    return () => window.removeEventListener('ai-status:reliability-pane', handler as EventListener);
+  }, []);
+
+  useEffect(() => {
     if (activePane !== 'canary' && activePane !== 'model') return;
     const params = new URLSearchParams({
       providerId,
@@ -316,7 +327,7 @@ export default function InsightsLab() {
 
   return (
     <div className="space-y-6">
-      <section className="surface-card-strong p-6">
+      <section className="surface-card-strong p-6" data-tour="reliability-intro">
         <p className="text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Reliability Lab</p>
         <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mt-2">
           Deep diagnostics for AI workloads
@@ -327,7 +338,7 @@ export default function InsightsLab() {
         </p>
       </section>
 
-      <div className="surface-card p-3 flex flex-wrap items-center gap-3 justify-between">
+      <div className="surface-card p-3 flex flex-wrap items-center gap-3 justify-between" data-tour="reliability-panes">
         <div className="flex flex-wrap gap-2">
           {PANES.map((pane) => (
             <button
@@ -419,7 +430,7 @@ export default function InsightsLab() {
       </div>
 
       {activePane === 'canary' && (
-        <div className="grid gap-6 lg:grid-cols-[1.1fr,0.9fr]">
+        <div className="grid gap-6 lg:grid-cols-[1.1fr,0.9fr]" data-tour="reliability-canary">
           <div className="surface-card-strong p-6">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Canary Copilot</h3>
             <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
@@ -496,7 +507,7 @@ export default function InsightsLab() {
       )}
 
       {activePane === 'model' && (
-        <div className="surface-card-strong p-6 space-y-5">
+        <div className="surface-card-strong p-6 space-y-5" data-tour="reliability-model">
           <div>
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Model detail</h3>
             <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">
@@ -597,7 +608,7 @@ export default function InsightsLab() {
       )}
 
       {activePane === 'matrix' && (
-        <div className="grid gap-6 lg:grid-cols-[1.3fr,0.7fr]">
+        <div className="grid gap-6 lg:grid-cols-[1.3fr,0.7fr]" data-tour="reliability-matrix">
           <div className="surface-card-strong p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
@@ -689,7 +700,7 @@ export default function InsightsLab() {
       )}
 
       {activePane === 'replay' && (
-        <div className="surface-card-strong p-6">
+        <div className="surface-card-strong p-6" data-tour="reliability-replay">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Incident Replay</h3>
           <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">
             Scrub through historical incidents and see how status evolved.
@@ -789,7 +800,7 @@ export default function InsightsLab() {
       )}
 
       {activePane === 'forecast' && (
-        <div className="surface-card-strong p-6">
+        <div className="surface-card-strong p-6" data-tour="reliability-forecast">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Reliability Forecast</h3>
           {forecast ? (
             <div className="mt-4 space-y-3">
@@ -809,7 +820,7 @@ export default function InsightsLab() {
       )}
 
       {activePane === 'rate' && (
-        <div className="surface-card-strong p-6">
+        <div className="surface-card-strong p-6" data-tour="reliability-rate">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Rate-limit transparency</h3>
           <div className="mt-4 surface-card p-4">
             <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Rate-limit incidents</h4>
@@ -868,7 +879,7 @@ export default function InsightsLab() {
       )}
 
       {activePane === 'radar' && (
-        <div className="surface-card-strong p-6">
+        <div className="surface-card-strong p-6" data-tour="reliability-radar">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Pricing + capacity radar</h3>
           <div className="mt-4 surface-card p-4">
             <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Budget guardrails</h4>
@@ -1030,7 +1041,7 @@ export default function InsightsLab() {
       )}
 
       {activePane === 'behavioral' && (
-        <div className="surface-card-strong p-6">
+        <div className="surface-card-strong p-6" data-tour="reliability-behavioral">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Behavioral stability</h3>
           {behavioral && behavioral.segments.length ? (
             <div className="mt-4 space-y-2">
@@ -1053,7 +1064,7 @@ export default function InsightsLab() {
       )}
 
       {activePane === 'ask' && (
-        <div className="surface-card-strong p-6">
+        <div className="surface-card-strong p-6" data-tour="reliability-ask">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Ask Status</h3>
           <div className="mt-4 space-y-3">
             <textarea

@@ -35,9 +35,23 @@ function loadEnv() {
     return env;
 }
 
+function isWsl() {
+    if (process.env.WSL_DISTRO_NAME) return true;
+    try {
+        return fs.readFileSync('/proc/version', 'utf8').toLowerCase().includes('microsoft');
+    } catch {
+        return false;
+    }
+}
+
 const env = loadEnv();
 const port = process.env.PORT || env.PORT || '3001';
-const cmd = spawn('npm', ['run', 'dev'], {
+const host = process.env.DEV_HOST || env.DEV_HOST || process.env.HOST || env.HOST || (isWsl() ? '0.0.0.0' : null);
+const args = ['run', 'dev'];
+if (host) {
+    args.push('--', '--hostname', host);
+}
+const cmd = spawn('npm', args, {
     env: { ...env, PORT: port },
     stdio: 'inherit'
 });

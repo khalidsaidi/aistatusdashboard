@@ -175,7 +175,7 @@ export default function APIDemo() {
   };
 
   return (
-    <div className="surface-card-strong" data-testid="api-demo">
+    <div className="surface-card-strong" data-testid="api-demo" data-tour="api-demo">
       <div className="p-6">
         <p className="text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
           Developer tools
@@ -210,7 +210,7 @@ export default function APIDemo() {
         </div>
 
         {/* API Examples */}
-        <div className="space-y-4 mb-6">
+        <div className="space-y-4 mb-6" data-tour="api-endpoints">
           <h3 className="text-lg font-medium text-slate-900 dark:text-white">
             Available API Endpoints
           </h3>

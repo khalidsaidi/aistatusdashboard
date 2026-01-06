@@ -6,33 +6,33 @@ interface ClientTimestampProps {
   format?: 'date' | 'time' | 'datetime';
   date?: Date;
   className?: string;
+  timeZone?: 'local' | 'utc';
 }
 
 export default function ClientTimestamp({
   format = 'datetime',
   date,
   className = '',
+  timeZone = 'local',
 }: ClientTimestampProps) {
-  const [mounted, setMounted] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
-    setMounted(true);
+    if (date) return undefined;
 
-    if (!date) {
-      // Update current time every second if no specific date provided
-      const interval = setInterval(() => {
-        setCurrentTime(new Date());
-      }, 1000);
+    // Update current time every second if no specific date provided
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
 
-      return () => clearInterval(interval);
-    }
+    return () => clearInterval(interval);
   }, [date]);
 
   // Always call formatDate function to avoid conditional logic after hooks
   const targetDate = date || currentTime;
 
-  const formatDate = (useUtc: boolean) => {
+  const formatDate = () => {
+    const useUtc = timeZone === 'utc';
     const locale = useUtc ? 'en-US' : undefined;
     const options = useUtc ? { timeZone: 'UTC' } : undefined;
 
@@ -47,8 +47,9 @@ export default function ClientTimestamp({
     }
   };
 
-  const fallback = date ? formatDate(true) : 'Loading...';
-
-  // Use conditional rendering instead of early return
-  return <span className={className}>{mounted ? formatDate(false) : fallback}</span>;
+  return (
+    <span className={className} suppressHydrationWarning>
+      {formatDate()}
+    </span>
+  );
 }

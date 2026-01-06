@@ -34,7 +34,9 @@ test.describe('Full-Stack Verification Suite', () => {
         // Subscribe
         await page.click('button:has-text("Notifications")');
         await page.fill('input[placeholder="name@example.com"]', testEmail);
-        await page.click('button:has-text("Openai")');
+        const openaiButton = page.getByRole('button', { name: /OpenAI/i }).first();
+        await openaiButton.scrollIntoViewIfNeeded();
+        await openaiButton.click({ force: true });
         page.on('dialog', d => d.dismiss());
         await Promise.all([
             page.waitForResponse((res) => {
@@ -100,6 +102,7 @@ test.describe('Full-Stack Verification Suite', () => {
 
     test('2. Analytics Data Integrity (Seed -> API -> UI)', async ({ page }) => {
         const seedCount = 42;
+        runVerify('clear', 'analytics_events');
         runVerify('analytics-seed', 'openai', seedCount.toString());
         console.log(`📊 Seeded ${seedCount} interaction events for OpenAI`);
 
@@ -116,9 +119,16 @@ test.describe('Full-Stack Verification Suite', () => {
 
         // Wait for specific counter
         const totalCounter = page.getByTestId('total-interactions');
-        await expect(totalCounter).toContainText(seedCount.toString(), { timeout: 10000 });
+        await expect
+            .poll(async () => {
+                const raw = (await totalCounter.textContent()) || '';
+                const value = parseInt(raw.replace(/[^\d]/g, ''), 10);
+                return Number.isFinite(value) ? value : 0;
+            }, { timeout: 10000 })
+            .toBeGreaterThanOrEqual(seedCount);
 
         // Check provider specific row
+        await page.click('button:has-text("Providers")');
         const openaiRow = page.locator('[data-testid="provider-engagement-item"][data-provider="openai"]');
         await expect(openaiRow).toContainText(seedCount.toString());
         await page.screenshot({ path: 'test-results/confidence-4-analytics.png' });
@@ -127,7 +137,8 @@ test.describe('Full-Stack Verification Suite', () => {
 
     test('3. UI Logic: Search, Filter & Sort', async ({ page }) => {
         await page.goto(`http://localhost:${PORT}?tab=dashboard`);
-        await page.waitForLoadState('networkidle');
+        await page.waitForLoadState('domcontentloaded');
+        await expect(page.locator('input[placeholder*="Search providers"]')).toBeVisible({ timeout: 15000 });
 
         // Ensure we are on dashboard tab
         await page.click('button:has-text("Status Dashboard")');

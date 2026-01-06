@@ -2,35 +2,42 @@ const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
 
-function loadEnvFromLocalFile() {
-    const envPath = path.resolve(process.cwd(), '.env.local');
-    if (!fs.existsSync(envPath)) return;
+function loadEnvFromFiles(files) {
+    files.forEach((file) => {
+        if (!file) return;
+        const envPath = path.resolve(process.cwd(), file);
+        if (!fs.existsSync(envPath)) return;
 
-    const content = fs.readFileSync(envPath, 'utf8');
-    const lines = content.split(/\r?\n/);
+        const content = fs.readFileSync(envPath, 'utf8');
+        const lines = content.split(/\r?\n/);
 
-    lines.forEach(rawLine => {
-        let line = rawLine.trim();
-        if (!line || line.startsWith('#')) return;
+        lines.forEach(rawLine => {
+            let line = rawLine.trim();
+            if (!line || line.startsWith('#')) return;
 
-        const firstEq = line.indexOf('=');
-        if (firstEq === -1) return;
+            const firstEq = line.indexOf('=');
+            if (firstEq === -1) return;
 
-        const key = line.substring(0, firstEq).trim();
-        let value = line.substring(firstEq + 1).trim();
+            const key = line.substring(0, firstEq).trim();
+            let value = line.substring(firstEq + 1).trim();
 
-        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
-            value = value.substring(1, value.length - 1);
-        }
+            if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+                value = value.substring(1, value.length - 1);
+            }
 
-        // Only fill missing env vars; never override existing process.env values.
-        if (process.env[key] === undefined) {
-            process.env[key] = value.replace(/\\n/g, '\n');
-        }
+            // Only fill missing env vars; never override existing process.env values.
+            if (process.env[key] === undefined) {
+                if (key === 'FIREBASE_SERVICE_ACCOUNT_KEY') {
+                    process.env[key] = value;
+                } else {
+                    process.env[key] = value.replace(/\\n/g, '\n');
+                }
+            }
+        });
     });
 }
 
-loadEnvFromLocalFile();
+loadEnvFromFiles(['.env.production.local', '.env.local']);
 
 // Load env for Firebase
 const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;

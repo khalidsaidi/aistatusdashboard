@@ -1,5 +1,6 @@
 import { providerService } from '@/lib/services/providers';
 import { statusService } from '@/lib/services/status';
+import { intelligenceService } from '@/lib/services/intelligence';
 import { log } from '@/lib/utils/logger';
 import DashboardTabs from './components/DashboardTabs';
 import ClientWrapper from './components/ClientWrapper';
@@ -11,17 +12,17 @@ export const dynamic = 'force-dynamic';
 // Fallback component
 function ErrorFallback({ error }: { error: string }) {
   return (
-    <main className="flex-1 bg-gray-50 dark:bg-gray-900">
+    <main className="flex-1">
       <div className="px-4 sm:px-6 py-8">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-8">
-            <h2 className="text-2xl font-bold text-red-800 dark:text-red-200 mb-4">
+          <div className="surface-card-strong p-8 border border-rose-200/70 dark:border-rose-700/70">
+            <h2 className="text-2xl font-semibold text-rose-700 dark:text-rose-200 mb-4">
               Service Unavailable
             </h2>
-            <p className="text-red-600 dark:text-red-400 mb-6">{error}</p>
+            <p className="text-rose-600 dark:text-rose-300 mb-6">{error}</p>
             <Link
               href="/"
-              className="inline-block bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-md"
+              className="inline-block cta-primary"
             >
               Refresh Page
             </Link>
@@ -40,14 +41,34 @@ export default async function DashboardPage() {
     const providers = providerService.getProviders();
     log('info', 'Fetching statuses', { count: providers.length });
 
-    statuses = await statusService.checkAll(providers);
+    const fallbackStatuses = await statusService.checkAll(providers);
+    let summaries: any[] = [];
+    try {
+      summaries = await intelligenceService.getProviderSummaries();
+    } catch (innerError) {
+      log('warn', 'Provider summary fetch failed, falling back to direct status', { innerError });
+    }
+
+    const summaryMap = new Map(summaries.map((summary) => [summary.providerId, summary]));
+
+    statuses = fallbackStatuses.map((status) => {
+      const summary = summaryMap.get(status.id);
+      if (!summary) return status;
+      const mergedStatus = summary.status || status.status;
+      return {
+        ...status,
+        status: mergedStatus,
+        details: summary.description || status.details,
+        lastChecked: summary.lastUpdated || status.lastChecked,
+      };
+    });
 
     // Calculate stats
     const stats = {
       total: statuses.length,
       operational: statuses.filter(s => s.status === 'operational').length,
-      down: statuses.filter(s => s.status === 'down').length,
-      degraded: statuses.filter(s => s.status === 'degraded').length,
+      down: statuses.filter(s => s.status === 'down' || s.status === 'major_outage').length,
+      degraded: statuses.filter(s => s.status === 'degraded' || s.status === 'partial_outage').length,
       unknown: statuses.filter(s => s.status === 'unknown').length
     };
 
@@ -67,12 +88,12 @@ export default async function DashboardPage() {
   }
 
   return (
-    <main className="flex-1 bg-gray-50 dark:bg-gray-900">
+    <main className="flex-1">
       <div className="px-4 sm:px-6 py-8">
         {error && (
-          <div className="max-w-6xl mx-auto mb-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 p-4 rounded-lg">
-            <p className="text-yellow-800 dark:text-yellow-200">
-              ⚠️ Warning: {error}
+          <div className="max-w-6xl mx-auto mb-6 surface-card border border-amber-200/70 dark:border-amber-700/70 p-4">
+            <p className="text-amber-800 dark:text-amber-200 text-sm">
+              Warning: {error}
             </p>
           </div>
         )}

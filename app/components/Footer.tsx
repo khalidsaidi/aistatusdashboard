@@ -8,15 +8,15 @@ export default function Footer() {
   return (
     <footer
       role="contentinfo"
-      className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 mt-auto"
+      className="border-t border-slate-200/70 dark:border-slate-800/70 mt-auto"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Reference Only Disclaimer */}
-        <div className="text-center mb-6">
-          <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-            ⚠️ For Reference Only
+        <div className="surface-card p-4 text-center">
+          <p className="text-sm text-slate-700 dark:text-slate-300 font-medium">
+            For Reference Only
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             This dashboard is provided for informational and reference purposes only. We assume no
             responsibility for accuracy, completeness, or any decisions made based on this
             information.
@@ -24,20 +24,20 @@ export default function Footer() {
         </div>
 
         {/* Trademark Attribution */}
-        <div className="text-center mb-6">
-          <p className="text-xs text-gray-500 dark:text-gray-500">
+        <div className="text-center">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             All trademarks and logos are the property of their respective owners and are used here
             for identification purposes only. No endorsement or partnership is implied.
           </p>
         </div>
 
         {/* Removal Clause */}
-        <div className="text-center mb-6">
-          <p className="text-xs text-gray-500 dark:text-gray-500">
+        <div className="text-center">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             If you are a rights holder and want your trademark removed, please{' '}
             <a
               href={contactHref}
-              className="text-blue-700 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300 py-1 px-2 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-slate-900 dark:text-white underline hover:text-slate-700 dark:hover:text-slate-200 py-1 px-2 min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded focus:outline-none focus:ring-2 focus:ring-slate-400"
               target={contactEmail ? undefined : '_blank'}
               rel={contactEmail ? undefined : 'noopener noreferrer'}
             >
@@ -48,21 +48,21 @@ export default function Footer() {
         </div>
 
         {/* Copyright and System Links */}
-        <div className="text-center border-t border-gray-200 dark:border-gray-700 pt-6 mb-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-            © 2025 AI Status Dashboard. Real-time AI Provider Monitoring since 2025
+        <div className="text-center border-t border-slate-200/70 dark:border-slate-800/70 pt-6">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+            Copyright 2025 AI Status Dashboard. Real-time AI Provider Monitoring since 2025
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             <a
               href="/api/health"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-400"
             >
               System Health
             </a>
-            {' • '}
+            {' | '}
             <a
               href="/api/status"
-              className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-400"
             >
               JSON API
             </a>
@@ -71,13 +71,13 @@ export default function Footer() {
 
         {/* Technical Info */}
         <div className="text-center">
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-            Built with Next.js • Respects robots.txt and rate limits •{' '}
+          <p className="text-xs text-slate-600 dark:text-slate-400">
+            Built with Next.js | Respects robots.txt and rate limits |{' '}
             <a
               href="https://github.com/khalidsaidi/aistatusdashboard"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-700 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1 min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-slate-900 dark:text-white underline hover:text-slate-700 dark:hover:text-slate-200 transition-colors inline-flex items-center gap-1 min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-400"
               title="View source code on GitHub"
             >
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -86,7 +86,7 @@ export default function Footer() {
               Open Source
             </a>
           </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
             Status checks are performed using official APIs and public status pages
           </p>
         </div>

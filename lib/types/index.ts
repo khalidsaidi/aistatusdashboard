@@ -1,4 +1,11 @@
-export type ProviderStatus = 'operational' | 'degraded' | 'down' | 'unknown';
+export type ProviderStatus =
+    | 'operational'
+    | 'degraded'
+    | 'partial_outage'
+    | 'down'
+    | 'major_outage'
+    | 'maintenance'
+    | 'unknown';
 
 export interface Provider {
     id: string;

@@ -3,6 +3,35 @@ const fs = require('fs');
 const path = require('path');
 const net = require('net');
 
+function loadEnvFile(filePath) {
+  if (!filePath) return;
+  if (!fs.existsSync(filePath)) return;
+  const content = fs.readFileSync(filePath, 'utf8');
+  content.split(/\r?\n/).forEach((raw) => {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) return;
+    const idx = line.indexOf('=');
+    if (idx === -1) return;
+    const key = line.slice(0, idx).trim();
+    let value = line.slice(idx + 1).trim();
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    if (process.env[key] === undefined) {
+      const needsRawJson = key === 'FIREBASE_SERVICE_ACCOUNT_KEY';
+      process.env[key] = needsRawJson ? value : value.replace(/\\n/g, '\n');
+    }
+  });
+}
+
+const defaultEnvFiles = [
+  process.env.ENV_FILE,
+  process.env.EXTERNAL_SMTP_ENV,
+  path.resolve(process.cwd(), '.env.production.local'),
+  path.resolve(process.cwd(), '.env.external.smtp.local'),
+];
+defaultEnvFiles.forEach(loadEnvFile);
+
 function getRunId() {
   return new Date().toISOString().replace(/[:.]/g, '-');
 }
@@ -70,6 +99,10 @@ async function main() {
   const smtpPort = await getFreePort();
   const webhookPort = await getFreePort();
   const externalSmtpHost = process.env.SMTP_HOST && !isLoopbackHost(process.env.SMTP_HOST);
+  const webhookTunnelMode = (process.env.WEBHOOK_TUNNEL || '').toLowerCase();
+  const useWebhookTunnel = webhookTunnelMode === 'cloudflared' || webhookTunnelMode === 'true';
+  let webhookTunnelUrl = null;
+  let webhookTunnelProc = null;
 
   const baseUrl = `http://localhost:${appPort}`;
   const debugSecret = `debug-${Math.random().toString(36).slice(2)}-${Date.now()}`;
@@ -89,6 +122,7 @@ async function main() {
 
   const cleanup = () => {
     killProcess(appProc, 'Next dev server');
+    killProcess(webhookTunnelProc, 'webhook tunnel');
     killProcess(webhookProc, 'webhook receiver');
     killProcess(smtpProc, 'SMTP sink');
   };
@@ -124,11 +158,54 @@ async function main() {
     stdio: 'inherit',
   });
 
+  if (useWebhookTunnel) {
+    console.log(`🔗 Starting webhook tunnel on port ${webhookPort}...`);
+    webhookTunnelProc = spawn(
+      'cloudflared',
+      ['tunnel', '--no-autoupdate', '--url', `http://127.0.0.1:${webhookPort}`],
+      { stdio: ['ignore', 'pipe', 'pipe'] }
+    );
+
+    const tunnelLog = path.join(webhookDir, 'tunnel.log');
+    const tunnelOut = fs.createWriteStream(tunnelLog, { flags: 'a' });
+    webhookTunnelProc.stdout.on('data', (data) => tunnelOut.write(data));
+    webhookTunnelProc.stderr.on('data', (data) => tunnelOut.write(data));
+
+    const urlRegex = /https:\/\/[a-z0-9-]+\.trycloudflare\.com/i;
+    const waitForTunnelUrl = async () => {
+      const start = Date.now();
+      while (Date.now() - start < 20_000) {
+        try {
+          const text = fs.readFileSync(tunnelLog, 'utf8');
+          const match = text.match(urlRegex);
+          if (match) return match[0];
+        } catch {
+          // ignore
+        }
+        await new Promise((r) => setTimeout(r, 500));
+      }
+      return null;
+    };
+
+    webhookTunnelUrl = await waitForTunnelUrl();
+    if (webhookTunnelUrl) {
+      const tunnelInfoPath = path.join(webhookDir, 'tunnel.json');
+      fs.writeFileSync(
+        tunnelInfoPath,
+        JSON.stringify({ url: webhookTunnelUrl, port: webhookPort, startedAt: new Date().toISOString() }, null, 2)
+      );
+      console.log(`🌐 Webhook tunnel URL: ${webhookTunnelUrl}`);
+    } else {
+      console.warn('⚠️ Unable to detect webhook tunnel URL within timeout; falling back to local URL.');
+    }
+  }
+
   const appEnv = {
     ...process.env,
     PORT: String(appPort),
     NEXT_PUBLIC_SITE_URL: baseUrl,
     NEXT_PUBLIC_ENABLE_SW_ON_LOCALHOST: 'true',
+    NEXT_PUBLIC_EXPORT_DEBUG: 'true',
     APP_ENABLE_EMAIL: 'true',
     ALLOW_LOCAL_WEBHOOKS: 'true',
     APP_ENABLE_DEBUG_ENDPOINTS: 'true',
@@ -166,7 +243,9 @@ async function main() {
       NEXT_PUBLIC_ENABLE_SW_ON_LOCALHOST: 'true',
       SMTP_SINK_DIR: smtpDir,
       WEBHOOK_SINK_DIR: webhookDir,
-      TEST_WEBHOOK_URL: process.env.TEST_WEBHOOK_URL || `http://127.0.0.1:${webhookPort}/webhook`,
+      TEST_WEBHOOK_URL:
+        process.env.TEST_WEBHOOK_URL ||
+        (webhookTunnelUrl ? `${webhookTunnelUrl}/webhook` : `http://127.0.0.1:${webhookPort}/webhook`),
       APP_DEBUG_SECRET: debugSecret,
     },
     stdio: 'inherit',

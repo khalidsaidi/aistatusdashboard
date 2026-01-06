@@ -46,7 +46,7 @@ export default function AutoRefreshIndicator({
       <div className="flex items-center gap-2">
         {isRefreshing ? (
           <>
-            <div className="animate-spin h-4 w-4 text-blue-600">
+            <div className="animate-spin h-4 w-4 text-slate-700 dark:text-slate-200">
               <svg className="w-full h-full" fill="none" viewBox="0 0 24 24">
                 <circle
                   className="opacity-25"
@@ -63,13 +63,13 @@ export default function AutoRefreshIndicator({
                 />
               </svg>
             </div>
-            <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+            <span className="text-sm text-slate-700 dark:text-slate-200 font-medium">
               Refreshing...
             </span>
           </>
         ) : (
           <>
-            <div className="h-4 w-4 text-green-600">
+            <div className="h-4 w-4 text-emerald-600">
               <svg className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   strokeLinecap="round"
@@ -79,7 +79,7 @@ export default function AutoRefreshIndicator({
                 />
               </svg>
             </div>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-slate-600 dark:text-slate-400">
               Next refresh in {formatTime(timeLeft)}
             </span>
           </>
@@ -88,9 +88,9 @@ export default function AutoRefreshIndicator({
 
       {/* Progress Bar */}
       <div className="flex-1 max-w-32">
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+        <div className="w-full bg-slate-200/70 dark:bg-slate-700/70 rounded-full h-2">
           <div
-            className="bg-blue-600 h-2 rounded-full transition-all duration-1000 ease-linear"
+            className="bg-slate-900 dark:bg-white h-2 rounded-full transition-all duration-1000 ease-linear"
             style={{ width: `${getProgressPercentage()}%` }}
           />
         </div>
@@ -100,7 +100,7 @@ export default function AutoRefreshIndicator({
       <button
         onClick={onRefresh}
         disabled={isRefreshing}
-        className="p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 min-h-[44px] min-w-[44px] flex items-center justify-center"
+        className="p-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-full hover:bg-slate-100/80 dark:hover:bg-slate-800/70 min-h-[44px] min-w-[44px] flex items-center justify-center"
         aria-label="Refresh now"
         title="Refresh now"
       >
@@ -144,7 +144,7 @@ export function CompactAutoRefreshIndicator({
       <button
         onClick={onRefresh}
         disabled={isRefreshing}
-        className="p-2 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 min-h-[44px] min-w-[44px] flex items-center justify-center relative"
+        className="p-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-full hover:bg-slate-100/80 dark:hover:bg-slate-800/70 min-h-[44px] min-w-[44px] flex items-center justify-center relative"
         aria-label={isRefreshing ? 'Refreshing...' : `Refresh now (auto-refresh in ${timeLeft}s)`}
         title={isRefreshing ? 'Refreshing...' : `Auto-refresh in ${timeLeft}s`}
       >
@@ -187,7 +187,7 @@ export function CompactAutoRefreshIndicator({
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
-              className="text-blue-600 opacity-20"
+              className="text-slate-900 dark:text-white opacity-20"
               strokeDasharray={`${((nextRefreshIn - timeLeft) / nextRefreshIn) * 125.6} 125.6`}
               strokeDashoffset="0"
               transform="rotate(-90 22 22)"
@@ -197,7 +197,7 @@ export function CompactAutoRefreshIndicator({
       </button>
 
       {!isRefreshing && (
-        <span className="text-xs text-gray-500 dark:text-gray-500 font-mono">
+        <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
           {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
         </span>
       )}

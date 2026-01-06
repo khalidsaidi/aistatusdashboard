@@ -8,6 +8,7 @@ import {
     parseMetaStatusResponse,
     parseRssFeedResponse,
     parseStatusPageResponse,
+    parseBetterstackResponse,
 } from '@/lib/utils/status-parsers';
 
 export class StatusService {
@@ -116,7 +117,8 @@ export class StatusService {
             format === 'google-cloud' ||
             format === 'statuspage' ||
             format === 'instatus' ||
-            format === 'meta'
+            format === 'meta' ||
+            format === 'betterstack'
         ) {
             const data = await readJson();
             if (!data) {
@@ -149,6 +151,18 @@ export class StatusService {
                 const status = parseMetaStatusResponse(data);
                 return {
                     status: status === 'unknown' ? this.statusFromHttp(response) : status,
+                };
+            }
+
+            if (format === 'betterstack') {
+                const status = parseBetterstackResponse(data);
+                const aggregate =
+                    typeof data?.data?.attributes?.aggregate_state === 'string'
+                        ? data.data.attributes.aggregate_state
+                        : undefined;
+                return {
+                    status: status === 'unknown' ? this.statusFromHttp(response) : status,
+                    details: aggregate ? `aggregate:${aggregate}` : undefined,
                 };
             }
 

@@ -29,6 +29,15 @@ yarn-error.log*
 
 # local secrets / sensitive artifacts
 .ai/creds/
+.ai/human/
+.ai/email/
+.ai/devserver.log
+.ai/devserver.pid
+.ai/tmp-browser-profile/
+
+# test artifacts
+/test-results/
+/test-results-all/
 
 # vercel
 .vercel

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StatusResult } from '@/lib/types';
 import { trackEvent } from '@/lib/utils/analytics-client';
 
@@ -12,6 +12,13 @@ interface ExportShareProps {
 export default function ExportShare({ statuses, className = '' }: ExportShareProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [exportFormat, setExportFormat] = useState<'json' | 'csv' | 'txt'>('json');
+  const [badgeProvider, setBadgeProvider] = useState(() => statuses[0]?.id || 'openai');
+
+  useEffect(() => {
+    if (!statuses.find((status) => status.id === badgeProvider) && statuses.length > 0) {
+      setBadgeProvider(statuses[0].id);
+    }
+  }, [statuses, badgeProvider]);
 
   const exportData = async (format: 'json' | 'csv' | 'txt') => {
     setIsExporting(true);
@@ -74,6 +81,12 @@ export default function ExportShare({ statuses, className = '' }: ExportSharePro
           filename = `ai-status-${timestamp}.txt`;
           mimeType = 'text/plain';
           break;
+      }
+
+      const shouldDebugExport =
+        process.env.NEXT_PUBLIC_EXPORT_DEBUG === 'true' || process.env.NODE_ENV !== 'production';
+      if (shouldDebugExport) {
+        (window as any).__exportDebug = { format, content, filename, mimeType };
       }
 
       // Create and download file
@@ -142,83 +155,152 @@ export default function ExportShare({ statuses, className = '' }: ExportSharePro
     }
   };
 
+  const badgeProviderLabel =
+    statuses.find((status) => status.id === badgeProvider)?.displayName ||
+    statuses.find((status) => status.id === badgeProvider)?.name ||
+    badgeProvider;
+
+  const badgeUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/api/badge/${badgeProvider}`
+      : `/api/badge/${badgeProvider}`;
+
+  const badgeMarkdown = `![${badgeProviderLabel} Status](${badgeUrl})`;
+
+  const copyBadgeMarkdown = async () => {
+    try {
+      await navigator.clipboard.writeText(badgeMarkdown);
+      alert('Badge markdown copied!');
+      trackEvent('share', { metadata: { method: 'badge_markdown', providerId: badgeProvider } });
+    } catch (error) {
+      alert('Unable to copy badge markdown.');
+    }
+  };
+
+  const copyBadgeUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(badgeUrl);
+      alert('Badge URL copied!');
+      trackEvent('share', { metadata: { method: 'badge_url', providerId: badgeProvider } });
+    } catch (error) {
+      alert('Unable to copy badge URL.');
+    }
+  };
+
   return (
     <div
-      className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 ${className}`}
+      className={`surface-card-strong p-6 ${className}`}
       data-testid="export-share"
+      data-tour="share-export"
     >
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">📤 Export Data</h3>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
+            Share & Export
+          </p>
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-white mt-2">
+            Shareable status snapshots
+          </h3>
+          <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
+            Export data, copy API links, or publish a live badge for any provider.
+          </p>
+        </div>
+      </div>
 
-      <div className="flex flex-col sm:flex-row gap-2">
-        <select
-          value={exportFormat}
-          onChange={(e) => setExportFormat(e.target.value as any)}
-          className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-          disabled={isExporting}
-        >
-          <option value="json">JSON</option>
-          <option value="csv">CSV</option>
-          <option value="txt">Text</option>
-        </select>
-        <button
-          onClick={() => exportData(exportFormat)}
-          disabled={isExporting}
-          className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-md transition-colors min-h-[44px] flex items-center justify-center gap-2"
-        >
-          {isExporting ? 'Exporting...' : `Export ${exportFormat.toUpperCase()}`}
-        </button>
+      <div className="mt-6 grid gap-4 lg:grid-cols-[1.05fr,0.95fr]">
+        <div className="surface-card p-4">
+          <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
+            Export snapshot
+          </h4>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <select
+              value={exportFormat}
+              onChange={(e) => setExportFormat(e.target.value as any)}
+              className="px-3 py-2 border border-slate-200/70 dark:border-slate-700/70 rounded-full bg-white/80 dark:bg-slate-900/70 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-slate-400/70 text-sm"
+              disabled={isExporting}
+              data-testid="export-format-select"
+            >
+              <option value="json">JSON</option>
+              <option value="csv">CSV</option>
+              <option value="txt">Text</option>
+            </select>
+            <button
+              onClick={() => exportData(exportFormat)}
+              disabled={isExporting}
+              className="cta-primary"
+            >
+              {isExporting ? 'Exporting...' : `Export ${exportFormat.toUpperCase()}`}
+            </button>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
+            Snapshots include provider status, latency, and last check time.
+          </p>
+        </div>
+
+        <div className="surface-card p-4">
+          <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
+            Share live status
+          </h4>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button onClick={shareStatus} className="cta-primary">
+              Share dashboard
+            </button>
+            <button onClick={copyApiUrl} className="cta-secondary">
+              Copy API URL
+            </button>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-3">
+            Ideal for Slack, docs, or incident channels.
+          </p>
+        </div>
       </div>
 
       {/* Share Section */}
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Share Status</h4>
-        <div className="flex flex-col sm:flex-row gap-2">
-          <button
-            onClick={shareStatus}
-            className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors min-h-[44px] flex items-center justify-center gap-2"
+      <div className="border-t border-slate-200/70 dark:border-slate-700/70 pt-5 mt-6">
+        <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-2">Share as badge</h4>
+        <div className="flex flex-col sm:flex-row gap-2 mb-3">
+          <select
+            value={badgeProvider}
+            onChange={(e) => setBadgeProvider(e.target.value)}
+            className="px-3 py-2 border border-slate-200/70 dark:border-slate-700/70 rounded-full bg-white/80 dark:bg-slate-900/70 text-slate-900 dark:text-white text-sm"
+            data-testid="badge-provider-select"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
-              />
-            </svg>
-            Share Dashboard
+            {statuses.map((status) => (
+              <option key={status.id} value={status.id}>
+                {status.displayName || status.name}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={copyBadgeMarkdown}
+            className="cta-primary"
+          >
+            Copy Markdown
           </button>
           <button
-            onClick={copyApiUrl}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-md transition-colors min-h-[44px] flex items-center justify-center gap-2"
+            onClick={copyBadgeUrl}
+            className="cta-secondary"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-              />
-            </svg>
-            Copy API URL
+            Copy Badge URL
           </button>
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-          Share current status or get API endpoint for integrations
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Use badges in README files, dashboards, or team status channels.
         </p>
       </div>
 
       {/* Quick Stats */}
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+      <div className="border-t border-slate-200/70 dark:border-slate-700/70 pt-4 mt-6">
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="text-gray-600 dark:text-gray-400">Total Providers:</span>
-            <span className="font-medium text-gray-900 dark:text-white ml-2">
+            <span className="text-slate-600 dark:text-slate-400">Total Providers:</span>
+            <span className="font-medium text-slate-900 dark:text-white ml-2">
               {statuses.length}
             </span>
           </div>
           <div>
-            <span className="text-gray-600 dark:text-gray-400">Operational:</span>
-            <span className="font-medium text-green-600 dark:text-green-400 ml-2">
+            <span className="text-slate-600 dark:text-slate-400">Operational:</span>
+            <span className="font-medium text-emerald-600 dark:text-emerald-400 ml-2">
               {statuses.filter((s) => s.status === 'operational').length}
             </span>
           </div>

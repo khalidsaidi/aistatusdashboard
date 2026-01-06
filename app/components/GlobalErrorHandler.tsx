@@ -7,7 +7,9 @@ export default function GlobalErrorHandler() {
   const { showError, showWarning } = useToast();
 
   const toastApiRef = useRef({ showError, showWarning });
-  toastApiRef.current = { showError, showWarning };
+  useEffect(() => {
+    toastApiRef.current = { showError, showWarning };
+  }, [showError, showWarning]);
 
   useEffect(() => {
     let fontErrorShown = false;

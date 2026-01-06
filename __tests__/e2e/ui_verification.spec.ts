@@ -4,9 +4,10 @@ test('comprehensive ui and api verification', async ({ page }) => {
     // 1. Load Dashboard
     const PORT = 3001;
     await page.goto(`http://localhost:${PORT}`);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.locator('input[placeholder*="Search providers"]')).toBeVisible({ timeout: 15000 });
     await expect(page).toHaveTitle(/AI Status Dashboard/);
-    await page.screenshot({ path: 'screenshots/dashboard-load.png', fullPage: true });
+    await page.screenshot({ path: 'screenshots/dashboard-load.png' });
 
     // 2. Test Notifications Tab
     const notificationsTab = page.getByRole('button', { name: /Notifications/i });
@@ -15,7 +16,9 @@ test('comprehensive ui and api verification', async ({ page }) => {
 
     // Email Sub-tab
     await page.fill('input[placeholder="name@example.com"]', 'verification@test.com');
-    await page.click('button:has-text("Openai")');
+    const openaiButton = page.getByRole('button', { name: /OpenAI/i }).first();
+    await openaiButton.scrollIntoViewIfNeeded();
+    await openaiButton.click({ force: true });
     page.on('dialog', dialog => dialog.dismiss());
     await page.click('button:has-text("Subscribe to Alerts")');
     await page.screenshot({ path: 'screenshots/email-subscription-submitted.png' });

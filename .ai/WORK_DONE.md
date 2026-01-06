@@ -134,3 +134,34 @@
   - `scripts/setup-gcp-service-health.js` for GCP Service Health log export → ingest endpoint.
 - Added public telemetry SDK (`public/sdk/ai-status-sdk.js`) + public key support for opt-in crowd telemetry.
 - GCP ingest endpoint now decodes Pub/Sub push payloads (base64 log entries).
+
+## Work completed (2026-01-06, launch blockers + SES verification)
+
+- Verified SES sandbox status and confirmed mail.tm recipient for testing:
+  - Triggered AWS SES verification email and captured it under `.ai/human/2026-01-06T03-49-15Z/smtp/`.
+  - Confirmed SES identity verification for the mail.tm recipient (allows real external SMTP send).
+- Ran App Hosting human verification suite (chromium + firefox + webkit, desktop + mobile):
+  - Run ID: `2026-01-06T04-53-51Z`
+  - Artifacts: `.ai/human/2026-01-06T04-53-51Z/`
+- Redeployed App Hosting with debug endpoints disabled (`APP_ENABLE_DEBUG_ENDPOINTS=false`).
+
+## Work completed (2026-01-06, SendGrid SMTP setup)
+
+- Switched SMTP host to SendGrid (`smtp.sendgrid.net`) and updated App Hosting secrets.
+- Created SendGrid domain authentication for `aistatusdashboard.com` (`email` subdomain).
+- Pushed SendGrid DNS CNAME records to GoDaddy (mail + DKIM1/DKIM2).
+- Verified SendGrid domain authentication (`valid: true`).
+
+## Work completed (2026-01-06, gap closure)
+
+- Added explicit model catalogs for every provider in `lib/data/models.json`.
+- Added `scripts/smtp-live-check.js` and captured a live SMTP delivery via Guerrilla Mail:
+  - Run ID: `2026-01-06T07-33-43-904Z`
+  - Artifacts: `.ai/human/2026-01-06T07-33-43-904Z/smtp/`
+- Triggered probe cron three times to seed telemetry baselines:
+  - Run ID: `2026-01-06T07-39-20-890Z`
+  - Artifacts: `.ai/human/2026-01-06T07-39-20-890Z/ingestion/probe-cron.json`
+- Disabled debug endpoints and export debug in `apphosting.yaml` and redeployed App Hosting.
+- Ran launch-blockers suite on local dev server:
+  - Run ID: `2026-01-06T07-43-20-627Z`
+  - Artifacts: `.ai/human/2026-01-06T07-43-20-627Z/`

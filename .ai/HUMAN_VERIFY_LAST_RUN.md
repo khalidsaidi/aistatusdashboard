@@ -1,16 +1,20 @@
 # Human Verification (latest)
 
-Run ID: `2026-01-03T02-51-23Z-apphosting-domain` (chromium + firefox + webkit; desktop + mobile; external SMTP + PTSV3 webhook; custom domain)
+Run ID: `2026-01-06T07-43-20-627Z` (chromium + firefox + webkit; desktop + mobile; local dev server; local SMTP sink + local webhook receiver)
 
 Artifacts:
-- Launch blockers summary: `.ai/human/2026-01-03T02-51-23Z-apphosting-domain/LAUNCH_BLOCKERS_SUMMARY.md`
-- Desktop artifacts: `.ai/human/2026-01-03T02-51-23Z-apphosting-domain/chromium-desktop-artifacts.json`
-- SMTP evidence: `.ai/human/2026-01-03T02-51-23Z-apphosting-domain/smtp/index.json`
-- Webhook evidence: `.ai/human/2026-01-03T02-51-23Z-apphosting-domain/webhooks/external.json`
+- Launch blockers summary: `.ai/human/2026-01-06T07-43-20-627Z/LAUNCH_BLOCKERS_SUMMARY.md`
+- Desktop artifacts: `.ai/human/2026-01-06T07-43-20-627Z/chromium-desktop-artifacts.json`
+- Mobile artifacts: `.ai/human/2026-01-06T07-43-20-627Z/chromium-mobile-artifacts.json`
+- Firefox artifacts: `.ai/human/2026-01-06T07-43-20-627Z/firefox-desktop-artifacts.json`
+- WebKit artifacts: `.ai/human/2026-01-06T07-43-20-627Z/webkit-desktop-artifacts.json`
+- SMTP evidence: `.ai/human/2026-01-06T07-43-20-627Z/smtp/index.json`
+- Webhook evidence: `.ai/human/2026-01-06T07-43-20-627Z/webhooks/last.json`
 
 Summary:
-- Email: confirmation + resend + status-change emails delivered via AWS SES SMTP to mail.tm inbox (From `hello@aistatusdashboard.com`) and confirmed via emailed link
-- Webhook: real POST delivered to external PTSV3 bin (`event: incident`, `provider.id: openai`) and captured in artifacts
-- RSS: `/rss.xml` served valid RSS XML and validated via API for Firefox/WebKit
-- Analytics tab + tracking verified
-- Comments: posted + like + report actions succeeded
+- Email: confirmation + resend + status-change emails delivered to local SMTP sink.
+- Webhook: delivery captured by local receiver (incident payload written to sink).
+- RSS: `/rss.xml` served valid RSS XML and validated.
+- Export/Share: downloads verified in Chromium/Firefox; WebKit validated via debug payload capture.
+- Comments + Analytics: posted, like, report, and analytics dashboards verified.
+- Notes: WebKit dev-only access-control errors ignored (RSC/SW diagnostics).

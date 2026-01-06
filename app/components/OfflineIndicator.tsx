@@ -9,19 +9,17 @@ interface OfflineIndicatorProps {
 export default function OfflineIndicator({ className = '' }: OfflineIndicatorProps) {
   const [isOnline, setIsOnline] = useState(true);
   const [lastOnline, setLastOnline] = useState<Date | null>(null);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-
     const updateOnlineStatus = () => {
       if (typeof navigator !== 'undefined') {
         const online = navigator.onLine;
-        setIsOnline(online);
-
-        if (!online && isOnline) {
-          setLastOnline(new Date());
-        }
+        setIsOnline((prev) => {
+          if (!online && prev) {
+            setLastOnline(new Date());
+          }
+          return online;
+        });
       }
     };
 
@@ -38,10 +36,9 @@ export default function OfflineIndicator({ className = '' }: OfflineIndicatorPro
         window.removeEventListener('offline', updateOnlineStatus);
       };
     }
-  }, [isOnline]);
+  }, []);
 
-  // Prevent hydration mismatch by not rendering until mounted
-  if (!mounted || isOnline) {
+  if (isOnline) {
     return null;
   }
 

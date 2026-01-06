@@ -4,12 +4,20 @@ Date (UTC): 2026-01-06
 
 ### What was run
 
-- `npm run type-check` ✅
-- `npm run lint` ✅
+- `node scripts/human-verify.js` ✅ (Run ID: `2026-01-06T04-53-51Z`, chromium+firefox+webkit, desktop+mobile, App Hosting URL, external SMTP via SES (verified mail.tm recipient) + external webhook via cloudflared)
+- `node scripts/launch-blockers-verify.js` ✅ (Run ID: `2026-01-06T07-43-20-627Z`, chromium+firefox+webkit, desktop+mobile, local dev server, local SMTP sink + local webhook receiver)
+- `node scripts/smtp-live-check.js` ✅ (Run ID: `2026-01-06T07-33-43-904Z`, Guerrilla Mail inbox, SendGrid SMTP, From header verified)
+- `GET /api/cron/probes` x3 ✅ (Run ID: `2026-01-06T07-39-20-890Z`, telemetry seed)
+- `aws ses verify-email-identity` ✅ (mail.tm recipient verified; confirmation link captured)
+- `curl /api/ingest/aws-health` + `curl /api/ingest/gcp-health` ✅ (controlled ingestion check; artifacts in `.ai/human/2026-01-06T03-49-15Z/ingestion/`)
+- `npx firebase-tools deploy --only apphosting --project ai-status-dashboard` ✅ (debug endpoints re-disabled after verification)
 
 ### Notes
 
-- Playwright/launch-blocker suites not rerun in this pass (no live upstream incidents available for AWS/GCP ingestion verification).
+- App Hosting run used `HUMAN_VERIFY_SKIP_DB=true` to avoid destructive Firestore cleanup on prod.
+- RSS click on Firefox didn’t trigger navigation, but `/rss.xml` validated via API.
+- “Report success” toast wasn’t observed across browsers (UI still sent report; needs visual confirmation).
+- SES account is still in sandbox (`ProductionAccessEnabled=false`); new recipients must be verified until SES production access is enabled.
 
 ---
 

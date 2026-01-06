@@ -159,9 +159,10 @@
       }
     ],
     "shard": null,
+    "tags": [],
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
-    "version": "1.53.2",
+    "version": "1.57.0",
     "workers": 1,
     "webServer": {
       "command": "node scripts/start-dev.js",
@@ -193,20 +194,20 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 55539,
+                  "duration": 6681,
                   "errors": [],
                   "stdout": [
                     {
                       "text": "Test Script Process Project ID: undefined\n"
                     },
                     {
-                      "text": "✅ Subscription verified in DB for e2e-237715@example.com\n"
+                      "text": "✅ Subscription verified in DB for e2e-720597@example.com\n"
                     },
                     {
-                      "text": "✅ Webhook verified in DB for https://e2e-webhook-237715.com\n"
+                      "text": "✅ Webhook verified in DB for https://e2e-webhook-720597.com\n"
                     },
                     {
-                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 237715\"\n"
+                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 720597\"\n"
                     },
                     {
                       "text": "📡 Injected \"down\" status for Anthropic into DB\n"
@@ -233,21 +234,7 @@
                     }
                   ],
                   "retry": 0,
-                  "steps": [
-                    {
-                      "title": "Expect \"poll toBe\"",
-                      "duration": 2270
-                    },
-                    {
-                      "title": "Expect \"poll toBe\"",
-                      "duration": 2813
-                    },
-                    {
-                      "title": "Expect \"poll toBe\"",
-                      "duration": 3203
-                    }
-                  ],
-                  "startTime": "2025-12-31T07:30:36.866Z",
+                  "startTime": "2026-01-05T05:42:00.464Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -256,6 +243,144 @@
             }
           ],
           "id": "3d948ddadc1e120bc168-ce2d2582a7c9cf3e82f0",
+          "file": "deep_verification.spec.ts",
+          "line": 15,
+          "column": 5
+        },
+        {
+          "title": "deep end-to-end verification",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8069,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Test Script Process Project ID: undefined\n"
+                    },
+                    {
+                      "text": "✅ Subscription verified in DB for e2e-764572@example.com\n"
+                    },
+                    {
+                      "text": "✅ Webhook verified in DB for https://e2e-webhook-764572.com\n"
+                    },
+                    {
+                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 764572\"\n"
+                    },
+                    {
+                      "text": "📡 Injected \"down\" status for Anthropic into DB\n"
+                    },
+                    {
+                      "text": "✅ UI correctly reflected the injected DB state change in Incidents tab (Propagation Success)\n"
+                    },
+                    {
+                      "text": "🚀 Deep End-to-End Verification Successful\n"
+                    }
+                  ],
+                  "stderr": [
+                    {
+                      "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                    },
+                    {
+                      "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                    },
+                    {
+                      "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                    },
+                    {
+                      "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                    }
+                  ],
+                  "retry": 0,
+                  "startTime": "2026-01-05T05:42:42.730Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3d948ddadc1e120bc168-82307fde7530aa65c6f1",
+          "file": "deep_verification.spec.ts",
+          "line": 15,
+          "column": 5
+        },
+        {
+          "title": "deep end-to-end verification",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11169,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Test Script Process Project ID: undefined\n"
+                    },
+                    {
+                      "text": "✅ Subscription verified in DB for e2e-809474@example.com\n"
+                    },
+                    {
+                      "text": "✅ Webhook verified in DB for https://e2e-webhook-809474.com\n"
+                    },
+                    {
+                      "text": "✅ Comment verified in DB: \"Deep E2E Verification Comment 809474\"\n"
+                    },
+                    {
+                      "text": "📡 Injected \"down\" status for Anthropic into DB\n"
+                    },
+                    {
+                      "text": "✅ UI correctly reflected the injected DB state change in Incidents tab (Propagation Success)\n"
+                    },
+                    {
+                      "text": "🚀 Deep End-to-End Verification Successful\n"
+                    }
+                  ],
+                  "stderr": [
+                    {
+                      "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                    },
+                    {
+                      "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                    },
+                    {
+                      "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                    },
+                    {
+                      "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                    }
+                  ],
+                  "retry": 0,
+                  "startTime": "2026-01-05T05:43:28.131Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3d948ddadc1e120bc168-fee6df427caffb4b99fb",
           "file": "deep_verification.spec.ts",
           "line": 15,
           "column": 5
@@ -291,7 +416,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 53746,
+                      "duration": 10119,
                       "errors": [],
                       "stdout": [
                         {
@@ -304,7 +429,7 @@
                           "text": "⚙️ Status Orchestrator triggered\n"
                         },
                         {
-                          "text": "✅ Notification lifecycle verified: Notification queued for test-293708@example.com\n"
+                          "text": "✅ Notification lifecycle verified: Notification queued for test-727229@example.com\n"
                         }
                       ],
                       "stderr": [
@@ -340,21 +465,7 @@
                         }
                       ],
                       "retry": 0,
-                      "steps": [
-                        {
-                          "title": "Expect \"poll toBe\"",
-                          "duration": 2653
-                        },
-                        {
-                          "title": "Expect \"poll toMatch\"",
-                          "duration": 2405
-                        },
-                        {
-                          "title": "Expect \"poll toMatch\"",
-                          "duration": 3356
-                        }
-                      ],
-                      "startTime": "2025-12-31T07:31:33.710Z",
+                      "startTime": "2026-01-05T05:42:07.232Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -383,7 +494,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 23705,
+                      "duration": 4273,
                       "errors": [],
                       "stdout": [
                         {
@@ -399,10 +510,13 @@
                       "stderr": [
                         {
                           "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
                         }
                       ],
                       "retry": 0,
-                      "startTime": "2025-12-31T07:32:37.859Z",
+                      "startTime": "2026-01-05T05:42:19.529Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -412,7 +526,7 @@
               ],
               "id": "2dbbd66c5ac68c116146-7948b5c962e0f41ed436",
               "file": "full-stack.spec.ts",
-              "line": 101,
+              "line": 103,
               "column": 9
             },
             {
@@ -431,19 +545,19 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 17247,
+                      "duration": 3928,
                       "errors": [],
                       "stdout": [
                         {
                           "text": "✅ UI Search verified\n"
                         },
                         {
-                          "text": "✅ UI Filter verified: Found 12 operational providers\n"
+                          "text": "✅ UI Filter verified: Found 16 operational providers\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-31T07:33:02.313Z",
+                      "startTime": "2026-01-05T05:42:26.744Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -453,7 +567,7 @@
               ],
               "id": "2dbbd66c5ac68c116146-0ceaebff63aac1c86bd4",
               "file": "full-stack.spec.ts",
-              "line": 128,
+              "line": 138,
               "column": 9
             },
             {
@@ -472,7 +586,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 9011,
+                      "duration": 223,
                       "errors": [],
                       "stdout": [
                         {
@@ -481,7 +595,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-12-31T07:33:19.595Z",
+                      "startTime": "2026-01-05T05:42:30.685Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -491,7 +605,7 @@
               ],
               "id": "2dbbd66c5ac68c116146-a8561924edb511aaaded",
               "file": "full-stack.spec.ts",
-              "line": 167,
+              "line": 178,
               "column": 9
             },
             {
@@ -510,7 +624,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 46240,
+                      "duration": 3571,
                       "errors": [],
                       "stdout": [
                         {
@@ -520,19 +634,10 @@
                       "stderr": [
                         {
                           "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
-                        },
-                        {
-                          "text": "⚠️ Comment not yet visible in UI, but API/DB confirmed (test-comment-293708)\n"
                         }
                       ],
                       "retry": 0,
-                      "steps": [
-                        {
-                          "title": "Expect \"poll toBe\"",
-                          "duration": 3760
-                        }
-                      ],
-                      "startTime": "2025-12-31T07:33:29.347Z",
+                      "startTime": "2026-01-05T05:42:30.923Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -542,7 +647,507 @@
               ],
               "id": "2dbbd66c5ac68c116146-5defd907676fb027823b",
               "file": "full-stack.spec.ts",
-              "line": 181,
+              "line": 192,
+              "column": 9
+            },
+            {
+              "title": "1. Notification Lifecycle (UI -> Change -> Queue)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11966,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🧹 Test state initialized\n"
+                        },
+                        {
+                          "text": "📡 Status change injected: OpenAI -> DOWN\n"
+                        },
+                        {
+                          "text": "⚙️ Status Orchestrator triggered\n"
+                        },
+                        {
+                          "text": "✅ Notification lifecycle verified: Notification queued for test-771728@example.com\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        }
+                      ],
+                      "retry": 0,
+                      "startTime": "2026-01-05T05:42:51.729Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2dbbd66c5ac68c116146-4ee32319bee7fd1334a1",
+              "file": "full-stack.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "2. Analytics Data Integrity (Seed -> API -> UI)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3081,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📊 Seeded 42 interaction events for OpenAI\n"
+                        },
+                        {
+                          "text": "✅ Analytics API data integrity verified\n"
+                        },
+                        {
+                          "text": "✅ Analytics UI rendering verified\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        }
+                      ],
+                      "retry": 0,
+                      "startTime": "2026-01-05T05:43:08.870Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2dbbd66c5ac68c116146-fc2609ce44cbad094e7d",
+              "file": "full-stack.spec.ts",
+              "line": 103,
+              "column": 9
+            },
+            {
+              "title": "3. UI Logic: Search, Filter & Sort",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3922,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ UI Search verified\n"
+                        },
+                        {
+                          "text": "✅ UI Filter verified: Found 16 operational providers\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-05T05:43:11.966Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2dbbd66c5ac68c116146-602e2c5ac5dc80a51fa6",
+              "file": "full-stack.spec.ts",
+              "line": 138,
+              "column": 9
+            },
+            {
+              "title": "4. Developer Tools: Badge & Health API",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 285,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Developer APIs (Health & Badge) verified\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-05T05:43:15.901Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2dbbd66c5ac68c116146-2635be0047bb17860e5a",
+              "file": "full-stack.spec.ts",
+              "line": 178,
+              "column": 9
+            },
+            {
+              "title": "5. Community Engagement: Full lifecycle",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3138,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Community engagement lifecycle verified\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        }
+                      ],
+                      "retry": 0,
+                      "startTime": "2026-01-05T05:43:16.195Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2dbbd66c5ac68c116146-43adf12fffca92fdc7eb",
+              "file": "full-stack.spec.ts",
+              "line": 192,
+              "column": 9
+            },
+            {
+              "title": "1. Notification Lifecycle (UI -> Change -> Queue)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13728,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🧹 Test state initialized\n"
+                        },
+                        {
+                          "text": "📡 Status change injected: OpenAI -> DOWN\n"
+                        },
+                        {
+                          "text": "⚙️ Status Orchestrator triggered\n"
+                        },
+                        {
+                          "text": "✅ Notification lifecycle verified: Notification queued for test-822452@example.com\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        }
+                      ],
+                      "retry": 0,
+                      "startTime": "2026-01-05T05:43:42.455Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2dbbd66c5ac68c116146-1d199581f06ba687baad",
+              "file": "full-stack.spec.ts",
+              "line": 30,
+              "column": 9
+            },
+            {
+              "title": "2. Analytics Data Integrity (Seed -> API -> UI)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6093,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📊 Seeded 42 interaction events for OpenAI\n"
+                        },
+                        {
+                          "text": "✅ Analytics API data integrity verified\n"
+                        },
+                        {
+                          "text": "✅ Analytics UI rendering verified\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        },
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        }
+                      ],
+                      "retry": 0,
+                      "startTime": "2026-01-05T05:43:58.532Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2dbbd66c5ac68c116146-3825cce5e957775e8a18",
+              "file": "full-stack.spec.ts",
+              "line": 103,
+              "column": 9
+            },
+            {
+              "title": "3. UI Logic: Search, Filter & Sort",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6689,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ UI Search verified\n"
+                        },
+                        {
+                          "text": "✅ UI Filter verified: Found 16 operational providers\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-05T05:44:04.640Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2dbbd66c5ac68c116146-d71bbb5d54e80bf4c128",
+              "file": "full-stack.spec.ts",
+              "line": 138,
+              "column": 9
+            },
+            {
+              "title": "4. Developer Tools: Badge & Health API",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1040,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Developer APIs (Health & Badge) verified\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-05T05:44:14.278Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2dbbd66c5ac68c116146-0cc5e83cf48478af1c5f",
+              "file": "full-stack.spec.ts",
+              "line": 178,
+              "column": 9
+            },
+            {
+              "title": "5. Community Engagement: Full lifecycle",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7128,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Community engagement lifecycle verified\n"
+                        }
+                      ],
+                      "stderr": [
+                        {
+                          "buffer": "VXNpbmcgUHJvamVjdCBJRDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKSW5pdGlhbGl6aW5nIEFkbWluIFNESyBmb3IgUHJvamVjdDogYWktc3RhdHVzLWRhc2hib2FyZC1kZXYKREJfVkVSSUZZX1NUQVJUOiBQcm9qZWN0PWFpLXN0YXR1cy1kYXNoYm9hcmQtZGV2Cg=="
+                        }
+                      ],
+                      "retry": 0,
+                      "startTime": "2026-01-05T05:44:15.332Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2dbbd66c5ac68c116146-b3f5a86f9fbcb96277bf",
+              "file": "full-stack.spec.ts",
+              "line": 192,
               "column": 9
             }
           ]
@@ -571,7 +1176,7 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 42799,
+                  "duration": 7615,
                   "errors": [],
                   "stdout": [
                     {
@@ -580,7 +1185,7 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2025-12-31T07:34:16.355Z",
+                  "startTime": "2026-01-05T05:42:34.507Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -592,15 +1197,91 @@
           "file": "ui_verification.spec.ts",
           "line": 3,
           "column": 5
+        },
+        {
+          "title": "comprehensive ui and api verification",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "firefox",
+              "projectName": "firefox",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7740,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Comprehensive UI & API Verification Successful\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-01-05T05:43:19.348Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91915c4990393a252d84-3c964762db3112c42991",
+          "file": "ui_verification.spec.ts",
+          "line": 3,
+          "column": 5
+        },
+        {
+          "title": "comprehensive ui and api verification",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11919,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "Comprehensive UI & API Verification Successful\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-01-05T05:44:22.484Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "91915c4990393a252d84-a104ef8d0d6eb7b3ef2f",
+          "file": "ui_verification.spec.ts",
+          "line": 3,
+          "column": 5
         }
       ]
     }
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-12-31T07:29:43.058Z",
-    "duration": 311122.204,
-    "expected": 7,
+    "startTime": "2026-01-05T05:41:58.337Z",
+    "duration": 175917.97699999998,
+    "expected": 21,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

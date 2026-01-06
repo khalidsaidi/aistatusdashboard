@@ -1,0 +1,502 @@
+{
+  "_default": {
+    "regions": [
+      "global"
+    ],
+    "endpoints": [
+      "api"
+    ],
+    "tiers": [
+      "unknown"
+    ],
+    "models": [
+      {
+        "id": "core",
+        "tier": "unknown",
+        "streaming": false
+      }
+    ]
+  },
+  "openai": {
+    "regions": [
+      "us-east",
+      "us-west",
+      "eu-west"
+    ],
+    "endpoints": [
+      "chat",
+      "embeddings",
+      "images",
+      "moderation"
+    ],
+    "tiers": [
+      "free",
+      "pro",
+      "enterprise"
+    ],
+    "models": [
+      {
+        "id": "gpt-4o",
+        "tier": "pro",
+        "streaming": true
+      },
+      {
+        "id": "gpt-4o-mini",
+        "tier": "free",
+        "streaming": true
+      },
+      {
+        "id": "gpt-4.1",
+        "tier": "enterprise",
+        "streaming": true
+      },
+      {
+        "id": "gpt-3.5-turbo",
+        "tier": "free",
+        "streaming": false
+      }
+    ]
+  },
+  "anthropic": {
+    "regions": [
+      "us-east",
+      "eu-west"
+    ],
+    "endpoints": [
+      "messages",
+      "embeddings"
+    ],
+    "tiers": [
+      "pro",
+      "enterprise"
+    ],
+    "models": [
+      {
+        "id": "claude-3-opus-20240229",
+        "tier": "enterprise",
+        "streaming": true
+      },
+      {
+        "id": "claude-3-sonnet-20240229",
+        "tier": "pro",
+        "streaming": true
+      },
+      {
+        "id": "claude-3-haiku-20240307",
+        "tier": "pro",
+        "streaming": true
+      }
+    ]
+  },
+  "google-ai": {
+    "regions": [
+      "us-central",
+      "eu-west"
+    ],
+    "endpoints": [
+      "chat",
+      "embeddings",
+      "vision"
+    ],
+    "tiers": [
+      "free",
+      "pro",
+      "enterprise"
+    ],
+    "models": [
+      {
+        "id": "gemini-1.5-pro",
+        "tier": "pro",
+        "streaming": true
+      },
+      {
+        "id": "gemini-1.5-flash",
+        "tier": "free",
+        "streaming": true
+      },
+      {
+        "id": "gemini-1.0-pro",
+        "tier": "pro",
+        "streaming": false
+      }
+    ]
+  },
+  "aws": {
+    "regions": [
+      "us-east-1",
+      "us-west-2",
+      "eu-west-1"
+    ],
+    "endpoints": [
+      "chat",
+      "embeddings",
+      "guardrails"
+    ],
+    "tiers": [
+      "enterprise"
+    ],
+    "models": [
+      {
+        "id": "claude-3-sonnet",
+        "tier": "enterprise",
+        "streaming": true
+      },
+      {
+        "id": "llama-3-70b",
+        "tier": "enterprise",
+        "streaming": true
+      }
+    ]
+  },
+  "azure": {
+    "regions": [
+      "eastus",
+      "westus",
+      "westeurope"
+    ],
+    "endpoints": [
+      "chat",
+      "embeddings",
+      "vision"
+    ],
+    "tiers": [
+      "enterprise"
+    ],
+    "models": [
+      {
+        "id": "gpt-4o",
+        "tier": "enterprise",
+        "streaming": true
+      },
+      {
+        "id": "gpt-4-turbo",
+        "tier": "enterprise",
+        "streaming": true
+      },
+      {
+        "id": "text-embedding-3-large",
+        "tier": "enterprise",
+        "streaming": false
+      }
+    ]
+  },
+  "mistral": {
+    "regions": [
+      "eu-west",
+      "us-east"
+    ],
+    "endpoints": [
+      "chat",
+      "embeddings"
+    ],
+    "tiers": [
+      "pro",
+      "enterprise"
+    ],
+    "models": [
+      {
+        "id": "mistral-large-latest",
+        "tier": "enterprise",
+        "streaming": true
+      },
+      {
+        "id": "mistral-medium-latest",
+        "tier": "pro",
+        "streaming": true
+      },
+      {
+        "id": "mistral-small-latest",
+        "tier": "pro",
+        "streaming": false
+      }
+    ]
+  },
+  "cohere": {
+    "regions": [
+      "us-east",
+      "eu-west"
+    ],
+    "endpoints": [
+      "chat",
+      "embed",
+      "rerank"
+    ],
+    "tiers": [
+      "pro",
+      "enterprise"
+    ],
+    "models": [
+      {
+        "id": "command-r-plus",
+        "tier": "enterprise",
+        "streaming": true
+      },
+      {
+        "id": "command-r",
+        "tier": "pro",
+        "streaming": true
+      },
+      {
+        "id": "embed-english",
+        "tier": "pro",
+        "streaming": false
+      }
+    ]
+  },
+  "groq": {
+    "regions": [
+      "us-east"
+    ],
+    "endpoints": [
+      "chat"
+    ],
+    "tiers": [
+      "free",
+      "pro"
+    ],
+    "models": [
+      {
+        "id": "llama3-70b-8192",
+        "tier": "pro",
+        "streaming": true
+      },
+      {
+        "id": "llama3-8b-8192",
+        "tier": "free",
+        "streaming": true
+      }
+    ]
+  },
+  "deepseek": {
+    "regions": [
+      "global"
+    ],
+    "endpoints": [
+      "chat"
+    ],
+    "tiers": [
+      "pro"
+    ],
+    "models": [
+      {
+        "id": "deepseek-chat",
+        "tier": "pro",
+        "streaming": true
+      },
+      {
+        "id": "deepseek-reasoner",
+        "tier": "pro",
+        "streaming": true
+      }
+    ]
+  },
+  "xai": {
+    "regions": [
+      "global"
+    ],
+    "endpoints": [
+      "chat"
+    ],
+    "tiers": [
+      "pro"
+    ],
+    "models": [
+      {
+        "id": "grok-2-latest",
+        "tier": "pro",
+        "streaming": true
+      },
+      {
+        "id": "grok-1.5-latest",
+        "tier": "pro",
+        "streaming": true
+      }
+    ]
+  },
+  "meta": {
+    "regions": [
+      "global"
+    ],
+    "endpoints": [
+      "chat",
+      "embeddings"
+    ],
+    "tiers": [
+      "free",
+      "enterprise"
+    ],
+    "models": [
+      {
+        "id": "llama-chat",
+        "tier": "enterprise",
+        "streaming": true
+      },
+      {
+        "id": "llama-embed",
+        "tier": "enterprise",
+        "streaming": false
+      }
+    ]
+  },
+  "perplexity": {
+    "regions": [
+      "global"
+    ],
+    "endpoints": [
+      "search",
+      "chat"
+    ],
+    "tiers": [
+      "free",
+      "pro"
+    ],
+    "models": [
+      {
+        "id": "search",
+        "tier": "free",
+        "streaming": true
+      },
+      {
+        "id": "pro",
+        "tier": "pro",
+        "streaming": true
+      }
+    ]
+  },
+  "ai21": {
+    "regions": [
+      "global"
+    ],
+    "endpoints": [
+      "chat",
+      "completion",
+      "embeddings"
+    ],
+    "tiers": [
+      "pro",
+      "enterprise"
+    ],
+    "models": [
+      {
+        "id": "jamba",
+        "tier": "enterprise",
+        "streaming": true
+      },
+      {
+        "id": "jurassic",
+        "tier": "pro",
+        "streaming": false
+      }
+    ]
+  },
+  "stability": {
+    "regions": [
+      "global"
+    ],
+    "endpoints": [
+      "image",
+      "video",
+      "audio"
+    ],
+    "tiers": [
+      "pro",
+      "enterprise"
+    ],
+    "models": [
+      {
+        "id": "image-generation",
+        "tier": "pro",
+        "streaming": false
+      },
+      {
+        "id": "video-generation",
+        "tier": "enterprise",
+        "streaming": false
+      }
+    ]
+  },
+  "cerebras": {
+    "regions": [
+      "global"
+    ],
+    "endpoints": [
+      "chat",
+      "completion"
+    ],
+    "tiers": [
+      "enterprise"
+    ],
+    "models": [
+      {
+        "id": "cerebras-chat",
+        "tier": "enterprise",
+        "streaming": true
+      }
+    ]
+  },
+  "runway": {
+    "regions": [
+      "global"
+    ],
+    "endpoints": [
+      "video",
+      "image"
+    ],
+    "tiers": [
+      "pro",
+      "enterprise"
+    ],
+    "models": [
+      {
+        "id": "video-generation",
+        "tier": "pro",
+        "streaming": false
+      },
+      {
+        "id": "image-generation",
+        "tier": "pro",
+        "streaming": false
+      }
+    ]
+  },
+  "huggingface": {
+    "regions": [
+      "global"
+    ],
+    "endpoints": [
+      "inference",
+      "spaces",
+      "hub"
+    ],
+    "tiers": [
+      "free",
+      "pro"
+    ],
+    "models": [
+      {
+        "id": "inference-endpoint",
+        "tier": "pro",
+        "streaming": false
+      }
+    ]
+  },
+  "replicate": {
+    "regions": [
+      "global"
+    ],
+    "endpoints": [
+      "inference",
+      "train"
+    ],
+    "tiers": [
+      "pro"
+    ],
+    "models": [
+      {
+        "id": "replicate-run",
+        "tier": "pro",
+        "streaming": false
+      }
+    ]
+  }
+}

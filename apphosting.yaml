@@ -19,12 +19,14 @@ env:
     value: "1:401066429430:web:88df5e30e599ab6c3e15d7"
   - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
     value: "G-ZV3PS0MPQ7"
+  - variable: NEXT_PUBLIC_EXPORT_DEBUG
+    value: "false"
   - variable: FIREBASE_PROJECT_ID
     value: "ai-status-dashboard"
   - variable: APP_ENABLE_EMAIL
     value: "true"
   - variable: SMTP_HOST
-    value: "email-smtp.us-east-1.amazonaws.com"
+    value: "smtp.sendgrid.net"
   - variable: SMTP_PORT
     value: "587"
   - variable: SMTP_SECURE
@@ -32,7 +34,7 @@ env:
   - variable: SMTP_FROM
     value: "AI Status Dashboard <hello@aistatusdashboard.com>"
   - variable: APP_ENABLE_DEBUG_ENDPOINTS
-    value: "true"
+    value: "false"
   - variable: APP_ALLOW_OPEN_CRON
     value: "false"
   - variable: APP_ALLOW_PUBLIC_WEBHOOKS

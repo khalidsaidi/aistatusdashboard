@@ -13,6 +13,7 @@ import ExportShare from './ExportShare';
 import ProviderTimeline from './ProviderTimeline';
 import ProviderCompare from './ProviderCompare';
 import ProviderDetailPanel from './ProviderDetailPanel';
+import GuidedTour from './GuidedTour';
 import React from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -44,6 +45,7 @@ type SpeedFilter = typeof SPEED_FILTERS[number];
 type UptimeFilter = typeof UPTIME_FILTERS[number];
 type SortKey = typeof SORT_KEYS[number];
 type SortOrder = typeof SORT_ORDERS[number];
+type TourMode = 'full' | DashboardTabId;
 
 // Error boundary component
 class ErrorBoundary extends React.Component<
@@ -129,6 +131,11 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
 
     const query = params.toString();
     router.replace(query ? `/?${query}` : '/', { scroll: false });
+  };
+
+  const startTour = (mode: TourMode) => {
+    if (typeof window === 'undefined') return;
+    window.dispatchEvent(new CustomEvent('ai-status:start-tour', { detail: { mode } }));
   };
 
   const navigateToNotifications = (providers: string[], mode?: 'email' | 'webhooks') => {
@@ -810,9 +817,10 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
 
   return (
     <ErrorBoundary>
+      <GuidedTour activeTab={activeTab} setTab={setTab} />
       <div className="max-w-6xl mx-auto space-y-8">
         {activeTab === 'dashboard' && majorIncidents.length > 0 && (
-          <div className="surface-card border-l-4 border-rose-500 p-4">
+          <div className="surface-card border-l-4 border-rose-500 p-4" data-tour="dashboard-major-incidents">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <div className="text-xs uppercase tracking-[0.2em] text-rose-600 dark:text-rose-300 mb-2">
@@ -852,7 +860,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
         )}
 
         {activeTab === 'dashboard' && (
-          <section className="surface-card-strong p-6">
+          <section className="surface-card-strong p-6" data-tour="dashboard-early-warnings">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
@@ -917,7 +925,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
         )}
 
         {activeTab === 'dashboard' && (
-          <section className="surface-card-strong p-6">
+          <section className="surface-card-strong p-6" data-tour="dashboard-staleness">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
@@ -977,16 +985,28 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
         )}
 
         {activeTab === 'dashboard' ? (
-          <section className="surface-card-strong relative overflow-hidden p-6 md:p-8 fade-rise">
+          <section
+            className="surface-card-strong relative overflow-hidden p-6 md:p-8 fade-rise"
+            data-tour="dashboard-summary"
+          >
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute -top-24 -right-10 h-52 w-52 rounded-full bg-cyan-400/15 blur-3xl" />
               <div className="absolute -bottom-20 -left-12 h-48 w-48 rounded-full bg-amber-300/20 blur-3xl" />
             </div>
             <div className="relative grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
               <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                   Live status
-                </p>
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => startTour('dashboard')}
+                    className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                  >
+                    Tour dashboard
+                  </button>
+                </div>
                 <h2 className="text-3xl md:text-4xl font-semibold text-slate-900 dark:text-white mt-2">
                   {systemStatus.label}
                 </h2>
@@ -1015,7 +1035,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
                   endpoint, or region — we overlay canaries and telemetry to show the difference.
                 </p>
               </div>
-              <div className="surface-card p-5">
+              <div className="surface-card p-5" data-tour="dashboard-engage">
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                   Engage
                 </p>
@@ -1059,10 +1079,19 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
             <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
               {tabHeadings[activeTab as Exclude<DashboardTabId, 'dashboard'>].description}
             </p>
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={() => startTour(activeTab as DashboardTabId)}
+                className="cta-secondary text-xs"
+              >
+                Tour this section
+              </button>
+            </div>
           </section>
         )}
 
-        <div className="surface-card p-2">
+        <div className="surface-card p-2" data-tour="tab-bar">
           <div className="flex flex-wrap gap-2">
             {tabs.map((tab) => (
               <button
@@ -1097,7 +1126,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
             }
           >
             <div className="space-y-6">
-              <div className="surface-card p-4">
+              <div className="surface-card p-4" data-tour="dashboard-filters">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
                   <div className="flex-1">
                     <div className="relative">
@@ -1350,7 +1379,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
               </div>
 
               {filteredAndSortedStatuses.length > 0 ? (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-tour="dashboard-provider-grid">
                   {filteredAndSortedStatuses.map(renderStatusCard)}
                 </div>
               ) : (
@@ -1390,8 +1419,8 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
               )}
 
               <div className="grid gap-6 lg:grid-cols-[1.1fr,0.9fr]">
-                <ExportShare statuses={filteredAndSortedStatuses} className="surface-card-strong" />
-                <div className="surface-card p-6">
+                <ExportShare statuses={safeStatuses} className="surface-card-strong" />
+                <div className="surface-card p-6" data-tour="dashboard-stay-loop">
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                     Stay in the loop
                   </h3>
