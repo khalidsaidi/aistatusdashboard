@@ -38,3 +38,7 @@ node scripts/status-accuracy-check.js --base https://aistatusdashboard.com --all
 
 ## Staleness guardrails
 The script now flags stale provider summaries (older than 2x poll interval + 60s) as errors.
+
+## Deployment gate
+The App Hosting deployment workflow blocks unless the strict status audit is green.
+Workflow: `.github/workflows/deploy-apphosting.yml`.

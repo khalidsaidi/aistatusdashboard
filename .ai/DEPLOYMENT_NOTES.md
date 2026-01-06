@@ -31,3 +31,11 @@ Evidence: see `deployment-curl.txt`.
 - Secrets moved to Secret Manager and wired via `apphosting.yaml`.
 - Next.js upgraded to 16.1.1 for CVE coverage.
 - Custom domain `aistatusdashboard.com` requested; DNS updates applied and awaiting propagation/activation (hostState: `HOST_NON_FAH`, ownershipState: `OWNERSHIP_MISSING` as of 2026-01-03).
+
+## Deployment Gate (Status Accuracy)
+- GitHub Actions workflow: `.github/workflows/deploy-apphosting.yml`
+- Deploys only proceed after the strict status accuracy audit passes.
+- Required secrets:
+  - `APP_CRON_SECRET` or `CRON_SECRET` (to trigger `/api/cron/ingest?force=1`)
+  - `FIREBASE_TOKEN` (firebase-tools deploy)
+  - Optional `STATUS_CHECK_BASE_URL` (defaults to https://aistatusdashboard.com)
