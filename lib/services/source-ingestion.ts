@@ -447,7 +447,15 @@ export class SourceIngestionService {
     const response = await fetchWithCache(`${source.id}:meta`, url, source.providerId, 'meta');
     if (!response.ok || !response.json) return null;
 
-    const status = parseMetaStatusResponse(response.json);
+    const metaStatus = parseMetaStatusResponse(response.json);
+    const status =
+      metaStatus === 'down'
+        ? 'major_outage'
+        : metaStatus === 'degraded'
+          ? 'degraded'
+          : metaStatus === 'operational'
+            ? 'operational'
+            : 'unknown';
 
     return {
       providerId: source.providerId,
