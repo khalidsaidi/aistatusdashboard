@@ -410,7 +410,18 @@ export class SourceIngestionService {
     if (!summaryResponse.ok) return null;
 
     if (!summaryResponse.json) {
-      const htmlStatus = parseHtmlResponse(summaryResponse.body || '');
+      let htmlStatus = parseHtmlResponse(summaryResponse.body || '');
+      const bodyText = summaryResponse.body || '';
+      const lowerBody = bodyText.toLowerCase();
+      if (
+        htmlStatus === 'unknown' &&
+        (lowerBody.includes('page not found') || lowerBody.includes('not found'))
+      ) {
+        const fallbackHtml = await fetchWithCache(`${source.id}:html-fallback`, base, source.providerId, 'html');
+        if (fallbackHtml.ok && fallbackHtml.body) {
+          htmlStatus = parseHtmlResponse(fallbackHtml.body);
+        }
+      }
       const status =
         htmlStatus === 'down'
           ? 'major_outage'

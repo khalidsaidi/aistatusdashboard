@@ -124,6 +124,23 @@ export class StatusService {
         ) {
             const data = await readJson();
             if (!data) {
+                const text = await response.clone().text().catch(() => '');
+                const parsed = parseHtmlResponse(text);
+                if (parsed !== 'unknown') {
+                    return { status: parsed };
+                }
+                if (provider.statusPageUrl) {
+                    try {
+                        const htmlResponse = await fetch(provider.statusPageUrl, { cache: 'no-store' });
+                        const htmlText = await htmlResponse.text();
+                        const htmlParsed = parseHtmlResponse(htmlText);
+                        if (htmlParsed !== 'unknown') {
+                            return { status: htmlParsed };
+                        }
+                    } catch {
+                        // ignore html fallback failures
+                    }
+                }
                 return { status: this.statusFromHttp(response) };
             }
 
@@ -155,7 +172,12 @@ export class StatusService {
             }
 
             if (format === 'meta') {
-                const status = parseMetaStatusResponse(data);
+                const metaOrg = Array.isArray(data)
+                    ? data.find((org: any) =>
+                          String(org?.name || '').toLowerCase().includes('meta')
+                      )
+                    : null;
+                const status = parseMetaStatusResponse(metaOrg ? [metaOrg] : data);
                 return {
                     status: status === 'unknown' ? this.statusFromHttp(response) : status,
                 };
@@ -207,7 +229,7 @@ export class StatusService {
             }
         }
 
-        if (looksLikeJson) {
+            if (looksLikeJson) {
             try {
                 const data = await response.clone().json();
                 const status =
@@ -230,6 +252,11 @@ export class StatusService {
                             : description,
                 };
             } catch {
+                const text = await response.clone().text().catch(() => '');
+                const parsed = parseHtmlResponse(text);
+                if (parsed !== 'unknown') {
+                    return { status: parsed };
+                }
                 return { status: this.statusFromHttp(response) };
             }
         }
