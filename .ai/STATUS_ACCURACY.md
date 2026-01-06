@@ -23,3 +23,4 @@
 - Re-ran cleanup dry-run: 0 matches.
 - Triggered `/api/cron/ingest` (prod) to refresh provider status.
 - Provider summary still shows `google-ai` as `major_outage` because prod has not yet been redeployed with filtering fixes.
+- App Hosting rollout failed due to TS error in `lib/utils/google-cloud.ts` (string | undefined). Fixed by coercing optional fields to string.

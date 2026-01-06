@@ -67,7 +67,12 @@ export function filterGoogleCloudIncidentsForAi(incidents: NormalizedIncident[],
   return incidents
     .map((incident) => {
       const pieces: string[] = [];
-      pieces.push(incident.title, incident.serviceName, incident.sourceStatus, incident.sourceSeverity);
+      pieces.push(
+        incident.title || '',
+        incident.serviceName || '',
+        incident.sourceStatus || '',
+        incident.sourceSeverity || ''
+      );
 
       const impactedNames = Array.isArray(incident.impactedComponentNames)
         ? incident.impactedComponentNames
