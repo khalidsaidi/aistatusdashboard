@@ -27,6 +27,7 @@ export type PlatformType =
   | 'aws'
   | 'azure'
   | 'rss'
+  | 'meta'
   | 'html'
   | 'unknown';
 
