@@ -89,6 +89,18 @@ async function fetchWithCache(
     const lastModified = response.headers.get('last-modified');
 
     if (response.status === 304) {
+      const cachedPayload = await sourceRegistryService.getLatestPayload(sourceId);
+      const body = cachedPayload?.body || undefined;
+      const cachedContentType = cachedPayload?.headers?.['content-type'] || '';
+      let json: any = null;
+      if (body && (cachedContentType.includes('application/json') || body.trim().startsWith('{') || body.trim().startsWith('['))) {
+        try {
+          json = JSON.parse(body);
+        } catch {
+          json = null;
+        }
+      }
+
       await sourceRegistryService.upsertEntry({
         sourceId,
         providerId: providerId || meta?.providerId || '',
@@ -98,7 +110,7 @@ async function fetchWithCache(
         lastStatusCode: response.status,
         lastFetchedAt: new Date().toISOString(),
       });
-      return { ok: true, statusCode: 304 };
+      return { ok: true, statusCode: 304, body, json };
     }
 
     const contentType = response.headers.get('content-type') || '';
