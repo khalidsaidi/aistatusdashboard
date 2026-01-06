@@ -14,13 +14,13 @@ export default function Navbar() {
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-              <div className="h-11 w-11 rounded-2xl bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/20">
+              <div className="h-12 w-12 rounded-2xl bg-white/95 dark:bg-slate-50 text-slate-900 flex items-center justify-center border border-slate-200/70 dark:border-slate-700/60 shadow-lg shadow-slate-900/10 dark:shadow-black/30">
                 <Image
                   src="/logo.png"
                   alt="AI Status Dashboard Logo"
-                  width={28}
-                  height={28}
-                  className="rounded-lg"
+                  width={32}
+                  height={32}
+                  className="rounded-lg drop-shadow-sm"
                   priority
                 />
               </div>

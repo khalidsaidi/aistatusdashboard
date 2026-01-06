@@ -330,6 +330,7 @@ export default function GuidedTour({ activeTab, setTab }: GuidedTourProps) {
       stepsRef.current = steps;
 
       const instance = driver({
+        steps: steps.map((entry) => entry.step),
         animate: true,
         allowClose: true,
         overlayOpacity: 0.6,
