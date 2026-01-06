@@ -32,7 +32,7 @@ env:
   - variable: SMTP_FROM
     value: "AI Status Dashboard <hello@aistatusdashboard.com>"
   - variable: APP_ENABLE_DEBUG_ENDPOINTS
-    value: "false"
+    value: "true"
   - variable: APP_ALLOW_OPEN_CRON
     value: "false"
   - variable: APP_ALLOW_PUBLIC_WEBHOOKS
