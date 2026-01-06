@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --max-warnings=0",
     "type-check": "tsc --noEmit",
     "test": "jest",
     "test:unit": "jest --testPathPattern=__tests__/unit",
@@ -15,6 +15,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.901.0",
     "firebase": "^12.7.0",
     "firebase-admin": "^13.4.0",
     "firebase-functions": "^7.0.2",

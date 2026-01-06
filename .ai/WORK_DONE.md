@@ -75,3 +75,62 @@
 - Re-ran launch‑blockers against the custom domain (`https://aistatusdashboard.com`) with external SMTP + PTSV3 webhook.
 - Re-disabled debug endpoints after verification and redeployed App Hosting.
 - Cleaned 14 pending human‑test comments from production Firestore via `scripts/cleanup-pending-test-comments.js`.
+
+## Work completed (2026-01-05)
+
+- Hardened launch-blocker automation for WebKit:
+  - Added debug export payload capture in `app/components/ExportShare.tsx` (gated by `NEXT_PUBLIC_EXPORT_DEBUG`).
+  - Updated `scripts/launch-blockers-verify.js` to enable export debug during local runs.
+  - Added WebKit download fallback + RSC fallback error filtering in `scripts/human-verify.js`.
+  - Increased navigation retry resilience for dev-mode navigation interruptions.
+- Ran cross-browser launch-blockers suite (chromium + firefox + webkit; desktop + mobile) with external SMTP + local webhook:
+  - Run ID: `2026-01-05T11-15-35-734Z`
+  - Artifacts: `.ai/human/2026-01-05T11-15-35-734Z/`
+
+## Work completed (2026-01-05, later)
+
+- Fixed Firebase Admin env handling:
+  - `scripts/refresh-firebase-admin-env.js` now stores a compact, valid JSON string (no multi-line values).
+  - `scripts/verify-db.js` preserves raw `FIREBASE_SERVICE_ACCOUNT_KEY` without `\\n` replacement.
+- Added external webhook tunnel support to launch-blockers:
+  - `scripts/launch-blockers-verify.js` can start a Cloudflare tunnel and writes `webhooks/tunnel.json`.
+  - `scripts/human-verify.js` now treats tunnel-based webhooks as locally captured while still validating delivery.
+- Hardened human verification:
+  - RSS response fallback uses probe output when the click-response body is empty.
+  - Analytics tab now falls back to direct `/?tab=analytics` navigation if UI click is flaky.
+  - RSC cancellation noise is ignored for WebKit mobile/desktop.
+- Deployed Firestore composite indexes to `ai-status-dashboard` via `npx firebase-tools deploy --only firestore:indexes`.
+- Ran cross-browser launch-blockers suite with external SMTP + external webhook tunnel:
+  - Run ID: `2026-01-05T23-20-35-948Z`
+  - Artifacts: `.ai/human/2026-01-05T23-20-35-948Z/`
+
+## Work completed (2026-01-06)
+
+- Provisioned Azure OpenAI resource:
+  - Subscription: `aistatusdashboard` (`20950b2b-fe26-4748-8c7b-ffa122ce85b2`)
+  - Resource group: `aistatusdashboard-rg`
+  - Resource: `aistatusdashboard-openai`
+- Created `gpt-4o` deployment via management API (model version `2024-08-06`, Standard SKU, capacity 10).
+- Stored Azure OpenAI API key + endpoint + deployment in `.env.production.local`.
+- Updated `apphosting.yaml` with Azure OpenAI env vars and secret reference.
+- Synced secrets to GCP Secret Manager (`scripts/sync-provider-secrets.js`).
+- Verified Azure OpenAI data-plane call returns `200` with `api-version=2024-02-15-preview`.
+- Enabled all optional ingestion/security secrets:
+  - Created `TELEMETRY_INGEST_SECRET`, `SYNTHETIC_INGEST_SECRET`, `TELEMETRY_SALT`,
+    `AWS_INGEST_SECRET`, `GCP_INGEST_SECRET`, `BETTERSTACK_INGEST_SECRET`, `APP_DEBUG_SECRET`.
+  - Granted App Hosting backend access and wired them in `apphosting.yaml`.
+  - Set `NEXT_PUBLIC_CONTACT_EMAIL` to `hello@aistatusdashboard.com`.
+
+## Work completed (2026-01-06, later)
+
+- Added GCP product catalog mapping (`products.json`) to preserve stable IDs while showing readable component names.
+- Added AWS Bedrock probe support + IAM user `aistatusdashboard-bedrock-probe` with invoke permissions.
+- Wired AWS Bedrock env vars + secrets in `apphosting.yaml`.
+- Added staleness detector + evidence packets + incident fingerprints in insights service.
+- Exposed staleness API at `/api/insights/staleness` and surfaced it on the dashboard.
+- Updated Reliability Lab (Insights) to show official/observed/account lenses + confidence/evidence.
+- Created setup scripts:
+  - `scripts/setup-aws-eventbridge.js` for AWS Health → ingest endpoint.
+  - `scripts/setup-gcp-service-health.js` for GCP Service Health log export → ingest endpoint.
+- Added public telemetry SDK (`public/sdk/ai-status-sdk.js`) + public key support for opt-in crowd telemetry.
+- GCP ingest endpoint now decodes Pub/Sub push payloads (base64 log entries).

@@ -1,0 +1,125 @@
+{
+  "providers": [
+    {
+      "providerId": "openai",
+      "type": "openai",
+      "envKey": "OPENAI_API_KEY",
+      "model": "gpt-4o-mini",
+      "modelEnvKey": "OPENAI_PROBE_MODEL",
+      "baseUrl": "https://api.openai.com/v1",
+      "endpoint": "chat",
+      "region": "us-east",
+      "tier": "pro",
+      "streaming": false
+    },
+    {
+      "providerId": "anthropic",
+      "type": "anthropic",
+      "envKey": "ANTHROPIC_API_KEY",
+      "model": "claude-3-haiku-20240307",
+      "modelEnvKey": "ANTHROPIC_PROBE_MODEL",
+      "baseUrl": "https://api.anthropic.com/v1",
+      "endpoint": "messages",
+      "region": "us-east",
+      "tier": "pro",
+      "streaming": false
+    },
+    {
+      "providerId": "google-ai",
+      "type": "gemini",
+      "envKey": "GOOGLE_GEMINI_API_KEY",
+      "model": "gemini-1.5-flash",
+      "modelEnvKey": "GEMINI_PROBE_MODEL",
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta",
+      "endpoint": "chat",
+      "region": "us-central",
+      "tier": "pro",
+      "streaming": false
+    },
+    {
+      "providerId": "cohere",
+      "type": "cohere",
+      "envKey": "COHERE_API_KEY",
+      "model": "command-r",
+      "modelEnvKey": "COHERE_PROBE_MODEL",
+      "baseUrl": "https://api.cohere.ai/v1",
+      "endpoint": "chat",
+      "region": "us-east",
+      "tier": "pro",
+      "streaming": false
+    },
+    {
+      "providerId": "groq",
+      "type": "openai",
+      "envKey": "GROQ_API_KEY",
+      "model": "llama3-8b-8192",
+      "modelEnvKey": "GROQ_PROBE_MODEL",
+      "baseUrl": "https://api.groq.com/openai/v1",
+      "endpoint": "chat",
+      "region": "us-east",
+      "tier": "free",
+      "streaming": false
+    },
+    {
+      "providerId": "mistral",
+      "type": "openai",
+      "envKey": "MISTRAL_API_KEY",
+      "model": "mistral-small-latest",
+      "modelEnvKey": "MISTRAL_PROBE_MODEL",
+      "baseUrl": "https://api.mistral.ai/v1",
+      "endpoint": "chat",
+      "region": "eu-west",
+      "tier": "pro",
+      "streaming": false
+    },
+    {
+      "providerId": "deepseek",
+      "type": "openai",
+      "envKey": "DEEPSEEK_API_KEY",
+      "model": "deepseek-chat",
+      "modelEnvKey": "DEEPSEEK_PROBE_MODEL",
+      "baseUrl": "https://api.deepseek.com",
+      "endpoint": "chat",
+      "region": "global",
+      "tier": "pro",
+      "streaming": false
+    },
+    {
+      "providerId": "xai",
+      "type": "openai",
+      "envKey": "XAI_API_KEY",
+      "model": "grok-2-latest",
+      "modelEnvKey": "XAI_PROBE_MODEL",
+      "baseUrl": "https://api.x.ai/v1",
+      "endpoint": "chat",
+      "region": "global",
+      "tier": "pro",
+      "streaming": false
+    },
+    {
+      "providerId": "azure",
+      "type": "azure-openai",
+      "envKey": "AZURE_OPENAI_API_KEY",
+      "model": "gpt-4o",
+      "modelEnvKey": "AZURE_OPENAI_MODEL",
+      "baseUrlEnvKey": "AZURE_OPENAI_ENDPOINT",
+      "deploymentEnvKey": "AZURE_OPENAI_DEPLOYMENT",
+      "apiVersion": "2024-02-15-preview",
+      "endpoint": "chat",
+      "region": "eastus",
+      "tier": "enterprise",
+      "streaming": false
+    },
+    {
+      "providerId": "aws",
+      "type": "bedrock",
+      "model": "anthropic.claude-3-haiku-20240307-v1:0",
+      "modelEnvKey": "AWS_BEDROCK_MODEL_ID",
+      "regionEnvKey": "AWS_BEDROCK_REGION",
+      "endpoint": "invoke",
+      "region": "us-east-1",
+      "tier": "enterprise",
+      "streaming": false
+    }
+  ]
+}

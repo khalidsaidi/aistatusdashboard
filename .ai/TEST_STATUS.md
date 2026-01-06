@@ -1,6 +1,21 @@
 ## Test status (last run)
 
-Date (UTC): 2026-01-03
+Date (UTC): 2026-01-06
+
+### What was run
+
+- `npm run type-check` ✅
+- `npm run lint` ✅
+
+### Notes
+
+- Playwright/launch-blocker suites not rerun in this pass (no live upstream incidents available for AWS/GCP ingestion verification).
+
+---
+
+## Previous runs
+
+Date (UTC): 2026-01-05
 
 ### What was run
 
@@ -12,6 +27,8 @@ Date (UTC): 2026-01-03
 - `node scripts/launch-blockers-verify.js` ✅ (Run ID: `2025-12-31T22-27-10-030Z`, chromium, desktop-only, external SMTP + PTSV3 webhook)
 - `node scripts/human-verify.js` ✅ (Run ID: `2026-01-03T01-08-09Z-apphosting-launch`, chromium+firefox+webkit, desktop+mobile, App Hosting URL, external SMTP + PTSV3 webhook)
 - `node scripts/human-verify.js` ✅ (Run ID: `2026-01-03T02-51-23Z-apphosting-domain`, chromium+firefox+webkit, desktop+mobile, custom domain, external SMTP + PTSV3 webhook)
+- `node scripts/launch-blockers-verify.js` ✅ (Run ID: `2026-01-05T11-15-35-734Z`, chromium+firefox+webkit, desktop+mobile, local dev server, external SMTP + local webhook)
+- `node scripts/launch-blockers-verify.js` ✅ (Run ID: `2026-01-05T23-20-35-948Z`, chromium+firefox+webkit, desktop+mobile, local dev server, external SMTP + external webhook via cloudflared)
 
 ### Evidence
 
@@ -32,6 +49,17 @@ Date (UTC): 2026-01-03
 - Desktop walkthrough (custom domain): `.ai/human/2026-01-03T02-51-23Z-apphosting-domain/chromium-desktop-artifacts.json`
 - SMTP evidence (custom domain): `.ai/human/2026-01-03T02-51-23Z-apphosting-domain/smtp/index.json`
 - Webhook evidence (custom domain): `.ai/human/2026-01-03T02-51-23Z-apphosting-domain/webhooks/external.json`
+- Launch blockers (local dev): `.ai/human/2026-01-05T11-15-35-734Z/LAUNCH_BLOCKERS_SUMMARY.md`
+- Desktop walkthrough (local dev): `.ai/human/2026-01-05T11-15-35-734Z/chromium-desktop-artifacts.json`
+- Mobile walkthrough (local dev): `.ai/human/2026-01-05T11-15-35-734Z/chromium-mobile-artifacts.json`
+- SMTP evidence (local dev): `.ai/human/2026-01-05T11-15-35-734Z/smtp/index.json`
+- Webhook evidence (local dev): `.ai/human/2026-01-05T11-15-35-734Z/webhooks/last.json`
+- Launch blockers (local dev + external webhook tunnel): `.ai/human/2026-01-05T23-20-35-948Z/LAUNCH_BLOCKERS_SUMMARY.md`
+- Desktop walkthrough (local dev + tunnel): `.ai/human/2026-01-05T23-20-35-948Z/chromium-desktop-artifacts.json`
+- Mobile walkthrough (local dev + tunnel): `.ai/human/2026-01-05T23-20-35-948Z/chromium-mobile-artifacts.json`
+- SMTP evidence (local dev + tunnel): `.ai/human/2026-01-05T23-20-35-948Z/smtp/index.json`
+- Webhook evidence (local dev + tunnel): `.ai/human/2026-01-05T23-20-35-948Z/webhooks/external.json`
+- Webhook tunnel info (local dev + tunnel): `.ai/human/2026-01-05T23-20-35-948Z/webhooks/tunnel.json`
 
 ### Notes
 
@@ -42,3 +70,4 @@ Date (UTC): 2026-01-03
   - a local webhook receiver (`scripts/webhook-receiver.js`)
   - a Next dev server with `APP_ENABLE_EMAIL=true`, `ALLOW_LOCAL_WEBHOOKS=true`, and debug endpoints enabled for deterministic delivery triggering.
 - App Hosting launch-blocker run used external SMTP + PTSV3 webhook with `HUMAN_VERIFY_SKIP_DB=true` to avoid destructive DB cleanup in prod.
+- WebKit export verification uses debug payload capture (`NEXT_PUBLIC_EXPORT_DEBUG=true`) if downloads are not emitted in headless WebKit.

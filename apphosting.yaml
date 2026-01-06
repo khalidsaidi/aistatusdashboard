@@ -1,6 +1,8 @@
 env:
   - variable: NEXT_PUBLIC_SITE_URL
     value: "https://aistatusdashboard.com"
+  - variable: NEXT_PUBLIC_CONTACT_EMAIL
+    value: "hello@aistatusdashboard.com"
   - variable: NEXT_PUBLIC_GA_MEASUREMENT_ID
     value: "G-ZV3PS0MPQ7"
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
@@ -35,6 +37,12 @@ env:
     value: "false"
   - variable: APP_ALLOW_PUBLIC_WEBHOOKS
     value: "true"
+  - variable: PROBE_ENABLED
+    value: "true"
+  - variable: PROBE_REAL_ENABLED
+    value: "true"
+  - variable: GEMINI_PROBE_MODEL
+    value: "gemini-1.5-flash"
   - variable: CRON_SECRET
     secret: "CRON_SECRET"
   - variable: APP_CRON_SECRET
@@ -45,9 +53,59 @@ env:
     secret: "WEBHOOK_SECRET"
   - variable: APP_DEBUG_SECRET
     secret: "APP_DEBUG_SECRET"
+  - variable: CHANGE_RADAR_SECRET
+    secret: "CHANGE_RADAR_SECRET"
+  - variable: APP_CHANGE_RADAR_SECRET
+    secret: "CHANGE_RADAR_SECRET"
+  - variable: TELEMETRY_INGEST_SECRET
+    secret: "TELEMETRY_INGEST_SECRET"
+  - variable: SYNTHETIC_INGEST_SECRET
+    secret: "SYNTHETIC_INGEST_SECRET"
+  - variable: TELEMETRY_PUBLIC_KEY
+    secret: "TELEMETRY_PUBLIC_KEY"
+  - variable: TELEMETRY_SALT
+    secret: "TELEMETRY_SALT"
+  - variable: AWS_INGEST_SECRET
+    secret: "AWS_INGEST_SECRET"
+  - variable: GCP_INGEST_SECRET
+    secret: "GCP_INGEST_SECRET"
+  - variable: BETTERSTACK_INGEST_SECRET
+    secret: "BETTERSTACK_INGEST_SECRET"
   - variable: SMTP_USER
     secret: "SMTP_USER"
   - variable: SMTP_PASSWORD
     secret: "SMTP_PASSWORD"
   - variable: FIREBASE_SERVICE_ACCOUNT_KEY
     secret: "FIREBASE_SERVICE_ACCOUNT_KEY"
+  - variable: GOOGLE_GEMINI_API_KEY
+    secret: "GOOGLE_GEMINI_API_KEY"
+  - variable: OPENAI_API_KEY
+    secret: "OPENAI_API_KEY"
+  - variable: ANTHROPIC_API_KEY
+    secret: "ANTHROPIC_API_KEY"
+  - variable: COHERE_API_KEY
+    secret: "COHERE_API_KEY"
+  - variable: GROQ_API_KEY
+    secret: "GROQ_API_KEY"
+  - variable: DEEPSEEK_API_KEY
+    secret: "DEEPSEEK_API_KEY"
+  - variable: XAI_API_KEY
+    secret: "XAI_API_KEY"
+  - variable: AZURE_OPENAI_ENDPOINT
+    value: "https://aistatusdashboard-openai.openai.azure.com"
+  - variable: AZURE_OPENAI_DEPLOYMENT
+    value: "gpt-4o"
+  - variable: AZURE_OPENAI_MODEL
+    value: "gpt-4o"
+  - variable: AZURE_OPENAI_API_KEY
+    secret: "AZURE_OPENAI_API_KEY"
+  - variable: AWS_ACCESS_KEY_ID
+    secret: "AWS_ACCESS_KEY_ID"
+  - variable: AWS_SECRET_ACCESS_KEY
+    secret: "AWS_SECRET_ACCESS_KEY"
+  - variable: AWS_REGION
+    value: "us-east-1"
+  - variable: AWS_BEDROCK_REGION
+    value: "us-east-1"
+  - variable: AWS_BEDROCK_MODEL_ID
+    value: "anthropic.claude-3-haiku-20240307-v1:0"

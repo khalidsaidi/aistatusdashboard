@@ -1,23 +1,35 @@
 # Gaps & Issues (current)
 
-## P1 – Security / abuse hardening (config required)
+## P0 – Launch blockers (active)
 
-1) Cron endpoints require explicit config in production
-- `/api/cron/status` and `/api/cron/notifications` now require `CRON_SECRET` / `APP_CRON_SECRET` in production (or `APP_ALLOW_OPEN_CRON=true`).
-  - App Hosting now provides these secrets via Secret Manager.
+- None currently.
 
-2) Webhook registration requires explicit config in production
-- `/api/webhooks` now requires `WEBHOOK_SECRET` / `APP_WEBHOOK_SECRET` in production (or `APP_ALLOW_PUBLIC_WEBHOOKS=true`).
-  - App Hosting now provides these secrets via Secret Manager and public access is enabled to support the UI.
+## P1 – Functional gaps
 
-3) “Real” external integrations exercised
-- External SMTP (AWS SES) and external webhook (PTSV3) were validated in the latest launch-blocker run.
+1) External event ingestion verification
+- AWS EventBridge + GCP Service Health pipelines created; still need a live event to confirm delivery.
+
+## P2 – UX polish
+
+1) “Ask Status” + predictive panels are heuristics
+- Needs more telemetry volume to feel authoritative.
+
+2) Model/region details depend on catalog completeness
+- Validate models.json and endpoints/regions per provider.
 
 ## Recently resolved (for history)
 
-- Status monitoring now uses real JSON/RSS sources where available (instead of “any 200 == operational”).
-- Email notification pipeline now supports double opt-in (`active: true`) and renders `{template,data}` at send time.
-- Webhooks now filter by `providers`/`types` before delivery.
-- Playwright is configured for deterministic E2E (`workers: 1`, `open: 'never'`, `http://localhost:3001`).
-- App Hosting custom domain `aistatusdashboard.com` is live (served via App Hosting; DNS verified).
-- Debug trigger was temporarily enabled for the custom-domain launch-blocker run and then disabled again.
+- Early warning panel, rate limit incidents, model detail view, and change radar admin UI added.
+- Provider detail panel wired to intel APIs for incidents + maintenance.
+- Gemini API key created + stored in Secret Manager; App Hosting env updated.
+- Mistral API key created + stored; Azure OpenAI resource, key, endpoint, and gpt-4o deployment created and wired.
+- Cross-browser launch-blocker suite rerun (chromium + firefox + webkit) with artifacts captured, including external webhook via cloudflared tunnel.
+- Firestore indexes deployed to production.
+- Provider API keys created + synced for OpenAI/Anthropic/Cohere/Groq/DeepSeek/xAI.
+- Hydration mismatch mitigated by routing timestamp renders through `ClientTimestamp` + suppressHydrationWarning.
+- Better Stack JSON parsing + Mistral Statuspage JSON support added to ingestion registry.
+- Status staleness detector added (official vs observed drift).
+- Incident fingerprint + evidence payloads surfaced in early warnings + model matrix.
+- GCP product catalog mapping integrated for stable IDs.
+- AWS Bedrock probe added + IAM user provisioning script created.
+- AWS EventBridge + GCP Service Health push scripts added.
