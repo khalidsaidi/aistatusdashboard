@@ -32,6 +32,9 @@ export default function ClientTimestamp({
   const targetDate = date || currentTime;
 
   const formatDate = () => {
+    if (Number.isNaN(targetDate.getTime())) {
+      return 'Unknown';
+    }
     const useUtc = timeZone === 'utc';
     const locale = useUtc ? 'en-US' : undefined;
     const options = useUtc ? { timeZone: 'UTC' } : undefined;

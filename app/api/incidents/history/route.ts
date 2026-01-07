@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { persistenceService } from '@/lib/services/persistence';
 import { intelligenceService } from '@/lib/services/intelligence';
+import { normalizeIncidentDates, toIsoString } from '@/lib/utils/normalize-dates';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,18 +15,21 @@ export async function GET(request: NextRequest) {
       limit,
     });
 
-    const normalizedIntel = intelIncidents.map((incident) => ({
+    const normalizedIntel = intelIncidents.map((incident) => {
+      const normalized = normalizeIncidentDates(incident);
+      return ({
       id: incident.id,
       provider: incident.providerId,
       title: incident.title,
       status: incident.status,
       severity: incident.severity || 'warning',
-      startTime: incident.startedAt,
-      endTime: incident.resolvedAt || undefined,
+      startTime: normalized.startedAt,
+      endTime: normalized.resolvedAt || undefined,
       impactedComponents: incident.impactedComponents || [],
       impactedRegions: incident.impactedRegions || [],
-      updates: incident.updates,
-    }));
+      updates: normalized.updates,
+    });
+    });
 
     const normalizedObserved = observedIncidents.map((record) => ({
       id: `observed-${record.id}-${Math.random().toString(36).slice(2, 6)}`,
@@ -33,7 +37,7 @@ export async function GET(request: NextRequest) {
       title: `${record.name} is ${record.status}`,
       status: record.status,
       severity: record.status === 'down' || record.status === 'major_outage' ? 'critical' : 'warning',
-      startTime: record.lastChecked,
+      startTime: toIsoString(record.lastChecked) || record.lastChecked,
       endTime: undefined,
       impactedComponents: [],
       impactedRegions: [],
