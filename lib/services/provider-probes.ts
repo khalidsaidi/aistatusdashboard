@@ -28,6 +28,25 @@ type ProbeRunSummary = {
 
 const DEFAULT_TIMEOUT_MS = 12000;
 const SEMANTIC_PROMPT = 'Respond with the single word READY.';
+const PROBE_NETWORK_CODES = [
+  'fetch failed',
+  'network',
+  'enotfound',
+  'econn',
+  'eai_again',
+  'dns',
+  'tls',
+  'socket',
+  'certificate',
+];
+
+function classifyProbeError(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error || 'unknown');
+  const lower = message.toLowerCase();
+  if (lower.includes('abort') || lower.includes('timeout')) return 'probe_timeout';
+  if (PROBE_NETWORK_CODES.some((code) => lower.includes(code))) return 'probe_network';
+  return 'probe_error';
+}
 
 function resolveModel(configEntry: ProbeProviderConfig): string {
   if (configEntry.modelEnvKey && process.env[configEntry.modelEnvKey]) {
@@ -501,8 +520,7 @@ export async function runRealProviderProbes(): Promise<ProbeRunSummary> {
       const message = error instanceof Error ? error.message : 'Unknown error';
       failures.push({ providerId: entry.providerId, error: message });
       const event = buildEvent(entry, config.monitoring.defaultTimeout || DEFAULT_TIMEOUT_MS);
-      event.errorCode = message;
-      event.http5xxRate = 1;
+      event.errorCode = classifyProbeError(error);
       events.push(event);
     }
   }
