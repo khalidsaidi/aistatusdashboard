@@ -34,6 +34,7 @@ const PROVIDERS = [
     createLabels: [/create.*key/i, /new.*key/i, /generate.*key/i],
     keyPattern: /sk-ant-[A-Za-z0-9_-]{20,}/i,
     timeoutMs: 120000,
+    captureTimeoutMs: 30000,
   },
   {
     id: 'cohere',
@@ -47,6 +48,7 @@ const PROVIDERS = [
     url: 'https://console.groq.com/keys',
     createLabels: [/create.*key/i, /new.*key/i, /generate.*key/i, /add.*key/i],
     keyPattern: /gsk_[A-Za-z0-9_-]{20,}/i,
+    captureTimeoutMs: 30000,
   },
   {
     id: 'mistral',
@@ -160,6 +162,87 @@ function findKeyInObject(value, pattern) {
     }
   }
   return null;
+}
+
+function isValidKeyCandidate(value, pattern) {
+  if (!value || typeof value !== 'string') return false;
+  const trimmed = value.trim();
+  if (!trimmed || /\s/.test(trimmed)) return false;
+  if (pattern) return pattern.test(trimmed);
+  return trimmed.length >= 24 && /[A-Za-z0-9]/.test(trimmed);
+}
+
+function normalizeKeyCandidate(value, pattern) {
+  if (!isValidKeyCandidate(value, pattern)) return null;
+  return value.trim();
+}
+
+function redactTokens(value) {
+  if (!value) return '';
+  return value
+    .replace(/sk-[A-Za-z0-9_-]{16,}/gi, '<redacted>')
+    .replace(/gsk_[A-Za-z0-9_-]{16,}/gi, '<redacted>')
+    .replace(/[A-Za-z0-9_-]{24,}/g, '<redacted>');
+}
+
+async function snapshotKeyContext(page, providerId) {
+  const data = await page.evaluate(() => {
+    const dialog =
+      document.querySelector('[role="dialog"]') ||
+      document.querySelector('[role="alertdialog"]') ||
+      document.querySelector('.modal') ||
+      document.querySelector('.MuiDialog-root') ||
+      document.querySelector('.chakra-modal__content') ||
+      document.querySelector('.ant-modal');
+
+    const dialogText = dialog ? dialog.innerText || '' : '';
+    const buttons = Array.from(document.querySelectorAll('button'))
+      .slice(0, 40)
+      .map((el) => (el.textContent || '').trim())
+      .filter(Boolean);
+    const inputs = Array.from(document.querySelectorAll('input,textarea'))
+      .slice(0, 20)
+      .map((el) => ({
+        placeholder: el.getAttribute('placeholder') || '',
+        name: el.getAttribute('name') || '',
+        type: el.getAttribute('type') || '',
+        aria: el.getAttribute('aria-label') || '',
+        value: el.value || '',
+      }));
+    const labels = Array.from(document.querySelectorAll('[aria-label],[title]'))
+      .slice(0, 40)
+      .map((el) => el.getAttribute('aria-label') || el.getAttribute('title') || '')
+      .filter(Boolean);
+
+    return {
+      url: window.location.href,
+      title: document.title,
+      dialogText,
+      buttons,
+      inputs,
+      labels,
+    };
+  });
+
+  const redacted = {
+    url: data.url,
+    title: redactTokens(data.title),
+    dialogText: redactTokens(data.dialogText).slice(0, 2000),
+    buttons: data.buttons.map((text) => redactTokens(text)).slice(0, 40),
+    inputs: data.inputs.map((input) => ({
+      ...input,
+      placeholder: redactTokens(input.placeholder),
+      name: redactTokens(input.name),
+      type: input.type,
+      aria: redactTokens(input.aria),
+      value: redactTokens(input.value),
+    })),
+    labels: data.labels.map((text) => redactTokens(text)).slice(0, 40),
+  };
+
+  const outPath = path.resolve(__dirname, '..', '.ai', 'creds', `${providerId}-key-context.json`);
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  fs.writeFileSync(outPath, JSON.stringify(redacted, null, 2));
 }
 
 async function launchChromeWithDebugging() {
@@ -387,7 +470,7 @@ async function captureKey(page, provider) {
   const pattern = provider.keyPattern;
   if (pattern && candidates.length) {
     const match = candidates.find((value) => pattern.test(value));
-    if (match) return match;
+    if (match) return match.trim();
   }
 
   if (pattern) {
@@ -396,7 +479,8 @@ async function captureKey(page, provider) {
       const match = document.body?.innerText?.match(regex);
       return match ? match[0] : null;
     }, pattern.source);
-    if (fromText) return fromText;
+    if (fromText) return fromText.trim();
+    return null;
   }
 
   if (!candidates.length) return null;
@@ -404,15 +488,83 @@ async function captureKey(page, provider) {
   return candidates[0];
 }
 
-async function createKeyForProvider(context, env, provider) {
+async function tryCopyFromPage(page, provider) {
+  const copySelectors = [
+    page.getByRole('button', { name: /copy/i }).first(),
+    page.locator('button[aria-label*="copy" i]').first(),
+    page.locator('button[title*="copy" i]').first(),
+    page.locator('[data-testid*="copy" i]').first(),
+    page.locator('button:has-text("Copy")').first(),
+    page.locator('[aria-label*="copy" i], [title*="copy" i]').first(),
+  ];
+  for (const copyButton of copySelectors) {
+    if (await copyButton.isVisible().catch(() => false)) {
+      await copyButton.click().catch(() => {});
+      const clipboardValue = await page.evaluate(() => navigator.clipboard.readText()).catch(() => null);
+      const normalized = normalizeKeyCandidate(clipboardValue, provider.keyPattern);
+      if (normalized) return normalized;
+    }
+  }
+  return null;
+}
+
+async function tryRevealKey(page, provider) {
+  const revealSelectors = [
+    page.getByRole('button', { name: /reveal|show|view/i }).first(),
+    page.locator('button[aria-label*="reveal" i], button[aria-label*="show" i], button[aria-label*="view" i]').first(),
+    page.locator('button[title*="reveal" i], button[title*="show" i], button[title*="view" i]').first(),
+    page.locator('[aria-label*="reveal" i], [aria-label*="show" i], [aria-label*="view" i]').first(),
+  ];
+  for (const revealButton of revealSelectors) {
+    if (await revealButton.isVisible().catch(() => false)) {
+      await revealButton.click().catch(() => {});
+      await page.waitForTimeout(1000);
+      const key = await captureKey(page, provider);
+      if (key) return key;
+    }
+  }
+  return null;
+}
+
+async function waitForKey(page, provider, getResponseKey, timeoutMs = 20000) {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    const responseKey = normalizeKeyCandidate(getResponseKey(), provider.keyPattern);
+    if (responseKey) return responseKey;
+
+    const key = await captureKey(page, provider);
+    if (key) return key;
+
+    const copied = await tryCopyFromPage(page, provider);
+    if (copied) return copied;
+
+    const clipboardValue = normalizeKeyCandidate(
+      await page.evaluate(() => navigator.clipboard.readText()).catch(() => null),
+      provider.keyPattern
+    );
+    if (clipboardValue) return clipboardValue;
+
+    const revealed = await tryRevealKey(page, provider);
+    if (revealed) return revealed;
+
+    await page.waitForTimeout(1000);
+  }
+  return null;
+}
+
+async function createKeyForProvider(context, env, provider, options = {}) {
+  const forceRegen = Boolean(options.forceRegen);
   if (provider.skipReason) {
     logLine(`${provider.id}: skipped (${provider.skipReason})`);
     return { id: provider.id, status: 'skipped', reason: provider.skipReason };
   }
 
-  if (env[provider.envKey]) {
+  if (env[provider.envKey] && !forceRegen) {
     logLine(`${provider.id}: existing key detected, skipping creation`);
     return { id: provider.id, status: 'existing' };
+  }
+  if (env[provider.envKey] && forceRegen) {
+    logLine(`${provider.id}: force regen enabled, replacing existing key`);
   }
 
   const page = await context.newPage();
@@ -607,7 +759,7 @@ async function createKeyForProvider(context, env, provider) {
       }
     }
 
-    await page.waitForTimeout(5000);
+    await page.waitForTimeout(1500);
 
     const fallbackConfirm = page.getByRole('button', { name: /create.*key|generate.*key|confirm|add/i }).first();
     if (await fallbackConfirm.isVisible().catch(() => false)) {
@@ -617,47 +769,8 @@ async function createKeyForProvider(context, env, provider) {
         await page.waitForTimeout(1500);
       }
     }
-
-    let key = responseKey || (await captureKey(page, provider));
-    if (!key) {
-      const copySelectors = [
-        page.getByRole('button', { name: /copy/i }).first(),
-        page.locator('button[aria-label*="copy" i]').first(),
-        page.locator('button[title*="copy" i]').first(),
-        page.locator('[data-testid*="copy" i]').first(),
-        page.locator('button:has-text("Copy")').first(),
-        page.locator('[aria-label*="copy" i], [title*="copy" i]').first(),
-      ];
-      for (const copyButton of copySelectors) {
-        if (await copyButton.isVisible().catch(() => false)) {
-          await copyButton.click().catch(() => {});
-          key = await page.evaluate(() => navigator.clipboard.readText()).catch(() => null);
-          if (key) break;
-        }
-      }
-    }
-    if (!key) {
-      key = await page.evaluate(() => navigator.clipboard.readText()).catch(() => null);
-    }
-    if (!key) {
-      const revealSelectors = [
-        page.getByRole('button', { name: /reveal|show|view/i }).first(),
-        page.locator('button[aria-label*="reveal" i], button[aria-label*="show" i], button[aria-label*="view" i]').first(),
-        page.locator('button[title*="reveal" i], button[title*="show" i], button[title*="view" i]').first(),
-        page.locator('[aria-label*="reveal" i], [aria-label*="show" i], [aria-label*="view" i]').first(),
-      ];
-      for (const revealButton of revealSelectors) {
-        if (await revealButton.isVisible().catch(() => false)) {
-          await revealButton.click().catch(() => {});
-          await page.waitForTimeout(1500);
-          key = await captureKey(page, provider);
-          if (key) break;
-        }
-      }
-    }
-    if (!key && responseKey) {
-      key = responseKey;
-    }
+    const captureTimeoutMs = provider.captureTimeoutMs || 20000;
+    const key = await waitForKey(page, provider, () => responseKey, captureTimeoutMs);
     page.off('request', requestListener);
     page.off('response', responseListener);
     if (!key) {
@@ -670,6 +783,8 @@ async function createKeyForProvider(context, env, provider) {
         logLine(`${provider.id}: request sample -> ${uniqueAll.join(' | ')}`);
       }
       await logKeyControls(page, provider.id);
+      await logAccessHints(page, provider.id);
+      await snapshotKeyContext(page, provider.id);
       return { id: provider.id, status: 'no_key' };
     }
 
@@ -690,6 +805,20 @@ async function main() {
     throw new Error(`User data dir not found: ${USER_DATA_DIR}`);
   }
 
+  const args = process.argv.slice(2);
+  const forceRegen = args.includes('--force') || args.includes('--force-regen');
+  const onlyArg = args.find((arg) => arg.startsWith('--only=') || arg.startsWith('--provider='));
+  const onlyList = onlyArg
+    ? onlyArg
+        .split('=')[1]
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean)
+    : null;
+  const providerList = onlyList
+    ? PROVIDERS.filter((provider) => onlyList.includes(provider.id))
+    : PROVIDERS;
+
   const originalContents = fs.existsSync(ENV_PATH) ? fs.readFileSync(ENV_PATH, 'utf8') : '';
   const existingEnv = originalContents ? parseEnv(originalContents) : {};
 
@@ -700,10 +829,10 @@ async function main() {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
 
   const results = [];
-  for (const provider of PROVIDERS) {
+  for (const provider of providerList) {
     const timeoutMs = provider.timeoutMs || 45000;
     const result = await Promise.race([
-      createKeyForProvider(context, existingEnv, provider),
+      createKeyForProvider(context, existingEnv, provider, { forceRegen }),
       new Promise((resolve) =>
         setTimeout(() => resolve({ id: provider.id, status: 'timeout' }), timeoutMs)
       ),

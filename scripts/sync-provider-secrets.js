@@ -18,6 +18,21 @@ const SECRET_KEYS = [
   'TELEMETRY_PUBLIC_KEY',
 ];
 
+const KEY_PATTERNS = {
+  OPENAI_API_KEY: /^sk-/,
+  ANTHROPIC_API_KEY: /^sk-ant-/i,
+  GROQ_API_KEY: /^gsk_/i,
+};
+
+function isValidSecretValue(key, value) {
+  if (!value) return false;
+  if (/\s/.test(value)) return false;
+  if (/[^\x20-\x7E]/.test(value)) return false;
+  const pattern = KEY_PATTERNS[key];
+  if (pattern && !pattern.test(value)) return false;
+  return true;
+}
+
 function parseEnv(contents) {
   const result = {};
   contents.split(/\r?\n/).forEach((line) => {
@@ -54,6 +69,7 @@ function main() {
   }
   const env = parseEnv(fs.readFileSync(ENV_PATH, 'utf8'));
   const missing = [];
+  const invalid = [];
   const updated = [];
 
   SECRET_KEYS.forEach((key) => {
@@ -62,12 +78,16 @@ function main() {
       missing.push(key);
       return;
     }
+    if (!isValidSecretValue(key, value)) {
+      invalid.push(key);
+      return;
+    }
     ensureSecret(key);
     addSecretVersion(key, value);
     updated.push(key);
   });
 
-  const report = { updated, missing };
+  const report = { updated, missing, invalid };
   fs.writeFileSync(
     path.resolve(__dirname, '..', '.ai', 'creds', 'secret-sync.json'),
     JSON.stringify(report, null, 2)

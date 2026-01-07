@@ -48,6 +48,14 @@ function classifyProbeError(error: unknown): string {
   return 'probe_error';
 }
 
+function isValidApiKey(value: string | undefined): value is string {
+  if (!value) return false;
+  const trimmed = value.trim();
+  if (!trimmed || /\s/.test(trimmed)) return false;
+  if (/[^\\x20-\\x7E]/.test(trimmed)) return false;
+  return true;
+}
+
 function resolveModel(configEntry: ProbeProviderConfig): string {
   if (configEntry.modelEnvKey && process.env[configEntry.modelEnvKey]) {
     return process.env[configEntry.modelEnvKey] as string;
@@ -462,36 +470,56 @@ export async function runRealProviderProbes(): Promise<ProbeRunSummary> {
       let result;
       switch (entry.type) {
         case 'openai':
-          if (!entry.envKey || !process.env[entry.envKey]) {
+          if (!entry.envKey || !apiKey) {
             skipped.push({ providerId: entry.providerId, reason: `Missing ${entry.envKey}` });
+            continue;
+          }
+          if (!isValidApiKey(apiKey)) {
+            skipped.push({ providerId: entry.providerId, reason: `Invalid ${entry.envKey}` });
             continue;
           }
           result = await probeOpenAICompatible(entry, apiKey as string);
           break;
         case 'anthropic':
-          if (!entry.envKey || !process.env[entry.envKey]) {
+          if (!entry.envKey || !apiKey) {
             skipped.push({ providerId: entry.providerId, reason: `Missing ${entry.envKey}` });
+            continue;
+          }
+          if (!isValidApiKey(apiKey)) {
+            skipped.push({ providerId: entry.providerId, reason: `Invalid ${entry.envKey}` });
             continue;
           }
           result = await probeAnthropic(entry, apiKey as string);
           break;
         case 'gemini':
-          if (!entry.envKey || !process.env[entry.envKey]) {
+          if (!entry.envKey || !apiKey) {
             skipped.push({ providerId: entry.providerId, reason: `Missing ${entry.envKey}` });
+            continue;
+          }
+          if (!isValidApiKey(apiKey)) {
+            skipped.push({ providerId: entry.providerId, reason: `Invalid ${entry.envKey}` });
             continue;
           }
           result = await probeGemini(entry, apiKey as string);
           break;
         case 'cohere':
-          if (!entry.envKey || !process.env[entry.envKey]) {
+          if (!entry.envKey || !apiKey) {
             skipped.push({ providerId: entry.providerId, reason: `Missing ${entry.envKey}` });
+            continue;
+          }
+          if (!isValidApiKey(apiKey)) {
+            skipped.push({ providerId: entry.providerId, reason: `Invalid ${entry.envKey}` });
             continue;
           }
           result = await probeCohere(entry, apiKey as string);
           break;
         case 'azure-openai':
-          if (!entry.envKey || !process.env[entry.envKey]) {
+          if (!entry.envKey || !apiKey) {
             skipped.push({ providerId: entry.providerId, reason: `Missing ${entry.envKey}` });
+            continue;
+          }
+          if (!isValidApiKey(apiKey)) {
+            skipped.push({ providerId: entry.providerId, reason: `Invalid ${entry.envKey}` });
             continue;
           }
           result = await probeAzureOpenAI(entry, apiKey as string);
