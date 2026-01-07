@@ -53,7 +53,7 @@ function normalizeApiKey(value: string | undefined): string | null {
   if (!value) return null;
   const stripped = value.replace(/\s+/g, '');
   if (!stripped) return null;
-  if (/[^\\x20-\\x7E]/.test(stripped)) return null;
+  if (/[^\x20-\x7E]/.test(stripped)) return null;
   return stripped;
 }
 
@@ -72,7 +72,7 @@ function describeKey(value: string | undefined) {
   return {
     length: value.length,
     hasWhitespace: /\s/.test(value),
-    hasNonAscii: /[^\\x20-\\x7E]/.test(value),
+    hasNonAscii: /[^\x20-\x7E]/.test(value),
     nonAsciiCodes,
   };
 }
