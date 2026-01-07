@@ -51,10 +51,11 @@ function classifyProbeError(error: unknown): string {
 
 function normalizeApiKey(value: string | undefined): string | null {
   if (!value) return null;
-  const stripped = value.replace(/\s+/g, '');
-  if (!stripped) return null;
-  if (/[^\x20-\x7E]/.test(stripped)) return null;
-  return stripped;
+  const normalized = value
+    .replace(/[\u2010-\u2015]/g, '-')
+    .replace(/[^\x20-\x7E]/g, '')
+    .replace(/\s+/g, '');
+  return normalized || null;
 }
 
 function describeKey(value: string | undefined) {
