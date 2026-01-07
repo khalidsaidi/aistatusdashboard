@@ -44,7 +44,7 @@ env:
   - variable: PROBE_REAL_ENABLED
     value: "true"
   - variable: GEMINI_PROBE_MODEL
-    value: "gemini-1.5-flash"
+    value: "gemini-2.0-flash"
   - variable: CRON_SECRET
     secret: "CRON_SECRET"
   - variable: APP_CRON_SECRET
@@ -110,4 +110,4 @@ env:
   - variable: AWS_BEDROCK_REGION
     value: "us-east-1"
   - variable: AWS_BEDROCK_MODEL_ID
-    value: "anthropic.claude-3-haiku-20240307-v1:0"
+    value: "amazon.titan-tg1-large"

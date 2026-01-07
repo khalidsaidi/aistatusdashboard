@@ -35,6 +35,7 @@ yarn-error.log*
 .ai/devserver.pid
 .ai/tmp-browser-profile/
 .ai/status-accuracy/
+.ai/probe-diagnostics/
 
 # test artifacts
 /test-results/
