@@ -1,6 +1,7 @@
 import probeProviders from '@/lib/data/probe_providers.json';
 import type { SyntheticProbeEvent } from '@/lib/types/insights';
 import { config } from '@/lib/config';
+import { log } from '@/lib/utils/logger';
 import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
 
 type ProbeProviderConfig = {
@@ -54,6 +55,17 @@ function normalizeApiKey(value: string | undefined): string | null {
   if (!stripped) return null;
   if (/[^\\x20-\\x7E]/.test(stripped)) return null;
   return stripped;
+}
+
+function describeKey(value: string | undefined) {
+  if (!value) {
+    return { length: 0, hasWhitespace: false, hasNonAscii: false };
+  }
+  return {
+    length: value.length,
+    hasWhitespace: /\s/.test(value),
+    hasNonAscii: /[^\\x20-\\x7E]/.test(value),
+  };
 }
 
 function resolveModel(configEntry: ProbeProviderConfig): string {
@@ -476,6 +488,7 @@ export async function runRealProviderProbes(): Promise<ProbeRunSummary> {
             continue;
           }
           if (!apiKey) {
+            log('warn', 'Invalid probe key', { providerId: entry.providerId, envKey: entry.envKey, ...describeKey(rawKey) });
             skipped.push({ providerId: entry.providerId, reason: `Invalid ${entry.envKey}` });
             continue;
           }
@@ -487,6 +500,7 @@ export async function runRealProviderProbes(): Promise<ProbeRunSummary> {
             continue;
           }
           if (!apiKey) {
+            log('warn', 'Invalid probe key', { providerId: entry.providerId, envKey: entry.envKey, ...describeKey(rawKey) });
             skipped.push({ providerId: entry.providerId, reason: `Invalid ${entry.envKey}` });
             continue;
           }
@@ -498,6 +512,7 @@ export async function runRealProviderProbes(): Promise<ProbeRunSummary> {
             continue;
           }
           if (!apiKey) {
+            log('warn', 'Invalid probe key', { providerId: entry.providerId, envKey: entry.envKey, ...describeKey(rawKey) });
             skipped.push({ providerId: entry.providerId, reason: `Invalid ${entry.envKey}` });
             continue;
           }
@@ -509,6 +524,7 @@ export async function runRealProviderProbes(): Promise<ProbeRunSummary> {
             continue;
           }
           if (!apiKey) {
+            log('warn', 'Invalid probe key', { providerId: entry.providerId, envKey: entry.envKey, ...describeKey(rawKey) });
             skipped.push({ providerId: entry.providerId, reason: `Invalid ${entry.envKey}` });
             continue;
           }
@@ -520,6 +536,7 @@ export async function runRealProviderProbes(): Promise<ProbeRunSummary> {
             continue;
           }
           if (!apiKey) {
+            log('warn', 'Invalid probe key', { providerId: entry.providerId, envKey: entry.envKey, ...describeKey(rawKey) });
             skipped.push({ providerId: entry.providerId, reason: `Invalid ${entry.envKey}` });
             continue;
           }
