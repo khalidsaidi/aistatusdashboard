@@ -59,12 +59,21 @@ function normalizeApiKey(value: string | undefined): string | null {
 
 function describeKey(value: string | undefined) {
   if (!value) {
-    return { length: 0, hasWhitespace: false, hasNonAscii: false };
+    return { length: 0, hasWhitespace: false, hasNonAscii: false, nonAsciiCodes: [] as string[] };
   }
+  const nonAsciiCodes = Array.from(
+    new Set(
+      Array.from(value)
+        .map((char) => char.charCodeAt(0))
+        .filter((code) => code < 0x20 || code > 0x7e)
+        .map((code) => `0x${code.toString(16)}`)
+    )
+  ).slice(0, 6);
   return {
     length: value.length,
     hasWhitespace: /\s/.test(value),
     hasNonAscii: /[^\\x20-\\x7E]/.test(value),
+    nonAsciiCodes,
   };
 }
 
