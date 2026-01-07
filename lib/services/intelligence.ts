@@ -23,6 +23,58 @@ export type ProviderStatusSummary = {
 };
 
 class IntelligenceService {
+  private toIsoString(value?: string | { toDate?: () => Date; seconds?: number; _seconds?: number } | Date | null) {
+    if (!value) return undefined;
+    if (typeof value === 'string') return value;
+    if (value instanceof Date) return value.toISOString();
+    if (typeof value.toDate === 'function') return value.toDate().toISOString();
+    if (typeof value.seconds === 'number') return new Date(value.seconds * 1000).toISOString();
+    if (typeof value._seconds === 'number') return new Date(value._seconds * 1000).toISOString();
+    const parsed = new Date(value as any);
+    if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+    return undefined;
+  }
+
+  private normalizeIncidentDates(incident: NormalizedIncident): NormalizedIncident {
+    const startedAt = this.toIsoString(incident.startedAt) || new Date().toISOString();
+    const updatedAt = this.toIsoString(incident.updatedAt) || startedAt;
+    const resolvedAt = this.toIsoString(incident.resolvedAt);
+    const updates = Array.isArray(incident.updates)
+      ? incident.updates.map((update) => ({
+          ...update,
+          createdAt: this.toIsoString(update.createdAt) || updatedAt,
+        }))
+      : [];
+
+    return {
+      ...incident,
+      startedAt,
+      updatedAt,
+      resolvedAt,
+      updates,
+    };
+  }
+
+  private normalizeMaintenanceDates(maintenance: NormalizedMaintenance): NormalizedMaintenance {
+    const scheduledFor = this.toIsoString(maintenance.scheduledFor) || new Date().toISOString();
+    const updatedAt = this.toIsoString(maintenance.updatedAt) || scheduledFor;
+    const completedAt = this.toIsoString(maintenance.completedAt);
+    const updates = Array.isArray(maintenance.updates)
+      ? maintenance.updates.map((update) => ({
+          ...update,
+          createdAt: this.toIsoString(update.createdAt) || updatedAt,
+        }))
+      : [];
+
+    return {
+      ...maintenance,
+      scheduledFor,
+      updatedAt,
+      completedAt,
+      updates,
+    };
+  }
+
   async getProviderSummaries(): Promise<ProviderStatusSummary[]> {
     const db = getDb();
     try {
@@ -101,8 +153,10 @@ class IntelligenceService {
     }
 
     const components = componentsSnap ? componentsSnap.docs.map((doc) => doc.data() as NormalizedComponent) : [];
-    let incidents = incidentsSnap.docs.map((doc) => doc.data() as NormalizedIncident);
-    const maintenances = maintSnap.docs.map((doc) => doc.data() as NormalizedMaintenance);
+    let incidents = incidentsSnap.docs.map((doc) => this.normalizeIncidentDates(doc.data() as NormalizedIncident));
+    const maintenances = maintSnap.docs.map((doc) =>
+      this.normalizeMaintenanceDates(doc.data() as NormalizedMaintenance)
+    );
 
     if (providerId === 'google-ai') {
       incidents = filterGoogleCloudIncidentsForAi(incidents, GOOGLE_AI_KEYWORDS);
@@ -128,7 +182,7 @@ class IntelligenceService {
     }
     try {
       const snapshot = await query.get();
-      let incidents = snapshot.docs.map((doc) => doc.data() as NormalizedIncident);
+      let incidents = snapshot.docs.map((doc) => this.normalizeIncidentDates(doc.data() as NormalizedIncident));
       if (options.providerId === 'google-ai') {
         incidents = filterGoogleCloudIncidentsForAi(incidents, GOOGLE_AI_KEYWORDS);
       }
@@ -145,7 +199,7 @@ class IntelligenceService {
         fallback = fallback.limit(50);
       }
       const snapshot = await fallback.get();
-      let incidents = snapshot.docs.map((doc) => doc.data() as NormalizedIncident);
+      let incidents = snapshot.docs.map((doc) => this.normalizeIncidentDates(doc.data() as NormalizedIncident));
       if (options.providerId === 'google-ai') {
         incidents = filterGoogleCloudIncidentsForAi(incidents, GOOGLE_AI_KEYWORDS);
       }
@@ -164,7 +218,9 @@ class IntelligenceService {
     }
     try {
       const snapshot = await query.get();
-      return snapshot.docs.map((doc) => doc.data() as NormalizedMaintenance);
+      return snapshot.docs.map((doc) =>
+        this.normalizeMaintenanceDates(doc.data() as NormalizedMaintenance)
+      );
     } catch (error) {
       log('warn', 'Maintenances query failed, falling back to basic query', { error, options });
       let fallback: FirebaseFirestore.Query = db.collection('maintenances');
@@ -177,7 +233,9 @@ class IntelligenceService {
         fallback = fallback.limit(50);
       }
       const snapshot = await fallback.get();
-      return snapshot.docs.map((doc) => doc.data() as NormalizedMaintenance);
+      return snapshot.docs.map((doc) =>
+        this.normalizeMaintenanceDates(doc.data() as NormalizedMaintenance)
+      );
     }
   }
 }
