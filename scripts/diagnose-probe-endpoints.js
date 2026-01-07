@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const DEFAULT_TIMEOUT_MS = 12000;
-const SEMANTIC_PROMPT = 'Respond with the single word READY.';
+const SEMANTIC_PROMPT = 'Output the word READY and nothing else.';
 
 function loadEnvFile(filePath) {
   if (!filePath || !fs.existsSync(filePath)) return;

@@ -28,7 +28,7 @@ type ProbeRunSummary = {
 };
 
 const DEFAULT_TIMEOUT_MS = 12000;
-const SEMANTIC_PROMPT = 'Respond with the single word READY.';
+const SEMANTIC_PROMPT = 'Output the word READY and nothing else.';
 const PROBE_NETWORK_CODES = [
   'fetch failed',
   'network',

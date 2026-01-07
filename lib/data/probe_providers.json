@@ -40,7 +40,7 @@
       "providerId": "cohere",
       "type": "cohere",
       "envKey": "COHERE_API_KEY",
-      "model": "command-r-plus",
+      "model": "command-r-08-2024",
       "modelEnvKey": "COHERE_PROBE_MODEL",
       "baseUrl": "https://api.cohere.ai/v1",
       "endpoint": "chat",

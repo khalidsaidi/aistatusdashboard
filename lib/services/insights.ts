@@ -188,13 +188,14 @@ function nowMinus(minutes: number): Date {
   return new Date(Date.now() - minutes * 60 * 1000);
 }
 
-const IGNORED_SYNTHETIC_CODES = new Set(['http-401', 'http-403', 'http-404']);
+const IGNORED_SYNTHETIC_CODES = new Set(['http-400', 'http-401', 'http-402', 'http-403', 'http-404']);
 
 function isSyntheticSignalCandidate(event: SyntheticProbeEvent): boolean {
   if (event.model === 'status' || event.endpoint === 'status') return false;
   const code = String(event.errorCode || '').toLowerCase().trim();
   if (!code) return true;
   if (code === 'semantic_mismatch') return true;
+  if (code.startsWith('probe_')) return false;
   if (code.startsWith('http-')) return !IGNORED_SYNTHETIC_CODES.has(code);
   return false;
 }

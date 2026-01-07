@@ -46,7 +46,7 @@ env:
   - variable: GEMINI_PROBE_MODEL
     value: "gemini-2.0-flash"
   - variable: COHERE_PROBE_MODEL
-    value: "command-r-plus"
+    value: "command-r-08-2024"
   - variable: GROQ_PROBE_MODEL
     value: "llama-3.1-8b-instant"
   - variable: CRON_SECRET
