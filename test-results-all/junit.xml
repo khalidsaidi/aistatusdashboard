@@ -1,11 +1,11 @@
-<testsuites id="" name="" tests="49" failures="0" skipped="0" errors="0" time="573.309932">
-<testsuite name="deep_verification.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="chromium" tests="1" failures="0" skipped="0" time="9.364" errors="0">
-<testcase name="deep end-to-end verification" classname="deep_verification.spec.ts" time="9.364">
+<testsuites id="" name="" tests="49" failures="0" skipped="0" errors="0" time="602.839861">
+<testsuite name="deep_verification.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="chromium" tests="1" failures="0" skipped="0" time="10.805" errors="0">
+<testcase name="deep end-to-end verification" classname="deep_verification.spec.ts" time="10.805">
 <system-out>
 <![CDATA[Test Script Process Project ID: undefined
-✅ Subscription verified in DB for e2e-782770@example.com
-✅ Webhook verified in DB for https://e2e-webhook-782770.com
-✅ Comment verified in DB: "Deep E2E Verification Comment 782770"
+✅ Subscription verified in DB for e2e-059792@example.com
+✅ Webhook verified in DB for https://e2e-webhook-059792.com
+✅ Comment verified in DB: "Deep E2E Verification Comment 059792"
 📡 Injected "down" status for Anthropic into DB
 ✅ UI correctly reflected the injected DB state change in Incidents tab (Propagation Success)
 🚀 Deep End-to-End Verification Successful
@@ -28,13 +28,13 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 </system-err>
 </testcase>
 </testsuite>
-<testsuite name="full-stack.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="chromium" tests="5" failures="0" skipped="0" time="35.708" errors="0">
-<testcase name="Full-Stack Verification Suite › 1. Notification Lifecycle (UI -&gt; Change -&gt; Queue)" classname="full-stack.spec.ts" time="22.229">
+<testsuite name="full-stack.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="chromium" tests="5" failures="0" skipped="0" time="37.988" errors="0">
+<testcase name="Full-Stack Verification Suite › 1. Notification Lifecycle (UI -&gt; Change -&gt; Queue)" classname="full-stack.spec.ts" time="24.122">
 <system-out>
 <![CDATA[🧹 Test state initialized
 📡 Status change injected: OpenAI -> DOWN
 ⚙️ Status Orchestrator triggered
-✅ Notification lifecycle verified: Notification queued for test-793122@example.com
+✅ Notification lifecycle verified: Notification queued for test-070526@example.com
 ]]>
 </system-out>
 <system-err>
@@ -71,7 +71,7 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 ]]>
 </system-err>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 2. Analytics Data Integrity (Seed -&gt; API -&gt; UI)" classname="full-stack.spec.ts" time="3.741">
+<testcase name="Full-Stack Verification Suite › 2. Analytics Data Integrity (Seed -&gt; API -&gt; UI)" classname="full-stack.spec.ts" time="4.261">
 <system-out>
 <![CDATA[📊 Seeded 42 interaction events for OpenAI
 ✅ Analytics API data integrity verified
@@ -88,20 +88,20 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 ]]>
 </system-err>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 3. UI Logic: Search, Filter &amp; Sort" classname="full-stack.spec.ts" time="4.187">
+<testcase name="Full-Stack Verification Suite › 3. UI Logic: Search, Filter &amp; Sort" classname="full-stack.spec.ts" time="4.357">
 <system-out>
 <![CDATA[✅ UI Search verified
 ✅ UI Filter verified: Found 18 operational providers
 ]]>
 </system-out>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 4. Developer Tools: Badge &amp; Health API" classname="full-stack.spec.ts" time="0.25">
+<testcase name="Full-Stack Verification Suite › 4. Developer Tools: Badge &amp; Health API" classname="full-stack.spec.ts" time="0.325">
 <system-out>
 <![CDATA[✅ Developer APIs (Health & Badge) verified
 ]]>
 </system-out>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 5. Community Engagement: Full lifecycle" classname="full-stack.spec.ts" time="5.301">
+<testcase name="Full-Stack Verification Suite › 5. Community Engagement: Full lifecycle" classname="full-stack.spec.ts" time="4.923">
 <system-out>
 <![CDATA[✅ Community engagement lifecycle verified
 ]]>
@@ -114,21 +114,21 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 </system-err>
 </testcase>
 </testsuite>
-<testsuite name="ui_verification.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="chromium" tests="1" failures="0" skipped="0" time="9.277" errors="0">
-<testcase name="comprehensive ui and api verification" classname="ui_verification.spec.ts" time="9.277">
+<testsuite name="ui_verification.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="chromium" tests="1" failures="0" skipped="0" time="9.829" errors="0">
+<testcase name="comprehensive ui and api verification" classname="ui_verification.spec.ts" time="9.829">
 <system-out>
 <![CDATA[Comprehensive UI & API Verification Successful
 ]]>
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="deep_verification.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="firefox" tests="1" failures="0" skipped="0" time="11.11" errors="0">
-<testcase name="deep end-to-end verification" classname="deep_verification.spec.ts" time="11.11">
+<testsuite name="deep_verification.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="firefox" tests="1" failures="0" skipped="0" time="11.636" errors="0">
+<testcase name="deep end-to-end verification" classname="deep_verification.spec.ts" time="11.636">
 <system-out>
 <![CDATA[Test Script Process Project ID: undefined
-✅ Subscription verified in DB for e2e-844865@example.com
-✅ Webhook verified in DB for https://e2e-webhook-844865.com
-✅ Comment verified in DB: "Deep E2E Verification Comment 844865"
+✅ Subscription verified in DB for e2e-126991@example.com
+✅ Webhook verified in DB for https://e2e-webhook-126991.com
+✅ Comment verified in DB: "Deep E2E Verification Comment 126991"
 📡 Injected "down" status for Anthropic into DB
 ✅ UI correctly reflected the injected DB state change in Incidents tab (Propagation Success)
 🚀 Deep End-to-End Verification Successful
@@ -151,13 +151,13 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 </system-err>
 </testcase>
 </testsuite>
-<testsuite name="full-stack.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="firefox" tests="5" failures="0" skipped="0" time="36.946" errors="0">
-<testcase name="Full-Stack Verification Suite › 1. Notification Lifecycle (UI -&gt; Change -&gt; Queue)" classname="full-stack.spec.ts" time="22.124">
+<testsuite name="full-stack.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="firefox" tests="5" failures="0" skipped="0" time="38.769" errors="0">
+<testcase name="Full-Stack Verification Suite › 1. Notification Lifecycle (UI -&gt; Change -&gt; Queue)" classname="full-stack.spec.ts" time="22.975">
 <system-out>
 <![CDATA[🧹 Test state initialized
 📡 Status change injected: OpenAI -> DOWN
 ⚙️ Status Orchestrator triggered
-✅ Notification lifecycle verified: Notification queued for test-855040@example.com
+✅ Notification lifecycle verified: Notification queued for test-137475@example.com
 ]]>
 </system-out>
 <system-err>
@@ -194,7 +194,7 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 ]]>
 </system-err>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 2. Analytics Data Integrity (Seed -&gt; API -&gt; UI)" classname="full-stack.spec.ts" time="5.137">
+<testcase name="Full-Stack Verification Suite › 2. Analytics Data Integrity (Seed -&gt; API -&gt; UI)" classname="full-stack.spec.ts" time="4.108">
 <system-out>
 <![CDATA[📊 Seeded 42 interaction events for OpenAI
 ✅ Analytics API data integrity verified
@@ -211,20 +211,20 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 ]]>
 </system-err>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 3. UI Logic: Search, Filter &amp; Sort" classname="full-stack.spec.ts" time="4.537">
+<testcase name="Full-Stack Verification Suite › 3. UI Logic: Search, Filter &amp; Sort" classname="full-stack.spec.ts" time="6.014">
 <system-out>
 <![CDATA[✅ UI Search verified
 ✅ UI Filter verified: Found 18 operational providers
 ]]>
 </system-out>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 4. Developer Tools: Badge &amp; Health API" classname="full-stack.spec.ts" time="0.529">
+<testcase name="Full-Stack Verification Suite › 4. Developer Tools: Badge &amp; Health API" classname="full-stack.spec.ts" time="0.483">
 <system-out>
 <![CDATA[✅ Developer APIs (Health & Badge) verified
 ]]>
 </system-out>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 5. Community Engagement: Full lifecycle" classname="full-stack.spec.ts" time="4.619">
+<testcase name="Full-Stack Verification Suite › 5. Community Engagement: Full lifecycle" classname="full-stack.spec.ts" time="5.189">
 <system-out>
 <![CDATA[✅ Community engagement lifecycle verified
 ]]>
@@ -237,21 +237,21 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 </system-err>
 </testcase>
 </testsuite>
-<testsuite name="ui_verification.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="firefox" tests="1" failures="0" skipped="0" time="8.973" errors="0">
-<testcase name="comprehensive ui and api verification" classname="ui_verification.spec.ts" time="8.973">
+<testsuite name="ui_verification.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="firefox" tests="1" failures="0" skipped="0" time="10.242" errors="0">
+<testcase name="comprehensive ui and api verification" classname="ui_verification.spec.ts" time="10.242">
 <system-out>
 <![CDATA[Comprehensive UI & API Verification Successful
 ]]>
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="deep_verification.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="webkit" tests="1" failures="0" skipped="0" time="14.662" errors="0">
-<testcase name="deep end-to-end verification" classname="deep_verification.spec.ts" time="14.662">
+<testsuite name="deep_verification.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="webkit" tests="1" failures="0" skipped="0" time="14.604" errors="0">
+<testcase name="deep end-to-end verification" classname="deep_verification.spec.ts" time="14.604">
 <system-out>
 <![CDATA[Test Script Process Project ID: undefined
-✅ Subscription verified in DB for e2e-908564@example.com
-✅ Webhook verified in DB for https://e2e-webhook-908564.com
-✅ Comment verified in DB: "Deep E2E Verification Comment 908564"
+✅ Subscription verified in DB for e2e-194182@example.com
+✅ Webhook verified in DB for https://e2e-webhook-194182.com
+✅ Comment verified in DB: "Deep E2E Verification Comment 194182"
 📡 Injected "down" status for Anthropic into DB
 ✅ UI correctly reflected the injected DB state change in Incidents tab (Propagation Success)
 🚀 Deep End-to-End Verification Successful
@@ -274,13 +274,13 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 </system-err>
 </testcase>
 </testsuite>
-<testsuite name="full-stack.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="webkit" tests="5" failures="0" skipped="0" time="56.723" errors="0">
-<testcase name="Full-Stack Verification Suite › 1. Notification Lifecycle (UI -&gt; Change -&gt; Queue)" classname="full-stack.spec.ts" time="25.721">
+<testsuite name="full-stack.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="webkit" tests="5" failures="0" skipped="0" time="59.795" errors="0">
+<testcase name="Full-Stack Verification Suite › 1. Notification Lifecycle (UI -&gt; Change -&gt; Queue)" classname="full-stack.spec.ts" time="28.264">
 <system-out>
 <![CDATA[🧹 Test state initialized
 📡 Status change injected: OpenAI -> DOWN
 ⚙️ Status Orchestrator triggered
-✅ Notification lifecycle verified: Notification queued for test-921507@example.com
+✅ Notification lifecycle verified: Notification queued for test-208003@example.com
 ]]>
 </system-out>
 <system-err>
@@ -317,7 +317,7 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 ]]>
 </system-err>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 2. Analytics Data Integrity (Seed -&gt; API -&gt; UI)" classname="full-stack.spec.ts" time="9.584">
+<testcase name="Full-Stack Verification Suite › 2. Analytics Data Integrity (Seed -&gt; API -&gt; UI)" classname="full-stack.spec.ts" time="10.721">
 <system-out>
 <![CDATA[📊 Seeded 42 interaction events for OpenAI
 ✅ Analytics API data integrity verified
@@ -334,20 +334,20 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 ]]>
 </system-err>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 3. UI Logic: Search, Filter &amp; Sort" classname="full-stack.spec.ts" time="8.568">
+<testcase name="Full-Stack Verification Suite › 3. UI Logic: Search, Filter &amp; Sort" classname="full-stack.spec.ts" time="8.918">
 <system-out>
 <![CDATA[✅ UI Search verified
 ✅ UI Filter verified: Found 18 operational providers
 ]]>
 </system-out>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 4. Developer Tools: Badge &amp; Health API" classname="full-stack.spec.ts" time="1.225">
+<testcase name="Full-Stack Verification Suite › 4. Developer Tools: Badge &amp; Health API" classname="full-stack.spec.ts" time="1.298">
 <system-out>
 <![CDATA[✅ Developer APIs (Health & Badge) verified
 ]]>
 </system-out>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 5. Community Engagement: Full lifecycle" classname="full-stack.spec.ts" time="11.625">
+<testcase name="Full-Stack Verification Suite › 5. Community Engagement: Full lifecycle" classname="full-stack.spec.ts" time="10.594">
 <system-out>
 <![CDATA[✅ Community engagement lifecycle verified
 ]]>
@@ -360,21 +360,21 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 </system-err>
 </testcase>
 </testsuite>
-<testsuite name="ui_verification.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="webkit" tests="1" failures="0" skipped="0" time="17.067" errors="0">
-<testcase name="comprehensive ui and api verification" classname="ui_verification.spec.ts" time="17.067">
+<testsuite name="ui_verification.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="webkit" tests="1" failures="0" skipped="0" time="19.63" errors="0">
+<testcase name="comprehensive ui and api verification" classname="ui_verification.spec.ts" time="19.63">
 <system-out>
 <![CDATA[Comprehensive UI & API Verification Successful
 ]]>
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="deep_verification.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="Mobile Chrome" tests="1" failures="0" skipped="0" time="11.871" errors="0">
-<testcase name="deep end-to-end verification" classname="deep_verification.spec.ts" time="11.871">
+<testsuite name="deep_verification.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="Mobile Chrome" tests="1" failures="0" skipped="0" time="9.713" errors="0">
+<testcase name="deep end-to-end verification" classname="deep_verification.spec.ts" time="9.713">
 <system-out>
 <![CDATA[Test Script Process Project ID: undefined
-✅ Subscription verified in DB for e2e-036063@example.com
-✅ Webhook verified in DB for https://e2e-webhook-036063.com
-✅ Comment verified in DB: "Deep E2E Verification Comment 036063"
+✅ Subscription verified in DB for e2e-326819@example.com
+✅ Webhook verified in DB for https://e2e-webhook-326819.com
+✅ Comment verified in DB: "Deep E2E Verification Comment 326819"
 📡 Injected "down" status for Anthropic into DB
 ✅ UI correctly reflected the injected DB state change in Incidents tab (Propagation Success)
 🚀 Deep End-to-End Verification Successful
@@ -397,13 +397,13 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 </system-err>
 </testcase>
 </testsuite>
-<testsuite name="full-stack.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="Mobile Chrome" tests="5" failures="0" skipped="0" time="41.584" errors="0">
-<testcase name="Full-Stack Verification Suite › 1. Notification Lifecycle (UI -&gt; Change -&gt; Queue)" classname="full-stack.spec.ts" time="23.676">
+<testsuite name="full-stack.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="Mobile Chrome" tests="5" failures="0" skipped="0" time="37.028" errors="0">
+<testcase name="Full-Stack Verification Suite › 1. Notification Lifecycle (UI -&gt; Change -&gt; Queue)" classname="full-stack.spec.ts" time="21.498">
 <system-out>
 <![CDATA[🧹 Test state initialized
 📡 Status change injected: OpenAI -> DOWN
 ⚙️ Status Orchestrator triggered
-✅ Notification lifecycle verified: Notification queued for test-047847@example.com
+✅ Notification lifecycle verified: Notification queued for test-336452@example.com
 ]]>
 </system-out>
 <system-err>
@@ -440,7 +440,7 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 ]]>
 </system-err>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 2. Analytics Data Integrity (Seed -&gt; API -&gt; UI)" classname="full-stack.spec.ts" time="6.001">
+<testcase name="Full-Stack Verification Suite › 2. Analytics Data Integrity (Seed -&gt; API -&gt; UI)" classname="full-stack.spec.ts" time="5.814">
 <system-out>
 <![CDATA[📊 Seeded 42 interaction events for OpenAI
 ✅ Analytics API data integrity verified
@@ -457,20 +457,20 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 ]]>
 </system-err>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 3. UI Logic: Search, Filter &amp; Sort" classname="full-stack.spec.ts" time="5.063">
+<testcase name="Full-Stack Verification Suite › 3. UI Logic: Search, Filter &amp; Sort" classname="full-stack.spec.ts" time="4.721">
 <system-out>
 <![CDATA[✅ UI Search verified
 ✅ UI Filter verified: Found 18 operational providers
 ]]>
 </system-out>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 4. Developer Tools: Badge &amp; Health API" classname="full-stack.spec.ts" time="0.429">
+<testcase name="Full-Stack Verification Suite › 4. Developer Tools: Badge &amp; Health API" classname="full-stack.spec.ts" time="0.359">
 <system-out>
 <![CDATA[✅ Developer APIs (Health & Badge) verified
 ]]>
 </system-out>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 5. Community Engagement: Full lifecycle" classname="full-stack.spec.ts" time="6.415">
+<testcase name="Full-Stack Verification Suite › 5. Community Engagement: Full lifecycle" classname="full-stack.spec.ts" time="4.636">
 <system-out>
 <![CDATA[✅ Community engagement lifecycle verified
 ]]>
@@ -483,21 +483,21 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 </system-err>
 </testcase>
 </testsuite>
-<testsuite name="ui_verification.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="Mobile Chrome" tests="1" failures="0" skipped="0" time="21.395" errors="0">
-<testcase name="comprehensive ui and api verification" classname="ui_verification.spec.ts" time="21.395">
+<testsuite name="ui_verification.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="Mobile Chrome" tests="1" failures="0" skipped="0" time="18.118" errors="0">
+<testcase name="comprehensive ui and api verification" classname="ui_verification.spec.ts" time="18.118">
 <system-out>
 <![CDATA[Comprehensive UI & API Verification Successful
 ]]>
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="deep_verification.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="Mobile Safari" tests="1" failures="0" skipped="0" time="18.183" errors="0">
-<testcase name="deep end-to-end verification" classname="deep_verification.spec.ts" time="18.183">
+<testsuite name="deep_verification.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="Mobile Safari" tests="1" failures="0" skipped="0" time="19.612" errors="0">
+<testcase name="deep end-to-end verification" classname="deep_verification.spec.ts" time="19.612">
 <system-out>
 <![CDATA[Test Script Process Project ID: undefined
-✅ Subscription verified in DB for e2e-117590@example.com
-✅ Webhook verified in DB for https://e2e-webhook-117590.com
-✅ Comment verified in DB: "Deep E2E Verification Comment 117590"
+✅ Subscription verified in DB for e2e-403431@example.com
+✅ Webhook verified in DB for https://e2e-webhook-403431.com
+✅ Comment verified in DB: "Deep E2E Verification Comment 403431"
 📡 Injected "down" status for Anthropic into DB
 ✅ UI correctly reflected the injected DB state change in Incidents tab (Propagation Success)
 🚀 Deep End-to-End Verification Successful
@@ -520,13 +520,13 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 </system-err>
 </testcase>
 </testsuite>
-<testsuite name="full-stack.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="Mobile Safari" tests="5" failures="0" skipped="0" time="53.115" errors="0">
-<testcase name="Full-Stack Verification Suite › 1. Notification Lifecycle (UI -&gt; Change -&gt; Queue)" classname="full-stack.spec.ts" time="22.275">
+<testsuite name="full-stack.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="Mobile Safari" tests="5" failures="0" skipped="0" time="53.882" errors="0">
+<testcase name="Full-Stack Verification Suite › 1. Notification Lifecycle (UI -&gt; Change -&gt; Queue)" classname="full-stack.spec.ts" time="23.163">
 <system-out>
 <![CDATA[🧹 Test state initialized
 📡 Status change injected: OpenAI -> DOWN
 ⚙️ Status Orchestrator triggered
-✅ Notification lifecycle verified: Notification queued for test-134942@example.com
+✅ Notification lifecycle verified: Notification queued for test-418273@example.com
 ]]>
 </system-out>
 <system-err>
@@ -563,7 +563,7 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 ]]>
 </system-err>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 2. Analytics Data Integrity (Seed -&gt; API -&gt; UI)" classname="full-stack.spec.ts" time="9.828">
+<testcase name="Full-Stack Verification Suite › 2. Analytics Data Integrity (Seed -&gt; API -&gt; UI)" classname="full-stack.spec.ts" time="9.802">
 <system-out>
 <![CDATA[📊 Seeded 42 interaction events for OpenAI
 ✅ Analytics API data integrity verified
@@ -580,20 +580,20 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 ]]>
 </system-err>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 3. UI Logic: Search, Filter &amp; Sort" classname="full-stack.spec.ts" time="8.309">
+<testcase name="Full-Stack Verification Suite › 3. UI Logic: Search, Filter &amp; Sort" classname="full-stack.spec.ts" time="8.225">
 <system-out>
 <![CDATA[✅ UI Search verified
 ✅ UI Filter verified: Found 18 operational providers
 ]]>
 </system-out>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 4. Developer Tools: Badge &amp; Health API" classname="full-stack.spec.ts" time="1.308">
+<testcase name="Full-Stack Verification Suite › 4. Developer Tools: Badge &amp; Health API" classname="full-stack.spec.ts" time="1.048">
 <system-out>
 <![CDATA[✅ Developer APIs (Health & Badge) verified
 ]]>
 </system-out>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 5. Community Engagement: Full lifecycle" classname="full-stack.spec.ts" time="11.395">
+<testcase name="Full-Stack Verification Suite › 5. Community Engagement: Full lifecycle" classname="full-stack.spec.ts" time="11.644">
 <system-out>
 <![CDATA[✅ Community engagement lifecycle verified
 ]]>
@@ -606,21 +606,21 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 </system-err>
 </testcase>
 </testsuite>
-<testsuite name="ui_verification.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="Mobile Safari" tests="1" failures="0" skipped="0" time="18.16" errors="0">
-<testcase name="comprehensive ui and api verification" classname="ui_verification.spec.ts" time="18.16">
+<testsuite name="ui_verification.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="Mobile Safari" tests="1" failures="0" skipped="0" time="17.75" errors="0">
+<testcase name="comprehensive ui and api verification" classname="ui_verification.spec.ts" time="17.75">
 <system-out>
 <![CDATA[Comprehensive UI & API Verification Successful
 ]]>
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="deep_verification.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="Microsoft Edge" tests="1" failures="0" skipped="0" time="10.911" errors="0">
-<testcase name="deep end-to-end verification" classname="deep_verification.spec.ts" time="10.911">
+<testsuite name="deep_verification.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="Microsoft Edge" tests="1" failures="0" skipped="0" time="11.812" errors="0">
+<testcase name="deep end-to-end verification" classname="deep_verification.spec.ts" time="11.812">
 <system-out>
 <![CDATA[Test Script Process Project ID: undefined
-✅ Subscription verified in DB for e2e-244378@example.com
-✅ Webhook verified in DB for https://e2e-webhook-244378.com
-✅ Comment verified in DB: "Deep E2E Verification Comment 244378"
+✅ Subscription verified in DB for e2e-545307@example.com
+✅ Webhook verified in DB for https://e2e-webhook-545307.com
+✅ Comment verified in DB: "Deep E2E Verification Comment 545307"
 📡 Injected "down" status for Anthropic into DB
 ✅ UI correctly reflected the injected DB state change in Incidents tab (Propagation Success)
 🚀 Deep End-to-End Verification Successful
@@ -643,13 +643,13 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 </system-err>
 </testcase>
 </testsuite>
-<testsuite name="full-stack.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="Microsoft Edge" tests="5" failures="0" skipped="0" time="36.922" errors="0">
-<testcase name="Full-Stack Verification Suite › 1. Notification Lifecycle (UI -&gt; Change -&gt; Queue)" classname="full-stack.spec.ts" time="22.976">
+<testsuite name="full-stack.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="Microsoft Edge" tests="5" failures="0" skipped="0" time="36.363" errors="0">
+<testcase name="Full-Stack Verification Suite › 1. Notification Lifecycle (UI -&gt; Change -&gt; Queue)" classname="full-stack.spec.ts" time="22.88">
 <system-out>
 <![CDATA[🧹 Test state initialized
 📡 Status change injected: OpenAI -> DOWN
 ⚙️ Status Orchestrator triggered
-✅ Notification lifecycle verified: Notification queued for test-255020@example.com
+✅ Notification lifecycle verified: Notification queued for test-556753@example.com
 ]]>
 </system-out>
 <system-err>
@@ -686,7 +686,7 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 ]]>
 </system-err>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 2. Analytics Data Integrity (Seed -&gt; API -&gt; UI)" classname="full-stack.spec.ts" time="3.784">
+<testcase name="Full-Stack Verification Suite › 2. Analytics Data Integrity (Seed -&gt; API -&gt; UI)" classname="full-stack.spec.ts" time="3.836">
 <system-out>
 <![CDATA[📊 Seeded 42 interaction events for OpenAI
 ✅ Analytics API data integrity verified
@@ -703,20 +703,20 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 ]]>
 </system-err>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 3. UI Logic: Search, Filter &amp; Sort" classname="full-stack.spec.ts" time="4.6">
+<testcase name="Full-Stack Verification Suite › 3. UI Logic: Search, Filter &amp; Sort" classname="full-stack.spec.ts" time="4.563">
 <system-out>
 <![CDATA[✅ UI Search verified
 ✅ UI Filter verified: Found 18 operational providers
 ]]>
 </system-out>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 4. Developer Tools: Badge &amp; Health API" classname="full-stack.spec.ts" time="0.355">
+<testcase name="Full-Stack Verification Suite › 4. Developer Tools: Badge &amp; Health API" classname="full-stack.spec.ts" time="0.3">
 <system-out>
 <![CDATA[✅ Developer APIs (Health & Badge) verified
 ]]>
 </system-out>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 5. Community Engagement: Full lifecycle" classname="full-stack.spec.ts" time="5.207">
+<testcase name="Full-Stack Verification Suite › 5. Community Engagement: Full lifecycle" classname="full-stack.spec.ts" time="4.784">
 <system-out>
 <![CDATA[✅ Community engagement lifecycle verified
 ]]>
@@ -729,21 +729,21 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 </system-err>
 </testcase>
 </testsuite>
-<testsuite name="ui_verification.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="Microsoft Edge" tests="1" failures="0" skipped="0" time="9.73" errors="0">
-<testcase name="comprehensive ui and api verification" classname="ui_verification.spec.ts" time="9.73">
+<testsuite name="ui_verification.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="Microsoft Edge" tests="1" failures="0" skipped="0" time="9.015" errors="0">
+<testcase name="comprehensive ui and api verification" classname="ui_verification.spec.ts" time="9.015">
 <system-out>
 <![CDATA[Comprehensive UI & API Verification Successful
 ]]>
 </system-out>
 </testcase>
 </testsuite>
-<testsuite name="deep_verification.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="Google Chrome" tests="1" failures="0" skipped="0" time="10.932" errors="0">
-<testcase name="deep end-to-end verification" classname="deep_verification.spec.ts" time="10.932">
+<testsuite name="deep_verification.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="Google Chrome" tests="1" failures="0" skipped="0" time="9.733" errors="0">
+<testcase name="deep end-to-end verification" classname="deep_verification.spec.ts" time="9.733">
 <system-out>
 <![CDATA[Test Script Process Project ID: undefined
-✅ Subscription verified in DB for e2e-307016@example.com
-✅ Webhook verified in DB for https://e2e-webhook-307016.com
-✅ Comment verified in DB: "Deep E2E Verification Comment 307016"
+✅ Subscription verified in DB for e2e-608591@example.com
+✅ Webhook verified in DB for https://e2e-webhook-608591.com
+✅ Comment verified in DB: "Deep E2E Verification Comment 608591"
 📡 Injected "down" status for Anthropic into DB
 ✅ UI correctly reflected the injected DB state change in Incidents tab (Propagation Success)
 🚀 Deep End-to-End Verification Successful
@@ -766,13 +766,13 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 </system-err>
 </testcase>
 </testsuite>
-<testsuite name="full-stack.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="Google Chrome" tests="5" failures="0" skipped="0" time="33.483" errors="0">
-<testcase name="Full-Stack Verification Suite › 1. Notification Lifecycle (UI -&gt; Change -&gt; Queue)" classname="full-stack.spec.ts" time="20.842">
+<testsuite name="full-stack.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="Google Chrome" tests="5" failures="0" skipped="0" time="43.506" errors="0">
+<testcase name="Full-Stack Verification Suite › 1. Notification Lifecycle (UI -&gt; Change -&gt; Queue)" classname="full-stack.spec.ts" time="31.101">
 <system-out>
 <![CDATA[🧹 Test state initialized
 📡 Status change injected: OpenAI -> DOWN
 ⚙️ Status Orchestrator triggered
-✅ Notification lifecycle verified: Notification queued for test-317752@example.com
+✅ Notification lifecycle verified: Notification queued for test-618123@example.com
 ]]>
 </system-out>
 <system-err>
@@ -809,7 +809,7 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 ]]>
 </system-err>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 2. Analytics Data Integrity (Seed -&gt; API -&gt; UI)" classname="full-stack.spec.ts" time="3.87">
+<testcase name="Full-Stack Verification Suite › 2. Analytics Data Integrity (Seed -&gt; API -&gt; UI)" classname="full-stack.spec.ts" time="3.897">
 <system-out>
 <![CDATA[📊 Seeded 42 interaction events for OpenAI
 ✅ Analytics API data integrity verified
@@ -826,20 +826,20 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 ]]>
 </system-err>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 3. UI Logic: Search, Filter &amp; Sort" classname="full-stack.spec.ts" time="4.485">
+<testcase name="Full-Stack Verification Suite › 3. UI Logic: Search, Filter &amp; Sort" classname="full-stack.spec.ts" time="4.499">
 <system-out>
 <![CDATA[✅ UI Search verified
 ✅ UI Filter verified: Found 18 operational providers
 ]]>
 </system-out>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 4. Developer Tools: Badge &amp; Health API" classname="full-stack.spec.ts" time="0.324">
+<testcase name="Full-Stack Verification Suite › 4. Developer Tools: Badge &amp; Health API" classname="full-stack.spec.ts" time="0.244">
 <system-out>
 <![CDATA[✅ Developer APIs (Health & Badge) verified
 ]]>
 </system-out>
 </testcase>
-<testcase name="Full-Stack Verification Suite › 5. Community Engagement: Full lifecycle" classname="full-stack.spec.ts" time="3.962">
+<testcase name="Full-Stack Verification Suite › 5. Community Engagement: Full lifecycle" classname="full-stack.spec.ts" time="3.765">
 <system-out>
 <![CDATA[✅ Community engagement lifecycle verified
 ]]>
@@ -852,8 +852,8 @@ DB_VERIFY_START: Project=ai-status-dashboard-dev
 </system-err>
 </testcase>
 </testsuite>
-<testsuite name="ui_verification.spec.ts" timestamp="2026-01-06T23:06:21.977Z" hostname="Google Chrome" tests="1" failures="0" skipped="0" time="9.58" errors="0">
-<testcase name="comprehensive ui and api verification" classname="ui_verification.spec.ts" time="9.58">
+<testsuite name="ui_verification.spec.ts" timestamp="2026-01-07T00:34:18.913Z" hostname="Google Chrome" tests="1" failures="0" skipped="0" time="10.445" errors="0">
+<testcase name="comprehensive ui and api verification" classname="ui_verification.spec.ts" time="10.445">
 <system-out>
 <![CDATA[Comprehensive UI & API Verification Successful
 ]]>
