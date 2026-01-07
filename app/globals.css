@@ -294,7 +294,7 @@ body {
 /* Custom styles that Tailwind doesn't cover */
 @layer base {
   html {
-    @apply scroll-smooth;
+    scroll-behavior: auto;
   }
 }
 

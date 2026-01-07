@@ -188,6 +188,21 @@ function nowMinus(minutes: number): Date {
   return new Date(Date.now() - minutes * 60 * 1000);
 }
 
+const IGNORED_SYNTHETIC_CODES = new Set(['http-401', 'http-403', 'http-404']);
+
+function isSyntheticSignalCandidate(event: SyntheticProbeEvent): boolean {
+  if (event.model === 'status' || event.endpoint === 'status') return false;
+  const code = String(event.errorCode || '').toLowerCase().trim();
+  if (!code) return true;
+  if (code === 'semantic_mismatch') return true;
+  if (code.startsWith('http-')) return !IGNORED_SYNTHETIC_CODES.has(code);
+  return false;
+}
+
+function filterSyntheticSignals(events: SyntheticProbeEvent[]): SyntheticProbeEvent[] {
+  return events.filter(isSyntheticSignalCandidate);
+}
+
 export class InsightsService {
   async ingestTelemetry(payload: Omit<TelemetryEvent, 'clientIdHash' | 'timestamp' | 'source'> & {
     clientId: string;
@@ -368,10 +383,11 @@ export class InsightsService {
     accountId?: string;
   }): Promise<CanaryCopilotResponse> {
     const windowMinutes = options.windowMinutes || DEFAULT_WINDOW_MINUTES;
-    const synthetic = await this.getSyntheticEvents({
+    const syntheticRaw = await this.getSyntheticEvents({
       providerId: options.providerId,
       windowMinutes,
     });
+    const synthetic = filterSyntheticSignals(syntheticRaw);
 
     const crowd = await this.getTelemetryEvents({
       providerId: options.providerId,
@@ -408,9 +424,6 @@ export class InsightsService {
       typeof officialData?.description === 'string' ? officialData.description : undefined;
 
     const syntheticSummary = makeLens('Synthetic probes', summarizeMetrics(syntheticScoped));
-    if (syntheticScoped.some((event) => event.model === 'status' || event.endpoint === 'status')) {
-      syntheticSummary.summary = `${syntheticSummary.summary} (status endpoint baseline)`;
-    }
     const crowdSummary = makeLens('Crowd telemetry', summarizeMetrics(crowdScoped));
     const accountSummary = makeLens('Your account', summarizeMetrics(accountScoped));
     const observedSummary = makeLens(
@@ -449,10 +462,11 @@ export class InsightsService {
     windowMinutes?: number;
   }): Promise<ModelMatrixResponse> {
     const windowMinutes = options.windowMinutes || DEFAULT_WINDOW_MINUTES;
-    const synthetic = await this.getSyntheticEvents({
+    const syntheticRaw = await this.getSyntheticEvents({
       providerId: options.providerId,
       windowMinutes,
     });
+    const synthetic = filterSyntheticSignals(syntheticRaw);
     const crowd = await this.getTelemetryEvents({
       providerId: options.providerId,
       windowMinutes,
@@ -835,7 +849,7 @@ export class InsightsService {
 
   async getEarlyWarnings(options: { windowMinutes?: number } = {}): Promise<EarlyWarningSignal[]> {
     const windowMinutes = options.windowMinutes || 30;
-    const synthetic = await this.getSyntheticEvents({ windowMinutes });
+    const synthetic = filterSyntheticSignals(await this.getSyntheticEvents({ windowMinutes }));
     const crowd = await this.getTelemetryEvents({ windowMinutes, source: 'crowd' });
 
     const grouped: Record<string, { synthetic: SyntheticProbeEvent[]; crowd: TelemetryEvent[] }> = {};
@@ -923,13 +937,9 @@ export class InsightsService {
       const providerId = data.providerId || doc.id;
       const officialStatus = typeof data.status === 'string' ? data.status : 'unknown';
 
-      const syntheticRaw = await this.getSyntheticEvents({ providerId, windowMinutes });
-      const synthetic = syntheticRaw.filter((event) => {
-        const code = String(event.errorCode || '').toLowerCase();
-        return !['http-401', 'http-403', 'http-404', 'invalid_key', 'unauthorized'].some((flag) =>
-          code.includes(flag)
-        );
-      });
+      const synthetic = filterSyntheticSignals(
+        await this.getSyntheticEvents({ providerId, windowMinutes })
+      );
       const crowd = await this.getTelemetryEvents({ providerId, windowMinutes, source: 'crowd' });
       const combined = [...synthetic, ...crowd];
       if (combined.length < minSamples) continue;

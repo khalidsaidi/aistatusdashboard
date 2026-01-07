@@ -120,6 +120,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
   }, [activeTab]);
 
   const setTab = (tab: DashboardTabId) => {
+    if (tab === activeTab) return;
     setActiveTab(tab);
     const params = new URLSearchParams(searchParams.toString());
 
@@ -451,7 +452,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
     const safeStatuses = displayStatuses.filter(
       (s) => s && typeof s === 'object' && s.status && s.id && s.name
     );
-    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const normalizedQuery = searchQueryDebounced.trim().toLowerCase();
 
     // Apply search filter (name + aliases)
     let filtered = safeStatuses.filter((status) => {
@@ -571,7 +572,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
     });
 
     return filtered;
-  }, [displayStatuses, rawStatusById, searchQuery, statusFilter, responseTimeFilter, uptimeFilter, sortBy, sortOrder, issuesOnly, watchlistOnly, watchlist]);
+  }, [displayStatuses, rawStatusById, searchQueryDebounced, statusFilter, responseTimeFilter, uptimeFilter, sortBy, sortOrder, issuesOnly, watchlistOnly, watchlist]);
 
   // Validate statuses prop after hooks initialization
   if (!Array.isArray(statuses)) {
