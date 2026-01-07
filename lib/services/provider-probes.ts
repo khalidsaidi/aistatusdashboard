@@ -238,7 +238,6 @@ async function probeOpenAICompatible(configEntry: ProbeProviderConfig, apiKey: s
   const text = extractOpenAIText(data);
   if (!isSemanticMatch(text)) {
     event.errorCode = 'semantic_mismatch';
-    event.http5xxRate = 1;
   }
   const tokens = outputTokens ?? totalTokens;
   if (tokens) {
@@ -284,7 +283,6 @@ async function probeAnthropic(configEntry: ProbeProviderConfig, apiKey: string) 
   const text = extractAnthropicText(data);
   if (!isSemanticMatch(text)) {
     event.errorCode = 'semantic_mismatch';
-    event.http5xxRate = 1;
   }
   const tokens = outputTokens ?? totalTokens;
   if (tokens) {
@@ -327,7 +325,6 @@ async function probeGemini(configEntry: ProbeProviderConfig, apiKey: string) {
   const text = extractGeminiText(data);
   if (!isSemanticMatch(text)) {
     event.errorCode = 'semantic_mismatch';
-    event.http5xxRate = 1;
   }
   const tokens = outputTokens ?? totalTokens;
   if (tokens) {
@@ -372,7 +369,6 @@ async function probeCohere(configEntry: ProbeProviderConfig, apiKey: string) {
   const text = extractCohereText(data);
   if (!isSemanticMatch(text)) {
     event.errorCode = 'semantic_mismatch';
-    event.http5xxRate = 1;
   }
   const tokens = outputTokens ?? totalTokens;
   if (tokens) {
@@ -418,7 +414,6 @@ async function probeAzureOpenAI(configEntry: ProbeProviderConfig, apiKey: string
   const text = extractOpenAIText(data);
   if (!isSemanticMatch(text)) {
     event.errorCode = 'semantic_mismatch';
-    event.http5xxRate = 1;
   }
   const tokens = outputTokens ?? totalTokens;
   if (tokens) {
@@ -470,7 +465,6 @@ async function probeBedrock(configEntry: ProbeProviderConfig) {
   const text = extractBedrockText(data);
   if (!isSemanticMatch(text)) {
     event.errorCode = 'semantic_mismatch';
-    event.http5xxRate = 1;
   }
   const { outputTokens, totalTokens } = parseBedrockUsage(data);
   const tokens = outputTokens ?? totalTokens;

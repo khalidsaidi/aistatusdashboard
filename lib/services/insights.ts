@@ -32,6 +32,7 @@ const LATENCY_DEGRADED_MS = 4000;
 const LATENCY_WARNING_MS = 2000;
 const ERROR_RATE_DEGRADED = 0.05;
 const THROTTLE_RATE_DEGRADED = 0.08;
+const SEMANTIC_MISMATCH_DEGRADED = 0.6;
 
 interface MetricSummary {
   latencyP50?: number;
@@ -41,6 +42,7 @@ interface MetricSummary {
   http429Rate?: number;
   tokensPerSec?: number;
   streamDisconnectRate?: number;
+  semanticMismatchRate?: number;
 }
 
 function percentile(values: number[], p: number): number | undefined {
@@ -58,6 +60,9 @@ function average(values: Array<number | undefined>): number | undefined {
 
 function summarizeMetrics(records: Array<TelemetryEvent | SyntheticProbeEvent>): MetricSummary {
   const latency = records.map((r) => r.latencyMs).filter((v) => typeof v === 'number');
+  const semanticMismatchCount = records.filter(
+    (record) => 'errorCode' in record && record.errorCode === 'semantic_mismatch'
+  ).length;
   return {
     latencyP50: percentile(latency, 50),
     latencyP95: percentile(latency, 95),
@@ -68,6 +73,7 @@ function summarizeMetrics(records: Array<TelemetryEvent | SyntheticProbeEvent>):
     streamDisconnectRate: average(
       records.map((r) => ('streamDisconnectRate' in r ? r.streamDisconnectRate : undefined))
     ),
+    semanticMismatchRate: records.length ? semanticMismatchCount / records.length : undefined,
   };
 }
 
@@ -77,6 +83,7 @@ function scoreSignal(summary: MetricSummary): 'healthy' | 'degraded' | 'down' | 
   }
   if ((summary.http5xxRate || 0) >= ERROR_RATE_DEGRADED) return 'down';
   if ((summary.http429Rate || 0) >= THROTTLE_RATE_DEGRADED) return 'degraded';
+  if ((summary.semanticMismatchRate || 0) >= SEMANTIC_MISMATCH_DEGRADED) return 'degraded';
   if ((summary.latencyP95 || 0) >= LATENCY_DEGRADED_MS) return 'degraded';
   return 'healthy';
 }
