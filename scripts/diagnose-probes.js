@@ -85,9 +85,31 @@ async function initAdmin() {
     process.exit(1);
   }
 
+  const parseServiceAccount = (value) => {
+    const candidates = [value, value.replace(/^"|"$/g, '')];
+    for (const candidate of candidates) {
+      try {
+        const parsed = JSON.parse(candidate);
+        if (parsed && typeof parsed === 'object') return parsed;
+      } catch {}
+    }
+    try {
+      const parsed = JSON.parse(JSON.parse(value));
+      if (parsed && typeof parsed === 'object') return parsed;
+    } catch {}
+    try {
+      const parsed = JSON.parse(value.replace(/\\"/g, '"'));
+      if (parsed && typeof parsed === 'object') return parsed;
+    } catch {}
+    return null;
+  };
+
   if (!admin.apps.length) {
     if (serviceAccountKey) {
-      const serviceAccount = JSON.parse(serviceAccountKey);
+      const serviceAccount = parseServiceAccount(serviceAccountKey);
+      if (!serviceAccount) {
+        throw new Error('Unable to parse FIREBASE_SERVICE_ACCOUNT_KEY.');
+      }
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
       });
