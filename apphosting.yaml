@@ -45,6 +45,10 @@ env:
     value: "true"
   - variable: GEMINI_PROBE_MODEL
     value: "gemini-2.0-flash"
+  - variable: COHERE_PROBE_MODEL
+    value: "command-r-plus"
+  - variable: GROQ_PROBE_MODEL
+    value: "llama-3.1-8b-instant"
   - variable: CRON_SECRET
     secret: "CRON_SECRET"
   - variable: APP_CRON_SECRET
@@ -112,4 +116,4 @@ env:
   - variable: AWS_BEDROCK_REGION
     value: "us-east-1"
   - variable: AWS_BEDROCK_MODEL_ID
-    value: "amazon.titan-tg1-large"
+    value: "amazon.titan-text-express-v1"

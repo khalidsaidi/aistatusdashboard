@@ -41,6 +41,8 @@ const PROVIDERS = [
     envKey: 'COHERE_API_KEY',
     url: 'https://dashboard.cohere.com/api-keys',
     createLabels: [/create.*key/i, /new.*key/i, /generate.*key/i, /add.*key/i],
+    avoidUuid: true,
+    disallowEmail: true,
   },
   {
     id: 'groq',
@@ -55,6 +57,7 @@ const PROVIDERS = [
     envKey: 'MISTRAL_API_KEY',
     url: 'https://console.mistral.ai/api-keys',
     createLabels: [/create.*key/i, /new.*key/i, /generate.*key/i, /add.*key/i],
+    avoidUuid: true,
   },
   {
     id: 'deepseek',
@@ -62,6 +65,7 @@ const PROVIDERS = [
     urls: ['https://platform.deepseek.com/api-keys', 'https://platform.deepseek.com/api_keys'],
     createLabels: [/create.*key/i, /new.*key/i, /generate.*key/i, /add.*key/i],
     navLabel: /api keys/i,
+    avoidUuid: true,
   },
   {
     id: 'xai',
@@ -79,6 +83,7 @@ const PROVIDERS = [
       /^new$/i,
     ],
     navLabel: /api keys/i,
+    avoidUuid: true,
   },
   {
     id: 'azure',
@@ -172,9 +177,24 @@ function isValidKeyCandidate(value, pattern) {
   return trimmed.length >= 24 && /[A-Za-z0-9]/.test(trimmed);
 }
 
-function normalizeKeyCandidate(value, pattern) {
+function isUuidLike(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
+function normalizeKeyCandidate(value, pattern, options = {}) {
   if (!isValidKeyCandidate(value, pattern)) return null;
-  return value.trim();
+  const trimmed = value.trim();
+  if (options.excludePrefixes) {
+    const lower = trimmed.toLowerCase();
+    if (options.excludePrefixes.some((prefix) => lower.startsWith(prefix))) {
+      return null;
+    }
+  }
+  if (options.disallowEmail && trimmed.includes('@')) {
+    return null;
+  }
+  if (!pattern && options.avoidUuid && isUuidLike(trimmed)) return null;
+  return trimmed;
 }
 
 function redactTokens(value) {
@@ -468,8 +488,12 @@ async function captureKey(page, provider) {
   }
 
   const pattern = provider.keyPattern;
-  if (pattern && candidates.length) {
-    const match = candidates.find((value) => pattern.test(value));
+  const excludedPrefixes = ['ai-status-'];
+  const filteredCandidates = (provider.avoidUuid ? candidates.filter((value) => !isUuidLike(value)) : candidates)
+    .filter((value) => !excludedPrefixes.some((prefix) => value.toLowerCase().startsWith(prefix)))
+    .filter((value) => (provider.disallowEmail ? !value.includes('@') : true));
+  if (pattern && filteredCandidates.length) {
+    const match = filteredCandidates.find((value) => pattern.test(value));
     if (match) return match.trim();
   }
 
@@ -483,9 +507,9 @@ async function captureKey(page, provider) {
     return null;
   }
 
-  if (!candidates.length) return null;
-  candidates.sort((a, b) => b.length - a.length);
-  return candidates[0];
+  if (!filteredCandidates.length) return null;
+  filteredCandidates.sort((a, b) => b.length - a.length);
+  return filteredCandidates[0];
 }
 
 async function tryCopyFromPage(page, provider) {
@@ -501,7 +525,11 @@ async function tryCopyFromPage(page, provider) {
     if (await copyButton.isVisible().catch(() => false)) {
       await copyButton.click().catch(() => {});
       const clipboardValue = await page.evaluate(() => navigator.clipboard.readText()).catch(() => null);
-      const normalized = normalizeKeyCandidate(clipboardValue, provider.keyPattern);
+      const normalized = normalizeKeyCandidate(clipboardValue, provider.keyPattern, {
+        avoidUuid: provider.avoidUuid,
+        disallowEmail: provider.disallowEmail,
+        excludePrefixes: ['ai-status-'],
+      });
       if (normalized) return normalized;
     }
   }
@@ -529,7 +557,11 @@ async function tryRevealKey(page, provider) {
 async function waitForKey(page, provider, getResponseKey, timeoutMs = 20000) {
   const startedAt = Date.now();
   while (Date.now() - startedAt < timeoutMs) {
-    const responseKey = normalizeKeyCandidate(getResponseKey(), provider.keyPattern);
+    const responseKey = normalizeKeyCandidate(getResponseKey(), provider.keyPattern, {
+      avoidUuid: provider.avoidUuid,
+      disallowEmail: provider.disallowEmail,
+      excludePrefixes: ['ai-status-'],
+    });
     if (responseKey) return responseKey;
 
     const key = await captureKey(page, provider);
@@ -540,7 +572,8 @@ async function waitForKey(page, provider, getResponseKey, timeoutMs = 20000) {
 
     const clipboardValue = normalizeKeyCandidate(
       await page.evaluate(() => navigator.clipboard.readText()).catch(() => null),
-      provider.keyPattern
+      provider.keyPattern,
+      { avoidUuid: provider.avoidUuid, disallowEmail: provider.disallowEmail, excludePrefixes: ['ai-status-'] }
     );
     if (clipboardValue) return clipboardValue;
 

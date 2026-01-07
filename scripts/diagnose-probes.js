@@ -86,21 +86,23 @@ async function initAdmin() {
   }
 
   const parseServiceAccount = (value) => {
-    const candidates = [value, value.replace(/^"|"$/g, '')];
-    for (const candidate of candidates) {
-      try {
-        const parsed = JSON.parse(candidate);
-        if (parsed && typeof parsed === 'object') return parsed;
-      } catch {}
+    let candidate = value;
+    for (let i = 0; i < 6; i += 1) {
+      const trimmed = candidate.replace(/^[\"']+|[\"']+$/g, '');
+      const unescaped = trimmed
+        .replace(/\\\\\"/g, '"')
+        .replace(/\\\"/g, '"')
+        .replace(/\\\\\\\\/g, '\\');
+      const start = unescaped.indexOf('{');
+      const end = unescaped.lastIndexOf('}');
+      if (start !== -1 && end !== -1 && end > start) {
+        try {
+          const parsed = JSON.parse(unescaped.slice(start, end + 1));
+          if (parsed && typeof parsed === 'object') return parsed;
+        } catch {}
+      }
+      candidate = unescaped;
     }
-    try {
-      const parsed = JSON.parse(JSON.parse(value));
-      if (parsed && typeof parsed === 'object') return parsed;
-    } catch {}
-    try {
-      const parsed = JSON.parse(value.replace(/\\"/g, '"'));
-      if (parsed && typeof parsed === 'object') return parsed;
-    } catch {}
     return null;
   };
 

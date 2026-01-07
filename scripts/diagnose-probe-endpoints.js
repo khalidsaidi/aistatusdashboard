@@ -165,16 +165,30 @@ async function probeAzure(entry, apiKey) {
 async function probeBedrock(entry) {
   const { BedrockRuntimeClient, InvokeModelCommand } = await import('@aws-sdk/client-bedrock-runtime');
   const client = new BedrockRuntimeClient({ region: entry.region });
-  const payload = {
-    anthropic_version: 'bedrock-2023-05-31',
-    max_tokens: 16,
-    messages: [{ role: 'user', content: [{ type: 'text', text: SEMANTIC_PROMPT }] }],
-  };
+  let payload = null;
+  const model = entry.model || '';
+  if (model.includes('anthropic') || model.includes('claude')) {
+    payload = {
+      anthropic_version: 'bedrock-2023-05-31',
+      max_tokens: 16,
+      messages: [{ role: 'user', content: [{ type: 'text', text: SEMANTIC_PROMPT }] }],
+    };
+  } else if (model.includes('titan')) {
+    payload = {
+      inputText: SEMANTIC_PROMPT,
+      textGenerationConfig: {
+        maxTokenCount: 16,
+        temperature: 0,
+      },
+    };
+  } else {
+    payload = { prompt: SEMANTIC_PROMPT, max_tokens: 16 };
+  }
   const start = Date.now();
   const encoder = new TextEncoder();
   const response = await client.send(
     new InvokeModelCommand({
-      modelId: entry.model,
+      modelId: model,
       contentType: 'application/json',
       accept: 'application/json',
       body: encoder.encode(JSON.stringify(payload)),
