@@ -237,6 +237,20 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "synthetic_probes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "providerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "timestamp",
+          "order": "DESCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []

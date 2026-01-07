@@ -320,7 +320,11 @@ export class InsightsService {
     } catch (error: any) {
       if (error?.code === 9 || error?.message?.includes('index')) {
         const fallback = await db.collection('synthetic_probes').limit(200).get();
-        return fallback.docs.map((doc) => this.mapSynthetic(doc.data()));
+        const mapped = fallback.docs.map((doc) => this.mapSynthetic(doc.data()));
+        if (options.providerId) {
+          return mapped.filter((event) => event.providerId === options.providerId);
+        }
+        return mapped;
       }
       throw error;
     }
