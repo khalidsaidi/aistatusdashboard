@@ -54,6 +54,20 @@ export default function Footer() {
           </p>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             <a
+              href="/providers"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-400"
+            >
+              Providers
+            </a>
+            {' | '}
+            <a
+              href="/how-it-works"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-400"
+            >
+              How it works
+            </a>
+            {' | '}
+            <a
               href="/api/health"
               className="hover:text-slate-900 dark:hover:text-white transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-400"
             >

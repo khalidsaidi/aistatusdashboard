@@ -75,12 +75,16 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: SITE_URL,
+    types: {
+      'application/rss+xml': `${SITE_URL}/rss.xml`,
+    },
   },
   verification: {
     google: process.env.GOOGLE_SITE_VERIFICATION,
   },
   category: 'technology',
   manifest: '/manifest.json',
+  themeColor: '#0f172a',
   icons: {
     icon: [
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
@@ -97,8 +101,7 @@ export const metadata: Metadata = {
     ],
   },
   other: {
-    'msapplication-TileColor': '#3b82f6',
-    'theme-color': '#3b82f6',
+    'msapplication-TileColor': '#0f172a',
   },
 };
 
@@ -132,25 +135,47 @@ function GoogleAnalytics() {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: 'AI Status Dashboard',
-    description: 'Real-time status monitoring dashboard for AI provider APIs',
-    url: SITE_URL,
-    applicationCategory: 'DeveloperApplication',
-    operatingSystem: 'Any',
-    offers: {
-      '@type': 'Offer',
-      price: '0',
-      priceCurrency: 'USD',
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'AI Status Dashboard',
+      url: SITE_URL,
+      logo: `${SITE_URL}/logo.png`,
+      contactPoint: process.env.NEXT_PUBLIC_CONTACT_EMAIL
+        ? {
+            '@type': 'ContactPoint',
+            email: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
+            contactType: 'support',
+          }
+        : undefined,
     },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      ratingCount: '127',
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'AI Status Dashboard',
+      url: SITE_URL,
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: `${SITE_URL}/?q={search_term_string}`,
+        'query-input': 'required name=search_term_string',
+      },
     },
-  };
+    {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'AI Status Dashboard',
+      description: 'Real-time status monitoring dashboard for AI provider APIs',
+      url: SITE_URL,
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'Any',
+      offers: {
+        '@type': 'Offer',
+        price: '0',
+        priceCurrency: 'USD',
+      },
+    },
+  ];
 
   return (
     <html
@@ -160,7 +185,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#0f172a" />
         <meta name="color-scheme" content="light dark" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -170,7 +195,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-TileColor" content="#0f172a" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
 
         {/* Structured Data */}

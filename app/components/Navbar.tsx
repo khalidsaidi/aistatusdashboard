@@ -28,9 +28,9 @@ export default function Navbar() {
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                   AI Status
                 </p>
-                <h1 className="text-lg md:text-xl font-semibold text-slate-900 dark:text-white">
+                <span className="text-lg md:text-xl font-semibold text-slate-900 dark:text-white">
                   Status Dashboard
-                </h1>
+                </span>
               </div>
             </Link>
           </div>

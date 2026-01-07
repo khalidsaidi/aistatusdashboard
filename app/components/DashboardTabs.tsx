@@ -16,6 +16,7 @@ import ProviderDetailPanel from './ProviderDetailPanel';
 import GuidedTour from './GuidedTour';
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { trackEvent } from '@/lib/utils/analytics-client';
 
@@ -796,6 +797,18 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
         )}
 
         <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700/70 flex flex-wrap gap-2 items-center">
+          <Link
+            href={`/provider/${status.id}`}
+            onClick={() =>
+              trackEvent('provider_detail_click', {
+                providerId: status.id,
+                metadata: { providerName: displayName },
+              })
+            }
+            className="text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+          >
+            Provider page &gt;
+          </Link>
           <a
             href={status.statusPageUrl}
             target="_blank"

@@ -26,6 +26,7 @@ const sourcePolls = new Map<string, number>();
 function ErrorFallback({ error }: { error: string }) {
   return (
     <main className="flex-1">
+      <h1 className="sr-only">AI Status Dashboard</h1>
       <div className="px-4 sm:px-6 py-8">
         <div className="max-w-4xl mx-auto text-center">
           <div className="surface-card-strong p-8 border border-rose-200/70 dark:border-rose-700/70">
