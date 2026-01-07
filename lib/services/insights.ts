@@ -327,11 +327,16 @@ export class InsightsService {
     } catch (error: any) {
       if (error?.code === 9 || error?.message?.includes('index')) {
         const fallback = await db.collection('synthetic_probes').limit(200).get();
+        const cutoff = nowMinus(windowMinutes);
         const mapped = fallback.docs.map((doc) => this.mapSynthetic(doc.data()));
+        const withinWindow = mapped.filter((event) => {
+          const ts = new Date(event.timestamp);
+          return Number.isFinite(ts.getTime()) && ts >= cutoff;
+        });
         if (options.providerId) {
-          return mapped.filter((event) => event.providerId === options.providerId);
+          return withinWindow.filter((event) => event.providerId === options.providerId);
         }
-        return mapped;
+        return withinWindow;
       }
       throw error;
     }
