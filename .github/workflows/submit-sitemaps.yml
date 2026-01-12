@@ -18,6 +18,7 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
           access_token_scopes: https://www.googleapis.com/auth/webmasters
+          token_format: "access_token"
 
       - name: Submit sitemaps
         env:

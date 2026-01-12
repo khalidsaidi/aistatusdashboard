@@ -15,7 +15,7 @@ SITEMAPS=(
 
 fail() { echo "[error] $1" >&2; exit 1; }
 
-# Allow caller to pass ACCESS_TOKEN; otherwise try ADC via gcloud.
+# Allow caller to pass ACCESS_TOKEN (preferred); otherwise try ADC via gcloud.
 ACCESS_TOKEN="${ACCESS_TOKEN:-}"
 if [ -z "$ACCESS_TOKEN" ]; then
   if command -v gcloud >/dev/null 2>&1; then
