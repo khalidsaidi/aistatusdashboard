@@ -31,6 +31,22 @@ export default async function IncidentDetailPage({ params }: { params: { inciden
     );
   }
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: incident.title,
+    description: incident.summary || incident.title,
+    datePublished: incident.startedAt,
+    dateModified: incident.updatedAt,
+    isBasedOn: incident.rawUrl || undefined,
+    identifier: incident.id,
+    creator: {
+      '@type': 'Organization',
+      name: 'AI Status Dashboard',
+      url: 'https://aistatusdashboard.com',
+    },
+  };
+
   return (
     <main className="flex-1">
       <div className="px-4 sm:px-6 py-10">
@@ -45,6 +61,12 @@ export default async function IncidentDetailPage({ params }: { params: { inciden
             <p className="text-sm text-slate-600 dark:text-slate-300 mt-3">
               Status: {incident.status} | Severity: {incident.severity}
             </p>
+            <a
+              href={`/incidents/${incident.id}/cite`}
+              className="cta-secondary text-xs inline-block mt-3"
+            >
+              Cite this incident
+            </a>
           </header>
 
           <section className="surface-card p-6 space-y-3">
@@ -74,6 +96,18 @@ export default async function IncidentDetailPage({ params }: { params: { inciden
               ))}
             </ul>
           </section>
+
+          <noscript>
+            <div className="surface-card p-4">
+              <p>Incident {incident.id}: {incident.title}</p>
+              <p>Status: {incident.status}. Data: /api/public/v1/incidents</p>
+            </div>
+          </noscript>
+
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
         </div>
       </div>
     </main>

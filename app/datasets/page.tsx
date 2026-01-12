@@ -23,6 +23,7 @@ export default function DatasetsPage() {
         name: 'AIStatusDashboard Incidents',
         url: `${SITE_URL}/datasets/incidents`,
         description: 'Normalized incident feed across AI providers.',
+        temporalCoverage: '2024-01-01/2025-12-31',
         distribution: [
           {
             '@type': 'DataDownload',
@@ -36,6 +37,7 @@ export default function DatasetsPage() {
         name: 'AIStatusDashboard Metrics',
         url: `${SITE_URL}/datasets/metrics`,
         description: 'Aggregated latency and reliability metrics.',
+        temporalCoverage: '2024-01-01/2025-12-31',
         distribution: [
           {
             '@type': 'DataDownload',

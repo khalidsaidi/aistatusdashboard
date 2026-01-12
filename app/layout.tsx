@@ -88,7 +88,6 @@ export const metadata: Metadata = {
   },
   category: 'technology',
   manifest: '/manifest.json',
-  themeColor: '#0f172a',
   icons: {
     icon: [
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
