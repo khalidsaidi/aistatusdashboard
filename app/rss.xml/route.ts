@@ -4,6 +4,27 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const now = new Date().toUTCString();
+  const items = [
+    {
+      title: 'Incidents feed (placeholder)',
+      link: 'https://aistatusdashboard.com/incidents',
+      guid: 'placeholder',
+      pubDate: now,
+      description: 'Incidents and maintenances feed will list latest items here.',
+    },
+  ];
+  const itemsXml = items
+    .map(
+      (i) => `<item>
+      <title>${i.title}</title>
+      <link>${i.link}</link>
+      <guid>${i.guid}</guid>
+      <pubDate>${i.pubDate}</pubDate>
+      <description>${i.description}</description>
+    </item>`
+    )
+    .join('\n');
+
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
@@ -11,13 +32,7 @@ export async function GET() {
     <link>https://aistatusdashboard.com/</link>
     <description>Incidents and maintenances</description>
     <lastBuildDate>${now}</lastBuildDate>
-    <item>
-      <title>Placeholder incident feed</title>
-      <link>https://aistatusdashboard.com/incidents</link>
-      <guid>placeholder</guid>
-      <pubDate>${now}</pubDate>
-      <description>Incidents feed placeholder.</description>
-    </item>
+    ${itemsXml}
   </channel>
 </rss>`;
   return new NextResponse(body, {
