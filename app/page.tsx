@@ -119,6 +119,17 @@ export default async function DashboardPage() {
   return (
     <main className="flex-1">
       <div className="px-4 sm:px-6 py-8">
+        <noscript>
+          <div className="surface-card p-4 mb-4">
+            <p>AI Status Dashboard snapshot (noscript):</p>
+            <ul>
+              <li><a href="/api/public/v1/status/summary">/api/public/v1/status/summary</a></li>
+              <li><a href="/api/public/v1/incidents">/api/public/v1/incidents</a></li>
+              <li><a href="/openapi.json">OpenAPI</a></li>
+              <li><a href="/llms.txt">llms.txt</a></li>
+            </ul>
+          </div>
+        </noscript>
         <div className="max-w-6xl mx-auto mb-6">
           <McpCallout />
         </div>
