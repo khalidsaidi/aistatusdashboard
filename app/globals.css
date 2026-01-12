@@ -199,6 +199,77 @@ body {
   }
 }
 
+.callout {
+  background: hsl(var(--surface));
+  border: 1px solid hsl(var(--border));
+  border-radius: calc(var(--radius) + 0.35rem);
+  padding: 1.5rem;
+  box-shadow: 0 12px 30px hsl(220 20% 20% / 0.08);
+}
+
+.callout--mcp {
+  background: linear-gradient(135deg, hsl(var(--surface)), hsl(var(--surface-muted)));
+}
+
+.callout__body h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.callout__body p {
+  margin-top: 0.5rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.callout__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  list-style: none;
+  padding: 0;
+}
+
+.callout__links a {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: hsl(var(--surface-strong));
+  color: hsl(var(--foreground));
+  text-decoration: none;
+  border: 1px solid hsl(var(--border));
+}
+
+.callout__links a:hover {
+  border-color: hsl(var(--brand));
+  color: hsl(var(--brand));
+}
+
+.callout__endpoint {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.callout__endpoint code {
+  padding: 0.2rem 0.45rem;
+  border-radius: 0.35rem;
+  background: hsl(var(--surface-strong));
+  border: 1px solid hsl(var(--border));
+}
+
+.callout__endpoint button {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
 /* Guided tour styling (driver.js) */
 .driver-popover.ai-tour-popover {
   background: hsl(var(--card));

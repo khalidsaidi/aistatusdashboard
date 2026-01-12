@@ -21,6 +21,7 @@ function getCanonicalHost(): string | null {
 }
 
 export function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
   const canonicalHost = getCanonicalHost();
   const currentHost = request.headers.get('host');
   const currentHostname = currentHost ? currentHost.split(':')[0] : null;
@@ -53,6 +54,12 @@ export function middleware(request: NextRequest) {
   }
 
   const response = NextResponse.next();
+
+  const privatePrefixes = ['/app', '/account', '/org', '/billing', '/api/private'];
+  if (privatePrefixes.some((prefix) => pathname.startsWith(prefix))) {
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  }
+
   if (request.method === 'GET' && shouldBypassCache(request)) {
     // Keep HTML uncached so deploys never serve stale shells with missing JS chunks.
     response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
@@ -67,11 +74,11 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/api/private/:path*',
   ],
 };

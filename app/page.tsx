@@ -7,6 +7,7 @@ import DashboardTabs from './components/DashboardTabs';
 import ClientWrapper from './components/ClientWrapper';
 import { Suspense } from 'react';
 import Link from 'next/link';
+import McpCallout from './components/McpCallout';
 
 export const dynamic = 'force-dynamic';
 
@@ -118,6 +119,9 @@ export default async function DashboardPage() {
   return (
     <main className="flex-1">
       <div className="px-4 sm:px-6 py-8">
+        <div className="max-w-6xl mx-auto mb-6">
+          <McpCallout />
+        </div>
         {error && (
           <div className="max-w-6xl mx-auto mb-6 surface-card border border-amber-200/70 dark:border-amber-700/70 p-4">
             <p className="text-amber-800 dark:text-amber-200 text-sm">

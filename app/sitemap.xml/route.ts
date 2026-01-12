@@ -31,7 +31,18 @@ export async function GET(request: NextRequest) {
   const providers = providerService.getProviders();
   const urls: string[] = [
     buildUrl(`${origin}/`, now, 'always', '1.0'),
+    buildUrl(`${origin}/status`, now, 'always', '0.9'),
+    buildUrl(`${origin}/ai`, now, 'weekly', '0.7'),
+    buildUrl(`${origin}/docs`, now, 'weekly', '0.7'),
+    buildUrl(`${origin}/docs/api`, now, 'weekly', '0.6'),
+    buildUrl(`${origin}/docs/agent/mcp-quickstart`, now, 'weekly', '0.6'),
+    buildUrl(`${origin}/docs/agent/mcp-tools`, now, 'weekly', '0.6'),
+    buildUrl(`${origin}/docs/agent/mcp-announcement`, now, 'weekly', '0.6'),
     buildUrl(`${origin}/providers`, now, 'daily', '0.8'),
+    buildUrl(`${origin}/incidents`, now, 'hourly', '0.7'),
+    buildUrl(`${origin}/datasets`, now, 'weekly', '0.6'),
+    buildUrl(`${origin}/datasets/incidents`, now, 'weekly', '0.6'),
+    buildUrl(`${origin}/datasets/metrics`, now, 'weekly', '0.6'),
     buildUrl(`${origin}/how-it-works`, now, 'monthly', '0.6'),
   ];
 
