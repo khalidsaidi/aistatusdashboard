@@ -43,6 +43,10 @@ env:
     value: "true"
   - variable: PROBE_REAL_ENABLED
     value: "true"
+  - variable: GOOGLE_SITE_VERIFICATION
+    value: "ueTuf7cizmQ207EZVX_RnvXzSW0FUqd_zAg7Kq2QpBU"
+  - variable: GOOGLE_SITE_VERIFICATION_ALT
+    value: "thZbMJrJpI5W61kPQCXhMn44Gt9ycmYeTX6f2xxIg68"
   - variable: GEMINI_PROBE_MODEL
     value: "gemini-2.0-flash"
   - variable: COHERE_PROBE_MODEL

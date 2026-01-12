@@ -14,6 +14,10 @@ import OfflineIndicator from './components/OfflineIndicator';
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-ZV3PS0MPQ7';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const googleSiteVerificationTokens = [
+  process.env.GOOGLE_SITE_VERIFICATION || 'ueTuf7cizmQ207EZVX_RnvXzSW0FUqd_zAg7Kq2QpBU',
+  process.env.GOOGLE_SITE_VERIFICATION_ALT || 'thZbMJrJpI5W61kPQCXhMn44Gt9ycmYeTX6f2xxIg68',
+].filter(Boolean);
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -80,7 +84,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: process.env.GOOGLE_SITE_VERIFICATION,
+    google: googleSiteVerificationTokens,
   },
   category: 'technology',
   manifest: '/manifest.json',

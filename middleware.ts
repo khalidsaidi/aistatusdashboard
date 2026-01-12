@@ -37,20 +37,22 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // PERFORMANCE FIX: Handle HEAD requests efficiently
+  // PERFORMANCE: only short-circuit HEAD requests that are clearly HTML page fetches.
   if (request.method === 'HEAD') {
-    // For HEAD requests, return minimal response without executing heavy server components
-    const response = new NextResponse(null, {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/html',
-        'Cache-Control': 'no-store, max-age=0, must-revalidate',
-        'X-Response-Time': '1ms',
-        'X-Optimized': 'head-request',
-      },
-    });
-
-    return response;
+    const accept = request.headers.get('accept') || '';
+    const fetchDest = request.headers.get('sec-fetch-dest') || '';
+    const isHtmlIntent = accept.includes('text/html') || fetchDest === 'document';
+    if (isHtmlIntent) {
+      return new NextResponse(null, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html',
+          'Cache-Control': 'no-store, max-age=0, must-revalidate',
+          'X-Response-Time': '1ms',
+          'X-Optimized': 'head-request',
+        },
+      });
+    }
   }
 
   const response = NextResponse.next();
