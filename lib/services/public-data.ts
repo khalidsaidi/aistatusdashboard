@@ -7,6 +7,7 @@ import { persistenceService } from '@/lib/services/persistence';
 import modelsCatalog from '@/lib/data/models.json';
 import { normalizeIncidentDates } from '@/lib/utils/normalize-dates';
 import type { NormalizedIncident } from '@/lib/types/ingestion';
+import type { ModelMatrixTile } from '@/lib/types/insights';
 import type { EvidenceItem } from '@/lib/utils/public-api';
 import { queryMetricSeries, type MetricName } from '@/lib/services/metrics';
 
@@ -26,6 +27,7 @@ export type ProviderCatalog = {
 };
 
 const DEFAULT_WINDOW_SECONDS = 1800;
+type HealthSignal = ModelMatrixTile['signal'];
 
 function resolveCatalog(providerId: string) {
   const catalog = (modelsCatalog as Record<string, any>)[providerId] || (modelsCatalog as any)._default;
@@ -405,6 +407,22 @@ export async function buildFallbackPlan(options: {
   tokensPerSec?: number;
   streamDisconnectRate?: number;
 }) {
+  const normalizedSignal: HealthSignal = (() => {
+    if (!options.signal) return 'no-data';
+    switch (options.signal.toLowerCase()) {
+      case 'healthy':
+        return 'healthy';
+      case 'degraded':
+        return 'degraded';
+      case 'down':
+        return 'down';
+      case 'no-data':
+        return 'no-data';
+      default:
+        return 'no-data';
+    }
+  })();
+
   const plan = insightsService.buildFallbackPlan({
     providerId: options.providerId,
     model: options.model,
@@ -412,7 +430,7 @@ export async function buildFallbackPlan(options: {
     region: options.region,
     tier: options.tier || 'unknown',
     streaming: Boolean(options.streaming),
-    signal: options.signal || 'unknown',
+    signal: normalizedSignal,
     latencyP50: options.latencyP50,
     latencyP95: options.latencyP95,
     latencyP99: options.latencyP99,
@@ -439,7 +457,7 @@ export async function buildFallbackPlan(options: {
           },
         ]
       : [],
-    confidence: options.signal && options.signal !== 'unknown' ? 0.75 : 0.6,
+    confidence: normalizedSignal !== 'no-data' ? 0.75 : 0.6,
   };
 }
 
