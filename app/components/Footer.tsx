@@ -2,7 +2,7 @@ export default function Footer() {
   const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || process.env.CONTACT_EMAIL;
   const contactHref = contactEmail
     ? `mailto:${contactEmail}?subject=Trademark%20Removal%20Request`
-    : 'https://github.com/khalidsaidi/aistatusdashboard/issues/new?labels=trademark&title=Trademark%20Removal%20Request';
+    : 'https://github.com/aistatusdashboard/aistatusdashboard/issues/new?labels=trademark&title=Trademark%20Removal%20Request';
   const contactLabel = contactEmail ? 'contact us' : 'open an issue';
 
   return (
@@ -88,7 +88,7 @@ export default function Footer() {
           <p className="text-xs text-slate-600 dark:text-slate-400">
             Built with Next.js | Respects robots.txt and rate limits |{' '}
             <a
-              href="https://github.com/khalidsaidi/aistatusdashboard"
+              href="https://github.com/aistatusdashboard/aistatusdashboard"
               target="_blank"
               rel="noopener noreferrer"
               className="text-slate-900 dark:text-white underline hover:text-slate-700 dark:hover:text-slate-200 transition-colors inline-flex items-center gap-1 min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-400"

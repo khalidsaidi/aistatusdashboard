@@ -1,11 +1,11 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.khalidsaidi/aistatusdashboard",
+  "name": "io.github.aistatusdashboard/aistatusdashboard",
   "title": "AIStatusDashboard",
   "description": "Read-only MCP server for AIStatusDashboard status, incidents, metrics, and fallback recommendations.",
   "version": "1.0.0",
   "repository": {
-    "url": "https://github.com/khalidsaidi/aistatusdashboard",
+    "url": "https://github.com/aistatusdashboard/aistatusdashboard",
     "source": "github"
   },
   "websiteUrl": "https://aistatusdashboard.com",
