@@ -1,4 +1,8 @@
 # AI Status Dashboard
+[![MCP Registry](https://img.shields.io/badge/MCP-Registry-blue)](https://modelcontextprotocol.io/registry/aistatusdashboard)
+[![OpenAPI](https://img.shields.io/badge/OpenAPI-available-success)](https://aistatusdashboard.com/openapi.json)
+[![Datasets](https://img.shields.io/badge/Datasets-available-informational)](https://aistatusdashboard.com/datasets)
+
 A real-time status dashboard for AI service providers (OpenAI, Anthropic, Google Gemini, etc.).
 
 ## Features
@@ -29,6 +33,13 @@ A real-time status dashboard for AI service providers (OpenAI, Anthropic, Google
 ```bash
 npm run dev
 ```
+
+### Quick links
+- OpenAPI: https://aistatusdashboard.com/openapi.json
+- MCP server: https://aistatusdashboard.com/mcp
+- MCP Quickstart: https://aistatusdashboard.com/docs/agent/mcp-quickstart
+- Datasets: https://aistatusdashboard.com/datasets
+- Citing: https://aistatusdashboard.com/docs/citations.md
 
 ### Deployment (Firebase App Hosting)
 1. Configure production environment variables in `apphosting.yaml`.

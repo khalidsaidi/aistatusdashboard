@@ -2,7 +2,11 @@
 
 User-agent: *
 Allow: /docs/
+Allow: /ai
 Allow: /status/
+Allow: /providers/
+Allow: /datasets
+Allow: /rss.xml
 Allow: /api/public/
 Allow: /llms.txt
 Allow: /llms-full.txt
@@ -18,7 +22,11 @@ Disallow: /static/
 
 User-agent: OAI-SearchBot
 Allow: /docs/
+Allow: /ai
 Allow: /status/
+Allow: /providers/
+Allow: /datasets
+Allow: /rss.xml
 Allow: /api/public/
 Allow: /llms.txt
 Allow: /llms-full.txt
