@@ -8,4 +8,6 @@ export const metadata: Metadata = {
   },
 };
 
-export { default, dynamic } from '../page';
+export const dynamic = 'force-dynamic';
+
+export { default } from '../page';
