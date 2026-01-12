@@ -19,6 +19,21 @@ const googleSiteVerificationTokens = [
   process.env.GOOGLE_SITE_VERIFICATION_ALT || 'thZbMJrJpI5W61kPQCXhMn44Gt9ycmYeTX6f2xxIg68',
 ].filter(Boolean);
 
+const homeJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'AI Status Dashboard',
+  url: SITE_URL,
+  applicationCategory: 'WebApplication',
+  operatingSystem: 'Web',
+  description: 'AI reliability control plane: status, incidents, metrics, and fallback policy generation.',
+  offers: { '@type': 'Offer', price: '0' },
+  sameAs: [
+    'https://github.com/aistatusdashboard/aistatusdashboard',
+    'https://modelcontextprotocol.io/registry/aistatusdashboard',
+  ],
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -204,7 +219,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Structured Data */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify([homeJsonLd, ...jsonLd]) }}
         />
 
         <Suspense fallback={null}>

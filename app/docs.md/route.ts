@@ -3,11 +3,16 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const body = `# AIStatusDashboard Docs
 
+AI Status Dashboard is a reliability control plane for AI providers. Use these docs to integrate the REST API, MCP tools, datasets, and citation endpoints.
+
 ## Quick links
+- https://aistatusdashboard.com/ai
 - https://aistatusdashboard.com/docs/api
 - https://aistatusdashboard.com/docs/agent/mcp-quickstart
 - https://aistatusdashboard.com/docs/agent/mcp-tools
 - https://aistatusdashboard.com/datasets
+- https://aistatusdashboard.com/status
+- https://aistatusdashboard.com/providers
 
 ## OpenAPI
 - https://aistatusdashboard.com/openapi.json
@@ -15,6 +20,11 @@ export async function GET() {
 
 ## MCP
 - https://aistatusdashboard.com/mcp
+- Registry: https://modelcontextprotocol.io/registry/aistatusdashboard
+
+## Citing
+- https://aistatusdashboard.com/docs/citations.md
+- https://aistatusdashboard.com/incidents/{id}/cite
 `;
 
   return new Response(body, {

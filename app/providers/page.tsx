@@ -9,6 +9,16 @@ export const metadata: Metadata = {
 
 export default function ProvidersPage() {
   const providers = providerService.getProviders();
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: providers.map((p, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: `https://aistatusdashboard.com/provider/${p.id}`,
+      name: p.displayName || p.name,
+    })),
+  };
   return (
     <main className="flex-1">
       <div className="px-4 sm:px-6 py-10 max-w-5xl mx-auto space-y-4">
@@ -25,6 +35,10 @@ export default function ProvidersPage() {
             <p>Noscript snapshot: use /api/public/v1/providers for JSON.</p>
           </div>
         </noscript>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </div>
     </main>
   );

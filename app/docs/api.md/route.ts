@@ -1,28 +1,24 @@
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const body = `# AIStatusDashboard Public API
+  const body = `# API Docs
 
-Base URL: https://aistatusdashboard.com/api/public/v1
+Base URL: https://aistatusdashboard.com
 
-## Endpoints
-- GET /providers
-- GET /providers/{provider}/surfaces
-- GET /providers/{provider}/regions
-- GET /providers/{provider}/models
-- GET /status/summary
-- GET /status/health-matrix
-- GET /incidents
-- GET /incidents/{incident_id}
-- GET /metrics
-- POST /recommendations/fallback_plan
-- POST /policy/generate
+## Key endpoints
+- GET /api/public/v1/status/summary
+- GET /api/public/v1/incidents
+- GET /api/public/v1/providers
+- GET /metrics/{series_id}.json
 
-## OpenAPI
+OpenAPI:
 - https://aistatusdashboard.com/openapi.json
-- https://aistatusdashboard.com/openapi.yaml
-`;
 
+## Example
+\`\`\`bash
+curl https://aistatusdashboard.com/api/public/v1/status/summary
+\`\`\`
+`;
   return new Response(body, {
     headers: {
       'Content-Type': 'text/markdown; charset=utf-8',
