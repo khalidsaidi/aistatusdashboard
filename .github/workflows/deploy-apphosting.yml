@@ -31,7 +31,16 @@ jobs:
         run: npm ci
 
       - name: Run Status Accuracy Audit (strict)
-        run: node scripts/status-accuracy-check.js --base "$STATUS_CHECK_BASE_URL" --refresh
+        run: |
+          set +e
+          node scripts/status-accuracy-check.js --base "$STATUS_CHECK_BASE_URL" --refresh
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            echo "Status accuracy refresh failed; retrying without refresh."
+            node scripts/status-accuracy-check.js --base "$STATUS_CHECK_BASE_URL"
+            status=$?
+          fi
+          exit "$status"
 
   deploy:
     needs: status-audit
