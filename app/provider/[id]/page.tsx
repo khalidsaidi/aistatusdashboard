@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { providerService } from '@/lib/services/providers';
 import { statusService } from '@/lib/services/status';
 import { intelligenceService } from '@/lib/services/intelligence';
-import { queryMetricSeries } from '@/lib/services/metrics';
+import { queryMetricSeries, type MetricName, type MetricSeries } from '@/lib/services/metrics';
 import { normalizeIncidentDates } from '@/lib/utils/normalize-dates';
 import sourcesConfig from '@/lib/data/sources.json';
 import providersConfig from '@/lib/data/providers.json';
@@ -45,6 +45,17 @@ function latestMetricValue(series: { series: Array<{ value: number | null }> }) 
     if (typeof value === 'number') return value;
   }
   return undefined;
+}
+
+function emptySeries(metric: MetricName, providerId: string, since: Date, until: Date): MetricSeries {
+  return {
+    metric,
+    provider_id: providerId,
+    since: since.toISOString(),
+    until: until.toISOString(),
+    granularity_seconds: 300,
+    series: [],
+  };
 }
 
 function resolveProvider(id: string) {
@@ -134,29 +145,36 @@ export default async function ProviderPage({ params }: { params: { id: string } 
 
   const now = new Date();
   const since = new Date(now.getTime() - 60 * 60 * 1000);
-  const [p50Series, p95Series, p99Series] = await Promise.all([
-    queryMetricSeries({
-      metric: 'latency_p50_ms',
-      providerId: provider.id,
-      since,
-      until: now,
-      granularitySeconds: 300,
-    }),
-    queryMetricSeries({
-      metric: 'latency_p95_ms',
-      providerId: provider.id,
-      since,
-      until: now,
-      granularitySeconds: 300,
-    }),
-    queryMetricSeries({
-      metric: 'latency_p99_ms',
-      providerId: provider.id,
-      since,
-      until: now,
-      granularitySeconds: 300,
-    }),
-  ]);
+  let p50Series = emptySeries('latency_p50_ms', provider.id, since, now);
+  let p95Series = emptySeries('latency_p95_ms', provider.id, since, now);
+  let p99Series = emptySeries('latency_p99_ms', provider.id, since, now);
+  try {
+    [p50Series, p95Series, p99Series] = await Promise.all([
+      queryMetricSeries({
+        metric: 'latency_p50_ms',
+        providerId: provider.id,
+        since,
+        until: now,
+        granularitySeconds: 300,
+      }),
+      queryMetricSeries({
+        metric: 'latency_p95_ms',
+        providerId: provider.id,
+        since,
+        until: now,
+        granularitySeconds: 300,
+      }),
+      queryMetricSeries({
+        metric: 'latency_p99_ms',
+        providerId: provider.id,
+        since,
+        until: now,
+        granularitySeconds: 300,
+      }),
+    ]);
+  } catch {
+    // Fallback to empty series if metrics lookups fail at runtime.
+  }
 
   const latencySnapshot = {
     p50: latestMetricValue(p50Series),
