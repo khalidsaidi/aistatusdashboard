@@ -20,7 +20,7 @@ AI Status Dashboard is a reliability control plane for AI providers. Use these d
 
 ## MCP
 - https://aistatusdashboard.com/mcp
-- Registry: https://modelcontextprotocol.io/registry/aistatusdashboard
+- Registry: https://registry.modelcontextprotocol.io/v0.1/servers/io.github.aistatusdashboard%2Faistatusdashboard/versions/latest
 
 ## Citing
 - https://aistatusdashboard.com/docs/citations.md

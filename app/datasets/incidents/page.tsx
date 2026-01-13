@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { intelligenceService } from '@/lib/services/intelligence';
+import { normalizeIncidentDates } from '@/lib/utils/normalize-dates';
 
 export const metadata: Metadata = {
   title: 'Incidents Dataset',
@@ -10,7 +12,37 @@ export const metadata: Metadata = {
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://aistatusdashboard.com';
 
-export default function IncidentsDatasetPage() {
+function formatBytes(bytes: number) {
+  if (!Number.isFinite(bytes)) return 'n/a';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+export default async function IncidentsDatasetPage() {
+  const incidents = (await intelligenceService.getIncidents({ limit: 200 })).map(normalizeIncidentDates);
+  const rows = incidents.map((incident) =>
+    JSON.stringify({
+      incident_id: `${incident.providerId}:${incident.id}`,
+      provider_id: incident.providerId,
+      title: incident.title,
+      status: incident.status,
+      severity: incident.severity,
+      started_at: incident.startedAt,
+      updated_at: incident.updatedAt,
+      resolved_at: incident.resolvedAt || null,
+      impacted_regions: incident.impactedRegions || [],
+      impacted_models: incident.impactedModels || [],
+      raw_url: incident.rawUrl || null,
+      source_id: incident.sourceId,
+      service_id: incident.serviceId || null,
+      service_name: incident.serviceName || null,
+      updates: incident.updates || [],
+    })
+  );
+  const rowCount = incidents.length;
+  const updatedAt = incidents[0]?.updatedAt || new Date().toISOString();
+  const bytes = Buffer.byteLength(rows.join('\n'), 'utf8');
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Dataset',
@@ -50,6 +82,21 @@ export default function IncidentsDatasetPage() {
             <a href="/datasets/schemas/incidents.schema.json" className="cta-secondary text-xs">
               View JSON schema
             </a>
+            <ul className="text-xs text-slate-500 dark:text-slate-400 space-y-1">
+              <li>Rows: {rowCount}</li>
+              <li>Download size: {formatBytes(bytes)}</li>
+              <li>Updated: {new Date(updatedAt).toLocaleString('en-US')}</li>
+            </ul>
+          </section>
+
+          <section className="surface-card p-6 space-y-3">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Cite this dataset</h2>
+            <ul className="text-sm text-slate-600 dark:text-slate-300 space-y-1">
+              <li>Canonical: {`${SITE_URL}/datasets/incidents`}</li>
+              <li>Download: {`${SITE_URL}/datasets/incidents.ndjson`}</li>
+              <li>Updated: {new Date(updatedAt).toLocaleString('en-US')}</li>
+              <li>Evidence API: {`${SITE_URL}/api/public/v1/incidents?limit=50`}</li>
+            </ul>
           </section>
         </div>
       </div>

@@ -4,7 +4,7 @@ export async function GET() {
   const body = `# MCP Quickstart
 
 Endpoint: https://aistatusdashboard.com/mcp
-Registry: https://modelcontextprotocol.io/registry/aistatusdashboard
+Registry: https://registry.modelcontextprotocol.io/v0.1/servers/io.github.aistatusdashboard%2Faistatusdashboard/versions/latest
 OpenAPI: https://aistatusdashboard.com/openapi.json
 
 ## Example call

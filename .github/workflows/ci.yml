@@ -59,3 +59,26 @@ jobs:
         with:
           name: bot-sweep
           path: bot_sweep.txt
+
+  discovery-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run discovery audit
+        run: |
+          OUT_FILE=discoverability_audit.md node scripts/audit-discovery.mjs
+
+      - name: Upload discovery audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: discovery-audit
+          path: discoverability_audit.md

@@ -33,6 +33,10 @@ export default function McpAnnouncementPage() {
               <li>Resources for providers, regions, models, and incident details</li>
               <li>OpenAPI endpoints for REST-based automation</li>
             </ul>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Stable public surfaces are now maintained for discovery: MCP, OpenAPI JSON/YAML, RSS, sitemap,
+              datasets (NDJSON/CSV), and markdown mirrors for docs and status pages.
+            </p>
           </section>
 
           <section className="surface-card p-6 space-y-3">

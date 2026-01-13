@@ -1,0 +1,27 @@
+# Discoverability Audit
+
+Automated checks for core discovery surfaces. This report captures a baseline (before) and post-fix (after) snapshot of the same URL set.
+
+## Before (initial audit)
+
+| URL | HEAD | GET | Content-Type | Cache-Control | Bytes | Snippet |
+| --- | --- | --- | --- | --- | --- | --- |
+| https://aistatusdashboard.com/sitemap.xml | 200 | 200 | application/xml; charset=utf-8 | max-age=300, private | 8130 | <?xml version="1.0" encoding="UTF-8"?> <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"> <url> <loc>https://aistatusdashboard.com/</loc> <lastmod>2026-01-13T02:53:11.523Z</lastmod> <changef |
+| https://aistatusdashboard.com/rss.xml | 200 | 200 | application/rss+xml; charset=utf-8 | max-age=300, private | 10481 | <?xml version="1.0" encoding="UTF-8"?> <rss version="2.0"> <channel> <title>AI Status Dashboard Incidents</title> <link>https://aistatusdashboard.com/</link> <description>Incidents and maintenances</d |
+| https://aistatusdashboard.com/rss.xml?provider=openai | 200 | 200 | application/rss+xml; charset=utf-8 | max-age=300, private | 10481 | <?xml version="1.0" encoding="UTF-8"?> <rss version="2.0"> <channel> <title>AI Status Dashboard Incidents</title> <link>https://aistatusdashboard.com/</link> <description>Incidents and maintenances</d |
+| https://aistatusdashboard.com/provider/openai | 404 | 404 | text/html; charset=utf-8 | max-age=0, must-revalidate, no-cache, no-store, private | 25087 | <!DOCTYPE html><html id="__next_error__"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_n |
+| https://aistatusdashboard.com/provider/anthropic | 404 | 404 | text/html; charset=utf-8 | max-age=0, must-revalidate, no-cache, no-store, private | 25093 | <!DOCTYPE html><html id="__next_error__"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_n |
+| https://aistatusdashboard.com/provider/google-ai | 404 | 404 | text/html; charset=utf-8 | max-age=0, must-revalidate, no-cache, no-store, private | 25093 | <!DOCTYPE html><html id="__next_error__"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_n |
+| https://aistatusdashboard.com/provider/mistral | 404 | 404 | text/html; charset=utf-8 | max-age=0, must-revalidate, no-cache, no-store, private | 25089 | <!DOCTYPE html><html id="__next_error__"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_n |
+| https://aistatusdashboard.com/datasets/incidents.ndjson | 200 | 200 | application/x-ndjson; charset=utf-8 | max-age=300, private | 228200 | {"incident_id":"openai:01KEACZ6R02744RQKCMSK1ZG54","provider_id":"openai","title":"ChatGPT issues while retrieving workspace members","status":"investigating","severity":"degraded","started_at":"2026- |
+| https://aistatusdashboard.com/datasets/metrics.csv | 200 | 200 | text/csv; charset=utf-8 | max-age=300, private | 7519 | timestamp,provider_id,metric,value,sample_count,sources 2026-01-12T02:53:17.379Z,openai,latency_p95_ms,,0, 2026-01-12T03:53:17.379Z,openai,latency_p95_ms,,0, 2026-01-12T04:53:17.379Z,openai,latency_p9 |
+| https://aistatusdashboard.com/openapi.yaml | 200 | 200 | application/yaml; charset=utf-8 | max-age=600, private | 136859 | openapi: "3.1.0" info: title: "AIStatusDashboard Public API" version: "1.0.0" description: "Read-only API for provider status, incidents, metrics, and recommendations. All responses include request_id |
+| https://aistatusdashboard.com/openapi-3.0.yaml | 200 | 200 | application/yaml; charset=utf-8 | max-age=600, private | 136859 | openapi: "3.0.0" info: title: "AIStatusDashboard Public API" version: "1.0.0" description: "Read-only API for provider status, incidents, metrics, and recommendations. All responses include request_id |
+| https://aistatusdashboard.com/docs.md | 200 | 200 | text/markdown; charset=utf-8 | max-age=300, private | 837 | # AIStatusDashboard Docs AI Status Dashboard is a reliability control plane for AI providers. Use these docs to integrate the REST API, MCP tools, datasets, and citation endpoints. ## Quick links - ht |
+| https://aistatusdashboard.com/status.md | 200 | 200 | text/markdown; charset=utf-8 | max-age=300, private | 263 | # Status This page mirrors public status data and links to the JSON endpoints. - Summary: https://aistatusdashboard.com/api/public/v1/status/summary - Incidents: https://aistatusdashboard.com/api/publ |
+| https://aistatusdashboard.com/providers.md | 200 | 200 | text/markdown; charset=UTF-8 | max-age=0, private | 374 | # Providers This is a crawl-friendly mirror of the providers list. Key providers: - OpenAI: https://aistatusdashboard.com/provider/openai - Anthropic: https://aistatusdashboard.com/provider/anthropic  |
+| https://aistatusdashboard.com/api/health | 200 | 200 | application/json | - | 142 | {"status":"healthy","timestamp":"2026-01-13T02:53:21.180Z","uptime":1189.470588899,"config":{"firebaseProject":"configured"},"responseTime":0} |
+
+## After (post-fixes)
+
+_TBD: re-run scripts/audit-discovery.mjs after fixes land._

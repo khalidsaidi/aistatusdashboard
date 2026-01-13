@@ -5,6 +5,7 @@ Allow: /docs/
 Allow: /ai
 Allow: /status/
 Allow: /providers/
+Allow: /provider/
 Allow: /datasets
 Allow: /rss.xml
 Allow: /api/public/
@@ -28,6 +29,7 @@ Allow: /docs/
 Allow: /ai
 Allow: /status/
 Allow: /providers/
+Allow: /provider/
 Allow: /datasets
 Allow: /rss.xml
 Allow: /api/public/

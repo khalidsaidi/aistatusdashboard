@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import McpCallout from '../components/McpCallout';
+import { MCP_REGISTRY_URL } from '@/lib/config/links';
 
 export const metadata: Metadata = {
   title: 'AI Integration',
@@ -23,7 +24,7 @@ export default function AiLandingPage() {
     offers: { '@type': 'Offer', price: '0' },
     sameAs: [
       'https://github.com/aistatusdashboard/aistatusdashboard',
-      'https://modelcontextprotocol.io/registry/aistatusdashboard',
+      MCP_REGISTRY_URL,
     ],
   };
 
@@ -57,7 +58,7 @@ export default function AiLandingPage() {
               <Link href="/docs/agent/mcp-quickstart" className="cta-secondary text-xs">
                 MCP quickstart
               </Link>
-              <a href="https://modelcontextprotocol.io/registry/aistatusdashboard" className="cta-secondary text-xs">
+              <a href={MCP_REGISTRY_URL} className="cta-secondary text-xs">
                 MCP Registry
               </a>
               <a href="https://github.com/aistatusdashboard/aistatusdashboard" className="cta-secondary text-xs">
@@ -69,6 +70,41 @@ export default function AiLandingPage() {
               <a href="/reports/monthly-provider-scorecards" className="cta-secondary text-xs">
                 Monthly provider scorecards
               </a>
+              <a href="/docs/discoverability-audit.md" className="cta-secondary text-xs">
+                Discoverability audit
+              </a>
+            </div>
+          </section>
+
+          <section className="surface-card p-6 space-y-3">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Build on AIStatusDashboard</h2>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Stable public surfaces for apps, agents, and search systems.
+            </p>
+            <div className="grid gap-3">
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded">
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 mb-2">Public APIs</p>
+                <pre className="text-xs text-slate-800 dark:text-slate-100 overflow-auto">
+{`/api/public/v1/status/summary
+/api/public/v1/incidents
+/api/public/v1/providers`}
+                </pre>
+              </div>
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded">
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 mb-2">Datasets</p>
+                <pre className="text-xs text-slate-800 dark:text-slate-100 overflow-auto">
+{`/datasets/incidents.ndjson
+/datasets/metrics.csv`}
+                </pre>
+              </div>
+              <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded">
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 mb-2">Discovery</p>
+                <pre className="text-xs text-slate-800 dark:text-slate-100 overflow-auto">
+{`/llms.txt
+/openapi.json
+/.well-known/ai-plugin.json`}
+                </pre>
+              </div>
             </div>
           </section>
 

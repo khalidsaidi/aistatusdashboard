@@ -30,7 +30,7 @@ const homeJsonLd = {
   offers: { '@type': 'Offer', price: '0' },
   sameAs: [
     'https://github.com/aistatusdashboard/aistatusdashboard',
-    'https://modelcontextprotocol.io/registry/aistatusdashboard',
+    'https://registry.modelcontextprotocol.io/v0.1/servers/io.github.aistatusdashboard%2Faistatusdashboard/versions/latest',
   ],
 };
 

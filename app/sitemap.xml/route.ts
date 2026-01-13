@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
     buildUrl(`${origin}/docs/api.md`, now, 'weekly', '0.6'),
     buildUrl(`${origin}/docs/agent/mcp-quickstart`, now, 'weekly', '0.6'),
     buildUrl(`${origin}/docs/agent/mcp-quickstart.md`, now, 'weekly', '0.6'),
+    buildUrl(`${origin}/docs/discoverability-audit.md`, now, 'weekly', '0.5'),
     buildUrl(`${origin}/providers`, now, 'daily', '0.8'),
     buildUrl(`${origin}/providers.md`, now, 'daily', '0.7'),
     buildUrl(`${origin}/incidents`, now, 'hourly', '0.7'),

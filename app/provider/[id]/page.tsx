@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { providerService } from '@/lib/services/providers';
 import { statusService } from '@/lib/services/status';
 import { intelligenceService } from '@/lib/services/intelligence';
+import { queryMetricSeries } from '@/lib/services/metrics';
 import { normalizeIncidentDates } from '@/lib/utils/normalize-dates';
 import sourcesConfig from '@/lib/data/sources.json';
 
@@ -28,6 +29,19 @@ function formatDate(value?: string) {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return 'Unknown';
   return parsed.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+function formatLatency(value?: number) {
+  if (typeof value !== 'number' || Number.isNaN(value)) return 'n/a';
+  return `${Math.round(value)}ms`;
+}
+
+function latestMetricValue(series: { series: Array<{ value: number | null }> }) {
+  for (let i = series.series.length - 1; i >= 0; i -= 1) {
+    const value = series.series[i].value;
+    if (typeof value === 'number') return value;
+  }
+  return undefined;
 }
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
@@ -96,12 +110,48 @@ export default async function ProviderPage({ params }: { params: { id: string } 
 
   const mergedStatus = useSummary ? summary.status : baseStatus.status;
   const lastUpdated = useSummary ? summary.lastUpdated || baseStatus.lastChecked : baseStatus.lastChecked;
+  const officialStatusUrl = provider.statusPageUrl || provider.statusUrl;
 
   const detail = await intelligenceService.getProviderDetail(provider.id);
   const incidents = detail.incidents
     .map(normalizeIncidentDates)
     .filter((incident) => incident.status !== 'resolved')
     .slice(0, 5);
+
+  const now = new Date();
+  const since = new Date(now.getTime() - 60 * 60 * 1000);
+  const [p50Series, p95Series, p99Series] = await Promise.all([
+    queryMetricSeries({
+      metric: 'latency_p50_ms',
+      providerId: provider.id,
+      since,
+      until: now,
+      granularitySeconds: 300,
+    }),
+    queryMetricSeries({
+      metric: 'latency_p95_ms',
+      providerId: provider.id,
+      since,
+      until: now,
+      granularitySeconds: 300,
+    }),
+    queryMetricSeries({
+      metric: 'latency_p99_ms',
+      providerId: provider.id,
+      since,
+      until: now,
+      granularitySeconds: 300,
+    }),
+  ]);
+
+  const latencySnapshot = {
+    p50: latestMetricValue(p50Series),
+    p95: latestMetricValue(p95Series),
+    p99: latestMetricValue(p99Series),
+  };
+
+  const evidenceSummaryUrl = `${SITE_URL}/api/public/v1/status/summary?provider=${provider.id}`;
+  const evidenceIncidentsUrl = `${SITE_URL}/api/public/v1/incidents?provider=${provider.id}&limit=5`;
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -150,7 +200,7 @@ export default async function ProviderPage({ params }: { params: { id: string } 
                 Last updated {formatDate(lastUpdated)}
               </span>
               <a
-                href={provider.statusPageUrl}
+                href={officialStatusUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-slate-600 dark:text-slate-300 underline hover:text-slate-900 dark:hover:text-white"
@@ -163,6 +213,27 @@ export default async function ProviderPage({ params }: { params: { id: string } 
               >
                 RSS feed
               </a>
+            </div>
+          </section>
+
+          <section className="surface-card p-6 space-y-3">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Performance snapshot</h2>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Latency percentiles based on the last 60 minutes of probes and telemetry.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-3 text-sm text-slate-600 dark:text-slate-300">
+              <div className="rounded-lg border border-slate-200/70 dark:border-slate-700/70 p-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">p50 latency</p>
+                <p className="text-lg font-semibold text-slate-900 dark:text-white">{formatLatency(latencySnapshot.p50)}</p>
+              </div>
+              <div className="rounded-lg border border-slate-200/70 dark:border-slate-700/70 p-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">p95 latency</p>
+                <p className="text-lg font-semibold text-slate-900 dark:text-white">{formatLatency(latencySnapshot.p95)}</p>
+              </div>
+              <div className="rounded-lg border border-slate-200/70 dark:border-slate-700/70 p-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">p99 latency</p>
+                <p className="text-lg font-semibold text-slate-900 dark:text-white">{formatLatency(latencySnapshot.p99)}</p>
+              </div>
             </div>
           </section>
 
@@ -221,6 +292,30 @@ export default async function ProviderPage({ params }: { params: { id: string } 
                 Browse all providers
               </Link>
             </div>
+          </section>
+
+          <section className="surface-card p-6 space-y-3">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Cite this provider</h2>
+            <ul className="text-sm text-slate-600 dark:text-slate-300 space-y-1">
+              <li>Canonical: {`${SITE_URL}/provider/${provider.id}`}</li>
+              <li>Last updated: {formatDate(lastUpdated)}</li>
+              <li>
+                Official status:{' '}
+                {officialStatusUrl ? (
+                  <a className="underline" href={officialStatusUrl} target="_blank" rel="noopener noreferrer">
+                    {officialStatusUrl}
+                  </a>
+                ) : (
+                  'n/a'
+                )}
+              </li>
+              <li>
+                Evidence: {evidenceSummaryUrl}
+              </li>
+              <li>
+                Incidents: {evidenceIncidentsUrl}
+              </li>
+            </ul>
           </section>
 
           <noscript>

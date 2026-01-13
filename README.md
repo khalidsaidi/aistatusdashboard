@@ -1,5 +1,5 @@
 # AI Status Dashboard
-[![MCP Registry](https://img.shields.io/badge/MCP-Registry-blue)](https://modelcontextprotocol.io/registry/aistatusdashboard)
+[![MCP Registry](https://img.shields.io/badge/MCP-Registry-blue)](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.aistatusdashboard%2Faistatusdashboard/versions/latest)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-available-success)](https://aistatusdashboard.com/openapi.json)
 [![Datasets](https://img.shields.io/badge/Datasets-available-informational)](https://aistatusdashboard.com/datasets)
 
@@ -38,6 +38,7 @@ npm run dev
 - OpenAPI: https://aistatusdashboard.com/openapi.json
 - MCP server: https://aistatusdashboard.com/mcp
 - MCP Quickstart: https://aistatusdashboard.com/docs/agent/mcp-quickstart
+- Discoverability audit: https://aistatusdashboard.com/docs/discoverability-audit.md
 - Datasets: https://aistatusdashboard.com/datasets
 - Citing: https://aistatusdashboard.com/docs/citations.md
 

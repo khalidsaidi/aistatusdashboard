@@ -77,6 +77,20 @@ export default function HowItWorksPage() {
               </Link>
             </div>
           </section>
+
+          <section className="surface-card p-6 space-y-4">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Build on AIStatusDashboard</h2>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Use stable public surfaces to integrate reliability data into your workflows.
+            </p>
+            <ul className="text-sm text-slate-600 dark:text-slate-300 list-disc pl-6 space-y-2">
+              <li>MCP endpoint: https://aistatusdashboard.com/mcp</li>
+              <li>OpenAPI: https://aistatusdashboard.com/openapi.json</li>
+              <li>Public JSON: /api/public/v1/status/summary, /api/public/v1/incidents</li>
+              <li>Datasets: /datasets/incidents.ndjson, /datasets/metrics.csv</li>
+              <li>Discovery audit: /docs/discoverability-audit.md</li>
+            </ul>
+          </section>
         </div>
       </div>
     </main>

@@ -111,7 +111,7 @@ append_json "$(jq -n --arg url "__check__/llms_full_size" --arg status "200" --a
 
 ai_body=$(curl -s "${BASE}/ai")
 mcp_link_ok="true"
-echo "$ai_body" | grep -q "modelcontextprotocol.io/registry/aistatusdashboard" || mcp_link_ok="false"
+echo "$ai_body" | grep -q "registry.modelcontextprotocol.io/v0.1/servers/io.github.aistatusdashboard%2Faistatusdashboard/versions/latest" || mcp_link_ok="false"
 append_json "$(jq -n --arg url "__check__/mcp_registry_link" --arg status "200" --arg ok "$mcp_link_ok" '{url:$url,status:($status|tonumber),ok:($ok=="true")}' )"
 
 plugin_body=$(curl -s "${BASE}/.well-known/ai-plugin.json")

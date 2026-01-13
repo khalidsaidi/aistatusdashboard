@@ -14,5 +14,9 @@ export async function GET(request: NextRequest) {
     responseTime: Date.now() - startTime
   };
 
-  return NextResponse.json(health);
+  return NextResponse.json(health, {
+    headers: {
+      'Cache-Control': 'no-store, max-age=0, must-revalidate',
+    },
+  });
 }

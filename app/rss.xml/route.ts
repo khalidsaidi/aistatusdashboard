@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { intelligenceService } from '@/lib/services/intelligence';
 import { normalizeIncidentDates, normalizeMaintenanceDates } from '@/lib/utils/normalize-dates';
 
@@ -15,10 +15,12 @@ function escapeXml(value: string) {
     .replace(/'/g, '&apos;');
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const providerId = request.nextUrl.searchParams.get('provider') || undefined;
   const now = new Date().toUTCString();
-  const incidents = (await intelligenceService.getIncidents({ limit: 25 })).map(normalizeIncidentDates);
-  const maintenances = (await intelligenceService.getMaintenances({ limit: 10 })).map(normalizeMaintenanceDates);
+  const incidents = (await intelligenceService.getIncidents({ limit: 25, providerId })).map(normalizeIncidentDates);
+  const maintenances = (await intelligenceService.getMaintenances({ limit: 10, providerId })).map(normalizeMaintenanceDates);
+  const titleSuffix = providerId ? ` (${providerId})` : '';
 
   const items = [
     ...incidents.map((incident) => ({
@@ -55,10 +57,11 @@ export async function GET() {
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>AI Status Dashboard Incidents</title>
+    <title>AI Status Dashboard Incidents${titleSuffix}</title>
     <link>${SITE_URL}/</link>
     <description>Incidents and maintenances</description>
     <lastBuildDate>${now}</lastBuildDate>
+    <ttl>60</ttl>
     ${itemsXml}
   </channel>
 </rss>`;
