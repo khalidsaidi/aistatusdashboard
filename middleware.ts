@@ -76,7 +76,7 @@ function applyDiscoveryHeaders(response: NextResponse, pathname: string) {
 
   if (pathname === '/discovery/audit/latest.json') {
     response.headers.set('Content-Type', 'application/json; charset=utf-8');
-    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+    response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
     return;
   }
 

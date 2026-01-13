@@ -134,6 +134,22 @@ const nextConfig = {
           ...commonHeaders,
         ],
       },
+      {
+        source: '/discovery/audit/latest.json',
+        headers: [
+          { key: 'Content-Type', value: 'application/json; charset=utf-8' },
+          { key: 'Cache-Control', value: 'no-store, max-age=0, must-revalidate' },
+          ...commonHeaders,
+        ],
+      },
+      {
+        source: '/discovery/audit',
+        headers: [
+          { key: 'Content-Type', value: 'text/html; charset=utf-8' },
+          { key: 'Cache-Control', value: 'public, max-age=300, s-maxage=600' },
+          ...commonHeaders,
+        ],
+      },
     ];
   },
   // Skip 404 page generation to avoid Pages Router conflict
