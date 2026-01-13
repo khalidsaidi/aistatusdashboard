@@ -60,7 +60,8 @@ function emptySeries(metric: MetricName, providerId: string, since: Date, until:
   };
 }
 
-function resolveProvider(id: string) {
+function resolveProvider(idInput: string | string[] | undefined) {
+  const id = Array.isArray(idInput) ? idInput[0] : idInput;
   if (!id) return undefined;
   const direct = providerService.getProvider(id);
   if (direct) return direct;
@@ -80,7 +81,7 @@ function resolveProvider(id: string) {
   return fallback;
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { id: string | string[] } }): Promise<Metadata> {
   const provider = resolveProvider(params.id);
   if (!provider) {
     return {
@@ -119,7 +120,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   };
 }
 
-export default async function ProviderPage({ params }: { params: { id: string } }) {
+export default async function ProviderPage({ params }: { params: { id: string | string[] } }) {
   const provider = resolveProvider(params.id);
   if (!provider) return notFound();
 
