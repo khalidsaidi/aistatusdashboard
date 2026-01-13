@@ -1,0 +1,4 @@
+- Updated `lib/data/providers.json` to include the `google` alias so `/provider/google` resolves to the Gemini provider page.
+- Locked `MCP_REGISTRY_URL` to the canonical registry listing to keep `/ai` and MCP callouts stable.
+- Updated `server.json` to set `websiteUrl` to `/ai` and bumped the MCP registry version to `1.0.1` so the registry listing links back to the AI landing page.
+- Re-deployed App Hosting backend after the link updates to keep production in sync.
