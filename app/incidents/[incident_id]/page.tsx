@@ -35,7 +35,7 @@ export default async function IncidentDetailPage({ params }: { params: { inciden
     '@context': 'https://schema.org',
     '@type': 'Dataset',
     name: incident.title,
-    description: incident.summary || incident.title,
+    description: incident.title,
     datePublished: incident.startedAt,
     dateModified: incident.updatedAt,
     isBasedOn: incident.rawUrl || undefined,
