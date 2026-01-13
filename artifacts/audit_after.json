@@ -1,0 +1,1085 @@
+{
+  "incident_id": "openai:01KEACZ6R02744RQKCMSK1ZG54",
+  "entries": [
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/ai",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/ai",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/robots.txt",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/robots.txt",
+      "content_type": "text/plain; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "# https://www.robotstxt.org/robotstxt.html\n\nUser-agent: *\nAllow: /docs/\nAllow: /ai\nAllow: /status/\nAllow: /incidents\nAllow: /reports\nAllow: /providers/\nAllow: /provider/\nAllow: /datasets\nAllow: /rss.x"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/sitemap.xml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/sitemap.xml",
+      "content_type": "application/xml; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n\n  <url>\n    <loc>https://aistatusdashboard.com/</loc>\n    <lastmod>2026-01-13T08:10:38.752Z</lastmo"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/rss.xml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/rss.xml",
+      "content_type": "application/rss+xml; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\">\n  <channel>\n    <title>AI Status Dashboard Incidents</title>\n    <link>https://aistatusdashboard.com/</link>\n    <description>Incidents and m"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/llms.txt",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/llms.txt",
+      "content_type": "text/plain; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "AI Status Dashboard - llms.txt\nStart here: https://aistatusdashboard.com/ai\n\nMCP server: https://aistatusdashboard.com/mcp\nOpenAPI: https://aistatusdashboard.com/openapi.json\nPlugin manifest: https://"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/llms-full.txt",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/llms-full.txt",
+      "content_type": "text/plain; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "# AI Status Dashboard - Full LLM Discovery Guide\n\n## Overview\nAI Status Dashboard is an AI reliability control plane: status, incidents, metrics, and fallback policy generation across major AI provide"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/openapi.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"openapi\":\"3.1.0\",\"info\":{\"title\":\"AIStatusDashboard Public API\",\"version\":\"1.0.0\",\"description\":\"Read-only API for provider status, incidents, metrics, and recommendations. All responses include req"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/openapi.yaml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi.yaml",
+      "content_type": "application/yaml; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "openapi: \"3.1.0\"\ninfo:\n    title: \"AIStatusDashboard Public API\"\n    version: \"1.0.0\"\n    description: \"Read-only API for provider status, incidents, metrics, and recommendations. All responses includ"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/openapi-3.0.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi-3.0.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"AIStatusDashboard Public API\",\"version\":\"1.0.0\",\"description\":\"Read-only API for provider status, incidents, metrics, and recommendations. All responses include req"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/openapi-3.0.yaml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi-3.0.yaml",
+      "content_type": "application/yaml; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "openapi: \"3.0.0\"\ninfo:\n    title: \"AIStatusDashboard Public API\"\n    version: \"1.0.0\"\n    description: \"Read-only API for provider status, incidents, metrics, and recommendations. All responses includ"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/.well-known/openapi.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/.well-known/openapi.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"openapi\":\"3.1.0\",\"info\":{\"title\":\"AIStatusDashboard Public API\",\"version\":\"1.0.0\",\"description\":\"Read-only API for provider status, incidents, metrics, and recommendations. All responses include req"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/.well-known/ai-plugin.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/.well-known/ai-plugin.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"schema_version\":\"v1\",\"name_for_human\":\"AIStatusDashboard\",\"name_for_model\":\"aistatusdashboard\",\"description_for_human\":\"Public status, incidents, and AI provider health telemetry.\",\"description_for_"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/mcp",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/mcp",
+      "content_type": "text/plain; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "AIStatusDashboard MCP endpoint.\nUse POST with JSON-RPC 2.0 for tools, resources, and prompts.\nSee https://aistatusdashboard.com/ai for quickstart and docs."
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/providers",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/providers",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/provider/openai",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/provider/openai",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/provider/aws",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/provider/aws",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/provider/azure",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/provider/azure",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/datasets",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/datasets",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/datasets/incidents.ndjson",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/datasets/incidents.ndjson",
+      "content_type": "application/x-ndjson; charset=utf-8",
+      "cache_control": "max-age=60, private",
+      "snippet": "{\"incident_id\":\"openai:01KEACZ6R02744RQKCMSK1ZG54\",\"provider_id\":\"openai\",\"title\":\"ChatGPT issues while retrieving workspace members\",\"status\":\"investigating\",\"severity\":\"degraded\",\"started_at\":\"2026-"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/datasets/metrics.csv",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/datasets/metrics.csv",
+      "content_type": "text/csv; charset=utf-8",
+      "cache_control": "max-age=60, private",
+      "snippet": "timestamp,provider_id,metric,value,sample_count,sources\n2026-01-12T08:10:48.500Z,openai,latency_p95_ms,,0,\n2026-01-12T09:10:48.500Z,openai,latency_p95_ms,,0,\n2026-01-12T10:10:48.500Z,openai,latency_p9"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/docs.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/docs.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# AIStatusDashboard Docs\n\nAI Status Dashboard is a reliability control plane for AI providers. Use these docs to integrate the REST API, MCP tools, datasets, and citation endpoints.\n\n## Quick links\n- "
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/docs/api.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/docs/api.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# API Docs\n\nBase URL: https://aistatusdashboard.com\n\n## Key endpoints\n- GET /api/public/v1/status/summary\n- GET /api/public/v1/incidents\n- GET /api/public/v1/providers\n- GET /metrics/{series_id}.json\n"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/docs/citations.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/docs/citations.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# Citing AI Status Dashboard\n\nUse these references when citing incidents, metrics, or datasets.\n\n- Homepage: https://aistatusdashboard.com/\n- AI landing: https://aistatusdashboard.com/ai\n- OpenAPI: ht"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/status.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/status.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# Status\n\nThis page mirrors public status data and links to the JSON endpoints.\n\n- Summary: https://aistatusdashboard.com/api/public/v1/status/summary\n- Incidents: https://aistatusdashboard.com/api/pu"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/providers.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/providers.md",
+      "content_type": "text/markdown; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "# Providers\n\nThis is a crawl-friendly mirror of the providers list.\n\nKey providers:\n- OpenAI: https://aistatusdashboard.com/provider/openai\n- Anthropic: https://aistatusdashboard.com/provider/anthropi"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/api/public/v1/status/summary",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/api/public/v1/status/summary",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=60, private",
+      "snippet": "{\"request_id\":\"2cffb665-0525-4ac0-95f8-f1ac1f2204ab\",\"generated_at\":\"2026-01-13T08:10:52.528Z\",\"evidence\":[{\"source_url\":\"https://status.openai.com\",\"metric_window\":{\"since\":\"2026-01-13T07:40:52.503Z\""
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/api/public/v1/incidents",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/api/public/v1/incidents",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=30, private",
+      "snippet": "{\"request_id\":\"e3f076d2-7696-4751-b585-48a90da0d4b3\",\"generated_at\":\"2026-01-13T08:10:52.970Z\",\"evidence\":[{\"ids\":[\"openai:01KEACZ6R02744RQKCMSK1ZG54\"],\"metric_window\":{\"since\":\"2026-01-06T19:36:32.00"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/api/health",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/api/health",
+      "content_type": "application/json",
+      "cache_control": "max-age=0, must-revalidate, no-store, private",
+      "snippet": "{\"status\":\"healthy\",\"timestamp\":\"2026-01-13T08:10:53.397Z\",\"uptime\":1760.139871811,\"config\":{\"firebaseProject\":\"configured\"},\"responseTime\":0}"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "default",
+      "url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54/cite",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54/cite",
+      "content_type": "application/json",
+      "cache_control": "max-age=300, private",
+      "snippet": "{\"title\":\"ChatGPT issues while retrieving workspace members\",\"incident_id\":\"openai:01KEACZ6R02744RQKCMSK1ZG54\",\"providers\":[\"openai\"],\"impacted\":{\"models\":[],\"regions\":[],\"endpoints\":[]},\"time_window\""
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/ai",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/ai",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/robots.txt",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/robots.txt",
+      "content_type": "text/plain; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "# https://www.robotstxt.org/robotstxt.html\n\nUser-agent: *\nAllow: /docs/\nAllow: /ai\nAllow: /status/\nAllow: /incidents\nAllow: /reports\nAllow: /providers/\nAllow: /provider/\nAllow: /datasets\nAllow: /rss.x"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/sitemap.xml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/sitemap.xml",
+      "content_type": "application/xml; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n\n  <url>\n    <loc>https://aistatusdashboard.com/</loc>\n    <lastmod>2026-01-13T08:10:55.323Z</lastmo"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/rss.xml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/rss.xml",
+      "content_type": "application/rss+xml; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\">\n  <channel>\n    <title>AI Status Dashboard Incidents</title>\n    <link>https://aistatusdashboard.com/</link>\n    <description>Incidents and m"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/llms.txt",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/llms.txt",
+      "content_type": "text/plain; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "AI Status Dashboard - llms.txt\nStart here: https://aistatusdashboard.com/ai\n\nMCP server: https://aistatusdashboard.com/mcp\nOpenAPI: https://aistatusdashboard.com/openapi.json\nPlugin manifest: https://"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/llms-full.txt",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/llms-full.txt",
+      "content_type": "text/plain; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "# AI Status Dashboard - Full LLM Discovery Guide\n\n## Overview\nAI Status Dashboard is an AI reliability control plane: status, incidents, metrics, and fallback policy generation across major AI provide"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/openapi.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"openapi\":\"3.1.0\",\"info\":{\"title\":\"AIStatusDashboard Public API\",\"version\":\"1.0.0\",\"description\":\"Read-only API for provider status, incidents, metrics, and recommendations. All responses include req"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/openapi.yaml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi.yaml",
+      "content_type": "application/yaml; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "openapi: \"3.1.0\"\ninfo:\n    title: \"AIStatusDashboard Public API\"\n    version: \"1.0.0\"\n    description: \"Read-only API for provider status, incidents, metrics, and recommendations. All responses includ"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/openapi-3.0.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi-3.0.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"AIStatusDashboard Public API\",\"version\":\"1.0.0\",\"description\":\"Read-only API for provider status, incidents, metrics, and recommendations. All responses include req"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/openapi-3.0.yaml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi-3.0.yaml",
+      "content_type": "application/yaml; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "openapi: \"3.0.0\"\ninfo:\n    title: \"AIStatusDashboard Public API\"\n    version: \"1.0.0\"\n    description: \"Read-only API for provider status, incidents, metrics, and recommendations. All responses includ"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/.well-known/openapi.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/.well-known/openapi.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"openapi\":\"3.1.0\",\"info\":{\"title\":\"AIStatusDashboard Public API\",\"version\":\"1.0.0\",\"description\":\"Read-only API for provider status, incidents, metrics, and recommendations. All responses include req"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/.well-known/ai-plugin.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/.well-known/ai-plugin.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"schema_version\":\"v1\",\"name_for_human\":\"AIStatusDashboard\",\"name_for_model\":\"aistatusdashboard\",\"description_for_human\":\"Public status, incidents, and AI provider health telemetry.\",\"description_for_"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/mcp",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/mcp",
+      "content_type": "text/plain; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "AIStatusDashboard MCP endpoint.\nUse POST with JSON-RPC 2.0 for tools, resources, and prompts.\nSee https://aistatusdashboard.com/ai for quickstart and docs."
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/providers",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/providers",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/provider/openai",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/provider/openai",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/provider/aws",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/provider/aws",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/provider/azure",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/provider/azure",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/datasets",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/datasets",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/datasets/incidents.ndjson",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/datasets/incidents.ndjson",
+      "content_type": "application/x-ndjson; charset=utf-8",
+      "cache_control": "max-age=60, private",
+      "snippet": "{\"incident_id\":\"openai:01KEACZ6R02744RQKCMSK1ZG54\",\"provider_id\":\"openai\",\"title\":\"ChatGPT issues while retrieving workspace members\",\"status\":\"investigating\",\"severity\":\"degraded\",\"started_at\":\"2026-"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/datasets/metrics.csv",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/datasets/metrics.csv",
+      "content_type": "text/csv; charset=utf-8",
+      "cache_control": "max-age=60, private",
+      "snippet": "timestamp,provider_id,metric,value,sample_count,sources\n2026-01-12T08:11:03.477Z,openai,latency_p95_ms,,0,\n2026-01-12T09:11:03.477Z,openai,latency_p95_ms,,0,\n2026-01-12T10:11:03.477Z,openai,latency_p9"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/docs.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/docs.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# AIStatusDashboard Docs\n\nAI Status Dashboard is a reliability control plane for AI providers. Use these docs to integrate the REST API, MCP tools, datasets, and citation endpoints.\n\n## Quick links\n- "
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/docs/api.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/docs/api.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# API Docs\n\nBase URL: https://aistatusdashboard.com\n\n## Key endpoints\n- GET /api/public/v1/status/summary\n- GET /api/public/v1/incidents\n- GET /api/public/v1/providers\n- GET /metrics/{series_id}.json\n"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/docs/citations.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/docs/citations.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# Citing AI Status Dashboard\n\nUse these references when citing incidents, metrics, or datasets.\n\n- Homepage: https://aistatusdashboard.com/\n- AI landing: https://aistatusdashboard.com/ai\n- OpenAPI: ht"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/status.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/status.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# Status\n\nThis page mirrors public status data and links to the JSON endpoints.\n\n- Summary: https://aistatusdashboard.com/api/public/v1/status/summary\n- Incidents: https://aistatusdashboard.com/api/pu"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/providers.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/providers.md",
+      "content_type": "text/markdown; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "# Providers\n\nThis is a crawl-friendly mirror of the providers list.\n\nKey providers:\n- OpenAI: https://aistatusdashboard.com/provider/openai\n- Anthropic: https://aistatusdashboard.com/provider/anthropi"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/api/public/v1/status/summary",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/api/public/v1/status/summary",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=60, private",
+      "snippet": "{\"request_id\":\"efb9794c-ab96-491d-8c23-8f4a8ff395bd\",\"generated_at\":\"2026-01-13T08:11:05.819Z\",\"evidence\":[{\"source_url\":\"https://status.openai.com\",\"metric_window\":{\"since\":\"2026-01-13T07:41:05.801Z\""
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/api/public/v1/incidents",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/api/public/v1/incidents",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=30, private",
+      "snippet": "{\"request_id\":\"2e285d85-f912-4c98-be51-019726677b9c\",\"generated_at\":\"2026-01-13T08:11:06.247Z\",\"evidence\":[{\"ids\":[\"openai:01KEACZ6R02744RQKCMSK1ZG54\"],\"metric_window\":{\"since\":\"2026-01-06T19:36:32.00"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/api/health",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/api/health",
+      "content_type": "application/json",
+      "cache_control": "max-age=0, must-revalidate, no-store, private",
+      "snippet": "{\"status\":\"healthy\",\"timestamp\":\"2026-01-13T08:11:06.663Z\",\"uptime\":1773.405743161,\"config\":{\"firebaseProject\":\"configured\"},\"responseTime\":0}"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "Googlebot",
+      "url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54/cite",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54/cite",
+      "content_type": "application/json",
+      "cache_control": "max-age=300, private",
+      "snippet": "{\"title\":\"ChatGPT issues while retrieving workspace members\",\"incident_id\":\"openai:01KEACZ6R02744RQKCMSK1ZG54\",\"providers\":[\"openai\"],\"impacted\":{\"models\":[],\"regions\":[],\"endpoints\":[]},\"time_window\""
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/ai",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/ai",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/robots.txt",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/robots.txt",
+      "content_type": "text/plain; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "# https://www.robotstxt.org/robotstxt.html\n\nUser-agent: *\nAllow: /docs/\nAllow: /ai\nAllow: /status/\nAllow: /incidents\nAllow: /reports\nAllow: /providers/\nAllow: /provider/\nAllow: /datasets\nAllow: /rss.x"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/sitemap.xml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/sitemap.xml",
+      "content_type": "application/xml; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n\n  <url>\n    <loc>https://aistatusdashboard.com/</loc>\n    <lastmod>2026-01-13T08:11:08.625Z</lastmo"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/rss.xml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/rss.xml",
+      "content_type": "application/rss+xml; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\">\n  <channel>\n    <title>AI Status Dashboard Incidents</title>\n    <link>https://aistatusdashboard.com/</link>\n    <description>Incidents and m"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/llms.txt",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/llms.txt",
+      "content_type": "text/plain; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "AI Status Dashboard - llms.txt\nStart here: https://aistatusdashboard.com/ai\n\nMCP server: https://aistatusdashboard.com/mcp\nOpenAPI: https://aistatusdashboard.com/openapi.json\nPlugin manifest: https://"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/llms-full.txt",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/llms-full.txt",
+      "content_type": "text/plain; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "# AI Status Dashboard - Full LLM Discovery Guide\n\n## Overview\nAI Status Dashboard is an AI reliability control plane: status, incidents, metrics, and fallback policy generation across major AI provide"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/openapi.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"openapi\":\"3.1.0\",\"info\":{\"title\":\"AIStatusDashboard Public API\",\"version\":\"1.0.0\",\"description\":\"Read-only API for provider status, incidents, metrics, and recommendations. All responses include req"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/openapi.yaml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi.yaml",
+      "content_type": "application/yaml; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "openapi: \"3.1.0\"\ninfo:\n    title: \"AIStatusDashboard Public API\"\n    version: \"1.0.0\"\n    description: \"Read-only API for provider status, incidents, metrics, and recommendations. All responses includ"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/openapi-3.0.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi-3.0.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"AIStatusDashboard Public API\",\"version\":\"1.0.0\",\"description\":\"Read-only API for provider status, incidents, metrics, and recommendations. All responses include req"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/openapi-3.0.yaml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi-3.0.yaml",
+      "content_type": "application/yaml; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "openapi: \"3.0.0\"\ninfo:\n    title: \"AIStatusDashboard Public API\"\n    version: \"1.0.0\"\n    description: \"Read-only API for provider status, incidents, metrics, and recommendations. All responses includ"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/.well-known/openapi.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/.well-known/openapi.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"openapi\":\"3.1.0\",\"info\":{\"title\":\"AIStatusDashboard Public API\",\"version\":\"1.0.0\",\"description\":\"Read-only API for provider status, incidents, metrics, and recommendations. All responses include req"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/.well-known/ai-plugin.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/.well-known/ai-plugin.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"schema_version\":\"v1\",\"name_for_human\":\"AIStatusDashboard\",\"name_for_model\":\"aistatusdashboard\",\"description_for_human\":\"Public status, incidents, and AI provider health telemetry.\",\"description_for_"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/mcp",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/mcp",
+      "content_type": "text/plain; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "AIStatusDashboard MCP endpoint.\nUse POST with JSON-RPC 2.0 for tools, resources, and prompts.\nSee https://aistatusdashboard.com/ai for quickstart and docs."
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/providers",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/providers",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/provider/openai",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/provider/openai",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/provider/aws",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/provider/aws",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/provider/azure",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/provider/azure",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/datasets",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/datasets",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/datasets/incidents.ndjson",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/datasets/incidents.ndjson",
+      "content_type": "application/x-ndjson; charset=utf-8",
+      "cache_control": "max-age=60, private",
+      "snippet": "{\"incident_id\":\"openai:01KEACZ6R02744RQKCMSK1ZG54\",\"provider_id\":\"openai\",\"title\":\"ChatGPT issues while retrieving workspace members\",\"status\":\"investigating\",\"severity\":\"degraded\",\"started_at\":\"2026-"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/datasets/metrics.csv",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/datasets/metrics.csv",
+      "content_type": "text/csv; charset=utf-8",
+      "cache_control": "max-age=60, private",
+      "snippet": "timestamp,provider_id,metric,value,sample_count,sources\n2026-01-12T08:11:16.847Z,openai,latency_p95_ms,,0,\n2026-01-12T09:11:16.847Z,openai,latency_p95_ms,,0,\n2026-01-12T10:11:16.847Z,openai,latency_p9"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/docs.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/docs.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# AIStatusDashboard Docs\n\nAI Status Dashboard is a reliability control plane for AI providers. Use these docs to integrate the REST API, MCP tools, datasets, and citation endpoints.\n\n## Quick links\n- "
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/docs/api.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/docs/api.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# API Docs\n\nBase URL: https://aistatusdashboard.com\n\n## Key endpoints\n- GET /api/public/v1/status/summary\n- GET /api/public/v1/incidents\n- GET /api/public/v1/providers\n- GET /metrics/{series_id}.json\n"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/docs/citations.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/docs/citations.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# Citing AI Status Dashboard\n\nUse these references when citing incidents, metrics, or datasets.\n\n- Homepage: https://aistatusdashboard.com/\n- AI landing: https://aistatusdashboard.com/ai\n- OpenAPI: ht"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/status.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/status.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# Status\n\nThis page mirrors public status data and links to the JSON endpoints.\n\n- Summary: https://aistatusdashboard.com/api/public/v1/status/summary\n- Incidents: https://aistatusdashboard.com/api/pu"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/providers.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/providers.md",
+      "content_type": "text/markdown; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "# Providers\n\nThis is a crawl-friendly mirror of the providers list.\n\nKey providers:\n- OpenAI: https://aistatusdashboard.com/provider/openai\n- Anthropic: https://aistatusdashboard.com/provider/anthropi"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/api/public/v1/status/summary",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/api/public/v1/status/summary",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=60, private",
+      "snippet": "{\"request_id\":\"005d8e63-a31a-4f47-b352-6540399847d4\",\"generated_at\":\"2026-01-13T08:11:19.032Z\",\"evidence\":[{\"source_url\":\"https://status.openai.com\",\"metric_window\":{\"since\":\"2026-01-13T07:41:19.001Z\""
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/api/public/v1/incidents",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/api/public/v1/incidents",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=30, private",
+      "snippet": "{\"request_id\":\"24cf48c8-db94-4f0e-8919-029b0e419b0e\",\"generated_at\":\"2026-01-13T08:11:19.539Z\",\"evidence\":[{\"ids\":[\"openai:01KEACZ6R02744RQKCMSK1ZG54\"],\"metric_window\":{\"since\":\"2026-01-06T19:36:32.00"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/api/health",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/api/health",
+      "content_type": "application/json",
+      "cache_control": "max-age=0, must-revalidate, no-store, private",
+      "snippet": "{\"status\":\"healthy\",\"timestamp\":\"2026-01-13T08:11:19.957Z\",\"uptime\":1786.69932056,\"config\":{\"firebaseProject\":\"configured\"},\"responseTime\":0}"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "OAI-SearchBot",
+      "url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54/cite",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54/cite",
+      "content_type": "application/json",
+      "cache_control": "max-age=300, private",
+      "snippet": "{\"title\":\"ChatGPT issues while retrieving workspace members\",\"incident_id\":\"openai:01KEACZ6R02744RQKCMSK1ZG54\",\"providers\":[\"openai\"],\"impacted\":{\"models\":[],\"regions\":[],\"endpoints\":[]},\"time_window\""
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/ai",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/ai",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/robots.txt",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/robots.txt",
+      "content_type": "text/plain; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "# https://www.robotstxt.org/robotstxt.html\n\nUser-agent: *\nAllow: /docs/\nAllow: /ai\nAllow: /status/\nAllow: /incidents\nAllow: /reports\nAllow: /providers/\nAllow: /provider/\nAllow: /datasets\nAllow: /rss.x"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/sitemap.xml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/sitemap.xml",
+      "content_type": "application/xml; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n\n  <url>\n    <loc>https://aistatusdashboard.com/</loc>\n    <lastmod>2026-01-13T08:11:21.879Z</lastmo"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/rss.xml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/rss.xml",
+      "content_type": "application/rss+xml; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\">\n  <channel>\n    <title>AI Status Dashboard Incidents</title>\n    <link>https://aistatusdashboard.com/</link>\n    <description>Incidents and m"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/llms.txt",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/llms.txt",
+      "content_type": "text/plain; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "AI Status Dashboard - llms.txt\nStart here: https://aistatusdashboard.com/ai\n\nMCP server: https://aistatusdashboard.com/mcp\nOpenAPI: https://aistatusdashboard.com/openapi.json\nPlugin manifest: https://"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/llms-full.txt",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/llms-full.txt",
+      "content_type": "text/plain; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "# AI Status Dashboard - Full LLM Discovery Guide\n\n## Overview\nAI Status Dashboard is an AI reliability control plane: status, incidents, metrics, and fallback policy generation across major AI provide"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/openapi.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"openapi\":\"3.1.0\",\"info\":{\"title\":\"AIStatusDashboard Public API\",\"version\":\"1.0.0\",\"description\":\"Read-only API for provider status, incidents, metrics, and recommendations. All responses include req"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/openapi.yaml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi.yaml",
+      "content_type": "application/yaml; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "openapi: \"3.1.0\"\ninfo:\n    title: \"AIStatusDashboard Public API\"\n    version: \"1.0.0\"\n    description: \"Read-only API for provider status, incidents, metrics, and recommendations. All responses includ"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/openapi-3.0.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi-3.0.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"openapi\":\"3.0.0\",\"info\":{\"title\":\"AIStatusDashboard Public API\",\"version\":\"1.0.0\",\"description\":\"Read-only API for provider status, incidents, metrics, and recommendations. All responses include req"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/openapi-3.0.yaml",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/openapi-3.0.yaml",
+      "content_type": "application/yaml; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "openapi: \"3.0.0\"\ninfo:\n    title: \"AIStatusDashboard Public API\"\n    version: \"1.0.0\"\n    description: \"Read-only API for provider status, incidents, metrics, and recommendations. All responses includ"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/.well-known/openapi.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/.well-known/openapi.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"openapi\":\"3.1.0\",\"info\":{\"title\":\"AIStatusDashboard Public API\",\"version\":\"1.0.0\",\"description\":\"Read-only API for provider status, incidents, metrics, and recommendations. All responses include req"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/.well-known/ai-plugin.json",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/.well-known/ai-plugin.json",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=600, private",
+      "snippet": "{\"schema_version\":\"v1\",\"name_for_human\":\"AIStatusDashboard\",\"name_for_model\":\"aistatusdashboard\",\"description_for_human\":\"Public status, incidents, and AI provider health telemetry.\",\"description_for_"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/mcp",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/mcp",
+      "content_type": "text/plain; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "AIStatusDashboard MCP endpoint.\nUse POST with JSON-RPC 2.0 for tools, resources, and prompts.\nSee https://aistatusdashboard.com/ai for quickstart and docs."
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/providers",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/providers",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "no-store",
+      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/provider/openai",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/provider/openai",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/provider/aws",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/provider/aws",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/provider/azure",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/provider/azure",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/datasets",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/datasets",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/datasets/incidents.ndjson",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/datasets/incidents.ndjson",
+      "content_type": "application/x-ndjson; charset=utf-8",
+      "cache_control": "max-age=60, private",
+      "snippet": "{\"incident_id\":\"openai:01KEACZ6R02744RQKCMSK1ZG54\",\"provider_id\":\"openai\",\"title\":\"ChatGPT issues while retrieving workspace members\",\"status\":\"investigating\",\"severity\":\"degraded\",\"started_at\":\"2026-"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/datasets/metrics.csv",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/datasets/metrics.csv",
+      "content_type": "text/csv; charset=utf-8",
+      "cache_control": "max-age=60, private",
+      "snippet": "timestamp,provider_id,metric,value,sample_count,sources\n2026-01-12T08:11:31.257Z,openai,latency_p95_ms,,0,\n2026-01-12T09:11:31.257Z,openai,latency_p95_ms,,0,\n2026-01-12T10:11:31.257Z,openai,latency_p9"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/docs.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/docs.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# AIStatusDashboard Docs\n\nAI Status Dashboard is a reliability control plane for AI providers. Use these docs to integrate the REST API, MCP tools, datasets, and citation endpoints.\n\n## Quick links\n- "
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/docs/api.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/docs/api.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# API Docs\n\nBase URL: https://aistatusdashboard.com\n\n## Key endpoints\n- GET /api/public/v1/status/summary\n- GET /api/public/v1/incidents\n- GET /api/public/v1/providers\n- GET /metrics/{series_id}.json\n"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/docs/citations.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/docs/citations.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# Citing AI Status Dashboard\n\nUse these references when citing incidents, metrics, or datasets.\n\n- Homepage: https://aistatusdashboard.com/\n- AI landing: https://aistatusdashboard.com/ai\n- OpenAPI: ht"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/status.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/status.md",
+      "content_type": "text/markdown; charset=utf-8",
+      "cache_control": "max-age=300, private",
+      "snippet": "# Status\n\nThis page mirrors public status data and links to the JSON endpoints.\n\n- Summary: https://aistatusdashboard.com/api/public/v1/status/summary\n- Incidents: https://aistatusdashboard.com/api/pu"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/providers.md",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/providers.md",
+      "content_type": "text/markdown; charset=UTF-8",
+      "cache_control": "max-age=0, private",
+      "snippet": "# Providers\n\nThis is a crawl-friendly mirror of the providers list.\n\nKey providers:\n- OpenAI: https://aistatusdashboard.com/provider/openai\n- Anthropic: https://aistatusdashboard.com/provider/anthropi"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/api/public/v1/status/summary",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/api/public/v1/status/summary",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=60, private",
+      "snippet": "{\"request_id\":\"b4cb0d5f-90d1-475e-8956-ae9328e9efbc\",\"generated_at\":\"2026-01-13T08:11:33.366Z\",\"evidence\":[{\"source_url\":\"https://status.openai.com\",\"metric_window\":{\"since\":\"2026-01-13T07:41:33.351Z\""
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/api/public/v1/incidents",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/api/public/v1/incidents",
+      "content_type": "application/json; charset=utf-8",
+      "cache_control": "max-age=30, private",
+      "snippet": "{\"request_id\":\"afb59333-2846-4d3a-adb2-3da6d08a01fc\",\"generated_at\":\"2026-01-13T08:11:34.697Z\",\"evidence\":[{\"ids\":[\"openai:01KEACZ6R02744RQKCMSK1ZG54\"],\"metric_window\":{\"since\":\"2026-01-06T19:36:32.00"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/api/health",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/api/health",
+      "content_type": "application/json",
+      "cache_control": "max-age=0, must-revalidate, no-store, private",
+      "snippet": "{\"status\":\"healthy\",\"timestamp\":\"2026-01-13T08:11:35.106Z\",\"uptime\":1801.848464643,\"config\":{\"firebaseProject\":\"configured\"},\"responseTime\":0}"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54",
+      "content_type": "text/html; charset=utf-8",
+      "cache_control": "max-age=0, must-revalidate, no-cache, no-store, private",
+      "snippet": "<!DOCTYPE html><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width"
+    },
+    {
+      "ua": "RSS-Reader",
+      "url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54/cite",
+      "status": "200",
+      "final_url": "https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54/cite",
+      "content_type": "application/json",
+      "cache_control": "max-age=300, private",
+      "snippet": "{\"title\":\"ChatGPT issues while retrieving workspace members\",\"incident_id\":\"openai:01KEACZ6R02744RQKCMSK1ZG54\",\"providers\":[\"openai\"],\"impacted\":{\"models\":[],\"regions\":[],\"endpoints\":[]},\"time_window\""
+    }
+  ]
+}
