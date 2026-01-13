@@ -53,6 +53,7 @@ export async function GET(request: NextRequest) {
     buildUrl(`${origin}/reports/weekly-ai-reliability`, now, 'weekly', '0.6'),
     buildUrl(`${origin}/reports/monthly-provider-scorecards`, now, 'monthly', '0.6'),
     buildUrl(`${origin}/status/site-health`, now, 'weekly', '0.5'),
+    buildUrl(`${origin}/system-health`, now, 'weekly', '0.5'),
   ];
 
   providers.forEach((provider) => {

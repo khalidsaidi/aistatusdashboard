@@ -68,17 +68,31 @@ export default function Footer() {
             </a>
             {' | '}
             <a
-              href="/api/health"
+              href="/system-health"
               className="hover:text-slate-900 dark:hover:text-white transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-400"
             >
               System Health
             </a>
             {' | '}
             <a
-              href="/api/status"
+              href="/api/public/v1/status/summary"
               className="hover:text-slate-900 dark:hover:text-white transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-400"
             >
-              JSON API
+              Status JSON
+            </a>
+            {' | '}
+            <a
+              href="/docs/api"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-400"
+            >
+              API Docs
+            </a>
+            {' | '}
+            <a
+              href="/openapi.json"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-400"
+            >
+              OpenAPI
             </a>
           </p>
         </div>

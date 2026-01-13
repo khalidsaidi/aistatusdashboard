@@ -1,19 +1,21 @@
 import { NextResponse } from 'next/server';
 
-const BODY = `AI Status Dashboard - llms.txt
-Start here: https://aistatusdashboard.com/ai
+const BODY = `# AI Status Dashboard
 
-MCP server: https://aistatusdashboard.com/mcp
-OpenAPI: https://aistatusdashboard.com/openapi.json
-Plugin manifest: https://aistatusdashboard.com/.well-known/ai-plugin.json
-OpenAPI (well-known): https://aistatusdashboard.com/.well-known/openapi.json
+> AI reliability control plane: status, incidents, datasets, and MCP tools. Start here: https://aistatusdashboard.com/ai
 
-Datasets:
-- https://aistatusdashboard.com/datasets (index)
+## Core endpoints
+- MCP server: https://aistatusdashboard.com/mcp
+- OpenAPI: https://aistatusdashboard.com/openapi.json
+- Plugin manifest: https://aistatusdashboard.com/.well-known/ai-plugin.json
+- OpenAPI (well-known): https://aistatusdashboard.com/.well-known/openapi.json
+
+## Datasets
+- https://aistatusdashboard.com/datasets
 - https://aistatusdashboard.com/datasets/incidents.ndjson
 - https://aistatusdashboard.com/datasets/metrics.csv
 
-Docs (Markdown mirrors):
+## Docs (Markdown mirrors)
 - https://aistatusdashboard.com/docs.md
 - https://aistatusdashboard.com/docs/api.md
 - https://aistatusdashboard.com/docs/agent/mcp-quickstart.md
@@ -21,10 +23,12 @@ Docs (Markdown mirrors):
 - https://aistatusdashboard.com/providers.md
 - https://aistatusdashboard.com/docs/citations.md
 
-Citing: https://aistatusdashboard.com/docs/citations.md
+## Citing
+- https://aistatusdashboard.com/docs/citations.md
 
-RSS: https://aistatusdashboard.com/rss.xml
-Sitemap: https://aistatusdashboard.com/sitemap.xml
+## Feeds
+- RSS: https://aistatusdashboard.com/rss.xml
+- Sitemap: https://aistatusdashboard.com/sitemap.xml
 `;
 
 export async function GET() {

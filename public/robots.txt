@@ -8,6 +8,9 @@ Allow: /providers/
 Allow: /datasets
 Allow: /rss.xml
 Allow: /api/public/
+Allow: /api/health
+Allow: /api/status
+Allow: /api/status/
 Allow: /llms.txt
 Allow: /llms-full.txt
 Allow: /sitemap.xml
@@ -28,6 +31,9 @@ Allow: /providers/
 Allow: /datasets
 Allow: /rss.xml
 Allow: /api/public/
+Allow: /api/health
+Allow: /api/status
+Allow: /api/status/
 Allow: /llms.txt
 Allow: /llms-full.txt
 Allow: /sitemap.xml

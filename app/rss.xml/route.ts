@@ -27,6 +27,7 @@ export async function GET() {
       guid: `incident-${incident.providerId}:${incident.id}`,
       pubDate: new Date(incident.updatedAt).toUTCString(),
       description: incident.title,
+      category: incident.providerId,
     })),
     ...maintenances.map((maintenance) => ({
       title: `${maintenance.providerId}: ${maintenance.title}`,
@@ -34,6 +35,7 @@ export async function GET() {
       guid: `maintenance-${maintenance.providerId}:${maintenance.id}`,
       pubDate: new Date(maintenance.updatedAt).toUTCString(),
       description: maintenance.title,
+      category: maintenance.providerId,
     })),
   ];
 
@@ -45,6 +47,7 @@ export async function GET() {
       <guid>${escapeXml(i.guid)}</guid>
       <pubDate>${escapeXml(i.pubDate)}</pubDate>
       <description>${escapeXml(i.description)}</description>
+      <category>${escapeXml(i.category)}</category>
     </item>`
     )
     .join('\n');
