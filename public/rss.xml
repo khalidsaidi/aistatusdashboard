@@ -4,13 +4,13 @@
     <title>AI Status Dashboard Incidents</title>
     <link>https://aistatusdashboard.com/</link>
     <description>Incidents and maintenances</description>
-    <lastBuildDate>Tue, 13 Jan 2026 10:42:37 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 13 Jan 2026 19:40:55 GMT</lastBuildDate>
     <ttl>60</ttl>
     <item>
       <title>openai: ChatGPT issues while retrieving workspace members</title>
       <link>https://aistatusdashboard.com/incidents/openai:01KEACZ6R02744RQKCMSK1ZG54</link>
       <guid>incident-openai:01KEACZ6R02744RQKCMSK1ZG54</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>ChatGPT issues while retrieving workspace members</description>
       <category>openai</category>
     </item>
@@ -18,7 +18,7 @@
       <title>openai: GPT-5.1 Codex Max Elevated Error Rate</title>
       <link>https://aistatusdashboard.com/incidents/openai:01KE98V1TQRRQC8T1VAHH18NDC</link>
       <guid>incident-openai:01KE98V1TQRRQC8T1VAHH18NDC</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>GPT-5.1 Codex Max Elevated Error Rate</description>
       <category>openai</category>
     </item>
@@ -26,7 +26,7 @@
       <title>aws: BEDROCK_TEST</title>
       <link>https://aistatusdashboard.com/incidents/aws:aws-health-test-2026-01-06T04:18:57Z</link>
       <guid>incident-aws:aws-health-test-2026-01-06T04:18:57Z</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>BEDROCK_TEST</description>
       <category>aws</category>
     </item>
@@ -34,7 +34,7 @@
       <title>aws: AWS_BEDROCK_TEST</title>
       <link>https://aistatusdashboard.com/incidents/aws:aws-health-1767669851763</link>
       <guid>incident-aws:aws-health-1767669851763</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>AWS_BEDROCK_TEST</description>
       <category>aws</category>
     </item>
@@ -42,7 +42,7 @@
       <title>anthropic: Errors on requests to Haiku 3.5</title>
       <link>https://aistatusdashboard.com/incidents/anthropic:m4bbg9f9lfjk</link>
       <guid>incident-anthropic:m4bbg9f9lfjk</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Errors on requests to Haiku 3.5</description>
       <category>anthropic</category>
     </item>
@@ -50,7 +50,7 @@
       <title>runway: Video upscale tasks cannot be started</title>
       <link>https://aistatusdashboard.com/incidents/runway:gy72t9kttbpr</link>
       <guid>incident-runway:gy72t9kttbpr</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Video upscale tasks cannot be started</description>
       <category>runway</category>
     </item>
@@ -58,7 +58,7 @@
       <title>openai: Some User May Experience Issues Loading Conversation History and Downloading Files from Custom GPTs</title>
       <link>https://aistatusdashboard.com/incidents/openai:01KD9TAC2AVM41E7FSGE3X0B9J</link>
       <guid>incident-openai:01KD9TAC2AVM41E7FSGE3X0B9J</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Some User May Experience Issues Loading Conversation History and Downloading Files from Custom GPTs</description>
       <category>openai</category>
     </item>
@@ -66,7 +66,7 @@
       <title>groq: Model Performance or Availability Issue: llama-3.3-70b-versatile</title>
       <link>https://aistatusdashboard.com/incidents/groq:01KD99GZ8D8KKBW1TDDRP9D2KJ</link>
       <guid>incident-groq:01KD99GZ8D8KKBW1TDDRP9D2KJ</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Model Performance or Availability Issue: llama-3.3-70b-versatile</description>
       <category>groq</category>
     </item>
@@ -74,7 +74,7 @@
       <title>runway: Unable to start new tasks</title>
       <link>https://aistatusdashboard.com/incidents/runway:c4ckg59k2h10</link>
       <guid>incident-runway:c4ckg59k2h10</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Unable to start new tasks</description>
       <category>runway</category>
     </item>
@@ -82,7 +82,7 @@
       <title>anthropic: Elevated error rates on Opus 4.5</title>
       <link>https://aistatusdashboard.com/incidents/anthropic:f9zwsv7f87wl</link>
       <guid>incident-anthropic:f9zwsv7f87wl</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Elevated error rates on Opus 4.5</description>
       <category>anthropic</category>
     </item>
@@ -90,7 +90,7 @@
       <title>deepseek: 【已恢复】DeepSeek 网页/API 性能异常（[Resolved]DeepSeek Web/API Service Degraded Performance）</title>
       <link>https://aistatusdashboard.com/incidents/deepseek:kdttdfwdcnkv</link>
       <guid>incident-deepseek:kdttdfwdcnkv</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>【已恢复】DeepSeek 网页/API 性能异常（[Resolved]DeepSeek Web/API Service Degraded Performance）</description>
       <category>deepseek</category>
     </item>
@@ -98,7 +98,7 @@
       <title>anthropic: Elevated error rates on Opus 4.5</title>
       <link>https://aistatusdashboard.com/incidents/anthropic:8f0x9qxn6bvf</link>
       <guid>incident-anthropic:8f0x9qxn6bvf</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Elevated error rates on Opus 4.5</description>
       <category>anthropic</category>
     </item>
@@ -106,7 +106,7 @@
       <title>openai: Some Android users are experiencing elevated errors while using ChatGPT.</title>
       <link>https://aistatusdashboard.com/incidents/openai:01KD19S888P8SGB2TFB82DWCW8</link>
       <guid>incident-openai:01KD19S888P8SGB2TFB82DWCW8</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Some Android users are experiencing elevated errors while using ChatGPT.</description>
       <category>openai</category>
     </item>
@@ -114,7 +114,7 @@
       <title>anthropic: Elevated error rates on Opus 4.5</title>
       <link>https://aistatusdashboard.com/incidents/anthropic:d2w4wfsd7fq6</link>
       <guid>incident-anthropic:d2w4wfsd7fq6</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Elevated error rates on Opus 4.5</description>
       <category>anthropic</category>
     </item>
@@ -122,7 +122,7 @@
       <title>replicate: High demand for H100 hardware type</title>
       <link>https://aistatusdashboard.com/incidents/replicate:01KCSDPNTXMP20260BEAFS86WQ</link>
       <guid>incident-replicate:01KCSDPNTXMP20260BEAFS86WQ</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>High demand for H100 hardware type</description>
       <category>replicate</category>
     </item>
@@ -130,7 +130,7 @@
       <title>anthropic: Research unavailable for some teams orgs</title>
       <link>https://aistatusdashboard.com/incidents/anthropic:3gvzshr7mqtr</link>
       <guid>incident-anthropic:3gvzshr7mqtr</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Research unavailable for some teams orgs</description>
       <category>anthropic</category>
     </item>
@@ -138,7 +138,7 @@
       <title>anthropic: Claude Code on Windows rendering improperly</title>
       <link>https://aistatusdashboard.com/incidents/anthropic:8rwc17y9kmqz</link>
       <guid>incident-anthropic:8rwc17y9kmqz</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Claude Code on Windows rendering improperly</description>
       <category>anthropic</category>
     </item>
@@ -146,7 +146,7 @@
       <title>anthropic: Elevated error rates on Sonnet 4.5</title>
       <link>https://aistatusdashboard.com/incidents/anthropic:8d87293jq0mk</link>
       <guid>incident-anthropic:8d87293jq0mk</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Elevated error rates on Sonnet 4.5</description>
       <category>anthropic</category>
     </item>
@@ -154,7 +154,7 @@
       <title>openai: Increased error rates for Sora API</title>
       <link>https://aistatusdashboard.com/incidents/openai:01KCTM1YZ1AW72M9JVW48TNJES</link>
       <guid>incident-openai:01KCTM1YZ1AW72M9JVW48TNJES</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Increased error rates for Sora API</description>
       <category>openai</category>
     </item>
@@ -162,7 +162,7 @@
       <title>openai: Degraded latency and increased error rates for Sora API</title>
       <link>https://aistatusdashboard.com/incidents/openai:01KCT3221DKSNWZ6QABP6V2ZE6</link>
       <guid>incident-openai:01KCT3221DKSNWZ6QABP6V2ZE6</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Degraded latency and increased error rates for Sora API</description>
       <category>openai</category>
     </item>
@@ -170,7 +170,7 @@
       <title>openai: ChatGPT intermittently not loading successfully after SSO authentication</title>
       <link>https://aistatusdashboard.com/incidents/openai:01KCQ4D84M0KCBPNCENAV6B8GZ</link>
       <guid>incident-openai:01KCQ4D84M0KCBPNCENAV6B8GZ</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>ChatGPT intermittently not loading successfully after SSO authentication</description>
       <category>openai</category>
     </item>
@@ -178,7 +178,7 @@
       <title>openai: Unable to Login on Sora Web</title>
       <link>https://aistatusdashboard.com/incidents/openai:01KCSQV59E8XZETJ89JTXME2AZ</link>
       <guid>incident-openai:01KCSQV59E8XZETJ89JTXME2AZ</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Unable to Login on Sora Web</description>
       <category>openai</category>
     </item>
@@ -186,7 +186,7 @@
       <title>openai: Finetuning jobs are intermittently failing</title>
       <link>https://aistatusdashboard.com/incidents/openai:01KCQ5FA8SEDPNZSZEH27V2H5X</link>
       <guid>incident-openai:01KCQ5FA8SEDPNZSZEH27V2H5X</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Finetuning jobs are intermittently failing</description>
       <category>openai</category>
     </item>
@@ -194,7 +194,7 @@
       <title>anthropic: Elevated error rates on Sonnet 4</title>
       <link>https://aistatusdashboard.com/incidents/anthropic:4pw74ts6z930</link>
       <guid>incident-anthropic:4pw74ts6z930</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Elevated error rates on Sonnet 4</description>
       <category>anthropic</category>
     </item>
@@ -202,7 +202,7 @@
       <title>groq: Data Center Failure Impacting Capacity - DMM1</title>
       <link>https://aistatusdashboard.com/incidents/groq:01KCNJCXJRRZB6WJE7A844VE3Q</link>
       <guid>incident-groq:01KCNJCXJRRZB6WJE7A844VE3Q</guid>
-      <pubDate>Tue, 13 Jan 2026 10:42:36 GMT</pubDate>
+      <pubDate>Tue, 13 Jan 2026 19:40:54 GMT</pubDate>
       <description>Data Center Failure Impacting Capacity - DMM1</description>
       <category>groq</category>
     </item>
