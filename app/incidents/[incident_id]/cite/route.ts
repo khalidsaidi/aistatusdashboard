@@ -11,8 +11,13 @@ async function sha256Hex(input: string): Promise<string> {
     .join('');
 }
 
-export async function GET(_request: NextRequest, { params }: { params: { incident_id: string } }) {
-  const id = params.incident_id;
+export async function GET(request: NextRequest, { params }: { params: { incident_id?: string } }) {
+  const paramId = params?.incident_id || '';
+  const pathId = request.nextUrl.pathname.split('/').slice(-2, -1)[0] || '';
+  const id = decodeURIComponent(paramId || pathId).trim();
+  if (!id) {
+    return NextResponse.json({ error: 'Missing incident id' }, { status: 400 });
+  }
   const incident = await getIncidentById(id);
   if (!incident) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
