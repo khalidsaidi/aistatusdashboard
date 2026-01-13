@@ -40,3 +40,22 @@ jobs:
       - name: Functions Build
         if: ${{ hashFiles('functions/package.json') != '' }}
         run: npm --prefix functions run build
+
+  bot-sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run bot sweep
+        run: |
+          chmod +x scripts/bot_sweep.sh
+          OUT_FILE=bot_sweep.txt scripts/bot_sweep.sh
+
+      - name: Upload bot sweep results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bot-sweep
+          path: bot_sweep.txt
