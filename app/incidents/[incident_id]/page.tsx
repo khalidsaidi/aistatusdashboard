@@ -1,20 +1,80 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { getIncidentById } from '@/lib/services/public-data';
+import { log } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
 
-export async function generateMetadata({ params }: { params: { incident_id: string } }): Promise<Metadata> {
+type IncidentParams = { incident_id: string };
+
+async function resolveParams(params: IncidentParams | Promise<IncidentParams>) {
+  return Promise.resolve(params);
+}
+
+function extractIncidentId(path?: string | null) {
+  if (!path) return undefined;
+  const match = path.match(/\/incidents\/([^/?#]+)/i);
+  return match ? decodeURIComponent(match[1]) : undefined;
+}
+
+async function resolveIncidentId(params: IncidentParams | Promise<IncidentParams>) {
+  const resolvedParams = await resolveParams(params);
+  if (resolvedParams?.incident_id) return resolvedParams.incident_id;
+  const headerList = await headers();
+  const fallbackPath =
+    headerList.get('x-forwarded-uri') ||
+    headerList.get('x-original-url') ||
+    headerList.get('x-url') ||
+    headerList.get('x-rewrite-url') ||
+    headerList.get('x-invoke-path');
+  const extracted = extractIncidentId(fallbackPath);
+  if (!extracted) {
+    log('warn', 'Incident param missing', {
+      fallbackPath,
+      headerSample: Array.from(headerList.keys()).slice(0, 8),
+    });
+  }
+  return extracted;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: IncidentParams | Promise<IncidentParams>;
+}): Promise<Metadata> {
+  const incidentId = await resolveIncidentId(params);
+  const safeId = incidentId || 'unknown';
   return {
-    title: `Incident ${params.incident_id}`,
+    title: `Incident ${safeId}`,
     description: 'Incident detail from AIStatusDashboard.',
     alternates: {
-      canonical: `/incidents/${params.incident_id}`,
+      canonical: `/incidents/${safeId}`,
     },
   };
 }
 
-export default async function IncidentDetailPage({ params }: { params: { incident_id: string } }) {
-  const incident = await getIncidentById(params.incident_id);
+export default async function IncidentDetailPage({
+  params,
+}: {
+  params: IncidentParams | Promise<IncidentParams>;
+}) {
+  const incidentId = await resolveIncidentId(params);
+  if (!incidentId) {
+    return (
+      <main className="flex-1">
+        <div className="px-4 sm:px-6 py-10">
+          <div className="max-w-4xl mx-auto surface-card-strong p-8 text-center">
+            <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Incident not found</h1>
+            <p className="text-sm text-slate-600 dark:text-slate-300 mt-3">
+              The incident ID could not be resolved.
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  const incident = await getIncidentById(incidentId);
 
   if (!incident) {
     return (

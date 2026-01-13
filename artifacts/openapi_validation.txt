@@ -1,0 +1,3 @@
+title: AIStatusDashboard Public API
+version: 1.0.0
+paths: 11

@@ -1,1 +1,8 @@
-sitemap.xml: parsed ok, bytes 8130
+urls:43
+/ai: True
+/llms.txt: True
+/llms-full.txt: True
+/openapi.json: False
+/docs: True
+/providers: True
+/datasets: True

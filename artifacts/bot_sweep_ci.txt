@@ -35,10 +35,10 @@ https://aistatusdashboard.com/datasets/metrics.csv | curl/8.7.1 | 200 | text/csv
 https://aistatusdashboard.com/datasets/metrics.csv | Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html) | 200 | text/csv; charset=utf-8 | max-age=300, private | -
 https://aistatusdashboard.com/datasets/metrics.csv | OAI-SearchBot | 200 | text/csv; charset=utf-8 | max-age=300, private | -
 https://aistatusdashboard.com/datasets/metrics.csv | Mozilla/5.0 (compatible; FeedFetcher-Google; +http://www.google.com/feedfetcher.html) | 200 | text/csv; charset=utf-8 | max-age=300, private | -
-https://aistatusdashboard.com/api/health | curl/8.7.1 | 200 | application/json | - | -
-https://aistatusdashboard.com/api/health | Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html) | 200 | application/json | - | -
-https://aistatusdashboard.com/api/health | OAI-SearchBot | 200 | application/json | - | -
-https://aistatusdashboard.com/api/health | Mozilla/5.0 (compatible; FeedFetcher-Google; +http://www.google.com/feedfetcher.html) | 200 | application/json | - | -
+https://aistatusdashboard.com/api/health | curl/8.7.1 | 200 | application/json | max-age=0, must-revalidate, no-store, private | -
+https://aistatusdashboard.com/api/health | Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html) | 200 | application/json | max-age=0, must-revalidate, no-store, private | -
+https://aistatusdashboard.com/api/health | OAI-SearchBot | 200 | application/json | max-age=0, must-revalidate, no-store, private | -
+https://aistatusdashboard.com/api/health | Mozilla/5.0 (compatible; FeedFetcher-Google; +http://www.google.com/feedfetcher.html) | 200 | application/json | max-age=0, must-revalidate, no-store, private | -
 https://aistatusdashboard.com/api/status | curl/8.7.1 | 200 | application/json | - | -
 https://aistatusdashboard.com/api/status | Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html) | 200 | application/json | - | -
 https://aistatusdashboard.com/api/status | OAI-SearchBot | 200 | application/json | - | -
