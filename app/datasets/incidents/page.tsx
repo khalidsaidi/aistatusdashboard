@@ -17,6 +17,7 @@ export default function IncidentsDatasetPage() {
     name: 'AIStatusDashboard Incidents Dataset',
     url: `${SITE_URL}/datasets/incidents`,
     description: 'Normalized incidents across AI providers with updates and severity metadata.',
+    temporalCoverage: '2024-01-01/2025-12-31',
     distribution: [
       {
         '@type': 'DataDownload',

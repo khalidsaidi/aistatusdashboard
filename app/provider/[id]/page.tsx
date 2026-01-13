@@ -116,6 +116,16 @@ export default async function ProviderPage({ params }: { params: { id: string } 
     url: `${SITE_URL}/provider/${provider.id}`,
   };
 
+  const appJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'AI Status Dashboard',
+    applicationCategory: 'WebApplication',
+    operatingSystem: 'Web',
+    url: `${SITE_URL}/provider/${provider.id}`,
+    description: `Provider status, incidents, and uptime signals for ${displayName}.`,
+  };
+
   return (
     <main className="flex-1">
       <div className="px-4 sm:px-6 py-10">
@@ -212,12 +222,18 @@ export default async function ProviderPage({ params }: { params: { id: string } 
               </Link>
             </div>
           </section>
+
+          <noscript>
+            <div className="surface-card p-4">
+              <p>Provider snapshot: /api/public/v1/status/summary and /api/public/v1/incidents</p>
+            </div>
+          </noscript>
         </div>
       </div>
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([structuredData, appJsonLd]) }}
       />
     </main>
   );

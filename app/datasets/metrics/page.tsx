@@ -17,6 +17,7 @@ export default function MetricsDatasetPage() {
     name: 'AIStatusDashboard Metrics Dataset',
     url: `${SITE_URL}/datasets/metrics`,
     description: 'Aggregated latency and reliability metrics across AI providers.',
+    temporalCoverage: '2024-01-01/2025-12-31',
     distribution: [
       {
         '@type': 'DataDownload',

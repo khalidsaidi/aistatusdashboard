@@ -71,8 +71,20 @@ export default function DocsPage() {
               <Link href="/datasets" className="cta-secondary text-xs">
                 Data catalog
               </Link>
+              <Link href="/reports/weekly-ai-reliability" className="cta-secondary text-xs">
+                Weekly report
+              </Link>
+              <Link href="/reports/monthly-provider-scorecards" className="cta-secondary text-xs">
+                Monthly scorecards
+              </Link>
             </div>
           </section>
+
+          <noscript>
+            <div className="surface-card p-4">
+              <p>Docs snapshot: /docs.md, /docs/api.md, /docs/agent/mcp-quickstart.md</p>
+            </div>
+          </noscript>
         </div>
       </div>
     </main>

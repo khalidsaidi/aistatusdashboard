@@ -63,6 +63,12 @@ export default function AiLandingPage() {
               <a href="https://github.com/aistatusdashboard/aistatusdashboard" className="cta-secondary text-xs">
                 GitHub repo
               </a>
+              <a href="/reports/weekly-ai-reliability" className="cta-secondary text-xs">
+                Weekly reliability report
+              </a>
+              <a href="/reports/monthly-provider-scorecards" className="cta-secondary text-xs">
+                Monthly provider scorecards
+              </a>
             </div>
           </section>
 

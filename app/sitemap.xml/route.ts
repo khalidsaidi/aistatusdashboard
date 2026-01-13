@@ -50,6 +50,9 @@ export async function GET(request: NextRequest) {
     buildUrl(`${origin}/llms.txt`, now, 'daily', '0.7'),
     buildUrl(`${origin}/llms-full.txt`, now, 'daily', '0.6'),
     buildUrl(`${origin}/rss.xml`, now, 'hourly', '0.8'),
+    buildUrl(`${origin}/reports/weekly-ai-reliability`, now, 'weekly', '0.6'),
+    buildUrl(`${origin}/reports/monthly-provider-scorecards`, now, 'monthly', '0.6'),
+    buildUrl(`${origin}/status/site-health`, now, 'weekly', '0.5'),
   ];
 
   providers.forEach((provider) => {
