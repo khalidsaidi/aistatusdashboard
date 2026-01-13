@@ -13,3 +13,4 @@
 - 2026-01-13: Replaced robots.txt with explicit allowlist policy, enforced public cache-control and index headers on discovery surfaces, added discovery policy CI check, and extended discovery audit JSON with policy checks.
 - 2026-01-13: Added robots.txt discovery headers and explicit cache-control for robots/openapi JSON in middleware to remove private caching for crawlers.
 - 2026-01-13: Added discovery proxy in middleware to serve crawl surfaces from GitHub raw with explicit public cache-control headers.
+- 2026-01-13: Updated `/docs/discoverability-audit.md` with the explicit robots policy and header snapshots for crawl surfaces.

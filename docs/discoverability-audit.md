@@ -71,7 +71,7 @@ Sitemap: https://aistatusdashboard.com/sitemap.xml
 
 ```
 HTTP/2 200
-cache-control: public, max-age=300, s-maxage=600
+cache-control: max-age=300, private
 x-robots-tag: index,follow
 ```
 
@@ -79,7 +79,7 @@ x-robots-tag: index,follow
 
 ```
 HTTP/2 200
-cache-control: public, max-age=60, s-maxage=300
+cache-control: max-age=60, private
 x-robots-tag: index,follow
 ```
 
@@ -87,7 +87,7 @@ x-robots-tag: index,follow
 
 ```
 HTTP/2 200
-cache-control: public, max-age=60, s-maxage=300
+cache-control: max-age=60, private
 x-robots-tag: index,follow
 ```
 
@@ -95,7 +95,7 @@ x-robots-tag: index,follow
 
 ```
 HTTP/2 200
-cache-control: public, max-age=300, s-maxage=600
+cache-control: max-age=300, private
 ```
 
 - https://aistatusdashboard.com/robots.txt
@@ -117,3 +117,4 @@ curl -i https://aistatusdashboard.com/discovery/audit/latest.json
 - All URLs must return HTTP 200 for a plain GET with a generic User-Agent.
 - RSS and sitemap should be valid XML and cacheable.
 - Dataset downloads must be cacheable and return correct content types.
+- Firebase App Hosting currently appends `private` to Cache-Control responses even when public caching is requested; the policy checks and CI still enforce the intended public directives.
