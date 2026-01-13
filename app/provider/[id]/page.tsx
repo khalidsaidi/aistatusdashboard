@@ -1,22 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { providerService } from '@/lib/services/providers';
 import { statusService } from '@/lib/services/status';
 import { intelligenceService } from '@/lib/services/intelligence';
 import { queryMetricSeries, type MetricName, type MetricSeries } from '@/lib/services/metrics';
 import { normalizeIncidentDates } from '@/lib/utils/normalize-dates';
 import { log } from '@/lib/utils/logger';
 import sourcesConfig from '@/lib/data/sources.json';
-import providersConfig from '@/lib/data/providers.json';
 import type { NormalizedComponent, NormalizedIncident, NormalizedMaintenance } from '@/lib/types/ingestion';
+import type { Provider } from '@/lib/types';
 
 export const revalidate = 300;
 export const dynamic = 'force-dynamic';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-const providersCatalog = (providersConfig.providers || []).filter((provider) => provider.enabled !== false);
-
 const sourcePolls = new Map<string, number>();
 (sourcesConfig as { sources?: Array<{ providerId?: string; pollIntervalSeconds?: number }> }).sources?.forEach(
   (source) => {
@@ -60,13 +57,15 @@ function emptySeries(metric: MetricName, providerId: string, since: Date, until:
   };
 }
 
-function resolveProvider(idInput: string | string[] | undefined) {
+async function resolveProvider(idInput: string | string[] | undefined): Promise<Provider | undefined> {
   const id = Array.isArray(idInput) ? idInput[0] : idInput;
   if (!id) return undefined;
-  const direct = providerService.getProvider(id);
-  if (direct) return direct;
+  const module = await import('@/lib/data/providers.json');
+  const providers = Array.isArray(module.providers)
+    ? (module.providers as Provider[]).filter((provider) => provider.enabled !== false)
+    : [];
   const normalized = id.toLowerCase();
-  const fallback = providersCatalog.find((provider) => {
+  const fallback = providers.find((provider) => {
     if (provider.id?.toLowerCase() === normalized) return true;
     const aliases = provider.aliases || [];
     return aliases.some((alias) => alias.toLowerCase() === normalized);
@@ -74,15 +73,15 @@ function resolveProvider(idInput: string | string[] | undefined) {
   if (!fallback) {
     log('warn', 'Provider lookup failed', {
       providerId: id,
-      catalogSize: providersCatalog.length,
-      sampleProviders: providersCatalog.slice(0, 5).map((provider) => provider.id),
+      catalogSize: providers.length,
+      sampleProviders: providers.slice(0, 5).map((provider) => provider.id),
     });
   }
   return fallback;
 }
 
 export async function generateMetadata({ params }: { params: { id: string | string[] } }): Promise<Metadata> {
-  const provider = resolveProvider(params.id);
+  const provider = await resolveProvider(params.id);
   if (!provider) {
     return {
       title: 'Provider Not Found',
@@ -121,7 +120,7 @@ export async function generateMetadata({ params }: { params: { id: string | stri
 }
 
 export default async function ProviderPage({ params }: { params: { id: string | string[] } }) {
-  const provider = resolveProvider(params.id);
+  const provider = await resolveProvider(params.id);
   if (!provider) return notFound();
 
   const displayName = provider.displayName || provider.name;
