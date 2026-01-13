@@ -142,6 +142,95 @@ function buildDocs() {
   };
 }
 
+function buildLlmsTxt() {
+  return `AI Status Dashboard - llms.txt
+Start here: ${SITE_URL}/ai
+
+MCP server: ${SITE_URL}/mcp
+OpenAPI: ${SITE_URL}/openapi.json
+Plugin manifest: ${SITE_URL}/.well-known/ai-plugin.json
+OpenAPI (well-known): ${SITE_URL}/.well-known/openapi.json
+
+Datasets:
+- ${SITE_URL}/datasets (index)
+- ${SITE_URL}/datasets/incidents.ndjson
+- ${SITE_URL}/datasets/metrics.csv
+
+Docs (Markdown):
+- ${SITE_URL}/docs.md
+- ${SITE_URL}/docs/api.md
+- ${SITE_URL}/docs/agent/mcp-quickstart.md
+- ${SITE_URL}/status.md
+- ${SITE_URL}/providers.md
+- ${SITE_URL}/docs/citations.md
+
+Citing: ${SITE_URL}/docs/citations.md
+RSS: ${SITE_URL}/rss.xml
+Sitemap: ${SITE_URL}/sitemap.xml
+
+Verification:
+- ${SITE_URL}/discovery/audit/latest.json
+- ${SITE_URL}/discovery/audit
+`;
+}
+
+function buildLlmsFull() {
+  return `# AI Status Dashboard - Full LLM Discovery Guide
+
+## Overview
+AI Status Dashboard is an AI reliability control plane: status, incidents, metrics, and fallback policy generation across major AI providers.
+
+## Core Endpoints
+- Landing: ${SITE_URL}/ai
+- MCP server: ${SITE_URL}/mcp
+- OpenAPI (JSON): ${SITE_URL}/openapi.json
+- OpenAPI (YAML): ${SITE_URL}/openapi.yaml
+- Plugin manifest: ${SITE_URL}/.well-known/ai-plugin.json
+- Well-known OpenAPI: ${SITE_URL}/.well-known/openapi.json
+- RSS/Atom: ${SITE_URL}/rss.xml
+- Sitemap: ${SITE_URL}/sitemap.xml
+- Discovery audit JSON: ${SITE_URL}/discovery/audit/latest.json
+- Discovery audit HTML: ${SITE_URL}/discovery/audit
+
+## Datasets
+- Index: ${SITE_URL}/datasets
+- Incidents NDJSON: ${SITE_URL}/datasets/incidents.ndjson
+- Metrics CSV: ${SITE_URL}/datasets/metrics.csv
+
+## Docs (Markdown mirrors)
+- Main docs: ${SITE_URL}/docs.md
+- API: ${SITE_URL}/docs/api.md
+- MCP Quickstart: ${SITE_URL}/docs/agent/mcp-quickstart.md
+- Status: ${SITE_URL}/status.md
+- Providers: ${SITE_URL}/providers.md
+- Citations: ${SITE_URL}/docs/citations.md
+
+## MCP Quickstart
+\`\`\`
+Endpoint: ${SITE_URL}/mcp
+Tools: status_summary, search_incidents, list_providers
+\`\`\`
+
+## REST Quickstart (curl)
+\`\`\`
+curl ${SITE_URL}/api/public/v1/status/summary
+curl "${SITE_URL}/api/public/v1/incidents?provider=openai&limit=5"
+curl ${SITE_URL}/api/public/v1/providers
+\`\`\`
+
+## Evidence endpoints
+- ${SITE_URL}/api/public/v1/status/summary
+- ${SITE_URL}/api/public/v1/incidents
+
+## Citing
+See ${SITE_URL}/docs/citations.md and /incidents/{id}/cite for evidence bundles.
+
+## Notes
+- Plain text / markdown only
+- Updated regularly
+`;
+}
+
 
 async function run() {
   const providersData = JSON.parse(await fs.readFile(path.join(process.cwd(), 'lib', 'data', 'providers.json'), 'utf8'));
@@ -199,15 +288,19 @@ async function run() {
   // OpenAPI YAML snapshots (JSON is valid YAML, so reuse the JSON payload)
   try {
     const openapiJson = await fetchText(`${SITE_URL}/openapi.json`);
+    await writeFile('openapi.json', openapiJson);
     await writeFile('openapi.yaml', openapiJson);
   } catch (err) {
+    await writeFile('openapi.json', '{}\n');
     await writeFile('openapi.yaml', 'openapi: 3.1.0\ninfo:\n  title: AIStatusDashboard Public API\n  version: 1.0.0\npaths: {}\n');
   }
 
   try {
     const openapi30Json = await fetchText(`${SITE_URL}/openapi-3.0.json`);
+    await writeFile('openapi-3.0.json', openapi30Json);
     await writeFile('openapi-3.0.yaml', openapi30Json);
   } catch (err) {
+    await writeFile('openapi-3.0.json', '{}\n');
     await writeFile('openapi-3.0.yaml', 'openapi: 3.0.0\ninfo:\n  title: AIStatusDashboard Public API\n  version: 1.0.0\npaths: {}\n');
   }
 
@@ -228,6 +321,10 @@ async function run() {
   } catch (err) {
     await writeFile('docs/discoverability-audit.md', '# Discoverability Audit\n\nAudit mirror unavailable.');
   }
+
+  // llms.txt + llms-full.txt
+  await writeFile('llms.txt', buildLlmsTxt());
+  await writeFile('llms-full.txt', buildLlmsFull());
 
   // ---- Discovery audit (JSON + HTML) ----
   const auditFiles = await Promise.all([

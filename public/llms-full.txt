@@ -1,9 +1,4 @@
-import { NextResponse } from 'next/server';
-
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
-const BODY = `# AI Status Dashboard - Full LLM Discovery Guide
+# AI Status Dashboard - Full LLM Discovery Guide
 
 ## Overview
 AI Status Dashboard is an AI reliability control plane: status, incidents, metrics, and fallback policy generation across major AI providers.
@@ -34,17 +29,17 @@ AI Status Dashboard is an AI reliability control plane: status, incidents, metri
 - Citations: https://aistatusdashboard.com/docs/citations.md
 
 ## MCP Quickstart
-\`\`\`
+```
 Endpoint: https://aistatusdashboard.com/mcp
 Tools: status_summary, search_incidents, list_providers
-\`\`\`
+```
 
 ## REST Quickstart (curl)
-\`\`\`
+```
 curl https://aistatusdashboard.com/api/public/v1/status/summary
-curl \"https://aistatusdashboard.com/api/public/v1/incidents?provider=openai&limit=5\"
+curl "https://aistatusdashboard.com/api/public/v1/incidents?provider=openai&limit=5"
 curl https://aistatusdashboard.com/api/public/v1/providers
-\`\`\`
+```
 
 ## Evidence endpoints
 - https://aistatusdashboard.com/api/public/v1/status/summary
@@ -56,14 +51,3 @@ See https://aistatusdashboard.com/docs/citations.md and /incidents/{id}/cite for
 ## Notes
 - Plain text / markdown only
 - Updated regularly
-`;
-
-export async function GET() {
-  return new NextResponse(BODY, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'no-store, max-age=0, must-revalidate',
-    },
-  });
-}

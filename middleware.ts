@@ -5,6 +5,9 @@ const DEFAULT_CANONICAL_HOST = 'aistatusdashboard.com';
 const DISCOVERY_EXTENSIONS = ['.xml', '.yaml', '.md', '.ndjson', '.csv'];
 const DISCOVERY_BUILD_ID =
   process.env.APP_BUILD_ID || process.env.GITHUB_SHA || process.env.COMMIT_SHA || 'unknown';
+const DISCOVERY_PROXY_ORIGIN =
+  process.env.DISCOVERY_PROXY_ORIGIN ||
+  'https://raw.githubusercontent.com/aistatusdashboard/aistatusdashboard/main/public';
 
 function shouldBypassCache(request: NextRequest): boolean {
   const accept = request.headers.get('accept') || '';
@@ -43,6 +46,12 @@ function isPublicIndexable(pathname: string): boolean {
   if (pathname.startsWith('/incidents')) return true;
   if (pathname.startsWith('/status')) return true;
   return false;
+}
+
+function getProxyPath(pathname: string): string {
+  if (pathname === '/discovery/audit') return '/discovery/audit/index.html';
+  if (pathname === '/discovery/audit/') return '/discovery/audit/index.html';
+  return pathname;
 }
 
 function applyDiscoveryHeaders(response: NextResponse, pathname: string) {
@@ -117,7 +126,7 @@ function applyDiscoveryHeaders(response: NextResponse, pathname: string) {
   }
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const canonicalHost = getCanonicalHost();
   const currentHost = request.headers.get('host');
@@ -135,6 +144,25 @@ export function middleware(request: NextRequest) {
   }
 
   if (isDiscoveryAsset(pathname)) {
+    try {
+      const proxyPath = getProxyPath(pathname);
+      const proxyUrl = `${DISCOVERY_PROXY_ORIGIN}${proxyPath}`;
+      const upstream = await fetch(proxyUrl, {
+        headers: {
+          'User-Agent': 'aistatusdashboard-discovery-proxy',
+        },
+      });
+      if (upstream.ok) {
+        const body = await upstream.arrayBuffer();
+        const response = new NextResponse(body, { status: 200 });
+        applyDiscoveryHeaders(response, pathname);
+        response.headers.set('X-Discovery-Source', 'proxy');
+        return response;
+      }
+    } catch {
+      // fall through to origin
+    }
+
     const response = NextResponse.next();
     applyDiscoveryHeaders(response, pathname);
     return response;
