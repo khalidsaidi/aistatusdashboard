@@ -6,9 +6,10 @@ const BODY = `# AI Status Dashboard
 
 ## Core endpoints
 - MCP server: https://aistatusdashboard.com/mcp
-- OpenAPI: https://aistatusdashboard.com/openapi.json
-- Plugin manifest: https://aistatusdashboard.com/.well-known/ai-plugin.json
+- OpenAPI (JSON): https://aistatusdashboard.com/openapi.json
+- OpenAPI (YAML): https://aistatusdashboard.com/openapi.yaml
 - OpenAPI (well-known): https://aistatusdashboard.com/.well-known/openapi.json
+- Plugin manifest: https://aistatusdashboard.com/.well-known/ai-plugin.json
 
 ## Datasets
 - https://aistatusdashboard.com/datasets
@@ -25,6 +26,10 @@ const BODY = `# AI Status Dashboard
 
 ## Citing
 - https://aistatusdashboard.com/docs/citations.md
+
+## Evidence APIs
+- https://aistatusdashboard.com/api/public/v1/status/summary
+- https://aistatusdashboard.com/api/public/v1/incidents
 
 ## Feeds
 - RSS: https://aistatusdashboard.com/rss.xml

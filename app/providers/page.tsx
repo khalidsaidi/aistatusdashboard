@@ -1,10 +1,17 @@
 import type { Metadata } from 'next';
 import { providerService } from '@/lib/services/providers';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
 export const metadata: Metadata = {
   title: 'Providers',
   description: 'Provider list snapshot for crawlers and users.',
-  alternates: { canonical: '/providers' },
+  alternates: {
+    canonical: '/providers',
+    types: {
+      'application/rss+xml': `${SITE_URL}/rss.xml`,
+    },
+  },
 };
 
 export default function ProvidersPage() {

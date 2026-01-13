@@ -8,7 +8,8 @@ AI Status Dashboard is an AI reliability control plane: status, incidents, metri
 ## Core Endpoints
 - Landing: https://aistatusdashboard.com/ai
 - MCP server: https://aistatusdashboard.com/mcp
-- OpenAPI: https://aistatusdashboard.com/openapi.json
+- OpenAPI (JSON): https://aistatusdashboard.com/openapi.json
+- OpenAPI (YAML): https://aistatusdashboard.com/openapi.yaml
 - Plugin manifest: https://aistatusdashboard.com/.well-known/ai-plugin.json
 - Well-known OpenAPI: https://aistatusdashboard.com/.well-known/openapi.json
 - RSS/Atom: https://aistatusdashboard.com/rss.xml
@@ -39,6 +40,10 @@ curl https://aistatusdashboard.com/api/public/v1/status/summary
 curl \"https://aistatusdashboard.com/api/public/v1/incidents?provider=openai&limit=5\"
 curl https://aistatusdashboard.com/api/public/v1/providers
 \`\`\`
+
+## Evidence endpoints
+- https://aistatusdashboard.com/api/public/v1/status/summary
+- https://aistatusdashboard.com/api/public/v1/incidents
 
 ## Citing
 See https://aistatusdashboard.com/docs/citations.md and /incidents/{id}/cite for evidence bundles.

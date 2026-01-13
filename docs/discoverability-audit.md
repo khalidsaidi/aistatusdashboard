@@ -1,43 +1,45 @@
 # Discoverability Audit
 
-Automated checks for core discovery surfaces. This report captures a baseline (before) and post-fix (after) snapshot of the same URL set.
+Self-service checklist for AIStatusDashboard discovery surfaces. This page lists the required public endpoints, their expected status codes, and content types.
 
-## Before (initial audit)
+Last verified: 2026-01-13T07:25:16+00:00
 
-| URL | HEAD | GET | Content-Type | Cache-Control | Bytes | Snippet |
-| --- | --- | --- | --- | --- | --- | --- |
-| https://aistatusdashboard.com/sitemap.xml | 200 | 200 | application/xml; charset=utf-8 | max-age=300, private | 8130 | <?xml version="1.0" encoding="UTF-8"?> <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"> <url> <loc>https://aistatusdashboard.com/</loc> <lastmod>2026-01-13T02:53:11.523Z</lastmod> <changef |
-| https://aistatusdashboard.com/rss.xml | 200 | 200 | application/rss+xml; charset=utf-8 | max-age=300, private | 10481 | <?xml version="1.0" encoding="UTF-8"?> <rss version="2.0"> <channel> <title>AI Status Dashboard Incidents</title> <link>https://aistatusdashboard.com/</link> <description>Incidents and maintenances</d |
-| https://aistatusdashboard.com/rss.xml?provider=openai | 200 | 200 | application/rss+xml; charset=utf-8 | max-age=300, private | 10481 | <?xml version="1.0" encoding="UTF-8"?> <rss version="2.0"> <channel> <title>AI Status Dashboard Incidents</title> <link>https://aistatusdashboard.com/</link> <description>Incidents and maintenances</d |
-| https://aistatusdashboard.com/provider/openai | 404 | 404 | text/html; charset=utf-8 | max-age=0, must-revalidate, no-cache, no-store, private | 25087 | <!DOCTYPE html><html id="__next_error__"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_n |
-| https://aistatusdashboard.com/provider/anthropic | 404 | 404 | text/html; charset=utf-8 | max-age=0, must-revalidate, no-cache, no-store, private | 25093 | <!DOCTYPE html><html id="__next_error__"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_n |
-| https://aistatusdashboard.com/provider/google-ai | 404 | 404 | text/html; charset=utf-8 | max-age=0, must-revalidate, no-cache, no-store, private | 25093 | <!DOCTYPE html><html id="__next_error__"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_n |
-| https://aistatusdashboard.com/provider/mistral | 404 | 404 | text/html; charset=utf-8 | max-age=0, must-revalidate, no-cache, no-store, private | 25089 | <!DOCTYPE html><html id="__next_error__"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="preload" as="script" fetchPriority="low" href="/_n |
-| https://aistatusdashboard.com/datasets/incidents.ndjson | 200 | 200 | application/x-ndjson; charset=utf-8 | max-age=300, private | 228200 | {"incident_id":"openai:01KEACZ6R02744RQKCMSK1ZG54","provider_id":"openai","title":"ChatGPT issues while retrieving workspace members","status":"investigating","severity":"degraded","started_at":"2026- |
-| https://aistatusdashboard.com/datasets/metrics.csv | 200 | 200 | text/csv; charset=utf-8 | max-age=300, private | 7519 | timestamp,provider_id,metric,value,sample_count,sources 2026-01-12T02:53:17.379Z,openai,latency_p95_ms,,0, 2026-01-12T03:53:17.379Z,openai,latency_p95_ms,,0, 2026-01-12T04:53:17.379Z,openai,latency_p9 |
-| https://aistatusdashboard.com/openapi.yaml | 200 | 200 | application/yaml; charset=utf-8 | max-age=600, private | 136859 | openapi: "3.1.0" info: title: "AIStatusDashboard Public API" version: "1.0.0" description: "Read-only API for provider status, incidents, metrics, and recommendations. All responses include request_id |
-| https://aistatusdashboard.com/openapi-3.0.yaml | 200 | 200 | application/yaml; charset=utf-8 | max-age=600, private | 136859 | openapi: "3.0.0" info: title: "AIStatusDashboard Public API" version: "1.0.0" description: "Read-only API for provider status, incidents, metrics, and recommendations. All responses include request_id |
-| https://aistatusdashboard.com/docs.md | 200 | 200 | text/markdown; charset=utf-8 | max-age=300, private | 837 | # AIStatusDashboard Docs AI Status Dashboard is a reliability control plane for AI providers. Use these docs to integrate the REST API, MCP tools, datasets, and citation endpoints. ## Quick links - ht |
-| https://aistatusdashboard.com/status.md | 200 | 200 | text/markdown; charset=utf-8 | max-age=300, private | 263 | # Status This page mirrors public status data and links to the JSON endpoints. - Summary: https://aistatusdashboard.com/api/public/v1/status/summary - Incidents: https://aistatusdashboard.com/api/publ |
-| https://aistatusdashboard.com/providers.md | 200 | 200 | text/markdown; charset=UTF-8 | max-age=0, private | 374 | # Providers This is a crawl-friendly mirror of the providers list. Key providers: - OpenAI: https://aistatusdashboard.com/provider/openai - Anthropic: https://aistatusdashboard.com/provider/anthropic  |
-| https://aistatusdashboard.com/api/health | 200 | 200 | application/json | - | 142 | {"status":"healthy","timestamp":"2026-01-13T02:53:21.180Z","uptime":1189.470588899,"config":{"firebaseProject":"configured"},"responseTime":0} |
+## Required endpoints
 
-## After (post-fixes)
+| URL | Expected status | Content-Type |
+| --- | --- | --- |
+| https://aistatusdashboard.com/ai | 200 | text/html |
+| https://aistatusdashboard.com/robots.txt | 200 | text/plain |
+| https://aistatusdashboard.com/sitemap.xml | 200 | application/xml |
+| https://aistatusdashboard.com/rss.xml | 200 | application/rss+xml |
+| https://aistatusdashboard.com/llms.txt | 200 | text/plain |
+| https://aistatusdashboard.com/llms-full.txt | 200 | text/plain |
+| https://aistatusdashboard.com/openapi.json | 200 | application/json |
+| https://aistatusdashboard.com/openapi.yaml | 200 | application/yaml |
+| https://aistatusdashboard.com/.well-known/openapi.json | 200 | application/json |
+| https://aistatusdashboard.com/.well-known/ai-plugin.json | 200 | application/json |
+| https://aistatusdashboard.com/mcp | 200 | text/plain |
+| https://aistatusdashboard.com/providers | 200 | text/html |
+| https://aistatusdashboard.com/datasets/incidents.ndjson | 200 | application/x-ndjson |
+| https://aistatusdashboard.com/datasets/metrics.csv | 200 | text/csv |
+| https://aistatusdashboard.com/docs.md | 200 | text/markdown |
+| https://aistatusdashboard.com/docs/api.md | 200 | text/markdown |
+| https://aistatusdashboard.com/docs/citations.md | 200 | text/markdown |
+| https://aistatusdashboard.com/docs/agent/mcp-quickstart.md | 200 | text/markdown |
 
-| URL | HEAD | GET | Content-Type | Cache-Control | Bytes | Snippet |
-| --- | --- | --- | --- | --- | --- | --- |
-| https://aistatusdashboard.com/sitemap.xml | 200 | 200 | application/xml; charset=utf-8 | max-age=300, private | 8336 | <?xml version="1.0" encoding="UTF-8"?> <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"> <url> <loc>https://aistatusdashboard.com/</loc> <lastmod>2026-01-13T05:23:26.797Z</lastmod> <changef |
-| https://aistatusdashboard.com/rss.xml | 200 | 200 | application/rss+xml; charset=utf-8 | max-age=300, private | 10499 | <?xml version="1.0" encoding="UTF-8"?> <rss version="2.0"> <channel> <title>AI Status Dashboard Incidents</title> <link>https://aistatusdashboard.com/</link> <description>Incidents and maintenances</d |
-| https://aistatusdashboard.com/rss.xml?provider=openai | 200 | 200 | application/rss+xml; charset=utf-8 | max-age=300, private | 10892 | <?xml version="1.0" encoding="UTF-8"?> <rss version="2.0"> <channel> <title>AI Status Dashboard Incidents (openai)</title> <link>https://aistatusdashboard.com/</link> <description>Incidents and mainte |
-| https://aistatusdashboard.com/provider/openai | 200 | 200 | text/html; charset=utf-8 | max-age=0, must-revalidate, no-cache, no-store, private | 48781 | <!DOCTYPE html><html lang="en" class="space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable"><head><meta charSet="utf-8"/><meta name="viewport" content="width |
-| https://aistatusdashboard.com/provider/anthropic | 200 | 200 | text/html; charset=utf-8 | max-age=0, must-revalidate, no-cache, no-store, private | 49395 | <!DOCTYPE html><html lang="en" class="space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable"><head><meta charSet="utf-8"/><meta name="viewport" content="width |
-| https://aistatusdashboard.com/provider/google-ai | 200 | 200 | text/html; charset=utf-8 | max-age=0, must-revalidate, no-cache, no-store, private | 56888 | <!DOCTYPE html><html lang="en" class="space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable"><head><meta charSet="utf-8"/><meta name="viewport" content="width |
-| https://aistatusdashboard.com/provider/mistral | 200 | 200 | text/html; charset=utf-8 | max-age=0, must-revalidate, no-cache, no-store, private | 47744 | <!DOCTYPE html><html lang="en" class="space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable"><head><meta charSet="utf-8"/><meta name="viewport" content="width |
-| https://aistatusdashboard.com/datasets/incidents.ndjson | 200 | 200 | application/x-ndjson; charset=utf-8 | max-age=300, private | 228200 | {"incident_id":"openai:01KEACZ6R02744RQKCMSK1ZG54","provider_id":"openai","title":"ChatGPT issues while retrieving workspace members","status":"investigating","severity":"degraded","started_at":"2026- |
-| https://aistatusdashboard.com/datasets/metrics.csv | 200 | 200 | text/csv; charset=utf-8 | max-age=300, private | 7519 | timestamp,provider_id,metric,value,sample_count,sources 2026-01-12T05:23:35.403Z,openai,latency_p95_ms,,0, 2026-01-12T06:23:35.403Z,openai,latency_p95_ms,,0, 2026-01-12T07:23:35.403Z,openai,latency_p9 |
-| https://aistatusdashboard.com/openapi.yaml | 200 | 200 | application/yaml; charset=utf-8 | max-age=600, private | 136859 | openapi: "3.1.0" info: title: "AIStatusDashboard Public API" version: "1.0.0" description: "Read-only API for provider status, incidents, metrics, and recommendations. All responses include request_id |
-| https://aistatusdashboard.com/openapi-3.0.yaml | 200 | 200 | application/yaml; charset=utf-8 | max-age=600, private | 136859 | openapi: "3.0.0" info: title: "AIStatusDashboard Public API" version: "1.0.0" description: "Read-only API for provider status, incidents, metrics, and recommendations. All responses include request_id |
-| https://aistatusdashboard.com/docs.md | 200 | 200 | text/markdown; charset=utf-8 | max-age=300, private | 896 | # AIStatusDashboard Docs AI Status Dashboard is a reliability control plane for AI providers. Use these docs to integrate the REST API, MCP tools, datasets, and citation endpoints. ## Quick links - ht |
-| https://aistatusdashboard.com/status.md | 200 | 200 | text/markdown; charset=utf-8 | max-age=300, private | 263 | # Status This page mirrors public status data and links to the JSON endpoints. - Summary: https://aistatusdashboard.com/api/public/v1/status/summary - Incidents: https://aistatusdashboard.com/api/publ |
-| https://aistatusdashboard.com/providers.md | 200 | 200 | text/markdown; charset=UTF-8 | max-age=0, private | 374 | # Providers This is a crawl-friendly mirror of the providers list. Key providers: - OpenAI: https://aistatusdashboard.com/provider/openai - Anthropic: https://aistatusdashboard.com/provider/anthropic  |
-| https://aistatusdashboard.com/api/health | 200 | 200 | application/json | max-age=0, must-revalidate, no-store, private | 141 | {"status":"healthy","timestamp":"2026-01-13T05:23:39.732Z","uptime":329.629425871,"config":{"firebaseProject":"configured"},"responseTime":0} |
+## Verify with curl
+
+```bash
+curl -i https://aistatusdashboard.com/sitemap.xml
+curl -i https://aistatusdashboard.com/rss.xml
+curl -i https://aistatusdashboard.com/datasets/incidents.ndjson
+curl -i https://aistatusdashboard.com/datasets/metrics.csv
+curl -i https://aistatusdashboard.com/llms.txt
+curl -i https://aistatusdashboard.com/openapi.yaml
+```
+
+## Notes
+
+- All URLs must return HTTP 200 for a plain GET with a generic User-Agent.
+- RSS and sitemap should be valid XML and cacheable.
+- Dataset downloads must be cacheable and return correct content types.

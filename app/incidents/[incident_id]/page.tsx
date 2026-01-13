@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
 import { getIncidentById } from '@/lib/services/public-data';
 import { log } from '@/lib/utils/logger';
 
@@ -11,15 +12,23 @@ async function resolveParams(params: IncidentParams | Promise<IncidentParams>) {
   return Promise.resolve(params);
 }
 
+function safeDecode(value: string) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 function extractIncidentId(path?: string | null) {
   if (!path) return undefined;
   const match = path.match(/\/incidents\/([^/?#]+)/i);
-  return match ? decodeURIComponent(match[1]) : undefined;
+  return match ? safeDecode(match[1]) : undefined;
 }
 
 async function resolveIncidentId(params: IncidentParams | Promise<IncidentParams>) {
   const resolvedParams = await resolveParams(params);
-  if (resolvedParams?.incident_id) return resolvedParams.incident_id;
+  if (resolvedParams?.incident_id) return safeDecode(resolvedParams.incident_id);
   const headerList = await headers();
   const fallbackPath =
     headerList.get('x-forwarded-uri') ||
@@ -60,47 +69,40 @@ export default async function IncidentDetailPage({
 }) {
   const incidentId = await resolveIncidentId(params);
   if (!incidentId) {
-    return (
-      <main className="flex-1">
-        <div className="px-4 sm:px-6 py-10">
-          <div className="max-w-4xl mx-auto surface-card-strong p-8 text-center">
-            <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Incident not found</h1>
-            <p className="text-sm text-slate-600 dark:text-slate-300 mt-3">
-              The incident ID could not be resolved.
-            </p>
-          </div>
-        </div>
-      </main>
-    );
+    notFound();
   }
 
   const incident = await getIncidentById(incidentId);
 
   if (!incident) {
-    return (
-      <main className="flex-1">
-        <div className="px-4 sm:px-6 py-10">
-          <div className="max-w-4xl mx-auto surface-card-strong p-8 text-center">
-            <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">Incident not found</h1>
-            <p className="text-sm text-slate-600 dark:text-slate-300 mt-3">
-              The incident ID could not be resolved.
-            </p>
-          </div>
-        </div>
-      </main>
-    );
+    notFound();
   }
+
+  const statusMap: Record<string, string> = {
+    resolved: 'https://schema.org/EventCompleted',
+    monitoring: 'https://schema.org/EventScheduled',
+    identified: 'https://schema.org/EventScheduled',
+    investigating: 'https://schema.org/EventScheduled',
+    update: 'https://schema.org/EventScheduled',
+  };
+  const eventStatus = statusMap[incident.status] || 'https://schema.org/EventScheduled';
 
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Dataset',
+    '@type': 'Event',
     name: incident.title,
     description: incident.title,
-    datePublished: incident.startedAt,
-    dateModified: incident.updatedAt,
+    startDate: incident.startedAt,
+    endDate: incident.resolvedAt || undefined,
+    eventStatus,
+    eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+    location: {
+      '@type': 'VirtualLocation',
+      url: incident.rawUrl || `https://aistatusdashboard.com/incidents/${incident.incident_id}`,
+    },
     isBasedOn: incident.rawUrl || undefined,
-    identifier: incident.id,
-    creator: {
+    identifier: incident.incident_id,
+    organizer: {
       '@type': 'Organization',
       name: 'AI Status Dashboard',
       url: 'https://aistatusdashboard.com',
@@ -122,7 +124,7 @@ export default async function IncidentDetailPage({
               Status: {incident.status} | Severity: {incident.severity}
             </p>
             <a
-              href={`/incidents/${incident.id}/cite`}
+              href={`/incidents/${incident.incident_id}/cite`}
               className="cta-secondary text-xs inline-block mt-3"
             >
               Cite this incident
@@ -140,6 +142,43 @@ export default async function IncidentDetailPage({
             {incident.resolvedAt && (
               <p className="text-sm text-slate-600 dark:text-slate-300">
                 Resolved: {incident.resolvedAt}
+              </p>
+            )}
+          </section>
+
+          <section className="surface-card p-6 space-y-3">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Impact scope</h2>
+            <div className="text-sm text-slate-600 dark:text-slate-300 space-y-2">
+              <p>Impacted regions: {incident.impactedRegions?.length ? incident.impactedRegions.join(', ') : 'None reported'}</p>
+              <p>Impacted models: {incident.impactedModels?.length ? incident.impactedModels.join(', ') : 'None reported'}</p>
+              <p>
+                Impacted components:{' '}
+                {incident.impactedComponentNames?.length
+                  ? incident.impactedComponentNames.join(', ')
+                  : incident.impactedComponents?.length
+                    ? incident.impactedComponents.join(', ')
+                    : 'None reported'}
+              </p>
+            </div>
+          </section>
+
+          <section className="surface-card p-6 space-y-3">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Official sources</h2>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Provider: {incident.providerId}
+            </p>
+            {incident.rawUrl ? (
+              <a
+                href={incident.rawUrl}
+                className="text-sm text-blue-600 hover:text-blue-700 underline underline-offset-2"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                View official incident page
+              </a>
+            ) : (
+              <p className="text-sm text-slate-600 dark:text-slate-300">
+                Official incident URL not available for this source.
               </p>
             )}
           </section>
