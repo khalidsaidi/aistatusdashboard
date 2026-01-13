@@ -9,6 +9,7 @@ import { log } from '@/lib/utils/logger';
 import sourcesConfig from '@/lib/data/sources.json';
 import type { NormalizedComponent, NormalizedIncident, NormalizedMaintenance } from '@/lib/types/ingestion';
 import type { Provider } from '@/lib/types';
+import type { ProviderCatalog } from '@/lib/services/public-data';
 
 export const revalidate = 300;
 export const dynamic = 'force-dynamic';
@@ -57,6 +58,28 @@ function emptySeries(metric: MetricName, providerId: string, since: Date, until:
   };
 }
 
+async function fetchProviderFromApi(providerId: string): Promise<Provider | undefined> {
+  try {
+    const response = await fetch(`${SITE_URL}/api/public/v1/providers`, { cache: 'no-store' });
+    if (!response.ok) return undefined;
+    const payload = await response.json();
+    const candidates = (payload?.data || []) as ProviderCatalog[];
+    const match = candidates.find((provider) => provider.id === providerId);
+    if (!match) return undefined;
+    return {
+      id: match.id,
+      name: match.name,
+      displayName: match.display_name || match.name,
+      statusUrl: match.status_url,
+      statusPageUrl: match.status_page_url,
+      category: match.category,
+    };
+  } catch (error) {
+    log('warn', 'Provider lookup via API failed', { providerId, error });
+    return undefined;
+  }
+}
+
 async function resolveProvider(idInput: string | string[] | undefined): Promise<Provider | undefined> {
   const id = Array.isArray(idInput) ? idInput[0] : idInput;
   if (!id) return undefined;
@@ -72,14 +95,17 @@ async function resolveProvider(idInput: string | string[] | undefined): Promise<
     const aliases = provider.aliases || [];
     return aliases.some((alias) => alias.toLowerCase() === normalized);
   });
-  if (!fallback) {
+  if (fallback) return fallback;
+  const apiFallback = await fetchProviderFromApi(id);
+  if (apiFallback) return apiFallback;
+  {
     log('warn', 'Provider lookup failed', {
       providerId: id,
       catalogSize: providers.length,
       sampleProviders: providers.slice(0, 5).map((provider) => provider.id),
     });
   }
-  return fallback;
+  return undefined;
 }
 
 export async function generateMetadata({ params }: { params: { id: string | string[] } }): Promise<Metadata> {
