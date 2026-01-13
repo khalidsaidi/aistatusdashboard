@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const DEFAULT_CANONICAL_HOST = 'aistatusdashboard.com';
+const DISCOVERY_EXTENSIONS = ['.xml', '.yaml', '.md', '.ndjson', '.csv'];
 
 function shouldBypassCache(request: NextRequest): boolean {
   const accept = request.headers.get('accept') || '';
@@ -20,6 +21,15 @@ function getCanonicalHost(): string | null {
   }
 }
 
+function isDiscoveryAsset(pathname: string): boolean {
+  if (pathname === '/rss.xml' || pathname === '/sitemap.xml') return true;
+  if (pathname.startsWith('/datasets/')) return true;
+  if (pathname.startsWith('/docs/') && pathname.endsWith('.md')) return true;
+  if (pathname === '/docs.md' || pathname === '/status.md' || pathname === '/providers.md') return true;
+  if (pathname === '/openapi.yaml' || pathname === '/openapi-3.0.yaml') return true;
+  return DISCOVERY_EXTENSIONS.some((ext) => pathname.endsWith(ext));
+}
+
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const canonicalHost = getCanonicalHost();
@@ -35,6 +45,10 @@ export function middleware(request: NextRequest) {
       url.protocol = 'https:';
       return NextResponse.redirect(url, 308);
     }
+  }
+
+  if (isDiscoveryAsset(pathname)) {
+    return NextResponse.next();
   }
 
   // PERFORMANCE: only short-circuit HEAD requests that are clearly HTML page fetches.

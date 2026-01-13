@@ -1,8 +1,4 @@
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
-
-export async function GET() {
-  const body = `# AIStatusDashboard Docs
+# AIStatusDashboard Docs
 
 AI Status Dashboard is a reliability control plane for AI providers. Use these docs to integrate the REST API, MCP tools, datasets, and citation endpoints.
 
@@ -26,12 +22,3 @@ AI Status Dashboard is a reliability control plane for AI providers. Use these d
 ## Citing
 - https://aistatusdashboard.com/docs/citations.md
 - https://aistatusdashboard.com/incidents/{id}/cite
-`;
-
-  return new Response(body, {
-    headers: {
-      'Content-Type': 'text/markdown; charset=utf-8',
-      'Cache-Control': 'public, max-age=300, s-maxage=600',
-    },
-  });
-}

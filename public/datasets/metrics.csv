@@ -1,0 +1,6 @@
+timestamp,provider_id,metric,value,sample_count,sources
+2026-01-13T09:46:13.440Z,openai,latency_p95_ms,,0,static
+2026-01-13T09:46:13.440Z,anthropic,latency_p95_ms,,0,static
+2026-01-13T09:46:13.440Z,google-ai,latency_p95_ms,,0,static
+2026-01-13T09:46:13.440Z,mistral,latency_p95_ms,,0,static
+2026-01-13T09:46:13.440Z,cohere,latency_p95_ms,,0,static

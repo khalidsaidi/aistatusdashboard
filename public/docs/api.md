@@ -1,8 +1,4 @@
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
-
-export async function GET() {
-  const body = `# API Docs
+# API Docs
 
 Base URL: https://aistatusdashboard.com
 
@@ -17,14 +13,7 @@ OpenAPI:
 - https://aistatusdashboard.com/openapi.yaml
 
 ## Example
-\`\`\`bash
+
+```bash
 curl https://aistatusdashboard.com/api/public/v1/status/summary
-\`\`\`
-`;
-  return new Response(body, {
-    headers: {
-      'Content-Type': 'text/markdown; charset=utf-8',
-      'Cache-Control': 'public, max-age=300, s-maxage=600',
-    },
-  });
-}
+```
