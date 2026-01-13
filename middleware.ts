@@ -3,6 +3,8 @@ import type { NextRequest } from 'next/server';
 
 const DEFAULT_CANONICAL_HOST = 'aistatusdashboard.com';
 const DISCOVERY_EXTENSIONS = ['.xml', '.yaml', '.md', '.ndjson', '.csv'];
+const DISCOVERY_BUILD_ID =
+  process.env.APP_BUILD_ID || process.env.GITHUB_SHA || process.env.COMMIT_SHA || 'unknown';
 
 function shouldBypassCache(request: NextRequest): boolean {
   const accept = request.headers.get('accept') || '';
@@ -30,6 +32,47 @@ function isDiscoveryAsset(pathname: string): boolean {
   return DISCOVERY_EXTENSIONS.some((ext) => pathname.endsWith(ext));
 }
 
+function applyDiscoveryHeaders(response: NextResponse, pathname: string) {
+  response.headers.set('X-Discovery-Handler', 'static');
+  response.headers.set('X-Discovery-Build', DISCOVERY_BUILD_ID);
+  response.headers.set('X-Discovery-Runtime', 'static');
+
+  if (pathname === '/rss.xml') {
+    response.headers.set('Content-Type', 'application/rss+xml; charset=utf-8');
+    response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=300');
+    return;
+  }
+
+  if (pathname === '/sitemap.xml') {
+    response.headers.set('Content-Type', 'application/xml; charset=utf-8');
+    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+    return;
+  }
+
+  if (pathname.endsWith('.yaml')) {
+    response.headers.set('Content-Type', 'text/yaml; charset=utf-8');
+    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+    return;
+  }
+
+  if (pathname.endsWith('.md')) {
+    response.headers.set('Content-Type', 'text/markdown; charset=utf-8');
+    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+    return;
+  }
+
+  if (pathname.endsWith('.ndjson')) {
+    response.headers.set('Content-Type', 'application/x-ndjson; charset=utf-8');
+    response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=300');
+    return;
+  }
+
+  if (pathname.endsWith('.csv')) {
+    response.headers.set('Content-Type', 'text/csv; charset=utf-8');
+    response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=300');
+  }
+}
+
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const canonicalHost = getCanonicalHost();
@@ -48,7 +91,9 @@ export function middleware(request: NextRequest) {
   }
 
   if (isDiscoveryAsset(pathname)) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    applyDiscoveryHeaders(response, pathname);
+    return response;
   }
 
   // PERFORMANCE: only short-circuit HEAD requests that are clearly HTML page fetches.
