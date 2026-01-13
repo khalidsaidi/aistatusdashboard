@@ -57,11 +57,12 @@
             "id": "google-ai",
             "name": "Google Gemini / AI Studio",
             "displayName": "Gemini (Google)",
-            "aliases": [
-                "gemini",
-                "google gemini",
-                "ai studio",
-                "google ai studio",
+      "aliases": [
+        "gemini",
+        "google",
+        "google gemini",
+        "ai studio",
+        "google ai studio",
                 "google ai",
                 "google cloud ai",
                 "vertex ai",

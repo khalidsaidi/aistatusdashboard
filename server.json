@@ -3,12 +3,12 @@
   "name": "io.github.aistatusdashboard/aistatusdashboard",
   "title": "AIStatusDashboard",
   "description": "Read-only MCP server for AIStatusDashboard status, incidents, metrics, and fallback recommendations.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "repository": {
     "url": "https://github.com/aistatusdashboard/aistatusdashboard",
     "source": "github"
   },
-  "websiteUrl": "https://aistatusdashboard.com",
+  "websiteUrl": "https://aistatusdashboard.com/ai",
   "remotes": [
     {
       "type": "streamable-http",
