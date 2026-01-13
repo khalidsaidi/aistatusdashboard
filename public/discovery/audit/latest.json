@@ -1,0 +1,111 @@
+{
+  "generated_at": "2026-01-13T10:42:36.510Z",
+  "site_url": "https://aistatusdashboard.com",
+  "generator": "scripts/generate-static-discovery-assets.cjs",
+  "node": "v20.19.0",
+  "score": {
+    "total": 100,
+    "note": "All required discovery files generated successfully."
+  },
+  "files": [
+    {
+      "path": "/sitemap.xml",
+      "url": "https://aistatusdashboard.com/sitemap.xml",
+      "expected_content_type": "application/xml; charset=utf-8",
+      "bytes": 11160,
+      "sha256": "ee107397488430e269c23eae333cf5212db5892dd472c89e9244e86461d1fe34"
+    },
+    {
+      "path": "/rss.xml",
+      "url": "https://aistatusdashboard.com/rss.xml",
+      "expected_content_type": "application/rss+xml; charset=utf-8",
+      "bytes": 10595,
+      "sha256": "3c0b8a59358f232011948dfa7766c783c08c4659deaa8e53acb2fb3e7b8326b9"
+    },
+    {
+      "path": "/openapi.yaml",
+      "url": "https://aistatusdashboard.com/openapi.yaml",
+      "expected_content_type": "application/yaml; charset=utf-8",
+      "bytes": 21181,
+      "sha256": "25b6dfa70c6ddf729a9d16eb8b333355fb44d6f102d705e77f112b039a505b05"
+    },
+    {
+      "path": "/openapi-3.0.yaml",
+      "url": "https://aistatusdashboard.com/openapi-3.0.yaml",
+      "expected_content_type": "application/yaml; charset=utf-8",
+      "bytes": 21181,
+      "sha256": "332df09900c07656f1794076dc359d6e3b97d00159cd6ffaaab969af4ca31640"
+    },
+    {
+      "path": "/datasets/incidents.ndjson",
+      "url": "https://aistatusdashboard.com/datasets/incidents.ndjson",
+      "expected_content_type": "application/x-ndjson; charset=utf-8",
+      "bytes": 11015,
+      "sha256": "121ec3703785def5a49eaac47b370016b3f7c2946763037ebd3ec64bf511b512"
+    },
+    {
+      "path": "/datasets/metrics.csv",
+      "url": "https://aistatusdashboard.com/datasets/metrics.csv",
+      "expected_content_type": "text/csv; charset=utf-8",
+      "bytes": 347,
+      "sha256": "bf9439b4dd45a928eb4c8b3dbf8d13bd96f85e8beba85dfbd92346858cf56c2b"
+    },
+    {
+      "path": "/docs.md",
+      "url": "https://aistatusdashboard.com/docs.md",
+      "expected_content_type": "text/markdown; charset=utf-8",
+      "bytes": 896,
+      "sha256": "eb8d0c0fd209c2e8342cae6182e546af083094797b2e132dd2415846dbf76642"
+    },
+    {
+      "path": "/docs/api.md",
+      "url": "https://aistatusdashboard.com/docs/api.md",
+      "expected_content_type": "text/markdown; charset=utf-8",
+      "bytes": 389,
+      "sha256": "50eac6a6a1333ded9b18656b8aa1bfad0a3ff007852f719dce62537dc4926c33"
+    },
+    {
+      "path": "/docs/citations.md",
+      "url": "https://aistatusdashboard.com/docs/citations.md",
+      "expected_content_type": "text/markdown; charset=utf-8",
+      "bytes": 866,
+      "sha256": "72c505dba4aae04727980541f72d1c975ce814779ffd5b42137802e06c8bd2d3"
+    },
+    {
+      "path": "/status.md",
+      "url": "https://aistatusdashboard.com/status.md",
+      "expected_content_type": "text/markdown; charset=utf-8",
+      "bytes": 263,
+      "sha256": "f25d4fcc707abdbb8784b241d44e76102492bb1b9472af84e25a955b0f92cff9"
+    },
+    {
+      "path": "/providers.md",
+      "url": "https://aistatusdashboard.com/providers.md",
+      "expected_content_type": "text/markdown; charset=utf-8",
+      "bytes": 1118,
+      "sha256": "d70c9b564217a6443ea5237a04a1dd8b154dd7d824ef347a1c2a0a4618070192"
+    },
+    {
+      "path": "/docs/agent/mcp-quickstart.md",
+      "url": "https://aistatusdashboard.com/docs/agent/mcp-quickstart.md",
+      "expected_content_type": "text/markdown; charset=utf-8",
+      "bytes": 451,
+      "sha256": "e311d7c8d8477e65c0dbfd7abb08d96e092bcf69f59cfdec75e04e692abc3dcb"
+    },
+    {
+      "path": "/docs/discoverability-audit.md",
+      "url": "https://aistatusdashboard.com/docs/discoverability-audit.md",
+      "expected_content_type": "text/markdown; charset=utf-8",
+      "bytes": 2147,
+      "sha256": "be72d58015cbc63b2af848d8c880898c2afbb1329fe555aca1d13ba3d57fccf9"
+    }
+  ],
+  "links": {
+    "ai": "https://aistatusdashboard.com/ai",
+    "llms": "https://aistatusdashboard.com/llms.txt",
+    "llms_full": "https://aistatusdashboard.com/llms-full.txt",
+    "openapi_json": "https://aistatusdashboard.com/openapi.json",
+    "plugin_manifest": "https://aistatusdashboard.com/.well-known/ai-plugin.json",
+    "mcp": "https://aistatusdashboard.com/mcp"
+  }
+}

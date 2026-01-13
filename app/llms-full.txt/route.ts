@@ -14,6 +14,8 @@ AI Status Dashboard is an AI reliability control plane: status, incidents, metri
 - Well-known OpenAPI: https://aistatusdashboard.com/.well-known/openapi.json
 - RSS/Atom: https://aistatusdashboard.com/rss.xml
 - Sitemap: https://aistatusdashboard.com/sitemap.xml
+- Discovery audit JSON: https://aistatusdashboard.com/discovery/audit/latest.json
+- Discovery audit HTML: https://aistatusdashboard.com/discovery/audit
 
 ## Datasets
 - Index: https://aistatusdashboard.com/datasets

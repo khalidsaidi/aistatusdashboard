@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 const fs = require('fs/promises');
 const path = require('path');
+const crypto = require('crypto');
 
 const SITE_URL = process.env.SITE_URL || 'https://aistatusdashboard.com';
 const now = new Date().toISOString();
@@ -14,6 +15,33 @@ async function writeFile(relPath, content) {
   await ensureDir(fullPath);
   await fs.writeFile(fullPath, content, 'utf8');
   console.log(`wrote public/${relPath}`);
+}
+
+async function sha256File(relPath) {
+  const fullPath = path.join(process.cwd(), 'public', relPath);
+  const buf = await fs.readFile(fullPath);
+  return crypto.createHash('sha256').update(buf).digest('hex');
+}
+
+async function fileInfo(relPath, expectedContentType) {
+  const fullPath = path.join(process.cwd(), 'public', relPath);
+  const stat = await fs.stat(fullPath);
+  return {
+    path: `/${relPath}`,
+    url: `${SITE_URL}/${relPath}`,
+    expected_content_type: expectedContentType,
+    bytes: stat.size,
+    sha256: await sha256File(relPath),
+  };
+}
+
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 async function fetchText(url) {
@@ -68,6 +96,7 @@ async function buildSitemap(incidents, providers) {
   addUrl(`${SITE_URL}/reports/weekly-ai-reliability`, '0.6', 'weekly');
   addUrl(`${SITE_URL}/reports/monthly-provider-scorecards`, '0.6', 'monthly');
   addUrl(`${SITE_URL}/docs/discoverability-audit`, '0.5', 'weekly');
+  addUrl(`${SITE_URL}/discovery/audit`, '0.6', 'daily');
 
   providers.forEach((provider) => {
     addUrl(`${SITE_URL}/provider/${provider.id}`, '0.7', 'hourly');
@@ -192,6 +221,59 @@ async function run() {
   } catch (err) {
     await writeFile('docs/discoverability-audit.md', '# Discoverability Audit\n\nAudit mirror unavailable.');
   }
+
+  // ---- Discovery audit (JSON + HTML) ----
+  const auditFiles = await Promise.all([
+    fileInfo('sitemap.xml', 'application/xml; charset=utf-8'),
+    fileInfo('rss.xml', 'application/rss+xml; charset=utf-8'),
+    fileInfo('openapi.yaml', 'application/yaml; charset=utf-8'),
+    fileInfo('openapi-3.0.yaml', 'application/yaml; charset=utf-8'),
+    fileInfo('datasets/incidents.ndjson', 'application/x-ndjson; charset=utf-8'),
+    fileInfo('datasets/metrics.csv', 'text/csv; charset=utf-8'),
+    fileInfo('docs.md', 'text/markdown; charset=utf-8'),
+    fileInfo('docs/api.md', 'text/markdown; charset=utf-8'),
+    fileInfo('docs/citations.md', 'text/markdown; charset=utf-8'),
+    fileInfo('status.md', 'text/markdown; charset=utf-8'),
+    fileInfo('providers.md', 'text/markdown; charset=utf-8'),
+    fileInfo('docs/agent/mcp-quickstart.md', 'text/markdown; charset=utf-8'),
+    fileInfo('docs/discoverability-audit.md', 'text/markdown; charset=utf-8'),
+  ]);
+
+  // Score = 100 if all required files exist (we’d have thrown if missing)
+  const audit = {
+    generated_at: now,
+    site_url: SITE_URL,
+    generator: 'scripts/generate-static-discovery-assets.cjs',
+    node: process.version,
+    score: { total: 100, note: 'All required discovery files generated successfully.' },
+    files: auditFiles,
+    links: {
+      ai: `${SITE_URL}/ai`,
+      llms: `${SITE_URL}/llms.txt`,
+      llms_full: `${SITE_URL}/llms-full.txt`,
+      openapi_json: `${SITE_URL}/openapi.json`,
+      plugin_manifest: `${SITE_URL}/.well-known/ai-plugin.json`,
+      mcp: `${SITE_URL}/mcp`,
+    },
+  };
+
+  await writeFile('discovery/audit/latest.json', JSON.stringify(audit, null, 2));
+
+  const auditHtml = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>AIStatusDashboard Discovery Audit</title>
+  <meta name="robots" content="index,follow" />
+</head>
+<body>
+  <h1>Discovery Audit</h1>
+  <p>Generated at: <code>${escapeHtml(audit.generated_at)}</code></p>
+  <p>JSON: <a href="/discovery/audit/latest.json">/discovery/audit/latest.json</a></p>
+  <pre>${escapeHtml(JSON.stringify(audit, null, 2))}</pre>
+</body>
+</html>`;
+  await writeFile('discovery/audit/index.html', auditHtml);
 }
 
 run().catch((err) => {

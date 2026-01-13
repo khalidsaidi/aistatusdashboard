@@ -34,6 +34,10 @@ const BODY = `# AI Status Dashboard
 ## Feeds
 - RSS: https://aistatusdashboard.com/rss.xml
 - Sitemap: https://aistatusdashboard.com/sitemap.xml
+
+## Verification
+- https://aistatusdashboard.com/discovery/audit/latest.json
+- https://aistatusdashboard.com/discovery/audit
 `;
 
 export async function GET() {

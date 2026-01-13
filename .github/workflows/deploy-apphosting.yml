@@ -66,5 +66,46 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Generate discovery assets
+        run: node scripts/generate-static-discovery-assets.cjs
+
+      - name: Verify discovery assets present
+        run: |
+          set -e
+          required=(
+            "public/discovery/audit/latest.json"
+            "public/sitemap.xml"
+            "public/rss.xml"
+            "public/datasets/incidents.ndjson"
+            "public/datasets/metrics.csv"
+            "public/docs.md"
+            "public/openapi.yaml"
+          )
+          for file in "${required[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "Missing required discovery asset: $file"
+              exit 1
+            fi
+          done
+
       - name: Deploy App Hosting
         run: npx firebase-tools deploy --only apphosting --project ai-status-dashboard --token "$FIREBASE_TOKEN"
+
+      - name: Post-deploy discovery smoke check
+        run: |
+          set -e
+          urls=(
+            "https://aistatusdashboard.com/discovery/audit/latest.json"
+            "https://aistatusdashboard.com/sitemap.xml"
+            "https://aistatusdashboard.com/rss.xml"
+            "https://aistatusdashboard.com/datasets/incidents.ndjson"
+            "https://aistatusdashboard.com/docs.md"
+            "https://aistatusdashboard.com/openapi.yaml"
+          )
+          for url in "${urls[@]}"; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+            if [ "$code" != "200" ]; then
+              echo "Smoke check failed: $url returned $code"
+              exit 1
+            fi
+          done

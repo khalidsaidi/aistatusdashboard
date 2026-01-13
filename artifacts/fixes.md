@@ -8,3 +8,4 @@
 - 2026-01-13: Updated markdown mirrors to reference OpenAPI YAML + dataset CSV, and added fallback for discoverability audit markdown (verified via `curl -i https://aistatusdashboard.com/llms.txt` and `curl -i https://aistatusdashboard.com/docs/discoverability-audit.md`).
 - 2026-01-13: Generated static discovery assets under `public/` (sitemap/rss/datasets/markdown/openapi YAML), removed dynamic route handlers for those paths, and added discovery headers + middleware bypass for crawl surfaces (verified locally via `node scripts/generate-static-discovery-assets.cjs`).
 - 2026-01-13: Added discovery response headers in `middleware.ts` for static crawl surfaces to guarantee consistent Content-Type and debug tracing across edges.
+- 2026-01-13: Added discovery audit JSON/HTML generator (public `/discovery/audit/latest.json`) and linked it from `/ai`, `llms.txt`, and sitemap; added CI guard + post-deploy smoke checks to prevent regressions.

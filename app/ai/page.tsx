@@ -73,6 +73,9 @@ export default function AiLandingPage() {
               <a href="/docs/discoverability-audit.md" className="cta-secondary text-xs">
                 Discoverability audit
               </a>
+              <a href="/discovery/audit/latest.json" className="cta-secondary text-xs">
+                Discovery audit (JSON)
+              </a>
             </div>
           </section>
 

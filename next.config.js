@@ -13,6 +13,14 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  async rewrites() {
+    return [
+      {
+        source: '/discovery/audit',
+        destination: '/discovery/audit/index.html',
+      },
+    ];
+  },
   async headers() {
     const commonHeaders = [
       { key: 'X-Discovery-Handler', value: 'static' },
@@ -41,7 +49,7 @@ const nextConfig = {
       {
         source: '/openapi.yaml',
         headers: [
-          { key: 'Content-Type', value: 'text/yaml; charset=utf-8' },
+          { key: 'Content-Type', value: 'application/yaml; charset=utf-8' },
           cacheHeader,
           ...commonHeaders,
         ],
@@ -49,7 +57,7 @@ const nextConfig = {
       {
         source: '/openapi-3.0.yaml',
         headers: [
-          { key: 'Content-Type', value: 'text/yaml; charset=utf-8' },
+          { key: 'Content-Type', value: 'application/yaml; charset=utf-8' },
           cacheHeader,
           ...commonHeaders,
         ],

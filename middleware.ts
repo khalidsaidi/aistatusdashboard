@@ -26,6 +26,7 @@ function getCanonicalHost(): string | null {
 function isDiscoveryAsset(pathname: string): boolean {
   if (pathname === '/rss.xml' || pathname === '/sitemap.xml') return true;
   if (pathname.startsWith('/datasets/')) return true;
+  if (pathname.startsWith('/discovery/audit')) return true;
   if (pathname.startsWith('/docs/') && pathname.endsWith('.md')) return true;
   if (pathname === '/docs.md' || pathname === '/status.md' || pathname === '/providers.md') return true;
   if (pathname === '/openapi.yaml' || pathname === '/openapi-3.0.yaml') return true;
@@ -50,7 +51,7 @@ function applyDiscoveryHeaders(response: NextResponse, pathname: string) {
   }
 
   if (pathname.endsWith('.yaml')) {
-    response.headers.set('Content-Type', 'text/yaml; charset=utf-8');
+    response.headers.set('Content-Type', 'application/yaml; charset=utf-8');
     response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=600');
     return;
   }
@@ -70,6 +71,18 @@ function applyDiscoveryHeaders(response: NextResponse, pathname: string) {
   if (pathname.endsWith('.csv')) {
     response.headers.set('Content-Type', 'text/csv; charset=utf-8');
     response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=300');
+    return;
+  }
+
+  if (pathname === '/discovery/audit/latest.json') {
+    response.headers.set('Content-Type', 'application/json; charset=utf-8');
+    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+    return;
+  }
+
+  if (pathname === '/discovery/audit') {
+    response.headers.set('Content-Type', 'text/html; charset=utf-8');
+    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=600');
   }
 }
 
