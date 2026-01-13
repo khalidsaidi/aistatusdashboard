@@ -2,7 +2,7 @@
 
 Self-service checklist for AIStatusDashboard discovery surfaces. This page lists the required public endpoints, their expected status codes, and content types.
 
-Last verified: 2026-01-13T07:25:16+00:00
+Last verified: 2026-01-13T08:47:58+00:00
 
 ## Required endpoints
 

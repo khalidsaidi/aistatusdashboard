@@ -4,6 +4,7 @@ import { listProviders } from '@/lib/services/public-data';
 import { queryMetricSeries } from '@/lib/services/metrics';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 const METRIC = 'latency_p95_ms';
 

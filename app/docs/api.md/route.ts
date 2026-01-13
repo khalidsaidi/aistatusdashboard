@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function GET() {
   const body = `# API Docs
@@ -13,6 +14,7 @@ Base URL: https://aistatusdashboard.com
 
 OpenAPI:
 - https://aistatusdashboard.com/openapi.json
+- https://aistatusdashboard.com/openapi.yaml
 
 ## Example
 \`\`\`bash

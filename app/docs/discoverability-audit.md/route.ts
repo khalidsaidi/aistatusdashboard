@@ -15,6 +15,13 @@ export async function GET() {
       },
     });
   } catch {
-    return new Response('Not found', { status: 404 });
+    const fallback = `# Discoverability Audit\n\nThe markdown mirror is unavailable right now. Visit https://aistatusdashboard.com/docs/discoverability-audit for the live audit checklist.\n`;
+    return new Response(fallback, {
+      headers: {
+        'Content-Type': 'text/markdown; charset=utf-8',
+        'Cache-Control': 'public, max-age=60, s-maxage=120',
+        'X-Audit-Status': 'fallback',
+      },
+    });
   }
 }

@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { providerService } from '@/lib/services/providers';
+import { intelligenceService } from '@/lib/services/intelligence';
+import { normalizeIncidentDates } from '@/lib/utils/normalize-dates';
+import { log } from '@/lib/utils/logger';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 function getRequestOrigin(request: NextRequest): string {
   const forwardedProto = request.headers.get('x-forwarded-proto');
@@ -25,54 +29,86 @@ function buildUrl(loc: string, lastmod: string, changefreq: string, priority: st
 }
 
 export async function GET(request: NextRequest) {
-  const origin = getRequestOrigin(request);
-  const now = new Date().toISOString();
+  try {
+    const origin = getRequestOrigin(request);
+    const now = new Date().toISOString();
 
-  const providers = providerService.getProviders();
-  const urls: string[] = [
-    buildUrl(`${origin}/`, now, 'always', '1.0'),
-    buildUrl(`${origin}/ai`, now, 'always', '0.9'),
-    buildUrl(`${origin}/status`, now, 'always', '0.9'),
-    buildUrl(`${origin}/status.md`, now, 'daily', '0.8'),
-    buildUrl(`${origin}/docs`, now, 'weekly', '0.7'),
-    buildUrl(`${origin}/docs.md`, now, 'weekly', '0.7'),
-    buildUrl(`${origin}/docs/api`, now, 'weekly', '0.6'),
-    buildUrl(`${origin}/docs/api.md`, now, 'weekly', '0.6'),
-    buildUrl(`${origin}/docs/citations`, now, 'weekly', '0.5'),
-    buildUrl(`${origin}/docs/citations.md`, now, 'weekly', '0.5'),
-    buildUrl(`${origin}/docs/agent/mcp-quickstart`, now, 'weekly', '0.6'),
-    buildUrl(`${origin}/docs/agent/mcp-quickstart.md`, now, 'weekly', '0.6'),
-    buildUrl(`${origin}/docs/discoverability-audit`, now, 'weekly', '0.5'),
-    buildUrl(`${origin}/docs/discoverability-audit.md`, now, 'weekly', '0.5'),
-    buildUrl(`${origin}/providers`, now, 'daily', '0.8'),
-    buildUrl(`${origin}/providers.md`, now, 'daily', '0.7'),
-    buildUrl(`${origin}/incidents`, now, 'hourly', '0.7'),
-    buildUrl(`${origin}/datasets`, now, 'weekly', '0.6'),
-    buildUrl(`${origin}/datasets/incidents`, now, 'weekly', '0.6'),
-    buildUrl(`${origin}/datasets/metrics`, now, 'weekly', '0.6'),
-    buildUrl(`${origin}/how-it-works`, now, 'monthly', '0.6'),
-    buildUrl(`${origin}/llms.txt`, now, 'daily', '0.7'),
-    buildUrl(`${origin}/llms-full.txt`, now, 'daily', '0.6'),
-    buildUrl(`${origin}/rss.xml`, now, 'hourly', '0.8'),
-    buildUrl(`${origin}/reports/weekly-ai-reliability`, now, 'weekly', '0.6'),
-    buildUrl(`${origin}/reports/monthly-provider-scorecards`, now, 'monthly', '0.6'),
-    buildUrl(`${origin}/status/site-health`, now, 'weekly', '0.5'),
-    buildUrl(`${origin}/system-health`, now, 'weekly', '0.5'),
-  ];
+    const providers = providerService.getProviders();
+    const urls: string[] = [
+      buildUrl(`${origin}/`, now, 'always', '1.0'),
+      buildUrl(`${origin}/ai`, now, 'always', '0.9'),
+      buildUrl(`${origin}/status`, now, 'always', '0.9'),
+      buildUrl(`${origin}/status.md`, now, 'daily', '0.8'),
+      buildUrl(`${origin}/docs`, now, 'weekly', '0.7'),
+      buildUrl(`${origin}/docs.md`, now, 'weekly', '0.7'),
+      buildUrl(`${origin}/docs/api`, now, 'weekly', '0.6'),
+      buildUrl(`${origin}/docs/api.md`, now, 'weekly', '0.6'),
+      buildUrl(`${origin}/docs/citations`, now, 'weekly', '0.5'),
+      buildUrl(`${origin}/docs/citations.md`, now, 'weekly', '0.5'),
+      buildUrl(`${origin}/docs/agent/mcp-quickstart`, now, 'weekly', '0.6'),
+      buildUrl(`${origin}/docs/agent/mcp-quickstart.md`, now, 'weekly', '0.6'),
+      buildUrl(`${origin}/docs/discoverability-audit`, now, 'weekly', '0.5'),
+      buildUrl(`${origin}/docs/discoverability-audit.md`, now, 'weekly', '0.5'),
+      buildUrl(`${origin}/providers`, now, 'daily', '0.8'),
+      buildUrl(`${origin}/providers.md`, now, 'daily', '0.7'),
+      buildUrl(`${origin}/incidents`, now, 'hourly', '0.7'),
+      buildUrl(`${origin}/datasets`, now, 'weekly', '0.6'),
+      buildUrl(`${origin}/datasets/incidents`, now, 'weekly', '0.6'),
+      buildUrl(`${origin}/datasets/metrics`, now, 'weekly', '0.6'),
+      buildUrl(`${origin}/how-it-works`, now, 'monthly', '0.6'),
+      buildUrl(`${origin}/llms.txt`, now, 'daily', '0.7'),
+      buildUrl(`${origin}/llms-full.txt`, now, 'daily', '0.6'),
+      buildUrl(`${origin}/rss.xml`, now, 'hourly', '0.8'),
+      buildUrl(`${origin}/reports/weekly-ai-reliability`, now, 'weekly', '0.6'),
+      buildUrl(`${origin}/reports/monthly-provider-scorecards`, now, 'monthly', '0.6'),
+      buildUrl(`${origin}/status/site-health`, now, 'weekly', '0.5'),
+      buildUrl(`${origin}/system-health`, now, 'weekly', '0.5'),
+    ];
 
-  providers.forEach((provider) => {
-    urls.push(buildUrl(`${origin}/provider/${provider.id}`, now, 'hourly', '0.7'));
-  });
+    providers.forEach((provider) => {
+      urls.push(buildUrl(`${origin}/provider/${provider.id}`, now, 'hourly', '0.7'));
+    });
 
-  const body = `<?xml version="1.0" encoding="UTF-8"?>
+    const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+    try {
+      const incidents = (await intelligenceService.getIncidents({ startDate: ninetyDaysAgo, limit: 200 }))
+        .map(normalizeIncidentDates);
+      incidents.forEach((incident) => {
+        const lastmod = incident.updatedAt || incident.startedAt || now;
+        urls.push(buildUrl(`${origin}/incidents/${incident.providerId}:${incident.id}`, lastmod, 'daily', '0.6'));
+      });
+    } catch (error) {
+      log('warn', 'Incident sitemap population failed', { error });
+    }
+
+    const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.join('\n')}
 </urlset>`;
 
-  return new NextResponse(body, {
-    headers: {
-      'Content-Type': 'application/xml; charset=utf-8',
-      'Cache-Control': 'public, max-age=300, s-maxage=600',
-    },
-  });
+    return new NextResponse(body, {
+      headers: {
+        'Content-Type': 'application/xml; charset=utf-8',
+        'Cache-Control': 'public, max-age=300, s-maxage=600',
+      },
+    });
+  } catch (error) {
+    log('error', 'Sitemap generation failed', { error });
+    const origin = getRequestOrigin(request);
+    const now = new Date().toISOString();
+    const body = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  ${buildUrl(`${origin}/`, now, 'always', '1.0')}
+  ${buildUrl(`${origin}/ai`, now, 'always', '0.9')}
+  ${buildUrl(`${origin}/providers`, now, 'daily', '0.8')}
+  ${buildUrl(`${origin}/datasets`, now, 'weekly', '0.6')}
+</urlset>`;
+    return new NextResponse(body, {
+      headers: {
+        'Content-Type': 'application/xml; charset=utf-8',
+        'Cache-Control': 'public, max-age=60, s-maxage=120',
+        'X-Sitemap-Status': 'fallback',
+      },
+    });
+  }
 }

@@ -3,3 +3,6 @@
 - Updated `server.json` to set `websiteUrl` to `/ai` and bumped the MCP registry version to `1.0.1` so the registry listing links back to the AI landing page.
 - Re-deployed App Hosting backend after the link updates to keep production in sync.
 - 2026-01-13: Baseline audit returned 200 for all discovery endpoints; no fixes required for this pass.
+- 2026-01-13: Added nodejs runtime + fallbacks for RSS, sitemap, datasets, and markdown mirrors to guarantee 200 responses (verified via `curl -i https://aistatusdashboard.com/rss.xml`, `curl -i https://aistatusdashboard.com/sitemap.xml`, `curl -i https://aistatusdashboard.com/datasets/incidents.ndjson`, `curl -i https://aistatusdashboard.com/docs.md`).
+- 2026-01-13: Hardened incident permalink rendering (URL decoding + 404 on missing + impact scope + Event JSON-LD) and updated OpenAPI YAML fallbacks (verified via `curl -i https://aistatusdashboard.com/incidents/<id>` and `curl -i https://aistatusdashboard.com/openapi.yaml`).
+- 2026-01-13: Updated markdown mirrors to reference OpenAPI YAML + dataset CSV, and added fallback for discoverability audit markdown (verified via `curl -i https://aistatusdashboard.com/llms.txt` and `curl -i https://aistatusdashboard.com/docs/discoverability-audit.md`).

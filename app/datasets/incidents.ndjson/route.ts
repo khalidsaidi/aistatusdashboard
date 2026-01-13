@@ -4,6 +4,7 @@ import { intelligenceService } from '@/lib/services/intelligence';
 import { normalizeIncidentDates } from '@/lib/utils/normalize-dates';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function GET(request: NextRequest) {
   const incidents = (await intelligenceService.getIncidents({ limit: 200 })).map(normalizeIncidentDates);

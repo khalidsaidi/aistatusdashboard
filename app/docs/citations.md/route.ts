@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function GET() {
   const body = `# Citing AI Status Dashboard
@@ -19,7 +20,7 @@ Use these references when citing incidents, metrics, or datasets.
 
 ## How to cite datasets
 - Incidents NDJSON: https://aistatusdashboard.com/datasets/incidents.ndjson
-- Metrics Parquet: https://aistatusdashboard.com/datasets/metrics.parquet
+- Metrics CSV: https://aistatusdashboard.com/datasets/metrics.csv
 
 Include temporal coverage and the retrieval date in your citation.
 `;

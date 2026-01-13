@@ -8,7 +8,7 @@
       "final_url": "https://aistatusdashboard.com/ai",
       "content_type": "text/html; charset=utf-8",
       "cache_control": "no-store",
-      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+      "snippet": "<!DOCTYPE html><!--build_1768293766339--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
     },
     {
       "ua": "default",
@@ -26,7 +26,7 @@
       "final_url": "https://aistatusdashboard.com/sitemap.xml",
       "content_type": "application/xml; charset=utf-8",
       "cache_control": "max-age=300, private",
-      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n\n  <url>\n    <loc>https://aistatusdashboard.com/</loc>\n    <lastmod>2026-01-13T08:10:38.752Z</lastmo"
+      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n\n  <url>\n    <loc>https://aistatusdashboard.com/</loc>\n    <lastmod>2026-01-13T08:48:42.915Z</lastmo"
     },
     {
       "ua": "default",
@@ -34,7 +34,7 @@
       "status": "200",
       "final_url": "https://aistatusdashboard.com/rss.xml",
       "content_type": "application/rss+xml; charset=utf-8",
-      "cache_control": "max-age=300, private",
+      "cache_control": "max-age=60, private",
       "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\">\n  <channel>\n    <title>AI Status Dashboard Incidents</title>\n    <link>https://aistatusdashboard.com/</link>\n    <description>Incidents and m"
     },
     {
@@ -125,7 +125,7 @@
       "final_url": "https://aistatusdashboard.com/providers",
       "content_type": "text/html; charset=utf-8",
       "cache_control": "no-store",
-      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+      "snippet": "<!DOCTYPE html><!--build_1768293766339--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
     },
     {
       "ua": "default",
@@ -179,7 +179,7 @@
       "final_url": "https://aistatusdashboard.com/datasets/metrics.csv",
       "content_type": "text/csv; charset=utf-8",
       "cache_control": "max-age=60, private",
-      "snippet": "timestamp,provider_id,metric,value,sample_count,sources\n2026-01-12T08:10:48.500Z,openai,latency_p95_ms,,0,\n2026-01-12T09:10:48.500Z,openai,latency_p95_ms,,0,\n2026-01-12T10:10:48.500Z,openai,latency_p9"
+      "snippet": "timestamp,provider_id,metric,value,sample_count,sources\n2026-01-12T08:48:52.805Z,openai,latency_p95_ms,,0,\n2026-01-12T09:48:52.805Z,openai,latency_p95_ms,,0,\n2026-01-12T10:48:52.805Z,openai,latency_p9"
     },
     {
       "ua": "default",
@@ -233,7 +233,7 @@
       "final_url": "https://aistatusdashboard.com/api/public/v1/status/summary",
       "content_type": "application/json; charset=utf-8",
       "cache_control": "max-age=60, private",
-      "snippet": "{\"request_id\":\"2cffb665-0525-4ac0-95f8-f1ac1f2204ab\",\"generated_at\":\"2026-01-13T08:10:52.528Z\",\"evidence\":[{\"source_url\":\"https://status.openai.com\",\"metric_window\":{\"since\":\"2026-01-13T07:40:52.503Z\""
+      "snippet": "{\"request_id\":\"fc9e3a6b-1bd3-40f0-a1e9-84ec59921527\",\"generated_at\":\"2026-01-13T08:48:55.018Z\",\"evidence\":[{\"source_url\":\"https://status.openai.com\",\"metric_window\":{\"since\":\"2026-01-13T08:18:54.996Z\""
     },
     {
       "ua": "default",
@@ -242,7 +242,7 @@
       "final_url": "https://aistatusdashboard.com/api/public/v1/incidents",
       "content_type": "application/json; charset=utf-8",
       "cache_control": "max-age=30, private",
-      "snippet": "{\"request_id\":\"e3f076d2-7696-4751-b585-48a90da0d4b3\",\"generated_at\":\"2026-01-13T08:10:52.970Z\",\"evidence\":[{\"ids\":[\"openai:01KEACZ6R02744RQKCMSK1ZG54\"],\"metric_window\":{\"since\":\"2026-01-06T19:36:32.00"
+      "snippet": "{\"request_id\":\"c2221e2e-648f-41cf-89dd-304e41075719\",\"generated_at\":\"2026-01-13T08:48:55.425Z\",\"evidence\":[{\"ids\":[\"openai:01KEACZ6R02744RQKCMSK1ZG54\"],\"metric_window\":{\"since\":\"2026-01-06T19:36:32.00"
     },
     {
       "ua": "default",
@@ -251,7 +251,7 @@
       "final_url": "https://aistatusdashboard.com/api/health",
       "content_type": "application/json",
       "cache_control": "max-age=0, must-revalidate, no-store, private",
-      "snippet": "{\"status\":\"healthy\",\"timestamp\":\"2026-01-13T08:10:53.397Z\",\"uptime\":1760.139871811,\"config\":{\"firebaseProject\":\"configured\"},\"responseTime\":0}"
+      "snippet": "{\"status\":\"healthy\",\"timestamp\":\"2026-01-13T08:48:55.837Z\",\"uptime\":259.719431928,\"config\":{\"firebaseProject\":\"configured\"},\"responseTime\":0}"
     },
     {
       "ua": "default",
@@ -278,7 +278,7 @@
       "final_url": "https://aistatusdashboard.com/ai",
       "content_type": "text/html; charset=utf-8",
       "cache_control": "no-store",
-      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+      "snippet": "<!DOCTYPE html><!--build_1768293766339--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
     },
     {
       "ua": "Googlebot",
@@ -296,7 +296,7 @@
       "final_url": "https://aistatusdashboard.com/sitemap.xml",
       "content_type": "application/xml; charset=utf-8",
       "cache_control": "max-age=300, private",
-      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n\n  <url>\n    <loc>https://aistatusdashboard.com/</loc>\n    <lastmod>2026-01-13T08:10:55.323Z</lastmo"
+      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n\n  <url>\n    <loc>https://aistatusdashboard.com/</loc>\n    <lastmod>2026-01-13T08:48:57.670Z</lastmo"
     },
     {
       "ua": "Googlebot",
@@ -304,7 +304,7 @@
       "status": "200",
       "final_url": "https://aistatusdashboard.com/rss.xml",
       "content_type": "application/rss+xml; charset=utf-8",
-      "cache_control": "max-age=300, private",
+      "cache_control": "max-age=60, private",
       "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\">\n  <channel>\n    <title>AI Status Dashboard Incidents</title>\n    <link>https://aistatusdashboard.com/</link>\n    <description>Incidents and m"
     },
     {
@@ -395,7 +395,7 @@
       "final_url": "https://aistatusdashboard.com/providers",
       "content_type": "text/html; charset=utf-8",
       "cache_control": "no-store",
-      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+      "snippet": "<!DOCTYPE html><!--build_1768293766339--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
     },
     {
       "ua": "Googlebot",
@@ -449,7 +449,7 @@
       "final_url": "https://aistatusdashboard.com/datasets/metrics.csv",
       "content_type": "text/csv; charset=utf-8",
       "cache_control": "max-age=60, private",
-      "snippet": "timestamp,provider_id,metric,value,sample_count,sources\n2026-01-12T08:11:03.477Z,openai,latency_p95_ms,,0,\n2026-01-12T09:11:03.477Z,openai,latency_p95_ms,,0,\n2026-01-12T10:11:03.477Z,openai,latency_p9"
+      "snippet": "timestamp,provider_id,metric,value,sample_count,sources\n2026-01-12T08:49:06.248Z,openai,latency_p95_ms,,0,\n2026-01-12T09:49:06.248Z,openai,latency_p95_ms,,0,\n2026-01-12T10:49:06.248Z,openai,latency_p9"
     },
     {
       "ua": "Googlebot",
@@ -503,7 +503,7 @@
       "final_url": "https://aistatusdashboard.com/api/public/v1/status/summary",
       "content_type": "application/json; charset=utf-8",
       "cache_control": "max-age=60, private",
-      "snippet": "{\"request_id\":\"efb9794c-ab96-491d-8c23-8f4a8ff395bd\",\"generated_at\":\"2026-01-13T08:11:05.819Z\",\"evidence\":[{\"source_url\":\"https://status.openai.com\",\"metric_window\":{\"since\":\"2026-01-13T07:41:05.801Z\""
+      "snippet": "{\"request_id\":\"88bccb48-5b77-4aa8-a8fd-cbeccf589a02\",\"generated_at\":\"2026-01-13T08:49:08.379Z\",\"evidence\":[{\"source_url\":\"https://status.openai.com\",\"metric_window\":{\"since\":\"2026-01-13T08:19:08.352Z\""
     },
     {
       "ua": "Googlebot",
@@ -512,7 +512,7 @@
       "final_url": "https://aistatusdashboard.com/api/public/v1/incidents",
       "content_type": "application/json; charset=utf-8",
       "cache_control": "max-age=30, private",
-      "snippet": "{\"request_id\":\"2e285d85-f912-4c98-be51-019726677b9c\",\"generated_at\":\"2026-01-13T08:11:06.247Z\",\"evidence\":[{\"ids\":[\"openai:01KEACZ6R02744RQKCMSK1ZG54\"],\"metric_window\":{\"since\":\"2026-01-06T19:36:32.00"
+      "snippet": "{\"request_id\":\"465df825-23ef-47a9-bc0e-77266bb39839\",\"generated_at\":\"2026-01-13T08:49:09.459Z\",\"evidence\":[{\"ids\":[\"openai:01KEACZ6R02744RQKCMSK1ZG54\"],\"metric_window\":{\"since\":\"2026-01-06T19:36:32.00"
     },
     {
       "ua": "Googlebot",
@@ -521,7 +521,7 @@
       "final_url": "https://aistatusdashboard.com/api/health",
       "content_type": "application/json",
       "cache_control": "max-age=0, must-revalidate, no-store, private",
-      "snippet": "{\"status\":\"healthy\",\"timestamp\":\"2026-01-13T08:11:06.663Z\",\"uptime\":1773.405743161,\"config\":{\"firebaseProject\":\"configured\"},\"responseTime\":0}"
+      "snippet": "{\"status\":\"healthy\",\"timestamp\":\"2026-01-13T08:49:09.858Z\",\"uptime\":273.740847635,\"config\":{\"firebaseProject\":\"configured\"},\"responseTime\":0}"
     },
     {
       "ua": "Googlebot",
@@ -548,7 +548,7 @@
       "final_url": "https://aistatusdashboard.com/ai",
       "content_type": "text/html; charset=utf-8",
       "cache_control": "no-store",
-      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+      "snippet": "<!DOCTYPE html><!--build_1768293766339--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
     },
     {
       "ua": "OAI-SearchBot",
@@ -566,7 +566,7 @@
       "final_url": "https://aistatusdashboard.com/sitemap.xml",
       "content_type": "application/xml; charset=utf-8",
       "cache_control": "max-age=300, private",
-      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n\n  <url>\n    <loc>https://aistatusdashboard.com/</loc>\n    <lastmod>2026-01-13T08:11:08.625Z</lastmo"
+      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n\n  <url>\n    <loc>https://aistatusdashboard.com/</loc>\n    <lastmod>2026-01-13T08:49:11.691Z</lastmo"
     },
     {
       "ua": "OAI-SearchBot",
@@ -574,7 +574,7 @@
       "status": "200",
       "final_url": "https://aistatusdashboard.com/rss.xml",
       "content_type": "application/rss+xml; charset=utf-8",
-      "cache_control": "max-age=300, private",
+      "cache_control": "max-age=60, private",
       "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\">\n  <channel>\n    <title>AI Status Dashboard Incidents</title>\n    <link>https://aistatusdashboard.com/</link>\n    <description>Incidents and m"
     },
     {
@@ -665,7 +665,7 @@
       "final_url": "https://aistatusdashboard.com/providers",
       "content_type": "text/html; charset=utf-8",
       "cache_control": "no-store",
-      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+      "snippet": "<!DOCTYPE html><!--build_1768293766339--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
     },
     {
       "ua": "OAI-SearchBot",
@@ -719,7 +719,7 @@
       "final_url": "https://aistatusdashboard.com/datasets/metrics.csv",
       "content_type": "text/csv; charset=utf-8",
       "cache_control": "max-age=60, private",
-      "snippet": "timestamp,provider_id,metric,value,sample_count,sources\n2026-01-12T08:11:16.847Z,openai,latency_p95_ms,,0,\n2026-01-12T09:11:16.847Z,openai,latency_p95_ms,,0,\n2026-01-12T10:11:16.847Z,openai,latency_p9"
+      "snippet": "timestamp,provider_id,metric,value,sample_count,sources\n2026-01-12T08:49:21.653Z,openai,latency_p95_ms,,0,\n2026-01-12T09:49:21.653Z,openai,latency_p95_ms,,0,\n2026-01-12T10:49:21.653Z,openai,latency_p9"
     },
     {
       "ua": "OAI-SearchBot",
@@ -773,7 +773,7 @@
       "final_url": "https://aistatusdashboard.com/api/public/v1/status/summary",
       "content_type": "application/json; charset=utf-8",
       "cache_control": "max-age=60, private",
-      "snippet": "{\"request_id\":\"005d8e63-a31a-4f47-b352-6540399847d4\",\"generated_at\":\"2026-01-13T08:11:19.032Z\",\"evidence\":[{\"source_url\":\"https://status.openai.com\",\"metric_window\":{\"since\":\"2026-01-13T07:41:19.001Z\""
+      "snippet": "{\"request_id\":\"6aae47da-3862-49cf-a2b6-e04f7812b74a\",\"generated_at\":\"2026-01-13T08:49:24.155Z\",\"evidence\":[{\"source_url\":\"https://status.openai.com\",\"metric_window\":{\"since\":\"2026-01-13T08:19:24.139Z\""
     },
     {
       "ua": "OAI-SearchBot",
@@ -782,7 +782,7 @@
       "final_url": "https://aistatusdashboard.com/api/public/v1/incidents",
       "content_type": "application/json; charset=utf-8",
       "cache_control": "max-age=30, private",
-      "snippet": "{\"request_id\":\"24cf48c8-db94-4f0e-8919-029b0e419b0e\",\"generated_at\":\"2026-01-13T08:11:19.539Z\",\"evidence\":[{\"ids\":[\"openai:01KEACZ6R02744RQKCMSK1ZG54\"],\"metric_window\":{\"since\":\"2026-01-06T19:36:32.00"
+      "snippet": "{\"request_id\":\"bac0da1f-dcda-4753-b4d1-efd107d8d744\",\"generated_at\":\"2026-01-13T08:49:24.534Z\",\"evidence\":[{\"ids\":[\"openai:01KEACZ6R02744RQKCMSK1ZG54\"],\"metric_window\":{\"since\":\"2026-01-06T19:36:32.00"
     },
     {
       "ua": "OAI-SearchBot",
@@ -791,7 +791,7 @@
       "final_url": "https://aistatusdashboard.com/api/health",
       "content_type": "application/json",
       "cache_control": "max-age=0, must-revalidate, no-store, private",
-      "snippet": "{\"status\":\"healthy\",\"timestamp\":\"2026-01-13T08:11:19.957Z\",\"uptime\":1786.69932056,\"config\":{\"firebaseProject\":\"configured\"},\"responseTime\":0}"
+      "snippet": "{\"status\":\"healthy\",\"timestamp\":\"2026-01-13T08:49:24.951Z\",\"uptime\":288.834152155,\"config\":{\"firebaseProject\":\"configured\"},\"responseTime\":0}"
     },
     {
       "ua": "OAI-SearchBot",
@@ -818,7 +818,7 @@
       "final_url": "https://aistatusdashboard.com/ai",
       "content_type": "text/html; charset=utf-8",
       "cache_control": "no-store",
-      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+      "snippet": "<!DOCTYPE html><!--build_1768293766339--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
     },
     {
       "ua": "RSS-Reader",
@@ -836,7 +836,7 @@
       "final_url": "https://aistatusdashboard.com/sitemap.xml",
       "content_type": "application/xml; charset=utf-8",
       "cache_control": "max-age=300, private",
-      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n\n  <url>\n    <loc>https://aistatusdashboard.com/</loc>\n    <lastmod>2026-01-13T08:11:21.879Z</lastmo"
+      "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n\n  <url>\n    <loc>https://aistatusdashboard.com/</loc>\n    <lastmod>2026-01-13T08:49:27.970Z</lastmo"
     },
     {
       "ua": "RSS-Reader",
@@ -844,7 +844,7 @@
       "status": "200",
       "final_url": "https://aistatusdashboard.com/rss.xml",
       "content_type": "application/rss+xml; charset=utf-8",
-      "cache_control": "max-age=300, private",
+      "cache_control": "max-age=60, private",
       "snippet": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rss version=\"2.0\">\n  <channel>\n    <title>AI Status Dashboard Incidents</title>\n    <link>https://aistatusdashboard.com/</link>\n    <description>Incidents and m"
     },
     {
@@ -935,7 +935,7 @@
       "final_url": "https://aistatusdashboard.com/providers",
       "content_type": "text/html; charset=utf-8",
       "cache_control": "no-store",
-      "snippet": "<!DOCTYPE html><!--build_1768289886405--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
+      "snippet": "<!DOCTYPE html><!--build_1768293766339--><html lang=\"en\" class=\"space_grotesk_47849994-module__7O3s-a__variable ibm_plex_mono_7741df84-module__F__NDG__variable\"><head><meta charSet=\"utf-8\"/><meta name"
     },
     {
       "ua": "RSS-Reader",
@@ -989,7 +989,7 @@
       "final_url": "https://aistatusdashboard.com/datasets/metrics.csv",
       "content_type": "text/csv; charset=utf-8",
       "cache_control": "max-age=60, private",
-      "snippet": "timestamp,provider_id,metric,value,sample_count,sources\n2026-01-12T08:11:31.257Z,openai,latency_p95_ms,,0,\n2026-01-12T09:11:31.257Z,openai,latency_p95_ms,,0,\n2026-01-12T10:11:31.257Z,openai,latency_p9"
+      "snippet": "timestamp,provider_id,metric,value,sample_count,sources\n2026-01-12T08:49:36.146Z,openai,latency_p95_ms,,0,\n2026-01-12T09:49:36.146Z,openai,latency_p95_ms,,0,\n2026-01-12T10:49:36.146Z,openai,latency_p9"
     },
     {
       "ua": "RSS-Reader",
@@ -1043,7 +1043,7 @@
       "final_url": "https://aistatusdashboard.com/api/public/v1/status/summary",
       "content_type": "application/json; charset=utf-8",
       "cache_control": "max-age=60, private",
-      "snippet": "{\"request_id\":\"b4cb0d5f-90d1-475e-8956-ae9328e9efbc\",\"generated_at\":\"2026-01-13T08:11:33.366Z\",\"evidence\":[{\"source_url\":\"https://status.openai.com\",\"metric_window\":{\"since\":\"2026-01-13T07:41:33.351Z\""
+      "snippet": "{\"request_id\":\"848bf6c1-636a-4643-8e84-b74ee3337560\",\"generated_at\":\"2026-01-13T08:49:38.652Z\",\"evidence\":[{\"source_url\":\"https://status.openai.com\",\"metric_window\":{\"since\":\"2026-01-13T08:19:38.633Z\""
     },
     {
       "ua": "RSS-Reader",
@@ -1052,7 +1052,7 @@
       "final_url": "https://aistatusdashboard.com/api/public/v1/incidents",
       "content_type": "application/json; charset=utf-8",
       "cache_control": "max-age=30, private",
-      "snippet": "{\"request_id\":\"afb59333-2846-4d3a-adb2-3da6d08a01fc\",\"generated_at\":\"2026-01-13T08:11:34.697Z\",\"evidence\":[{\"ids\":[\"openai:01KEACZ6R02744RQKCMSK1ZG54\"],\"metric_window\":{\"since\":\"2026-01-06T19:36:32.00"
+      "snippet": "{\"request_id\":\"a379e18d-abc9-4a46-8cb8-b5b81001d98a\",\"generated_at\":\"2026-01-13T08:49:39.044Z\",\"evidence\":[{\"ids\":[\"openai:01KEACZ6R02744RQKCMSK1ZG54\"],\"metric_window\":{\"since\":\"2026-01-06T19:36:32.00"
     },
     {
       "ua": "RSS-Reader",
@@ -1061,7 +1061,7 @@
       "final_url": "https://aistatusdashboard.com/api/health",
       "content_type": "application/json",
       "cache_control": "max-age=0, must-revalidate, no-store, private",
-      "snippet": "{\"status\":\"healthy\",\"timestamp\":\"2026-01-13T08:11:35.106Z\",\"uptime\":1801.848464643,\"config\":{\"firebaseProject\":\"configured\"},\"responseTime\":0}"
+      "snippet": "{\"status\":\"healthy\",\"timestamp\":\"2026-01-13T08:49:39.441Z\",\"uptime\":303.324211391,\"config\":{\"firebaseProject\":\"configured\"},\"responseTime\":1}"
     },
     {
       "ua": "RSS-Reader",
