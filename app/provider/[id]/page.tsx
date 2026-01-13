@@ -65,11 +65,19 @@ function resolveProvider(id: string) {
   const direct = providerService.getProvider(id);
   if (direct) return direct;
   const normalized = id.toLowerCase();
-  return providersCatalog.find((provider) => {
+  const fallback = providersCatalog.find((provider) => {
     if (provider.id?.toLowerCase() === normalized) return true;
     const aliases = provider.aliases || [];
     return aliases.some((alias) => alias.toLowerCase() === normalized);
   });
+  if (!fallback) {
+    log('warn', 'Provider lookup failed', {
+      providerId: id,
+      catalogSize: providersCatalog.length,
+      sampleProviders: providersCatalog.slice(0, 5).map((provider) => provider.id),
+    });
+  }
+  return fallback;
 }
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
