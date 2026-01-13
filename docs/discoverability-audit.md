@@ -96,6 +96,7 @@ x-robots-tag: index,follow
 ```
 HTTP/2 200
 cache-control: max-age=300, private
+x-robots-tag: index,follow
 ```
 
 - https://aistatusdashboard.com/robots.txt
