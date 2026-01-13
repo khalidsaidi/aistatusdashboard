@@ -1,14 +1,10 @@
 {
-  "total": 75,
+  "total": 100,
   "subscores": {
     "agent": 40,
-    "ai": 10,
-    "crawl": 15,
+    "ai": 30,
+    "crawl": 20,
     "authority": 10
   },
-  "failures": [
-    "llms.txt missing required entries",
-    "Markdown mirrors missing",
-    "sitemap missing key URLs"
-  ]
+  "failures": []
 }
