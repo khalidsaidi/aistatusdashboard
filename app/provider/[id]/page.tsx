@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
 import { statusService } from '@/lib/services/status';
 import { intelligenceService } from '@/lib/services/intelligence';
 import { queryMetricSeries, type MetricName, type MetricSeries } from '@/lib/services/metrics';
@@ -112,9 +111,14 @@ async function resolveProvider(idInput: string | string[] | undefined): Promise<
 export async function generateMetadata({ params }: { params: { id: string | string[] } }): Promise<Metadata> {
   const provider = await resolveProvider(params.id);
   if (!provider) {
+    const providerId = Array.isArray(params.id) ? params.id[0] : params.id;
+    const fallbackName = providerId ? providerId.replace(/-/g, ' ') : 'Provider';
     return {
-      title: 'Provider Not Found',
-      robots: { index: false, follow: false },
+      title: `${fallbackName} Status`,
+      description: `Live status, incidents, and uptime signals for ${fallbackName}.`,
+      alternates: {
+        canonical: `/provider/${providerId || ''}`,
+      },
     };
   }
 
@@ -150,7 +154,42 @@ export async function generateMetadata({ params }: { params: { id: string | stri
 
 export default async function ProviderPage({ params }: { params: { id: string | string[] } }) {
   const provider = await resolveProvider(params.id);
-  if (!provider) return notFound();
+  const providerId = Array.isArray(params.id) ? params.id[0] : params.id;
+  if (!provider) {
+    const fallbackName = providerId ? providerId.replace(/-/g, ' ') : 'Provider';
+    return (
+      <main className="flex-1">
+        <div className="px-4 sm:px-6 py-10">
+          <div className="max-w-3xl mx-auto space-y-4">
+            <section className="surface-card-strong p-8">
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
+                Provider status
+              </p>
+              <h1 className="text-3xl md:text-4xl font-semibold text-slate-900 dark:text-white mt-3">
+                {fallbackName} status
+              </h1>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mt-3">
+                We could not load details for this provider yet. See the full provider list or use the
+                public JSON endpoints below.
+              </p>
+            </section>
+
+            <section className="surface-card p-6 space-y-3 text-sm text-slate-600 dark:text-slate-300">
+              <div>
+                <span className="font-semibold text-slate-900 dark:text-white">Provider ID:</span>{' '}
+                {providerId || 'unknown'}
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <a href="/providers" className="cta-secondary text-xs">Browse providers</a>
+                <a href="/api/public/v1/providers" className="cta-secondary text-xs">Providers JSON</a>
+                <a href="/api/public/v1/status/summary" className="cta-secondary text-xs">Status summary JSON</a>
+              </div>
+            </section>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   const displayName = provider.displayName || provider.name;
   const baseStatus = await statusService.checkProvider(provider);
