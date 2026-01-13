@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getIncidentById } from '@/lib/services/public-data';
-import crypto from 'crypto';
+
+async function sha256Hex(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
 
 export async function GET(_request: NextRequest, { params }: { params: { incident_id: string } }) {
   const id = params.incident_id;
@@ -11,7 +18,7 @@ export async function GET(_request: NextRequest, { params }: { params: { inciden
   const now = new Date().toISOString();
   const evidenceUrls = [`https://aistatusdashboard.com/incidents/${id}`];
   if (incident.rawUrl) evidenceUrls.push(incident.rawUrl);
-  const content_hash = crypto.createHash('sha256').update(JSON.stringify(incident)).digest('hex');
+  const content_hash = await sha256Hex(JSON.stringify(incident));
   const payload = {
     title: incident.title,
     incident_id: id,
