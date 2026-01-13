@@ -10,3 +10,4 @@
 - 2026-01-13: Added discovery response headers in `middleware.ts` for static crawl surfaces to guarantee consistent Content-Type and debug tracing across edges.
 - 2026-01-13: Added discovery audit JSON/HTML generator (public `/discovery/audit/latest.json`) and linked it from `/ai`, `llms.txt`, and sitemap; added CI guard + post-deploy smoke checks to prevent regressions.
 - 2026-01-13: Removed stale static llms files and forced dynamic no-store responses so `/llms.txt` and `/llms-full.txt` always include the discovery audit URLs.
+- 2026-01-13: Replaced robots.txt with explicit allowlist policy, enforced public cache-control and index headers on discovery surfaces, added discovery policy CI check, and extended discovery audit JSON with policy checks.

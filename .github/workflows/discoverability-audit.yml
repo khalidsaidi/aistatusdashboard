@@ -24,3 +24,7 @@ jobs:
           BASE_URL: https://aistatusdashboard.com
           AUDIT_LABEL: CI Audit
         run: node scripts/audit-discovery.mjs
+      - name: Discovery policy check
+        env:
+          BASE_URL: https://aistatusdashboard.com
+        run: node scripts/discovery-policy-check.mjs

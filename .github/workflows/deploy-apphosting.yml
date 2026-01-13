@@ -91,6 +91,9 @@ jobs:
       - name: Deploy App Hosting
         run: npx firebase-tools deploy --only apphosting --project ai-status-dashboard --token "$FIREBASE_TOKEN"
 
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Post-deploy discovery smoke check
         run: |
           set -e
@@ -109,3 +112,17 @@ jobs:
               exit 1
             fi
           done
+
+      - name: Post-deploy discovery policy check
+        run: |
+          set -e
+          audit=$(curl -s "https://aistatusdashboard.com/discovery/audit/latest.json")
+          score=$(echo "$audit" | jq -r '.score.total')
+          robots_ok=$(echo "$audit" | jq -r '.policy_checks.robots_txt.has_newlines and .policy_checks.robots_txt.contains_sitemap_line and ( .policy_checks.robots_txt.blocks_gptbot_root | not )')
+          noindex_ok=$(echo "$audit" | jq -r '(.policy_checks.public_noindex_detected | not)')
+          cache_ok=$(echo "$audit" | jq -r '(.policy_checks.cache_control_private_detected_on_public | not)')
+          if [ "$score" != "100" ] || [ "$robots_ok" != "true" ] || [ "$noindex_ok" != "true" ] || [ "$cache_ok" != "true" ]; then
+            echo "Discovery audit policy checks failed"
+            echo "$audit"
+            exit 1
+          fi

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-01-13T19:49:27.147Z",
+  "generated_at": "2026-01-13T20:50:34.185Z",
   "site_url": "https://aistatusdashboard.com",
   "generator": "scripts/generate-static-discovery-assets.cjs",
   "node": "v20.19.0",
@@ -13,14 +13,14 @@
       "url": "https://aistatusdashboard.com/sitemap.xml",
       "expected_content_type": "application/xml; charset=utf-8",
       "bytes": 11160,
-      "sha256": "ba49e2f5dbf5558cb0c86a1d6ab9db469b5a81102775eda52e4d94827d3e8578"
+      "sha256": "a43b22ad80a61fe9c0f64f47e8b8d36b3bda6f9626ea830b032393cd5ca00fa4"
     },
     {
       "path": "/rss.xml",
       "url": "https://aistatusdashboard.com/rss.xml",
       "expected_content_type": "application/rss+xml; charset=utf-8",
       "bytes": 10595,
-      "sha256": "195018f423af7eb60f2f9eda2f1d52fee07c209a5effd617c382f08c92b8d389"
+      "sha256": "ec3785bbea9107d21f3d707276d21e0a2150e9062c35bec9d8e9d138dab54575"
     },
     {
       "path": "/openapi.yaml",
@@ -48,7 +48,7 @@
       "url": "https://aistatusdashboard.com/datasets/metrics.csv",
       "expected_content_type": "text/csv; charset=utf-8",
       "bytes": 347,
-      "sha256": "d667c1e9e614afea21ef12159913c78a018eb0331790e1ab5663cb8eaadd947b"
+      "sha256": "d744f7e219920da71e2e78419f6675d18b8aa9a6771dd2be763e87b461a12725"
     },
     {
       "path": "/docs.md",
@@ -96,10 +96,20 @@
       "path": "/docs/discoverability-audit.md",
       "url": "https://aistatusdashboard.com/docs/discoverability-audit.md",
       "expected_content_type": "text/markdown; charset=utf-8",
-      "bytes": 2147,
-      "sha256": "be72d58015cbc63b2af848d8c880898c2afbb1329fe555aca1d13ba3d57fccf9"
+      "bytes": 3605,
+      "sha256": "a52add359e1d6d6c9a263a82bb45c6c08855969203701056fe7a8bc8d68da064"
     }
   ],
+  "policy_checks": {
+    "robots_txt": {
+      "has_newlines": true,
+      "contains_sitemap_line": true,
+      "blocks_gptbot_root": false
+    },
+    "public_noindex_detected": false,
+    "cache_control_private_detected_on_public": false,
+    "source": "build"
+  },
   "links": {
     "ai": "https://aistatusdashboard.com/ai",
     "llms": "https://aistatusdashboard.com/llms.txt",

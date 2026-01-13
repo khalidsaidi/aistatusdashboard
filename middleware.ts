@@ -26,6 +26,7 @@ function getCanonicalHost(): string | null {
 function isDiscoveryAsset(pathname: string): boolean {
   if (pathname === '/rss.xml' || pathname === '/sitemap.xml') return true;
   if (pathname === '/llms.txt' || pathname === '/llms-full.txt') return true;
+  if (pathname === '/openapi.json' || pathname === '/openapi-3.0.json') return true;
   if (pathname.startsWith('/datasets/')) return true;
   if (pathname.startsWith('/discovery/audit')) return true;
   if (pathname.startsWith('/docs/') && pathname.endsWith('.md')) return true;
@@ -34,7 +35,17 @@ function isDiscoveryAsset(pathname: string): boolean {
   return DISCOVERY_EXTENSIONS.some((ext) => pathname.endsWith(ext));
 }
 
+function isPublicIndexable(pathname: string): boolean {
+  if (isDiscoveryAsset(pathname)) return true;
+  if (pathname === '/ai' || pathname === '/providers' || pathname === '/datasets') return true;
+  if (pathname.startsWith('/provider/')) return true;
+  if (pathname.startsWith('/incidents')) return true;
+  if (pathname.startsWith('/status')) return true;
+  return false;
+}
+
 function applyDiscoveryHeaders(response: NextResponse, pathname: string) {
+  response.headers.set('X-Robots-Tag', 'index,follow');
   response.headers.set('X-Discovery-Handler', 'static');
   response.headers.set('X-Discovery-Build', DISCOVERY_BUILD_ID);
   response.headers.set('X-Discovery-Runtime', 'static');
@@ -53,7 +64,7 @@ function applyDiscoveryHeaders(response: NextResponse, pathname: string) {
 
   if (pathname.endsWith('.yaml')) {
     response.headers.set('Content-Type', 'application/yaml; charset=utf-8');
-    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+    response.headers.set('Cache-Control', 'public, max-age=600, s-maxage=1200');
     return;
   }
 
@@ -77,13 +88,13 @@ function applyDiscoveryHeaders(response: NextResponse, pathname: string) {
 
   if (pathname === '/llms.txt' || pathname === '/llms-full.txt') {
     response.headers.set('Content-Type', 'text/plain; charset=utf-8');
-    response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=600');
     return;
   }
 
   if (pathname === '/discovery/audit/latest.json') {
     response.headers.set('Content-Type', 'application/json; charset=utf-8');
-    response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
+    response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=300');
     return;
   }
 
@@ -137,8 +148,11 @@ export function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
   const privatePrefixes = ['/app', '/account', '/org', '/billing', '/api/private'];
-  if (privatePrefixes.some((prefix) => pathname.startsWith(prefix))) {
-    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  const isPrivate = privatePrefixes.some((prefix) => pathname.startsWith(prefix));
+  if (isPrivate) {
+    response.headers.set('X-Robots-Tag', 'noindex,nofollow');
+  } else if (isPublicIndexable(pathname)) {
+    response.headers.set('X-Robots-Tag', 'index,follow');
   }
 
   if (request.method === 'GET' && shouldBypassCache(request)) {

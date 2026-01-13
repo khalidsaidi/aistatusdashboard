@@ -7,10 +7,10 @@
 </head>
 <body>
   <h1>Discovery Audit</h1>
-  <p>Generated at: <code>2026-01-13T19:49:27.147Z</code></p>
+  <p>Generated at: <code>2026-01-13T20:50:34.185Z</code></p>
   <p>JSON: <a href="/discovery/audit/latest.json">/discovery/audit/latest.json</a></p>
   <pre>{
-  &quot;generated_at&quot;: &quot;2026-01-13T19:49:27.147Z&quot;,
+  &quot;generated_at&quot;: &quot;2026-01-13T20:50:34.185Z&quot;,
   &quot;site_url&quot;: &quot;https://aistatusdashboard.com&quot;,
   &quot;generator&quot;: &quot;scripts/generate-static-discovery-assets.cjs&quot;,
   &quot;node&quot;: &quot;v20.19.0&quot;,
@@ -24,14 +24,14 @@
       &quot;url&quot;: &quot;https://aistatusdashboard.com/sitemap.xml&quot;,
       &quot;expected_content_type&quot;: &quot;application/xml; charset=utf-8&quot;,
       &quot;bytes&quot;: 11160,
-      &quot;sha256&quot;: &quot;ba49e2f5dbf5558cb0c86a1d6ab9db469b5a81102775eda52e4d94827d3e8578&quot;
+      &quot;sha256&quot;: &quot;a43b22ad80a61fe9c0f64f47e8b8d36b3bda6f9626ea830b032393cd5ca00fa4&quot;
     },
     {
       &quot;path&quot;: &quot;/rss.xml&quot;,
       &quot;url&quot;: &quot;https://aistatusdashboard.com/rss.xml&quot;,
       &quot;expected_content_type&quot;: &quot;application/rss+xml; charset=utf-8&quot;,
       &quot;bytes&quot;: 10595,
-      &quot;sha256&quot;: &quot;195018f423af7eb60f2f9eda2f1d52fee07c209a5effd617c382f08c92b8d389&quot;
+      &quot;sha256&quot;: &quot;ec3785bbea9107d21f3d707276d21e0a2150e9062c35bec9d8e9d138dab54575&quot;
     },
     {
       &quot;path&quot;: &quot;/openapi.yaml&quot;,
@@ -59,7 +59,7 @@
       &quot;url&quot;: &quot;https://aistatusdashboard.com/datasets/metrics.csv&quot;,
       &quot;expected_content_type&quot;: &quot;text/csv; charset=utf-8&quot;,
       &quot;bytes&quot;: 347,
-      &quot;sha256&quot;: &quot;d667c1e9e614afea21ef12159913c78a018eb0331790e1ab5663cb8eaadd947b&quot;
+      &quot;sha256&quot;: &quot;d744f7e219920da71e2e78419f6675d18b8aa9a6771dd2be763e87b461a12725&quot;
     },
     {
       &quot;path&quot;: &quot;/docs.md&quot;,
@@ -107,10 +107,20 @@
       &quot;path&quot;: &quot;/docs/discoverability-audit.md&quot;,
       &quot;url&quot;: &quot;https://aistatusdashboard.com/docs/discoverability-audit.md&quot;,
       &quot;expected_content_type&quot;: &quot;text/markdown; charset=utf-8&quot;,
-      &quot;bytes&quot;: 2147,
-      &quot;sha256&quot;: &quot;be72d58015cbc63b2af848d8c880898c2afbb1329fe555aca1d13ba3d57fccf9&quot;
+      &quot;bytes&quot;: 3605,
+      &quot;sha256&quot;: &quot;a52add359e1d6d6c9a263a82bb45c6c08855969203701056fe7a8bc8d68da064&quot;
     }
   ],
+  &quot;policy_checks&quot;: {
+    &quot;robots_txt&quot;: {
+      &quot;has_newlines&quot;: true,
+      &quot;contains_sitemap_line&quot;: true,
+      &quot;blocks_gptbot_root&quot;: false
+    },
+    &quot;public_noindex_detected&quot;: false,
+    &quot;cache_control_private_detected_on_public&quot;: false,
+    &quot;source&quot;: &quot;build&quot;
+  },
   &quot;links&quot;: {
     &quot;ai&quot;: &quot;https://aistatusdashboard.com/ai&quot;,
     &quot;llms&quot;: &quot;https://aistatusdashboard.com/llms.txt&quot;,

@@ -52,6 +52,12 @@ async function fetchText(url) {
   return res.text();
 }
 
+async function fetchWithHeaders(url) {
+  const res = await fetch(url, { headers: { 'User-Agent': 'aistatusdashboard-audit' } });
+  const text = await res.text();
+  return { status: res.status, headers: res.headers, text };
+}
+
 function xmlEscape(value) {
   return value
     .replace(/&/g, '&amp;')
@@ -240,14 +246,119 @@ async function run() {
     fileInfo('docs/discoverability-audit.md', 'text/markdown; charset=utf-8'),
   ]);
 
+  // ---- Policy checks ----
+  const robotsPath = path.join(process.cwd(), 'public', 'robots.txt');
+  const robotsText = await fs.readFile(robotsPath, 'utf8');
+  const robotsLines = robotsText.split(/\r?\n/);
+  const robotsHasNewlines = robotsLines.length > 3;
+  const robotsHasSitemap = robotsText.includes('Sitemap: https://aistatusdashboard.com/sitemap.xml');
+
+  let blocksGptbotRoot = false;
+  let inGptBot = false;
+  for (const line of robotsLines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      inGptBot = false;
+      continue;
+    }
+    if (/^user-agent:/i.test(trimmed)) {
+      inGptBot = trimmed.toLowerCase().includes('gptbot');
+      continue;
+    }
+    if (inGptBot && /^disallow:/i.test(trimmed)) {
+      const value = trimmed.split(':')[1]?.trim() || '';
+      if (value === '/' || value === '/*') {
+        blocksGptbotRoot = true;
+      }
+    }
+  }
+
+  const publicNoindexUrls = [
+    '/ai',
+    '/providers',
+    '/provider/openai',
+    '/datasets',
+    '/discovery/audit',
+    '/llms.txt',
+    '/openapi.json',
+  ];
+
+  const liveChecks = process.env.POLICY_CHECKS_LIVE === '1';
+  let publicNoindexDetected = false;
+  if (liveChecks) {
+    for (const relative of publicNoindexUrls) {
+      const url = `${SITE_URL}${relative}`;
+      const { headers, text } = await fetchWithHeaders(url);
+      const xRobots = headers.get('x-robots-tag') || '';
+      if (xRobots.toLowerCase().includes('noindex')) {
+        publicNoindexDetected = true;
+        break;
+      }
+      const contentType = headers.get('content-type') || '';
+      if (contentType.includes('text/html')) {
+        const metaNoindex = /<meta[^>]*name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(text);
+        if (metaNoindex) {
+          publicNoindexDetected = true;
+          break;
+        }
+      }
+    }
+  }
+
+  const cacheControlUrls = [
+    '/sitemap.xml',
+    '/rss.xml',
+    '/llms.txt',
+    '/llms-full.txt',
+    '/discovery/audit/latest.json',
+    '/openapi.json',
+    '/openapi.yaml',
+  ];
+
+  let cacheControlPrivateDetected = false;
+  if (liveChecks) {
+    for (const relative of cacheControlUrls) {
+      const url = `${SITE_URL}${relative}`;
+      const { headers } = await fetchWithHeaders(url);
+      const cacheControl = headers.get('cache-control') || '';
+      if (cacheControl.toLowerCase().includes('private')) {
+        cacheControlPrivateDetected = true;
+        break;
+      }
+    }
+  }
+
+  const policyChecks = {
+    robots_txt: {
+      has_newlines: robotsHasNewlines,
+      contains_sitemap_line: robotsHasSitemap,
+      blocks_gptbot_root: blocksGptbotRoot,
+    },
+    public_noindex_detected: publicNoindexDetected,
+    cache_control_private_detected_on_public: cacheControlPrivateDetected,
+  };
+
+  const policyOk =
+    robotsHasNewlines &&
+    robotsHasSitemap &&
+    !blocksGptbotRoot &&
+    !publicNoindexDetected &&
+    !cacheControlPrivateDetected;
+
   // Score = 100 if all required files exist (we’d have thrown if missing)
   const audit = {
     generated_at: now,
     site_url: SITE_URL,
     generator: 'scripts/generate-static-discovery-assets.cjs',
     node: process.version,
-    score: { total: 100, note: 'All required discovery files generated successfully.' },
+    score: {
+      total: policyOk ? 100 : 80,
+      note: policyOk
+        ? 'All required discovery files generated successfully.'
+        : 'Discovery policy checks failed.',
+    },
     files: auditFiles,
+    policy_checks: { ...policyChecks, source: liveChecks ? 'live' : 'build' },
     links: {
       ai: `${SITE_URL}/ai`,
       llms: `${SITE_URL}/llms.txt`,

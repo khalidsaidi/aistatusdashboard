@@ -70,7 +70,7 @@ export default function AiLandingPage() {
               <a href="/reports/monthly-provider-scorecards" className="cta-secondary text-xs">
                 Monthly provider scorecards
               </a>
-              <a href="/docs/discoverability-audit.md" className="cta-secondary text-xs">
+              <a href="/docs/discoverability-audit" className="cta-secondary text-xs">
                 Discoverability audit
               </a>
               <a href="/discovery/audit/latest.json" className="cta-secondary text-xs">

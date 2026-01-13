@@ -34,7 +34,7 @@ const nextConfig = {
         source: '/sitemap.xml',
         headers: [
           { key: 'Content-Type', value: 'application/xml; charset=utf-8' },
-          cacheHeader,
+          { key: 'Cache-Control', value: 'public, max-age=300, s-maxage=600' },
           ...commonHeaders,
         ],
       },
@@ -47,10 +47,34 @@ const nextConfig = {
         ],
       },
       {
+        source: '/robots.txt',
+        headers: [
+          { key: 'Content-Type', value: 'text/plain; charset=utf-8' },
+          { key: 'Cache-Control', value: 'public, max-age=300, s-maxage=600' },
+          ...commonHeaders,
+        ],
+      },
+      {
+        source: '/openapi.json',
+        headers: [
+          { key: 'Content-Type', value: 'application/json; charset=utf-8' },
+          { key: 'Cache-Control', value: 'public, max-age=600, s-maxage=1200' },
+          ...commonHeaders,
+        ],
+      },
+      {
+        source: '/openapi-3.0.json',
+        headers: [
+          { key: 'Content-Type', value: 'application/json; charset=utf-8' },
+          { key: 'Cache-Control', value: 'public, max-age=600, s-maxage=1200' },
+          ...commonHeaders,
+        ],
+      },
+      {
         source: '/openapi.yaml',
         headers: [
           { key: 'Content-Type', value: 'application/yaml; charset=utf-8' },
-          cacheHeader,
+          { key: 'Cache-Control', value: 'public, max-age=600, s-maxage=1200' },
           ...commonHeaders,
         ],
       },
@@ -58,7 +82,7 @@ const nextConfig = {
         source: '/openapi-3.0.yaml',
         headers: [
           { key: 'Content-Type', value: 'application/yaml; charset=utf-8' },
-          cacheHeader,
+          { key: 'Cache-Control', value: 'public, max-age=600, s-maxage=1200' },
           ...commonHeaders,
         ],
       },
@@ -66,7 +90,7 @@ const nextConfig = {
         source: '/llms.txt',
         headers: [
           { key: 'Content-Type', value: 'text/plain; charset=utf-8' },
-          { key: 'Cache-Control', value: 'no-store, max-age=0, must-revalidate' },
+          { key: 'Cache-Control', value: 'public, max-age=300, s-maxage=600' },
           ...commonHeaders,
         ],
       },
@@ -74,7 +98,7 @@ const nextConfig = {
         source: '/llms-full.txt',
         headers: [
           { key: 'Content-Type', value: 'text/plain; charset=utf-8' },
-          { key: 'Cache-Control', value: 'no-store, max-age=0, must-revalidate' },
+          { key: 'Cache-Control', value: 'public, max-age=300, s-maxage=600' },
           ...commonHeaders,
         ],
       },
@@ -154,7 +178,7 @@ const nextConfig = {
         source: '/discovery/audit/latest.json',
         headers: [
           { key: 'Content-Type', value: 'application/json; charset=utf-8' },
-          { key: 'Cache-Control', value: 'no-store, max-age=0, must-revalidate' },
+          { key: 'Cache-Control', value: 'public, max-age=60, s-maxage=300' },
           ...commonHeaders,
         ],
       },
