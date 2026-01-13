@@ -61,8 +61,10 @@ async function resolveProvider(idInput: string | string[] | undefined): Promise<
   const id = Array.isArray(idInput) ? idInput[0] : idInput;
   if (!id) return undefined;
   const module = await import('@/lib/data/providers.json');
-  const providers = Array.isArray(module.providers)
-    ? (module.providers as Provider[]).filter((provider) => provider.enabled !== false)
+  const rawProviders = (module as { default?: { providers?: Provider[] }; providers?: Provider[] }).default?.providers
+    ?? (module as { providers?: Provider[] }).providers;
+  const providers = Array.isArray(rawProviders)
+    ? rawProviders.filter((provider) => provider.enabled !== false)
     : [];
   const normalized = id.toLowerCase();
   const fallback = providers.find((provider) => {
