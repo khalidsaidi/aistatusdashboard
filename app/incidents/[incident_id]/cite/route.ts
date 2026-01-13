@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getIncidentById } from '@/lib/services/public-data';
 
+export const runtime = 'nodejs';
+
 async function sha256Hex(input: string): Promise<string> {
   const data = new TextEncoder().encode(input);
   const digest = await crypto.subtle.digest('SHA-256', data);
