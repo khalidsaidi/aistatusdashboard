@@ -9,6 +9,7 @@ import { normalizeIncidentDates } from '@/lib/utils/normalize-dates';
 import { log } from '@/lib/utils/logger';
 import sourcesConfig from '@/lib/data/sources.json';
 import providersConfig from '@/lib/data/providers.json';
+import type { NormalizedComponent, NormalizedIncident, NormalizedMaintenance } from '@/lib/types/ingestion';
 
 export const revalidate = 300;
 export const dynamic = 'force-dynamic';
@@ -139,7 +140,11 @@ export default async function ProviderPage({ params }: { params: { id: string } 
   const lastUpdated = useSummary ? summary.lastUpdated || baseStatus.lastChecked : baseStatus.lastChecked;
   const officialStatusUrl = provider.statusPageUrl || provider.statusUrl;
 
-  let detail = { components: [], incidents: [], maintenances: [] };
+  let detail: {
+    components: NormalizedComponent[];
+    incidents: NormalizedIncident[];
+    maintenances: NormalizedMaintenance[];
+  } = { components: [], incidents: [], maintenances: [] };
   try {
     detail = await intelligenceService.getProviderDetail(provider.id);
   } catch (error) {
