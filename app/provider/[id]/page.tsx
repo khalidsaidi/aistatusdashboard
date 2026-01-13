@@ -7,11 +7,13 @@ import { intelligenceService } from '@/lib/services/intelligence';
 import { queryMetricSeries } from '@/lib/services/metrics';
 import { normalizeIncidentDates } from '@/lib/utils/normalize-dates';
 import sourcesConfig from '@/lib/data/sources.json';
+import providersConfig from '@/lib/data/providers.json';
 
 export const revalidate = 300;
 export const dynamic = 'force-dynamic';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+const providersCatalog = (providersConfig.providers || []).filter((provider) => provider.enabled !== false);
 
 const sourcePolls = new Map<string, number>();
 (sourcesConfig as { sources?: Array<{ providerId?: string; pollIntervalSeconds?: number }> }).sources?.forEach(
@@ -45,8 +47,19 @@ function latestMetricValue(series: { series: Array<{ value: number | null }> }) 
   return undefined;
 }
 
+function resolveProvider(id: string) {
+  const direct = providerService.getProvider(id);
+  if (direct) return direct;
+  const normalized = id.toLowerCase();
+  return providersCatalog.find((provider) => {
+    if (provider.id?.toLowerCase() === normalized) return true;
+    const aliases = provider.aliases || [];
+    return aliases.some((alias) => alias.toLowerCase() === normalized);
+  });
+}
+
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const provider = providerService.getProvider(params.id);
+  const provider = resolveProvider(params.id);
   if (!provider) {
     return {
       title: 'Provider Not Found',
@@ -85,7 +98,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 }
 
 export default async function ProviderPage({ params }: { params: { id: string } }) {
-  const provider = providerService.getProvider(params.id);
+  const provider = resolveProvider(params.id);
   if (!provider) return notFound();
 
   const displayName = provider.displayName || provider.name;
