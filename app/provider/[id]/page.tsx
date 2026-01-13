@@ -9,6 +9,7 @@ import sourcesConfig from '@/lib/data/sources.json';
 import type { NormalizedComponent, NormalizedIncident, NormalizedMaintenance } from '@/lib/types/ingestion';
 import type { Provider } from '@/lib/types';
 import type { ProviderCatalog } from '@/lib/services/public-data';
+import { headers } from 'next/headers';
 
 export const revalidate = 300;
 export const dynamic = 'force-dynamic';
@@ -57,6 +58,32 @@ function emptySeries(metric: MetricName, providerId: string, since: Date, until:
   };
 }
 
+function extractProviderId(path?: string | null) {
+  if (!path) return undefined;
+  const match = path.match(/\/provider\/([^/?#]+)/i);
+  return match ? decodeURIComponent(match[1]) : undefined;
+}
+
+function resolveProviderId(idInput: string | string[] | undefined) {
+  const id = Array.isArray(idInput) ? idInput[0] : idInput;
+  if (id) return id;
+  const headerList = headers();
+  const fallbackPath =
+    headerList.get('x-forwarded-uri') ||
+    headerList.get('x-original-url') ||
+    headerList.get('x-url') ||
+    headerList.get('x-rewrite-url') ||
+    headerList.get('x-invoke-path');
+  const extracted = extractProviderId(fallbackPath);
+  if (!extracted) {
+    log('warn', 'Provider param missing', {
+      fallbackPath,
+      headerSample: Array.from(headerList.keys()).slice(0, 8),
+    });
+  }
+  return extracted;
+}
+
 async function fetchProviderFromApi(providerId: string): Promise<Provider | undefined> {
   try {
     const response = await fetch(`${SITE_URL}/api/public/v1/providers`, { cache: 'no-store' });
@@ -81,7 +108,7 @@ async function fetchProviderFromApi(providerId: string): Promise<Provider | unde
 }
 
 async function resolveProvider(idInput: string | string[] | undefined): Promise<Provider | undefined> {
-  const id = Array.isArray(idInput) ? idInput[0] : idInput;
+  const id = resolveProviderId(idInput);
   if (!id) return undefined;
   const module = await import('@/lib/data/providers.json');
   const rawProviders = (module as { default?: { providers?: Provider[] }; providers?: Provider[] }).default?.providers
@@ -111,7 +138,7 @@ async function resolveProvider(idInput: string | string[] | undefined): Promise<
 export async function generateMetadata({ params }: { params: { id: string | string[] } }): Promise<Metadata> {
   const provider = await resolveProvider(params.id);
   if (!provider) {
-    const providerId = Array.isArray(params.id) ? params.id[0] : params.id;
+    const providerId = resolveProviderId(params.id);
     const fallbackName = providerId ? providerId.replace(/-/g, ' ') : 'Provider';
     return {
       title: `${fallbackName} Status`,
@@ -154,7 +181,7 @@ export async function generateMetadata({ params }: { params: { id: string | stri
 
 export default async function ProviderPage({ params }: { params: { id: string | string[] } }) {
   const provider = await resolveProvider(params.id);
-  const providerId = Array.isArray(params.id) ? params.id[0] : params.id;
+  const providerId = resolveProviderId(params.id);
   if (!provider) {
     const fallbackName = providerId ? providerId.replace(/-/g, ' ') : 'Provider';
     return (
