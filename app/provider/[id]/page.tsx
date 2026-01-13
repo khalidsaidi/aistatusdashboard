@@ -66,13 +66,14 @@ async function fetchProviderFromApi(providerId: string): Promise<Provider | unde
     const candidates = (payload?.data || []) as ProviderCatalog[];
     const match = candidates.find((provider) => provider.id === providerId);
     if (!match) return undefined;
+    const statusUrl = match.status_url || match.status_page_url || '';
     return {
       id: match.id,
       name: match.name,
       displayName: match.display_name || match.name,
-      statusUrl: match.status_url,
-      statusPageUrl: match.status_page_url,
-      category: match.category,
+      statusUrl,
+      statusPageUrl: match.status_page_url || statusUrl,
+      category: match.category || 'Unknown',
     };
   } catch (error) {
     log('warn', 'Provider lookup via API failed', { providerId, error });
