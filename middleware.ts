@@ -24,6 +24,7 @@ function getCanonicalHost(): string | null {
 }
 
 function isDiscoveryAsset(pathname: string): boolean {
+  if (pathname === '/robots.txt') return true;
   if (pathname === '/rss.xml' || pathname === '/sitemap.xml') return true;
   if (pathname === '/llms.txt' || pathname === '/llms-full.txt') return true;
   if (pathname === '/openapi.json' || pathname === '/openapi-3.0.json') return true;
@@ -62,6 +63,12 @@ function applyDiscoveryHeaders(response: NextResponse, pathname: string) {
     return;
   }
 
+  if (pathname === '/robots.txt') {
+    response.headers.set('Content-Type', 'text/plain; charset=utf-8');
+    response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+    return;
+  }
+
   if (pathname.endsWith('.yaml')) {
     response.headers.set('Content-Type', 'application/yaml; charset=utf-8');
     response.headers.set('Cache-Control', 'public, max-age=600, s-maxage=1200');
@@ -89,6 +96,12 @@ function applyDiscoveryHeaders(response: NextResponse, pathname: string) {
   if (pathname === '/llms.txt' || pathname === '/llms-full.txt') {
     response.headers.set('Content-Type', 'text/plain; charset=utf-8');
     response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+    return;
+  }
+
+  if (pathname === '/openapi.json' || pathname === '/openapi-3.0.json') {
+    response.headers.set('Content-Type', 'application/json; charset=utf-8');
+    response.headers.set('Cache-Control', 'public, max-age=600, s-maxage=1200');
     return;
   }
 
