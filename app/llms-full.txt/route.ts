@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const BODY = `# AI Status Dashboard - Full LLM Discovery Guide
 
 ## Overview
@@ -60,7 +63,7 @@ export async function GET() {
     status: 200,
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
-      'Cache-Control': 'public, max-age=300, s-maxage=600',
+      'Cache-Control': 'no-store, max-age=0, must-revalidate',
     },
   });
 }

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-01-13T19:40:54.496Z",
+  "generated_at": "2026-01-13T19:49:27.147Z",
   "site_url": "https://aistatusdashboard.com",
   "generator": "scripts/generate-static-discovery-assets.cjs",
   "node": "v20.19.0",
@@ -13,14 +13,14 @@
       "url": "https://aistatusdashboard.com/sitemap.xml",
       "expected_content_type": "application/xml; charset=utf-8",
       "bytes": 11160,
-      "sha256": "c4f5260336898eee93044ead443c5806b2aa4f26434c57a831655dfe8ae12094"
+      "sha256": "ba49e2f5dbf5558cb0c86a1d6ab9db469b5a81102775eda52e4d94827d3e8578"
     },
     {
       "path": "/rss.xml",
       "url": "https://aistatusdashboard.com/rss.xml",
       "expected_content_type": "application/rss+xml; charset=utf-8",
       "bytes": 10595,
-      "sha256": "99aa45d50366205bf4d401ca4624cb11df6144018f5ffea36861f4f85023c792"
+      "sha256": "195018f423af7eb60f2f9eda2f1d52fee07c209a5effd617c382f08c92b8d389"
     },
     {
       "path": "/openapi.yaml",
@@ -48,7 +48,7 @@
       "url": "https://aistatusdashboard.com/datasets/metrics.csv",
       "expected_content_type": "text/csv; charset=utf-8",
       "bytes": 347,
-      "sha256": "ab801db840a6b8aff110bfa84302a88aa29a134e0c8102608b3d3a4e89e59960"
+      "sha256": "d667c1e9e614afea21ef12159913c78a018eb0331790e1ab5663cb8eaadd947b"
     },
     {
       "path": "/docs.md",

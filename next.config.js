@@ -63,6 +63,22 @@ const nextConfig = {
         ],
       },
       {
+        source: '/llms.txt',
+        headers: [
+          { key: 'Content-Type', value: 'text/plain; charset=utf-8' },
+          { key: 'Cache-Control', value: 'no-store, max-age=0, must-revalidate' },
+          ...commonHeaders,
+        ],
+      },
+      {
+        source: '/llms-full.txt',
+        headers: [
+          { key: 'Content-Type', value: 'text/plain; charset=utf-8' },
+          { key: 'Cache-Control', value: 'no-store, max-age=0, must-revalidate' },
+          ...commonHeaders,
+        ],
+      },
+      {
         source: '/docs.md',
         headers: [
           { key: 'Content-Type', value: 'text/markdown; charset=utf-8' },

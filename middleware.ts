@@ -25,6 +25,7 @@ function getCanonicalHost(): string | null {
 
 function isDiscoveryAsset(pathname: string): boolean {
   if (pathname === '/rss.xml' || pathname === '/sitemap.xml') return true;
+  if (pathname === '/llms.txt' || pathname === '/llms-full.txt') return true;
   if (pathname.startsWith('/datasets/')) return true;
   if (pathname.startsWith('/discovery/audit')) return true;
   if (pathname.startsWith('/docs/') && pathname.endsWith('.md')) return true;
@@ -71,6 +72,12 @@ function applyDiscoveryHeaders(response: NextResponse, pathname: string) {
   if (pathname.endsWith('.csv')) {
     response.headers.set('Content-Type', 'text/csv; charset=utf-8');
     response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=300');
+    return;
+  }
+
+  if (pathname === '/llms.txt' || pathname === '/llms-full.txt') {
+    response.headers.set('Content-Type', 'text/plain; charset=utf-8');
+    response.headers.set('Cache-Control', 'no-store, max-age=0, must-revalidate');
     return;
   }
 
