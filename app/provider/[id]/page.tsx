@@ -9,6 +9,7 @@ import { normalizeIncidentDates } from '@/lib/utils/normalize-dates';
 import sourcesConfig from '@/lib/data/sources.json';
 
 export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
