@@ -26,7 +26,7 @@ export async function GET() {
       link: `${SITE_URL}/incidents/${incident.providerId}:${incident.id}`,
       guid: `incident-${incident.providerId}:${incident.id}`,
       pubDate: new Date(incident.updatedAt).toUTCString(),
-      description: incident.summary || incident.title,
+      description: incident.title,
     })),
     ...maintenances.map((maintenance) => ({
       title: `${maintenance.providerId}: ${maintenance.title}`,
