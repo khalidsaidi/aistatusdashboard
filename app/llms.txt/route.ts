@@ -11,7 +11,7 @@ OpenAPI (well-known): https://aistatusdashboard.com/.well-known/openapi.json
 Datasets:
 - https://aistatusdashboard.com/datasets (index)
 - https://aistatusdashboard.com/datasets/incidents.ndjson
-- https://aistatusdashboard.com/datasets/metrics.parquet
+- https://aistatusdashboard.com/datasets/metrics.csv
 
 Docs (Markdown mirrors):
 - https://aistatusdashboard.com/docs.md

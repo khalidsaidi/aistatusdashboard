@@ -17,7 +17,7 @@ AI Status Dashboard is an AI reliability control plane: status, incidents, metri
 ## Datasets
 - Index: https://aistatusdashboard.com/datasets
 - Incidents NDJSON: https://aistatusdashboard.com/datasets/incidents.ndjson
-- Metrics Parquet: https://aistatusdashboard.com/datasets/metrics.parquet
+- Metrics CSV: https://aistatusdashboard.com/datasets/metrics.csv
 
 ## Docs (Markdown mirrors)
 - Main docs: https://aistatusdashboard.com/docs.md

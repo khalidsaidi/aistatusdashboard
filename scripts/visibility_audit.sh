@@ -120,6 +120,12 @@ echo "$plugin_body" | grep -q "\"api\"" || plugin_ok="false"
 echo "$plugin_body" | grep -q "openapi.json" || plugin_ok="false"
 append_json "$(jq -n --arg url "__check__/ai_plugin_ok" --arg status "200" --arg ok "$plugin_ok" '{url:$url,status:($status|tonumber),ok:($ok=="true")}' )"
 
+tools_body=$(curl -s -X POST -H "content-type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' "${BASE}/mcp")
+mcp_tools_ok="true"
+echo "$tools_body" | grep -q "tools" || mcp_tools_ok="false"
+append_json "$(jq -n --arg url "__check__/mcp_tools" --arg status "200" --arg ok "$mcp_tools_ok" '{url:$url,status:($status|tonumber),ok:($ok=="true")}' )"
+
 incident_id=$(curl -s "${BASE}/api/public/v1/incidents?limit=1" | jq -r '.data.incidents[0].incident_id // empty')
 if [ -n "$incident_id" ]; then
   inc_url="${BASE}/incidents/${incident_id}"

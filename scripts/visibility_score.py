@@ -24,8 +24,8 @@ failures = []
 # A) Agent/tool discoverability (40)
 if check_flag("__check__/mcp_registry_link"): score += 10; sub["agent"] += 10
 else: failures.append("MCP registry link missing from /ai")
-if check("/mcp"): score += 10; sub["agent"] += 10
-else: failures.append("MCP endpoint not reachable")
+if check_flag("__check__/mcp_tools"): score += 10; sub["agent"] += 10
+else: failures.append("MCP tools/list check failed")
 if check("/openapi.json") and check_flag("__check__/openapi_match"): score += 10; sub["agent"] += 10
 else: failures.append("OpenAPI mismatch or missing")
 if check("/.well-known/ai-plugin.json") and check_flag("__check__/ai_plugin_ok"): score += 10; sub["agent"] += 10
