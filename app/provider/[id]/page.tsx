@@ -6,6 +6,7 @@ import { statusService } from '@/lib/services/status';
 import { intelligenceService } from '@/lib/services/intelligence';
 import { queryMetricSeries, type MetricName, type MetricSeries } from '@/lib/services/metrics';
 import { normalizeIncidentDates } from '@/lib/utils/normalize-dates';
+import { log } from '@/lib/utils/logger';
 import sourcesConfig from '@/lib/data/sources.json';
 import providersConfig from '@/lib/data/providers.json';
 
@@ -59,6 +60,7 @@ function emptySeries(metric: MetricName, providerId: string, since: Date, until:
 }
 
 function resolveProvider(id: string) {
+  if (!id) return undefined;
   const direct = providerService.getProvider(id);
   if (direct) return direct;
   const normalized = id.toLowerCase();
@@ -137,7 +139,12 @@ export default async function ProviderPage({ params }: { params: { id: string } 
   const lastUpdated = useSummary ? summary.lastUpdated || baseStatus.lastChecked : baseStatus.lastChecked;
   const officialStatusUrl = provider.statusPageUrl || provider.statusUrl;
 
-  const detail = await intelligenceService.getProviderDetail(provider.id);
+  let detail = { components: [], incidents: [], maintenances: [] };
+  try {
+    detail = await intelligenceService.getProviderDetail(provider.id);
+  } catch (error) {
+    log('warn', 'Provider detail load failed', { providerId: provider.id, error });
+  }
   const incidents = detail.incidents
     .map(normalizeIncidentDates)
     .filter((incident) => incident.status !== 'resolved')
