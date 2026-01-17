@@ -41,6 +41,12 @@ const PROBE_NETWORK_CODES = [
   'certificate',
 ];
 
+const AWS_REGION_BY_PROBE_REGION: Record<string, string> = {
+  'us-east': 'us-east-1',
+  'us-west': 'us-west-2',
+  'eu-west': 'eu-west-1',
+};
+
 function classifyProbeError(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error || 'unknown');
   const lower = message.toLowerCase();
@@ -97,6 +103,11 @@ function resolveRegion(configEntry: ProbeProviderConfig): string {
     return process.env[configEntry.regionEnvKey] as string;
   }
   return process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || configEntry.region;
+}
+
+function resolveBedrockRegionOverride(regionOverride?: string): string | undefined {
+  if (!regionOverride) return undefined;
+  return AWS_REGION_BY_PROBE_REGION[regionOverride] || regionOverride;
 }
 
 function buildEvent(configEntry: ProbeProviderConfig, latencyMs: number): SyntheticProbeEvent {
@@ -549,7 +560,8 @@ export async function runRealProviderProbes(options?: { regionOverride?: string 
           break;
         case 'bedrock':
           try {
-            result = await probeBedrock(entry, regionOverride);
+            const awsRegionOverride = resolveBedrockRegionOverride(regionOverride);
+            result = await probeBedrock(entry, awsRegionOverride);
           } catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             if (/credential|accessdenied|unrecognizedclient/i.test(message)) {
