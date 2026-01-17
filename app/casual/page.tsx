@@ -34,7 +34,7 @@ export default function CasualHubPage() {
                 <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
                   Status for {app.label.replace(' Status', '')} across text, images, login, and more.
                 </p>
-                <span className="text-xs text-slate-500 mt-3 inline-block">View status -></span>
+                <span className="text-xs text-slate-500 mt-3 inline-block">View status</span>
               </Link>
             ))}
           </section>
