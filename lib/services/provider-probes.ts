@@ -517,6 +517,10 @@ export async function runRealProviderProbes(options?: { regionOverride?: string 
   for (const entry of configs) {
     const rawKey = entry.envKey ? process.env[entry.envKey] : undefined;
     const apiKey = normalizeApiKey(rawKey);
+    const eventRegion =
+      entry.type === 'bedrock'
+        ? resolveBedrockRegionOverride(regionOverride) || regionOverride || null
+        : regionOverride || null;
     try {
       let result;
       switch (entry.type) {
@@ -607,8 +611,8 @@ export async function runRealProviderProbes(options?: { regionOverride?: string 
       }
 
       if (result?.event) {
-        if (regionOverride) {
-          result.event.region = regionOverride;
+        if (eventRegion) {
+          result.event.region = eventRegion;
         }
         events.push(result.event);
       }
@@ -616,8 +620,8 @@ export async function runRealProviderProbes(options?: { regionOverride?: string 
       const message = error instanceof Error ? error.message : 'Unknown error';
       failures.push({ providerId: entry.providerId, error: message });
       const event = buildEvent(entry, config.monitoring.defaultTimeout || DEFAULT_TIMEOUT_MS);
-      if (regionOverride) {
-        event.region = regionOverride;
+      if (eventRegion) {
+        event.region = eventRegion;
       }
       event.errorCode = classifyProbeError(error);
       events.push(event);

@@ -117,7 +117,7 @@
       "modelEnvKey": "AWS_BEDROCK_MODEL_ID",
       "modelAlias": "mistral-7b",
       "regionEnvKey": "AWS_BEDROCK_REGION",
-      "endpoint": "invoke",
+      "endpoint": "chat",
       "region": "us-east-1",
       "tier": "enterprise",
       "streaming": false
