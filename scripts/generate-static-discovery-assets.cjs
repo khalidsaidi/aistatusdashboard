@@ -99,6 +99,9 @@ async function buildSitemap(incidents, providers) {
   addUrl(`${SITE_URL}/datasets/metrics`, '0.6', 'weekly');
   addUrl(`${SITE_URL}/docs`, '0.7', 'weekly');
   addUrl(`${SITE_URL}/status`, '0.7', 'weekly');
+  addUrl(`${SITE_URL}/terms`, '0.5', 'monthly');
+  addUrl(`${SITE_URL}/privacy`, '0.5', 'monthly');
+  addUrl(`${SITE_URL}/air.json`, '0.6', 'weekly');
   addUrl(`${SITE_URL}/reports/weekly-ai-reliability`, '0.6', 'weekly');
   addUrl(`${SITE_URL}/reports/monthly-provider-scorecards`, '0.6', 'monthly');
   addUrl(`${SITE_URL}/docs/discoverability-audit`, '0.5', 'weekly');
@@ -155,6 +158,10 @@ OpenAPI: ${SITE_URL}/openapi.json
 Plugin manifest: ${SITE_URL}/.well-known/ai-plugin.json
 OpenAPI (well-known): ${SITE_URL}/.well-known/openapi.json
 
+Trust / Verification:
+- ${SITE_URL}/air.json
+- ${SITE_URL}/.well-known/air.json
+
 Datasets:
 - ${SITE_URL}/datasets (index)
 - ${SITE_URL}/datasets/incidents.ndjson
@@ -197,6 +204,8 @@ AI Status Dashboard is an AI reliability control plane: status, incidents, metri
 - OpenAPI (YAML): ${SITE_URL}/openapi.yaml
 - Plugin manifest: ${SITE_URL}/.well-known/ai-plugin.json
 - Well-known OpenAPI: ${SITE_URL}/.well-known/openapi.json
+- Air.json: ${SITE_URL}/air.json
+- Air.json (well-known): ${SITE_URL}/.well-known/air.json
 - RSS/Atom: ${SITE_URL}/rss.xml
 - Sitemap: ${SITE_URL}/sitemap.xml
 - Discovery audit JSON: ${SITE_URL}/discovery/audit/latest.json
@@ -303,22 +312,75 @@ async function run() {
 
   // OpenAPI YAML snapshots (JSON is valid YAML, so reuse the JSON payload)
   try {
-    const openapiJson = await fetchText(`${SITE_URL}/openapi.json`);
+    const openapiJson = await fs.readFile(path.join(process.cwd(), 'public', 'openapi.json'), 'utf8');
     await writeFile('openapi.json', openapiJson);
     await writeFile('openapi.yaml', openapiJson);
+    await writeFile('.well-known/openapi.json', openapiJson);
   } catch (err) {
+    const fallback = 'openapi: 3.1.0\ninfo:\n  title: AIStatusDashboard Public API\n  version: 1.0.0\npaths: {}\n';
     await writeFile('openapi.json', '{}\n');
-    await writeFile('openapi.yaml', 'openapi: 3.1.0\ninfo:\n  title: AIStatusDashboard Public API\n  version: 1.0.0\npaths: {}\n');
+    await writeFile('openapi.yaml', fallback);
+    await writeFile('.well-known/openapi.json', '{}\n');
   }
 
   try {
-    const openapi30Json = await fetchText(`${SITE_URL}/openapi-3.0.json`);
+    const openapi30Json = await fs.readFile(path.join(process.cwd(), 'public', 'openapi-3.0.json'), 'utf8');
     await writeFile('openapi-3.0.json', openapi30Json);
     await writeFile('openapi-3.0.yaml', openapi30Json);
   } catch (err) {
     await writeFile('openapi-3.0.json', '{}\n');
     await writeFile('openapi-3.0.yaml', 'openapi: 3.0.0\ninfo:\n  title: AIStatusDashboard Public API\n  version: 1.0.0\npaths: {}\n');
   }
+
+  const airJson = {
+    name: 'AI Status Dashboard',
+    description: 'AI reliability control plane: status, incidents, metrics, and fallback policy generation.',
+    canonical_base_url: SITE_URL,
+    contact: {
+      email: 'hello@aistatusdashboard.com',
+      support_url: `${SITE_URL}/docs`,
+    },
+    legal: {
+      terms_url: `${SITE_URL}/terms`,
+      privacy_url: `${SITE_URL}/privacy`,
+    },
+    verification: {
+      discovery_audit_json: `${SITE_URL}/discovery/audit/latest.json`,
+      discovery_audit_html: `${SITE_URL}/discovery/audit`,
+    },
+    callable_surface: {
+      openapi: `${SITE_URL}/openapi.json`,
+      openapi_well_known: `${SITE_URL}/.well-known/openapi.json`,
+      plugin_manifest: `${SITE_URL}/.well-known/ai-plugin.json`,
+      mcp_endpoint: `${SITE_URL}/mcp`,
+    },
+    llm_entrypoints: {
+      llms_txt: `${SITE_URL}/llms.txt`,
+      llms_full_txt: `${SITE_URL}/llms-full.txt`,
+    },
+  };
+
+  const pluginManifest = {
+    schema_version: 'v1',
+    name_for_human: 'AIStatusDashboard',
+    name_for_model: 'aistatusdashboard',
+    description_for_human: 'Public status, incidents, and AI provider health telemetry.',
+    description_for_model:
+      'Read-only API for provider status, incidents, providers, and casual status summaries. Includes datasets and evidence links.',
+    auth: { type: 'none' },
+    api: {
+      type: 'openapi',
+      url: `${SITE_URL}/openapi.json`,
+      is_user_authenticated: false,
+    },
+    logo_url: `${SITE_URL}/logo.png`,
+    contact_email: 'hello@aistatusdashboard.com',
+    legal_info_url: `${SITE_URL}/terms`,
+  };
+
+  await writeFile('air.json', JSON.stringify(airJson, null, 2));
+  await writeFile('.well-known/air.json', JSON.stringify(airJson, null, 2));
+  await writeFile('.well-known/ai-plugin.json', JSON.stringify(pluginManifest, null, 2));
 
   // Markdown mirrors
   const docsMap = buildDocs();
@@ -348,6 +410,10 @@ async function run() {
     fileInfo('rss.xml', 'application/rss+xml; charset=utf-8'),
     fileInfo('openapi.yaml', 'application/yaml; charset=utf-8'),
     fileInfo('openapi-3.0.yaml', 'application/yaml; charset=utf-8'),
+    fileInfo('air.json', 'application/json; charset=utf-8'),
+    fileInfo('.well-known/air.json', 'application/json; charset=utf-8'),
+    fileInfo('.well-known/ai-plugin.json', 'application/json; charset=utf-8'),
+    fileInfo('.well-known/openapi.json', 'application/json; charset=utf-8'),
     fileInfo('datasets/incidents.ndjson', 'application/x-ndjson; charset=utf-8'),
     fileInfo('datasets/metrics.csv', 'text/csv; charset=utf-8'),
     fileInfo('docs.md', 'text/markdown; charset=utf-8'),

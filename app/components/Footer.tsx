@@ -94,6 +94,20 @@ export default function Footer() {
             >
               OpenAPI
             </a>
+            {' | '}
+            <a
+              href="/terms"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-400"
+            >
+              Terms
+            </a>
+            {' | '}
+            <a
+              href="/privacy"
+              className="hover:text-slate-900 dark:hover:text-white transition-colors inline-flex items-center justify-center min-h-[44px] py-2 px-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-400"
+            >
+              Privacy
+            </a>
           </p>
         </div>
 

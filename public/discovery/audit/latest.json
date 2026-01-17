@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-01-16T18:18:44.072Z",
+  "generated_at": "2026-01-17T06:41:35.267Z",
   "site_url": "https://aistatusdashboard.com",
   "generator": "scripts/generate-static-discovery-assets.cjs",
   "node": "v20.19.0",
@@ -12,43 +12,71 @@
       "path": "/sitemap.xml",
       "url": "https://aistatusdashboard.com/sitemap.xml",
       "expected_content_type": "application/xml; charset=utf-8",
-      "bytes": 11906,
-      "sha256": "5ca14544a9468ca717ca1a86bb0c03c9d4d35bdd287aaba96a96e415519451fd"
+      "bytes": 12430,
+      "sha256": "3676c488a2d76aeeedc51d45de5d3a8a80021f28fc716466ed1fe8b6a3a8453e"
     },
     {
       "path": "/rss.xml",
       "url": "https://aistatusdashboard.com/rss.xml",
       "expected_content_type": "application/rss+xml; charset=utf-8",
-      "bytes": 10595,
-      "sha256": "42351171f04d12ad255a1bd2669a15d775dacac8e72146fa1f33bf42d26a72f3"
+      "bytes": 10321,
+      "sha256": "67e7c339295f1a5c30013bbd574f19081f03296e340cc4b2a2a54e0f0472bd9e"
     },
     {
       "path": "/openapi.yaml",
       "url": "https://aistatusdashboard.com/openapi.yaml",
       "expected_content_type": "application/yaml; charset=utf-8",
-      "bytes": 23435,
-      "sha256": "11d0342311138696f8cc0724176dc5d19951aa1dc2c62c8d5b3f84ab82897915"
+      "bytes": 68394,
+      "sha256": "f9da1a4d04313edc771f1883c0690ed05fb851ca122317b631c57374cb8892ed"
     },
     {
       "path": "/openapi-3.0.yaml",
       "url": "https://aistatusdashboard.com/openapi-3.0.yaml",
       "expected_content_type": "application/yaml; charset=utf-8",
-      "bytes": 23435,
-      "sha256": "7fcb5a0af7cc592e09991ab7c24e49eeb86b78a201aa0999574b1126a533b70d"
+      "bytes": 68394,
+      "sha256": "62bdc8d381107b314bb346a99075fd549b6d03227045f1161b107310d2b2593a"
+    },
+    {
+      "path": "/air.json",
+      "url": "https://aistatusdashboard.com/air.json",
+      "expected_content_type": "application/json; charset=utf-8",
+      "bytes": 1111,
+      "sha256": "ec739af4c090486682f9b26f2e989af9ad891f930bec9043bfb7517e520d2cf5"
+    },
+    {
+      "path": "/.well-known/air.json",
+      "url": "https://aistatusdashboard.com/.well-known/air.json",
+      "expected_content_type": "application/json; charset=utf-8",
+      "bytes": 1111,
+      "sha256": "ec739af4c090486682f9b26f2e989af9ad891f930bec9043bfb7517e520d2cf5"
+    },
+    {
+      "path": "/.well-known/ai-plugin.json",
+      "url": "https://aistatusdashboard.com/.well-known/ai-plugin.json",
+      "expected_content_type": "application/json; charset=utf-8",
+      "bytes": 686,
+      "sha256": "185552f06db11c82734aa847e3b5812c8292ad3a9322284d82eb327e12a35af9"
+    },
+    {
+      "path": "/.well-known/openapi.json",
+      "url": "https://aistatusdashboard.com/.well-known/openapi.json",
+      "expected_content_type": "application/json; charset=utf-8",
+      "bytes": 68394,
+      "sha256": "f9da1a4d04313edc771f1883c0690ed05fb851ca122317b631c57374cb8892ed"
     },
     {
       "path": "/datasets/incidents.ndjson",
       "url": "https://aistatusdashboard.com/datasets/incidents.ndjson",
       "expected_content_type": "application/x-ndjson; charset=utf-8",
-      "bytes": 11015,
-      "sha256": "121ec3703785def5a49eaac47b370016b3f7c2946763037ebd3ec64bf511b512"
+      "bytes": 10948,
+      "sha256": "affce4524649e88258ade43a399ab206dd1aa1feaacc4f0a0dca3ef50885a56d"
     },
     {
       "path": "/datasets/metrics.csv",
       "url": "https://aistatusdashboard.com/datasets/metrics.csv",
       "expected_content_type": "text/csv; charset=utf-8",
       "bytes": 347,
-      "sha256": "d53ca881bbe90bfa74faa9b9dee0b5385540a15c86a145b0c7440a98c8dd6d45"
+      "sha256": "ee60a7875d1a82e7fb0c2dfa38b7e774ff10c299412939f3f3059345ef4abc51"
     },
     {
       "path": "/docs.md",

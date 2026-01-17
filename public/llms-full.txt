@@ -10,6 +10,8 @@ AI Status Dashboard is an AI reliability control plane: status, incidents, metri
 - OpenAPI (YAML): https://aistatusdashboard.com/openapi.yaml
 - Plugin manifest: https://aistatusdashboard.com/.well-known/ai-plugin.json
 - Well-known OpenAPI: https://aistatusdashboard.com/.well-known/openapi.json
+- Air.json: https://aistatusdashboard.com/air.json
+- Air.json (well-known): https://aistatusdashboard.com/.well-known/air.json
 - RSS/Atom: https://aistatusdashboard.com/rss.xml
 - Sitemap: https://aistatusdashboard.com/sitemap.xml
 - Discovery audit JSON: https://aistatusdashboard.com/discovery/audit/latest.json

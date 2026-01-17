@@ -113,6 +113,11 @@ jobs:
             fi
           done
 
+      - name: Agentability readiness validation
+        run: |
+          set -e
+          BASE_URL="https://aistatusdashboard.com" scripts/validate-agentability-readiness.sh
+
       - name: Post-deploy discovery policy check
         run: |
           set -e

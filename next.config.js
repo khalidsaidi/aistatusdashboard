@@ -79,6 +79,38 @@ const nextConfig = {
         ],
       },
       {
+        source: '/.well-known/openapi.json',
+        headers: [
+          { key: 'Content-Type', value: 'application/json; charset=utf-8' },
+          { key: 'Cache-Control', value: 'public, max-age=600, s-maxage=1200' },
+          ...commonHeaders,
+        ],
+      },
+      {
+        source: '/.well-known/ai-plugin.json',
+        headers: [
+          { key: 'Content-Type', value: 'application/json; charset=utf-8' },
+          { key: 'Cache-Control', value: 'public, max-age=600, s-maxage=1200' },
+          ...commonHeaders,
+        ],
+      },
+      {
+        source: '/air.json',
+        headers: [
+          { key: 'Content-Type', value: 'application/json; charset=utf-8' },
+          { key: 'Cache-Control', value: 'public, max-age=300, s-maxage=600' },
+          ...commonHeaders,
+        ],
+      },
+      {
+        source: '/.well-known/air.json',
+        headers: [
+          { key: 'Content-Type', value: 'application/json; charset=utf-8' },
+          { key: 'Cache-Control', value: 'public, max-age=300, s-maxage=600' },
+          ...commonHeaders,
+        ],
+      },
+      {
         source: '/openapi-3.0.yaml',
         headers: [
           { key: 'Content-Type', value: 'application/yaml; charset=utf-8' },

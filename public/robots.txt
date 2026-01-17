@@ -25,6 +25,7 @@ Allow: /openapi.yaml
 Allow: /openapi-3.0.json
 Allow: /openapi-3.0.yaml
 Allow: /.well-known/
+Allow: /air.json
 Allow: /rss.xml
 Allow: /sitemap.xml
 Allow: /discovery/audit

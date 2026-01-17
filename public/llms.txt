@@ -6,6 +6,10 @@ OpenAPI: https://aistatusdashboard.com/openapi.json
 Plugin manifest: https://aistatusdashboard.com/.well-known/ai-plugin.json
 OpenAPI (well-known): https://aistatusdashboard.com/.well-known/openapi.json
 
+Trust / Verification:
+- https://aistatusdashboard.com/air.json
+- https://aistatusdashboard.com/.well-known/air.json
+
 Datasets:
 - https://aistatusdashboard.com/datasets (index)
 - https://aistatusdashboard.com/datasets/incidents.ndjson
