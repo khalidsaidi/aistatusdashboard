@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { providerService } from '@/lib/services/providers';
 import ClientTimestamp from './ClientTimestamp';
 import modelsCatalog from '@/lib/data/models.json';
+import { getProbeDefaultsMap } from '@/lib/utils/probe-defaults';
 import type {
   CanaryCopilotResponse,
   ModelMatrixResponse,
@@ -76,6 +77,8 @@ export default function InsightsLab() {
   const catalog = useMemo(() => getCatalog(providerId), [providerId]);
   const initialCatalog = getCatalog('openai');
   const initialModel = initialCatalog.models[0];
+  const probeDefaultsRef = useRef<Record<string, ReturnType<typeof getProbeDefaultsMap>[string]>>({});
+  const appliedDefaultsRef = useRef<Record<string, boolean>>({});
   const [model, setModel] = useState(initialModel?.id || 'core');
   const [endpoint, setEndpoint] = useState(initialCatalog.endpoints[0] || 'api');
   const [region, setRegion] = useState(initialCatalog.regions[0] || 'global');
@@ -110,8 +113,23 @@ export default function InsightsLab() {
   const [radarUrl, setRadarUrl] = useState('');
   const [radarStatus, setRadarStatus] = useState('');
 
+  const applyProbeDefaults = (nextProviderId: string) => {
+    const defaults = probeDefaultsRef.current[nextProviderId];
+    if (defaults) {
+      setModel(defaults.model || 'core');
+      setEndpoint(defaults.endpoint || 'api');
+      setRegion(defaults.region || 'global');
+      setTier(defaults.tier || 'unknown');
+      setStreaming(Boolean(defaults.streaming));
+      appliedDefaultsRef.current[nextProviderId] = true;
+      return true;
+    }
+    return false;
+  };
+
   const handleProviderChange = (nextProviderId: string) => {
     setProviderId(nextProviderId);
+    if (applyProbeDefaults(nextProviderId)) return;
     const nextCatalog = getCatalog(nextProviderId);
     const nextModel = nextCatalog.models[0];
     setModel(nextModel?.id || 'core');
@@ -120,6 +138,13 @@ export default function InsightsLab() {
     setTier(nextModel?.tier || nextCatalog.tiers?.[0] || 'unknown');
     setStreaming(Boolean(nextModel?.streaming));
   };
+
+  useEffect(() => {
+    probeDefaultsRef.current = getProbeDefaultsMap();
+    if (!appliedDefaultsRef.current[providerId]) {
+      applyProbeDefaults(providerId);
+    }
+  }, [providerId]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
