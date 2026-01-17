@@ -47,6 +47,8 @@ const AWS_REGION_BY_PROBE_REGION: Record<string, string> = {
   'eu-west': 'eu-west-1',
 };
 
+const BEDROCK_ON_DEMAND_PROBE_REGIONS = new Set(['us-east']);
+
 function classifyProbeError(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error || 'unknown');
   const lower = message.toLowerCase();
@@ -571,6 +573,13 @@ export async function runRealProviderProbes(options?: { regionOverride?: string 
           break;
         case 'bedrock':
           try {
+            if (regionOverride && !BEDROCK_ON_DEMAND_PROBE_REGIONS.has(regionOverride)) {
+              skipped.push({
+                providerId: entry.providerId,
+                reason: `Bedrock on-demand not supported in ${regionOverride}`,
+              });
+              continue;
+            }
             const awsRegionOverride = resolveBedrockRegionOverride(regionOverride);
             result = await probeBedrock(entry, awsRegionOverride);
           } catch (error) {
