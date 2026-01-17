@@ -194,6 +194,9 @@ function extractBedrockText(data: any): string | undefined {
   if (Array.isArray(data?.content)) {
     return data.content.map((item: any) => item?.text).filter(Boolean).join(' ');
   }
+  if (Array.isArray(data?.output?.message?.content)) {
+    return data.output.message.content.map((item: any) => item?.text).filter(Boolean).join(' ');
+  }
   if (Array.isArray(data?.results)) {
     return data.results.map((item: any) => item?.outputText).filter(Boolean).join(' ');
   }
@@ -444,6 +447,14 @@ async function probeBedrock(configEntry: ProbeProviderConfig, regionOverride?: s
       anthropic_version: 'bedrock-2023-05-31',
       max_tokens: 16,
       messages: [{ role: 'user', content: [{ type: 'text', text: SEMANTIC_PROMPT }] }],
+    };
+  } else if (model.includes('nova')) {
+    payload = {
+      messages: [{ role: 'user', content: [{ text: SEMANTIC_PROMPT }] }],
+      inferenceConfig: {
+        maxTokens: 16,
+        temperature: 0,
+      },
     };
   } else if (model.includes('titan')) {
     payload = {
