@@ -277,8 +277,10 @@ export default function InsightsLab() {
   }, [matrix]);
 
   const selectedEndpointTiles = tilesByEndpoint[endpoint] || [];
-  const regionOrder = regions;
-  const modelOrder = models.map((item) => item.id);
+  const observedRegions = Array.from(new Set(selectedEndpointTiles.map((tile) => tile.region)));
+  const observedModels = Array.from(new Set(selectedEndpointTiles.map((tile) => tile.model)));
+  const regionOrder = observedRegions.length ? observedRegions : regions;
+  const modelOrder = observedModels.length ? observedModels : models.map((item) => item.id);
 
   const handleTileClick = async (tile: any) => {
     const response = await fetch('/api/insights/fallback', {
