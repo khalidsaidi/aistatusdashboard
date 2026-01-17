@@ -52,3 +52,6 @@ next-env.d.ts
 .firebase/
 *-debug.log
 serviceAccountKey.json.env.production.local
+
+# local reports
+/agentability_audit_*/
