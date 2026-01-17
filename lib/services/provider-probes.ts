@@ -10,6 +10,7 @@ type ProbeProviderConfig = {
   envKey?: string;
   model: string;
   modelEnvKey?: string;
+  modelAlias?: string;
   baseUrl?: string;
   baseUrlEnvKey?: string;
   deploymentEnvKey?: string;
@@ -47,7 +48,7 @@ const AWS_REGION_BY_PROBE_REGION: Record<string, string> = {
   'eu-west': 'eu-west-1',
 };
 
-const BEDROCK_ON_DEMAND_PROBE_REGIONS = new Set(['us-east']);
+const BEDROCK_INFERENCE_PROFILE_MODELS = ['nova'];
 
 function classifyProbeError(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error || 'unknown');
@@ -93,6 +94,10 @@ function resolveModel(configEntry: ProbeProviderConfig): string {
   return configEntry.model;
 }
 
+function resolveEventModel(configEntry: ProbeProviderConfig): string {
+  return configEntry.modelAlias || resolveModel(configEntry);
+}
+
 function resolveBaseUrl(configEntry: ProbeProviderConfig): string | undefined {
   if (configEntry.baseUrlEnvKey && process.env[configEntry.baseUrlEnvKey]) {
     return process.env[configEntry.baseUrlEnvKey] as string;
@@ -112,10 +117,14 @@ function resolveBedrockRegionOverride(regionOverride?: string): string | undefin
   return AWS_REGION_BY_PROBE_REGION[regionOverride] || regionOverride;
 }
 
+function requiresInferenceProfile(modelId: string): boolean {
+  return BEDROCK_INFERENCE_PROFILE_MODELS.some((token) => modelId.includes(token));
+}
+
 function buildEvent(configEntry: ProbeProviderConfig, latencyMs: number): SyntheticProbeEvent {
   return {
     providerId: configEntry.providerId,
-    model: resolveModel(configEntry),
+    model: resolveEventModel(configEntry),
     endpoint: configEntry.endpoint,
     region: configEntry.region,
     tier: configEntry.tier,
@@ -573,10 +582,11 @@ export async function runRealProviderProbes(options?: { regionOverride?: string 
           break;
         case 'bedrock':
           try {
-            if (regionOverride && !BEDROCK_ON_DEMAND_PROBE_REGIONS.has(regionOverride)) {
+            const resolvedModel = resolveModel(entry);
+            if (regionOverride && requiresInferenceProfile(resolvedModel) && regionOverride !== 'us-east') {
               skipped.push({
                 providerId: entry.providerId,
-                reason: `Bedrock on-demand not supported in ${regionOverride}`,
+                reason: `Bedrock requires inference profile in ${regionOverride}`,
               });
               continue;
             }

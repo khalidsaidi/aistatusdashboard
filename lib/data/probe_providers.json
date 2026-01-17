@@ -113,8 +113,9 @@
     {
       "providerId": "aws",
       "type": "bedrock",
-      "model": "amazon.titan-text-express-v1",
+      "model": "mistral.mistral-7b-instruct-v0:2",
       "modelEnvKey": "AWS_BEDROCK_MODEL_ID",
+      "modelAlias": "mistral-7b",
       "regionEnvKey": "AWS_BEDROCK_REGION",
       "endpoint": "invoke",
       "region": "us-east-1",

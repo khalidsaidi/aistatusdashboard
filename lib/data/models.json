@@ -137,6 +137,11 @@
     ],
     "models": [
       {
+        "id": "mistral-7b",
+        "tier": "enterprise",
+        "streaming": true
+      },
+      {
         "id": "claude-3-sonnet",
         "tier": "enterprise",
         "streaming": true
