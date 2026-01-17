@@ -422,8 +422,8 @@ async function probeAzureOpenAI(configEntry: ProbeProviderConfig, apiKey: string
   return { event };
 }
 
-async function probeBedrock(configEntry: ProbeProviderConfig) {
-  const region = resolveRegion(configEntry);
+async function probeBedrock(configEntry: ProbeProviderConfig, regionOverride?: string) {
+  const region = regionOverride || resolveRegion(configEntry);
   const model = resolveModel(configEntry);
   const client = new BedrockRuntimeClient({ region });
 
@@ -474,11 +474,12 @@ async function probeBedrock(configEntry: ProbeProviderConfig) {
   return { event };
 }
 
-export async function runRealProviderProbes(): Promise<ProbeRunSummary> {
+export async function runRealProviderProbes(options?: { regionOverride?: string }): Promise<ProbeRunSummary> {
   const configs = (probeProviders as { providers: ProbeProviderConfig[] }).providers || [];
   const events: SyntheticProbeEvent[] = [];
   const skipped: Array<{ providerId: string; reason: string }> = [];
   const failures: Array<{ providerId: string; error: string }> = [];
+  const regionOverride = options?.regionOverride;
 
   for (const entry of configs) {
     const rawKey = entry.envKey ? process.env[entry.envKey] : undefined;
@@ -548,7 +549,7 @@ export async function runRealProviderProbes(): Promise<ProbeRunSummary> {
           break;
         case 'bedrock':
           try {
-            result = await probeBedrock(entry);
+            result = await probeBedrock(entry, regionOverride);
           } catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             if (/credential|accessdenied|unrecognizedclient/i.test(message)) {
@@ -564,12 +565,18 @@ export async function runRealProviderProbes(): Promise<ProbeRunSummary> {
       }
 
       if (result?.event) {
+        if (regionOverride) {
+          result.event.region = regionOverride;
+        }
         events.push(result.event);
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error';
       failures.push({ providerId: entry.providerId, error: message });
       const event = buildEvent(entry, config.monitoring.defaultTimeout || DEFAULT_TIMEOUT_MS);
+      if (regionOverride) {
+        event.region = regionOverride;
+      }
       event.errorCode = classifyProbeError(error);
       events.push(event);
     }

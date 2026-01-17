@@ -4,6 +4,7 @@ import { statusService } from '@/lib/services/status';
 import { insightsService } from '@/lib/services/insights';
 import { runRealProviderProbes } from '@/lib/services/provider-probes';
 import { log } from '@/lib/utils/logger';
+import { normalizeProbeRegion } from '@/lib/utils/probe-region';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,6 +40,9 @@ export async function GET(request: NextRequest) {
   if (authResponse) return authResponse;
 
   try {
+    const regionOverride = normalizeProbeRegion(
+      request.headers.get('x-probe-region') || request.nextUrl.searchParams.get('region')
+    );
     const providers = providerService.getProviders();
     const results = await Promise.allSettled(providers.map((provider) => statusService.checkProvider(provider)));
 
@@ -50,7 +54,7 @@ export async function GET(request: NextRequest) {
         providerId: data.id,
         model: 'status',
         endpoint: 'status',
-        region: 'global',
+        region: regionOverride || 'global',
         tier: 'unknown',
         streaming: false,
         latencyMs: data.responseTime,
@@ -66,7 +70,7 @@ export async function GET(request: NextRequest) {
 
     if (process.env.PROBE_REAL_ENABLED === 'true') {
       try {
-        const summary = await runRealProviderProbes();
+        const summary = await runRealProviderProbes({ regionOverride: regionOverride || undefined });
         let ingestedReal = 0;
         for (const event of summary.events) {
           await insightsService.ingestSynthetic(event);
@@ -78,7 +82,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, ingested, real: realSummary });
+    return NextResponse.json({ success: true, region: regionOverride || 'global', ingested, real: realSummary });
   } catch (error) {
     log('error', 'Synthetic probe cron failed', { error });
     return NextResponse.json({ error: 'Internal Error' }, { status: 500 });

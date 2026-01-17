@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { insightsService } from '@/lib/services/insights';
 import { runRealProviderProbes } from '@/lib/services/provider-probes';
 import { log } from '@/lib/utils/logger';
+import { normalizeProbeRegion } from '@/lib/utils/probe-region';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,7 +45,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const summary = await runRealProviderProbes();
+    const regionOverride = normalizeProbeRegion(
+      request.headers.get('x-probe-region') || request.nextUrl.searchParams.get('region')
+    );
+    const summary = await runRealProviderProbes({ regionOverride: regionOverride || undefined });
     let ingested = 0;
     for (const event of summary.events) {
       await insightsService.ingestSynthetic(event);
@@ -53,6 +57,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      region: regionOverride || 'global',
       ingested,
       skipped: summary.skipped,
       failures: summary.failures,
