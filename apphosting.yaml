@@ -73,6 +73,8 @@ env:
     secret: "SYNTHETIC_INGEST_SECRET"
   - variable: TELEMETRY_PUBLIC_KEY
     secret: "TELEMETRY_PUBLIC_KEY"
+  - variable: NEXT_PUBLIC_TELEMETRY_PUBLIC_KEY
+    secret: "TELEMETRY_PUBLIC_KEY"
   - variable: TELEMETRY_SALT
     secret: "TELEMETRY_SALT"
   - variable: AWS_INGEST_SECRET

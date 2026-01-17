@@ -37,12 +37,13 @@
   function sendTelemetry(payload) {
     const url = '/api/telemetry/ingest';
     const headers = { 'Content-Type': 'application/json' };
-    if (state.config.telemetryKey) {
+    const hasKey = Boolean(state.config.telemetryKey);
+    if (hasKey) {
       headers['x-telemetry-key'] = state.config.telemetryKey;
     }
 
     const body = JSON.stringify(payload);
-    if (navigator.sendBeacon) {
+    if (!hasKey && navigator.sendBeacon) {
       try {
         const blob = new Blob([body], { type: 'application/json' });
         navigator.sendBeacon(url, blob);

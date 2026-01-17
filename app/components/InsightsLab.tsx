@@ -72,7 +72,7 @@ export default function InsightsLab() {
 
   const [activePane, setActivePane] = useState<PaneId>('canary');
   const [providerId, setProviderId] = useState('openai');
-  const [accountId, setAccountId] = useState('');
+  const [accountId, setAccountId] = useState(() => readLocalValue('ai-status-account-id', ''));
 
   const catalog = useMemo(() => getCatalog(providerId), [providerId]);
   const initialCatalog = getCatalog('openai');
@@ -151,6 +151,15 @@ export default function InsightsLab() {
     window.localStorage.setItem('ai-status-budget-limit', budgetLimit);
     window.localStorage.setItem('ai-status-budget-threshold', budgetThreshold);
   }, [budgetLimit, budgetThreshold]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (accountId) {
+      window.localStorage.setItem('ai-status-account-id', accountId);
+    } else {
+      window.localStorage.removeItem('ai-status-account-id');
+    }
+  }, [accountId]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

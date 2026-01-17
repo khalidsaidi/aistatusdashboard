@@ -14,6 +14,7 @@ import ProviderTimeline from './ProviderTimeline';
 import ProviderCompare from './ProviderCompare';
 import ProviderDetailPanel from './ProviderDetailPanel';
 import GuidedTour from './GuidedTour';
+import TelemetryBeacon from './TelemetryBeacon';
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -857,6 +858,7 @@ export default function DashboardTabs({ statuses = [] }: DashboardTabsProps) {
 
   return (
     <ErrorBoundary>
+      <TelemetryBeacon statuses={statuses} />
       <GuidedTour activeTab={activeTab} setTab={setTab} />
       <div className="max-w-6xl mx-auto space-y-8">
         {activeTab === 'dashboard' && majorIncidents.length > 0 && (

@@ -258,6 +258,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </noscript>
 
+        <Script src="/sdk/ai-status-sdk.js" strategy="afterInteractive" />
+
         {/* Service Worker Registration */}
         <Script id="sw-registration" strategy="afterInteractive">
           {`
