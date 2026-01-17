@@ -47,9 +47,15 @@ export default function Navbar() {
                 Dashboard
               </Link>
               <Link
-                href="/casual/chatgpt"
+                href="/casual"
                 className="px-3 py-2 rounded-full hover:text-slate-900 dark:hover:text-white transition"
                 data-tour="nav-casual"
+              >
+                Casual Mode
+              </Link>
+              <Link
+                href="/casual/chatgpt"
+                className="px-3 py-2 rounded-full hover:text-slate-900 dark:hover:text-white transition"
               >
                 ChatGPT Status
               </Link>
@@ -149,6 +155,7 @@ export default function Navbar() {
             <nav className="px-4 py-6 space-y-3 text-slate-700 dark:text-slate-200">
               {[
                 { href: '/', label: 'Dashboard' },
+                { href: '/casual', label: 'Casual Mode' },
                 { href: '/casual/chatgpt', label: 'ChatGPT Status' },
                 { href: '/?tab=notifications', label: 'Notifications' },
                 { href: '/?tab=analytics', label: 'Analytics' },
