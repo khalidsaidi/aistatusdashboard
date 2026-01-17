@@ -49,6 +49,7 @@ export default function Navbar() {
               <Link
                 href="/casual/chatgpt"
                 className="px-3 py-2 rounded-full hover:text-slate-900 dark:hover:text-white transition"
+                data-tour="nav-casual"
               >
                 ChatGPT Status
               </Link>

@@ -54,6 +54,13 @@ const ALL_STEPS: StepDefinition[] = [
     { group: 'nav' }
   ),
   buildStep(
+    '[data-tour="nav-casual"]',
+    'Casual Mode',
+    'Plain-English status for popular apps like ChatGPT, Claude, and Gemini.',
+    { group: 'nav' },
+    { side: 'bottom', align: 'center' }
+  ),
+  buildStep(
     '[data-tour="theme-toggle"]',
     'Theme',
     'Toggle light and dark mode to match your working environment.',
@@ -85,6 +92,12 @@ const ALL_STEPS: StepDefinition[] = [
     '[data-tour="dashboard-summary"]',
     'Live system summary',
     'The top-level health signal across all providers, refreshed every 60 seconds.',
+    { group: 'dashboard', tab: 'dashboard' }
+  ),
+  buildStep(
+    '[data-tour="dashboard-engage"]',
+    'Stay ahead of incidents',
+    'Start alerts or webhooks from the live status summary.',
     { group: 'dashboard', tab: 'dashboard' }
   ),
   buildStep(
@@ -128,6 +141,12 @@ const ALL_STEPS: StepDefinition[] = [
     '[data-tour="notifications-panel"]',
     'Notifications hub',
     'Email, webhooks, incidents, and maintenance in one place.',
+    { group: 'notifications', tab: 'notifications', notifyTab: 'email' }
+  ),
+  buildStep(
+    '[data-tour="notifications-tabs"]',
+    'Notification channels',
+    'Switch between email, webhooks, incidents, and maintenance updates.',
     { group: 'notifications', tab: 'notifications', notifyTab: 'email' }
   ),
   buildStep(
