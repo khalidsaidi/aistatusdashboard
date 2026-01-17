@@ -20,6 +20,12 @@ AI Status Dashboard is an AI reliability control plane: status, incidents, metri
 - Incidents NDJSON: https://aistatusdashboard.com/datasets/incidents.ndjson
 - Metrics CSV: https://aistatusdashboard.com/datasets/metrics.csv
 
+## Casual mode
+- ChatGPT: https://aistatusdashboard.com/casual/chatgpt
+- Claude: https://aistatusdashboard.com/casual/claude
+- Gemini: https://aistatusdashboard.com/casual/gemini
+- JSON: https://aistatusdashboard.com/api/public/v1/casual/status?app=chatgpt
+
 ## Docs (Markdown mirrors)
 - Main docs: https://aistatusdashboard.com/docs.md
 - API: https://aistatusdashboard.com/docs/api.md

@@ -10,10 +10,18 @@ AI Status Dashboard is a reliability control plane for AI providers. Use these d
 - https://aistatusdashboard.com/datasets
 - https://aistatusdashboard.com/status
 - https://aistatusdashboard.com/providers
+- https://aistatusdashboard.com/casual/chatgpt
+- https://aistatusdashboard.com/casual
 
 ## OpenAPI
 - https://aistatusdashboard.com/openapi.json
 - https://aistatusdashboard.com/openapi.yaml
+
+## Casual Mode
+- https://aistatusdashboard.com/casual/chatgpt
+- https://aistatusdashboard.com/casual/claude
+- https://aistatusdashboard.com/casual/gemini
+- https://aistatusdashboard.com/api/public/v1/casual/status?app=chatgpt
 
 ## MCP
 - https://aistatusdashboard.com/mcp

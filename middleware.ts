@@ -214,7 +214,7 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|rss.xml|llms.txt|llms-full.txt|openapi.json|openapi-3.0.json|openapi.yaml|openapi-3.0.yaml|docs.md|status.md|providers.md|discovery/|datasets/|.*\\.md$|.*\\.csv$|.*\\.ndjson$|.*\\.yaml$|.*\\.xml$|.*\\.txt$).*)',
     '/api/private/:path*',
   ],
 };

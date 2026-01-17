@@ -103,6 +103,10 @@ async function buildSitemap(incidents, providers) {
   addUrl(`${SITE_URL}/reports/monthly-provider-scorecards`, '0.6', 'monthly');
   addUrl(`${SITE_URL}/docs/discoverability-audit`, '0.5', 'weekly');
   addUrl(`${SITE_URL}/discovery/audit`, '0.6', 'daily');
+  addUrl(`${SITE_URL}/casual`, '0.7', 'daily');
+  addUrl(`${SITE_URL}/casual/chatgpt`, '0.8', 'daily');
+  addUrl(`${SITE_URL}/casual/claude`, '0.8', 'daily');
+  addUrl(`${SITE_URL}/casual/gemini`, '0.8', 'daily');
 
   providers.forEach((provider) => {
     addUrl(`${SITE_URL}/provider/${provider.id}`, '0.7', 'hourly');
@@ -134,8 +138,8 @@ function buildRss(incidents) {
 
 function buildDocs() {
   return {
-    'docs.md': `# AIStatusDashboard Docs\n\nAI Status Dashboard is a reliability control plane for AI providers. Use these docs to integrate the REST API, MCP tools, datasets, and citation endpoints.\n\n## Quick links\n- ${SITE_URL}/ai\n- ${SITE_URL}/docs/api\n- ${SITE_URL}/docs/agent/mcp-quickstart\n- ${SITE_URL}/docs/agent/mcp-tools\n- ${SITE_URL}/datasets\n- ${SITE_URL}/status\n- ${SITE_URL}/providers\n\n## OpenAPI\n- ${SITE_URL}/openapi.json\n- ${SITE_URL}/openapi.yaml\n\n## MCP\n- ${SITE_URL}/mcp\n- Registry: https://registry.modelcontextprotocol.io/v0.1/servers/io.github.aistatusdashboard%2Faistatusdashboard/versions/latest\n\n## Citing\n- ${SITE_URL}/docs/citations.md\n- ${SITE_URL}/incidents/{id}/cite\n`,
-    'docs/api.md': `# API Docs\n\nBase URL: ${SITE_URL}\n\n## Key endpoints\n- GET /api/public/v1/status/summary\n- GET /api/public/v1/incidents\n- GET /api/public/v1/providers\n- GET /metrics/{series_id}.json\n\nOpenAPI:\n- ${SITE_URL}/openapi.json\n- ${SITE_URL}/openapi.yaml\n\n## Example\n\n\`\`\`bash\ncurl ${SITE_URL}/api/public/v1/status/summary\n\`\`\`\n`,
+    'docs.md': `# AIStatusDashboard Docs\n\nAI Status Dashboard is a reliability control plane for AI providers. Use these docs to integrate the REST API, MCP tools, datasets, and citation endpoints.\n\n## Quick links\n- ${SITE_URL}/ai\n- ${SITE_URL}/docs/api\n- ${SITE_URL}/docs/agent/mcp-quickstart\n- ${SITE_URL}/docs/agent/mcp-tools\n- ${SITE_URL}/datasets\n- ${SITE_URL}/status\n- ${SITE_URL}/providers\n- ${SITE_URL}/casual/chatgpt\n- ${SITE_URL}/casual\n\n## OpenAPI\n- ${SITE_URL}/openapi.json\n- ${SITE_URL}/openapi.yaml\n\n## Casual Mode\n- ${SITE_URL}/casual/chatgpt\n- ${SITE_URL}/casual/claude\n- ${SITE_URL}/casual/gemini\n- ${SITE_URL}/api/public/v1/casual/status?app=chatgpt\n\n## MCP\n- ${SITE_URL}/mcp\n- Registry: https://registry.modelcontextprotocol.io/v0.1/servers/io.github.aistatusdashboard%2Faistatusdashboard/versions/latest\n\n## Citing\n- ${SITE_URL}/docs/citations.md\n- ${SITE_URL}/incidents/{id}/cite\n`,
+    'docs/api.md': `# API Docs\n\nBase URL: ${SITE_URL}\n\n## Key endpoints\n- GET /api/public/v1/status/summary\n- GET /api/public/v1/incidents\n- GET /api/public/v1/providers\n- GET /api/public/v1/casual/status?app=chatgpt\n- POST /api/public/v1/casual/reports\n- GET /metrics/{series_id}.json\n\nOpenAPI:\n- ${SITE_URL}/openapi.json\n- ${SITE_URL}/openapi.yaml\n\n## Example\n\n\`\`\`bash\ncurl ${SITE_URL}/api/public/v1/status/summary\n\`\`\`\n`,
     'docs/citations.md': `# Citing AI Status Dashboard\n\nUse these references when citing incidents, metrics, or datasets.\n\n- Homepage: ${SITE_URL}/\n- AI landing: ${SITE_URL}/ai\n- OpenAPI: ${SITE_URL}/openapi.json\n- MCP: ${SITE_URL}/mcp\n- Datasets: ${SITE_URL}/datasets\n- Incident citation endpoint: ${SITE_URL}/incidents/{id}/cite\n\n## How to cite incidents\n1. Use the /incidents/{id}/cite endpoint for a JSON evidence bundle.\n2. Include the permalink and generated_at timestamp.\n3. Include source_urls (official status pages) from the cite payload.\n\n## How to cite datasets\n- Incidents NDJSON: ${SITE_URL}/datasets/incidents.ndjson\n- Metrics CSV: ${SITE_URL}/datasets/metrics.csv\n\nInclude temporal coverage and the retrieval date in your citation.\n`,
     'status.md': `# Status\n\nThis page mirrors public status data and links to the JSON endpoints.\n\n- Summary: ${SITE_URL}/api/public/v1/status/summary\n- Incidents: ${SITE_URL}/api/public/v1/incidents\n- RSS: ${SITE_URL}/rss.xml\n`,
     'docs/agent/mcp-quickstart.md': `# MCP Quickstart\n\nEndpoint: ${SITE_URL}/mcp\nRegistry: https://registry.modelcontextprotocol.io/v0.1/servers/io.github.aistatusdashboard%2Faistatusdashboard/versions/latest\nOpenAPI: ${SITE_URL}/openapi.json\n\n## Example call\n\n\`\`\`json\n{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"method\": \"tools/call\",\n  \"params\": {\n    \"name\": \"status.get_summary\",\n    \"arguments\": { \"provider\": \"openai\", \"window_seconds\": 1800 }\n  }\n}\n\`\`\`\n`,
@@ -163,6 +167,12 @@ Docs (Markdown):
 - ${SITE_URL}/status.md
 - ${SITE_URL}/providers.md
 - ${SITE_URL}/docs/citations.md
+
+Casual mode:
+- ${SITE_URL}/casual/chatgpt
+- ${SITE_URL}/casual/claude
+- ${SITE_URL}/casual/gemini
+- ${SITE_URL}/api/public/v1/casual/status?app=chatgpt
 
 Citing: ${SITE_URL}/docs/citations.md
 RSS: ${SITE_URL}/rss.xml
@@ -196,6 +206,12 @@ AI Status Dashboard is an AI reliability control plane: status, incidents, metri
 - Index: ${SITE_URL}/datasets
 - Incidents NDJSON: ${SITE_URL}/datasets/incidents.ndjson
 - Metrics CSV: ${SITE_URL}/datasets/metrics.csv
+
+## Casual mode
+- ChatGPT: ${SITE_URL}/casual/chatgpt
+- Claude: ${SITE_URL}/casual/claude
+- Gemini: ${SITE_URL}/casual/gemini
+- JSON: ${SITE_URL}/api/public/v1/casual/status?app=chatgpt
 
 ## Docs (Markdown mirrors)
 - Main docs: ${SITE_URL}/docs.md

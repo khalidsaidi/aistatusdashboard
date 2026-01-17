@@ -70,6 +70,12 @@ export default function AiLandingPage() {
               <a href="/reports/monthly-provider-scorecards" className="cta-secondary text-xs">
                 Monthly provider scorecards
               </a>
+              <a href="/casual/chatgpt" className="cta-secondary text-xs">
+                Casual Mode (ChatGPT)
+              </a>
+              <a href="/casual" className="cta-secondary text-xs">
+                Casual Mode hub
+              </a>
               <a href="/docs/discoverability-audit" className="cta-secondary text-xs">
                 Discoverability audit
               </a>

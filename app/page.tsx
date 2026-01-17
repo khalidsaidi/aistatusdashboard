@@ -133,6 +133,18 @@ export default async function DashboardPage() {
         <div className="max-w-6xl mx-auto mb-6">
           <McpCallout />
         </div>
+        <div className="max-w-6xl mx-auto mb-6 surface-card border border-slate-200/70 dark:border-slate-700/70 p-4 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Casual Mode</p>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Plain-English status for everyday users. Start with ChatGPT or browse all casual pages.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Link href="/casual/chatgpt" className="cta-primary text-xs">ChatGPT Status</Link>
+            <Link href="/casual" className="cta-secondary text-xs">View all</Link>
+          </div>
+        </div>
         {error && (
           <div className="max-w-6xl mx-auto mb-6 surface-card border border-amber-200/70 dark:border-amber-700/70 p-4">
             <p className="text-amber-800 dark:text-amber-200 text-sm">

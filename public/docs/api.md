@@ -6,6 +6,8 @@ Base URL: https://aistatusdashboard.com
 - GET /api/public/v1/status/summary
 - GET /api/public/v1/incidents
 - GET /api/public/v1/providers
+- GET /api/public/v1/casual/status?app=chatgpt
+- POST /api/public/v1/casual/reports
 - GET /metrics/{series_id}.json
 
 OpenAPI:

@@ -1,0 +1,36 @@
+{
+  "surfaces": {
+    "text": {
+      "label": "Text",
+      "endpoints": ["chat", "messages", "responses", "completions", "invoke"]
+    },
+    "images": {
+      "label": "Images",
+      "endpoints": ["images", "image", "vision", "generation"]
+    },
+    "voice": {
+      "label": "Voice",
+      "endpoints": ["audio", "speech", "voice"]
+    },
+    "browse": {
+      "label": "Browse",
+      "endpoints": ["browse", "web", "search"]
+    },
+    "tools": {
+      "label": "Tools",
+      "endpoints": ["tools", "function", "assistants", "connectors", "agents"]
+    },
+    "login": {
+      "label": "Login",
+      "endpoints": ["auth", "login", "session"]
+    },
+    "billing": {
+      "label": "Billing",
+      "endpoints": ["billing", "subscription", "payment", "quota"]
+    },
+    "rate_limits": {
+      "label": "Rate limits",
+      "endpoints": ["rate", "throttle", "limit"]
+    }
+  }
+}

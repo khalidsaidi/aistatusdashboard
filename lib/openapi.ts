@@ -127,6 +127,50 @@ export function buildOpenApiSpec(version: '3.0.0' | '3.1.0') {
           },
         },
       },
+      CasualStatus: {
+        type: 'object',
+        properties: {
+          app_id: { type: 'string' },
+          app_name: { type: 'string' },
+          provider_id: { type: 'string', enum: enums.providers },
+          overall_status: { type: 'string' },
+          headline: { type: 'string' },
+          symptoms: { type: 'array', items: { type: 'string' } },
+          actions: { type: 'array', items: { type: 'string' } },
+          confidence: { type: 'number' },
+          updated_at: { type: 'string', format: 'date-time' },
+          surfaces: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                label: { type: 'string' },
+                status: { type: 'string' },
+                headline: { type: 'string' },
+                symptoms: { type: 'array', items: { type: 'string' } },
+                actions: { type: 'array', items: { type: 'string' } },
+                confidence: { type: 'number' },
+                updated_at: { type: 'string', format: 'date-time' },
+                evidence: { type: 'array', items: { type: 'object' } },
+              },
+            },
+          },
+          is_it_just_me: {
+            type: 'object',
+            properties: {
+              window_minutes: { type: 'number' },
+              reports: { type: 'number' },
+              likely_global: { type: 'boolean' },
+              baseline_per_10m: { type: 'number' },
+              top_regions: { type: 'array', items: { type: 'object' } },
+              note: { type: 'string' },
+            },
+          },
+          history: { type: 'object' },
+          evidence: { type: 'array', items: { type: 'object' } },
+        },
+      },
       HealthMatrix: {
         type: 'object',
         properties: {
@@ -364,6 +408,66 @@ export function buildOpenApiSpec(version: '3.0.0' | '3.1.0') {
                     },
                   ],
                 },
+              },
+            },
+          },
+        },
+      },
+    },
+    '/casual/status': {
+      get: {
+        operationId: 'getCasualStatus',
+        summary: 'Get casual-mode status summary for a consumer app.',
+        parameters: [
+          { name: 'app', in: 'query', required: true, schema: { type: 'string' } },
+          { name: 'window_minutes', in: 'query', required: false, schema: { type: 'number' } },
+        ],
+        responses: {
+          200: {
+            description: 'Casual status payload',
+            content: {
+              'application/json': {
+                schema: {
+                  allOf: [
+                    { $ref: '#/components/schemas/ResponseEnvelope' },
+                    { properties: { data: { $ref: '#/components/schemas/CasualStatus' } } },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    '/casual/reports': {
+      post: {
+        operationId: 'postCasualReport',
+        summary: 'Submit an anonymous casual-mode user report.',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['app', 'surface', 'issue'],
+                properties: {
+                  app: { type: 'string' },
+                  surface: { type: 'string' },
+                  issue: { type: 'boolean' },
+                  issueType: { type: 'string' },
+                  region: { type: 'string' },
+                  clientType: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: 'Report accepted',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/ResponseEnvelope' },
               },
             },
           },

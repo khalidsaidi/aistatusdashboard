@@ -1,0 +1,52 @@
+{
+  "cards": [
+    {
+      "id": "switch-modality",
+      "title": "Switch modality",
+      "surfaces": ["images", "voice"],
+      "signals": ["errors", "image_fail", "streaming"],
+      "steps": [
+        "Use text chat while images/voice recover",
+        "Retry your original request later",
+        "Keep prompts shorter for now"
+      ],
+      "caution": "Avoid repeated retries if errors persist."
+    },
+    {
+      "id": "lighter-model",
+      "title": "Try a lighter model",
+      "surfaces": ["text"],
+      "signals": ["latency", "rate_limit", "errors"],
+      "steps": [
+        "Switch to a smaller or faster model",
+        "Reduce output length",
+        "Retry after a short wait"
+      ],
+      "caution": "Don't spam retries; back off if errors continue."
+    },
+    {
+      "id": "login-checks",
+      "title": "Quick login checks",
+      "surfaces": ["login"],
+      "signals": ["auth"],
+      "steps": [
+        "Try incognito or another browser",
+        "Clear site data if stuck",
+        "Wait a few minutes and retry"
+      ],
+      "caution": "Avoid repeated password resets while the issue persists."
+    },
+    {
+      "id": "rate-limit-backoff",
+      "title": "Back off retries",
+      "surfaces": ["rate_limits"],
+      "signals": ["rate_limit"],
+      "steps": [
+        "Wait 10-30 minutes",
+        "Reduce request size",
+        "Retry with slower cadence"
+      ],
+      "caution": "Aggressive retries can make throttling worse."
+    }
+  ]
+}

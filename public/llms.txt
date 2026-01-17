@@ -19,6 +19,12 @@ Docs (Markdown):
 - https://aistatusdashboard.com/providers.md
 - https://aistatusdashboard.com/docs/citations.md
 
+Casual mode:
+- https://aistatusdashboard.com/casual/chatgpt
+- https://aistatusdashboard.com/casual/claude
+- https://aistatusdashboard.com/casual/gemini
+- https://aistatusdashboard.com/api/public/v1/casual/status?app=chatgpt
+
 Citing: https://aistatusdashboard.com/docs/citations.md
 RSS: https://aistatusdashboard.com/rss.xml
 Sitemap: https://aistatusdashboard.com/sitemap.xml

@@ -34,6 +34,8 @@ export default function ApiDocsPage() {
               <li>GET /status/health-matrix</li>
               <li>GET /incidents</li>
               <li>GET /metrics</li>
+              <li>GET /casual/status?app=chatgpt</li>
+              <li>POST /casual/reports</li>
               <li>POST /recommendations/fallback_plan</li>
               <li>POST /policy/generate</li>
             </ul>
