@@ -131,6 +131,17 @@ export default function Footer() {
           <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
             Status checks are performed using official APIs and public status pages
           </p>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+            Validated by{' '}
+            <a
+              href="https://agentability.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-900 dark:text-white underline hover:text-slate-700 dark:hover:text-slate-200 transition-colors inline-flex items-center min-h-[44px] py-1 px-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-400"
+            >
+              Agentability.org
+            </a>
+          </p>
         </div>
       </div>
     </footer>
